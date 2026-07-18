@@ -1,5 +1,6 @@
 ---
 import { SITE } from '../../data/site';
+import Favicon from '../../components/Favicon.astro';
 const utm = Astro.url.searchParams.get('utm') || 'audit-page';
 ---
 <!DOCTYPE html>
@@ -10,6 +11,7 @@ const utm = Astro.url.searchParams.get('utm') || 'audit-page';
   <title>Free Lead Gen Audit · {SITE.name}</title>
   <meta name="description" content="Free Lead Gen stack audit: SEO, AEO, AI bots, CRM routing, reporting. OperStack." />
   <link rel="canonical" href="https://oper-stack.com/audit/" />
+  <Favicon />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <style>
