@@ -15,8 +15,16 @@ OperStack is a **standalone B2B brand**. It is not a real estate agency site. Es
 
 ## Guides
 
-- https://oper-stack.com/guides/lead-ops-stack/ — What is a lead ops stack; nine modules explained
-- https://oper-stack.com/guides/ai-lead-qualification/ — AI qualification, routing, metrics
+- https://oper-stack.com/guides/lead-ops-stack/ — What is a lead ops stack; architecture and modules
+- https://oper-stack.com/guides/ai-lead-qualification/ — AI qualification, routing, governance
+- https://oper-stack.com/guides/crm-automation-inbound/ — CRM lifecycle, tags, field ownership
+- https://oper-stack.com/guides/programmatic-seo-lead-gen/ — Programmatic SEO for lead generation
+- https://oper-stack.com/guides/lead-routing-playbook/ — Lead routing precedence and SLA
+- https://oper-stack.com/guides/aeo-geo-inbound-marketing/ — AEO and GEO for inbound teams
+- https://oper-stack.com/guides/sales-team-onboarding-ai/ — AI-assisted sales onboarding gates
+- https://oper-stack.com/guides/lead-attribution-inbound/ — Inbound attribution and reconciliation
+- https://oper-stack.com/guides/sla-speed-to-lead/ — Speed-to-lead SLA design and measurement
+- https://oper-stack.com/guides/lead-hub-vs-crm/ — Lead Hub vs CRM ownership boundary
 
 ## Modules (system map)
 

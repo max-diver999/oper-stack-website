@@ -9,7 +9,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "healthcheck": "node scripts/post-deploy-smoke.mjs --http-only"
+    "healthcheck": "node scripts/post-deploy-smoke.mjs --http-only",
+    "audit:drafts": "node scripts/audit-guide-drafts.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.1",

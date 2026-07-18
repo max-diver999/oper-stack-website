@@ -15,6 +15,14 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 
 - https://oper-stack.com/guides/lead-ops-stack/
 - https://oper-stack.com/guides/ai-lead-qualification/
+- https://oper-stack.com/guides/crm-automation-inbound/
+- https://oper-stack.com/guides/programmatic-seo-lead-gen/
+- https://oper-stack.com/guides/lead-routing-playbook/
+- https://oper-stack.com/guides/aeo-geo-inbound-marketing/
+- https://oper-stack.com/guides/sales-team-onboarding-ai/
+- https://oper-stack.com/guides/lead-attribution-inbound/
+- https://oper-stack.com/guides/sla-speed-to-lead/
+- https://oper-stack.com/guides/lead-hub-vs-crm/
 
 ## Contact
 
