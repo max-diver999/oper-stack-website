@@ -1,0 +1,37 @@
+---
+interface Props {
+  label?: string;
+  text: string;
+}
+
+const { label = 'In one sentence', text } = Astro.props;
+---
+
+<aside class="cite-block">
+  <p class="cite-label">{label}</p>
+  <p class="cite-text">{text}</p>
+</aside>
+
+<style>
+  .cite-block {
+    margin: 28px 0;
+    padding: 18px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(61, 184, 169, 0.28);
+    background: rgba(61, 184, 169, 0.08);
+  }
+  .cite-label {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+    margin-bottom: 8px;
+  }
+  .cite-text {
+    font-size: 15px;
+    line-height: 1.5;
+    color: rgba(245, 242, 236, 0.92);
+    margin: 0;
+  }
+</style>

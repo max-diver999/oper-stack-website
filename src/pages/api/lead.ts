@@ -94,7 +94,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
 
     const lines = [
-      isHealthcheck ? '🧪 <b>Healthcheck lead</b>' : `🏡 <b>New lead | ${escapeHtml(SITE.name)}</b>`,
+      isHealthcheck ? '🧪 <b>Healthcheck lead</b>' : `📥 <b>New lead | ${escapeHtml(SITE.name)}</b>`,
       nameText ? `👤 ${escapeHtml(nameText)}` : null,
       resolvedPhone ? `📱 ${escapeHtml(resolvedPhone)}` : null,
       messageText ? `💬 ${escapeHtml(messageText)}` : null,

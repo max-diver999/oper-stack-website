@@ -1,0 +1,154 @@
+---
+import { getCollection, render } from 'astro:content';
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import { SITE } from '../../data/site';
+
+export async function getStaticPaths() {
+  const guides = await getCollection('guides');
+  return guides.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const { title, description, pubDate, updatedDate, author, faq = [] } = entry.data;
+
+const canonical = `${SITE.url}/guides/${entry.id}/`;
+const isoDate = (updatedDate || pubDate).toISOString();
+const displayDate = (updatedDate || pubDate).toLocaleDateString('en-US', {
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+});
+
+const articleSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: title,
+  description,
+  datePublished: pubDate.toISOString(),
+  dateModified: isoDate,
+  author: {
+    '@type': 'Person',
+    name: author,
+  },
+  publisher: {
+    '@type': 'Organization',
+    name: SITE.name,
+    url: SITE.url,
+  },
+  mainEntityOfPage: canonical,
+};
+
+const faqSchema =
+  faq.length > 0
+    ? {
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: faq.map((item) => ({
+          '@type': 'Question',
+          name: item.question,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: item.answer,
+          },
+        })),
+      }
+    : null;
+
+const jsonLd = faqSchema ? [articleSchema, faqSchema] : articleSchema;
+
+const allGuides = await getCollection('guides');
+const related = allGuides
+  .filter((g) => g.id !== entry.id)
+  .slice(0, 2);
+
+const citeMatch = entry.body?.match(/## In one sentence\s+\n+\*\*(.+?)\*\*/);
+const citeText = citeMatch?.[1] || description;
+---
+
+<CommercialLayout title={`${title} · ${SITE.name}`} description={description} canonical={canonical} jsonLd={jsonLd}>
+  <article class="wrap prose">
+    <p class="meta">
+      <time datetime={isoDate}>{displayDate}</time> · {author}
+    </p>
+    <h1>{title}</h1>
+    <p class="lede">{description}</p>
+
+    <CitabilityBlock text={citeText} />
+
+    <Content />
+
+    {related.length > 0 && (
+      <section class="related">
+        <h2>Related guides</h2>
+        <ul>
+          {related.map((g) => (
+            <li>
+              <a href={`/guides/${g.id}/`}>{g.data.title}</a>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )}
+
+    <section class="cta-box">
+      <h2>Map your stack</h2>
+      <p>Free audit: where leads leak between site, chat, and CRM.</p>
+      <p style="margin-top:14px">
+        <a class="btn" href={`/audit/?utm=guide-${entry.id}`}>Request audit →</a>
+        <a class="btn btn-ghost" href="/pricing/" style="margin-left:12px">Pricing</a>
+      </p>
+    </section>
+
+    {faq.length > 0 && <FaqSection items={faq} />}
+  </article>
+</CommercialLayout>
+
+<style>
+  .meta {
+    font-family: var(--fm);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .related {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .related h2 {
+    font-family: var(--fd);
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .related ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .related li { margin-bottom: 8px; }
+  .cta-box {
+    margin: 40px 0;
+    padding: 24px;
+    border-radius: 14px;
+    border: 1px solid rgba(61, 184, 169, 0.25);
+    background: rgba(61, 184, 169, 0.06);
+  }
+  .cta-box h2 {
+    font-family: var(--fd);
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+  .cta-box p {
+    color: var(--muted);
+    font-size: 15px;
+    margin: 0;
+  }
+</style>

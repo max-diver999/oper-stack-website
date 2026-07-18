@@ -1,0 +1,61 @@
+# OperStack (full)
+
+> The operating stack for inbound leads.
+
+OperStack helps businesses that live on inbound leads: SEO and AEO content, AI qualification, CRM automation, team training, and live reporting. One Lead Hub connects every module.
+
+OperStack is a **standalone B2B brand**. It is not a real estate agency site. EstateOS is an optional vertical module for property businesses.
+
+## Primary pages
+
+- https://oper-stack.com/ — interactive system map (9 modules + Lead Hub)
+- https://oper-stack.com/pricing/ — audit (free), setup, retainer
+- https://oper-stack.com/audit/ — free Lead Gen stack audit form
+- https://oper-stack.com/guides/ — lead operations guides index
+
+## Guides
+
+- https://oper-stack.com/guides/lead-ops-stack/ — What is a lead ops stack; nine modules explained
+- https://oper-stack.com/guides/ai-lead-qualification/ — AI qualification, routing, metrics
+
+## Modules (system map)
+
+1. SEO + AEO Site — organic acquisition
+2. AI Lead Qualification — 24/7 response and scoring
+3. CRM Automation — pipeline ops and webhooks
+4. Call Analytics — QA and script gaps
+5. Reporting Engine — dashboards and source ROI
+6. Content Engine — editorial factory
+7. Social Distribution — RSS syndication
+8. News + Shorts — signal layer for freshness
+9. Team Training — onboarding and CRM certification gates
+10. Lead Hub (center) — routing, attribution, SLA, audit log
+
+## Pricing summary
+
+| Plan | Price | Best for |
+| --- | --- | --- |
+| Audit | Free | Stack review and action list |
+| Setup | Custom quote | Lead Hub + 3 to 5 modules launch |
+| Retainer | Custom quote | Ongoing ops, content, enablement |
+
+## Definitions (citability)
+
+**Lead ops stack:** Connected systems that capture, qualify, route, and report on inbound leads through one Lead Hub.
+
+**Lead Hub:** Routing and analytics control point above channel tools and CRM; owns stages, tags, SLAs, and source attribution.
+
+**AI lead qualification:** Scripted conversational AI that scores inbound chats and routes qualified leads into CRM with context.
+
+## Contact
+
+- Email: info@oper-stack.com
+- Website: https://oper-stack.com
+
+## Topics
+
+Lead operations, inbound automation, programmatic SEO for B2B, AI lead qualification, CRM routing, sales team onboarding, marketing ops dashboards, AEO, GEO citability.
+
+## Founder
+
+Maksim Shchegolev

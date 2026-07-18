@@ -1,0 +1,74 @@
+---
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { getCollection } from 'astro:content';
+import { SITE } from '../../data/site';
+
+const guides = (await getCollection('guides')).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+
+const canonical = `${SITE.url}/guides/`;
+---
+
+<CommercialLayout
+  title={`Guides · ${SITE.name}`}
+  description="OperStack guides on lead operations, AI qualification, CRM routing, and inbound automation for B2B teams."
+  canonical={canonical}
+>
+  <div class="wrap">
+    <h1>Guides</h1>
+    <p class="lede">
+      Practical playbooks for inbound lead operations. Written for teams that run on SEO, chat, and CRM, not slide decks.
+    </p>
+
+    <ul class="guide-list">
+      {guides.map((guide) => (
+        <li>
+          <a href={`/guides/${guide.id}/`}>
+            <span class="title">{guide.data.title}</span>
+            <span class="desc">{guide.data.description}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+
+    <p style="margin-top:32px">
+      <a class="btn" href="/audit/?utm=guides-index">Free stack audit →</a>
+      <a class="btn btn-ghost" href="/pricing/" style="margin-left:12px">Pricing</a>
+    </p>
+  </div>
+</CommercialLayout>
+
+<style>
+  .guide-list {
+    list-style: none;
+    display: grid;
+    gap: 12px;
+    margin-top: 24px;
+  }
+  .guide-list a {
+    display: block;
+    padding: 18px 20px;
+    border-radius: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    text-decoration: none;
+  }
+  .guide-list a:hover {
+    border-color: rgba(61, 184, 169, 0.35);
+    background: rgba(61, 184, 169, 0.06);
+  }
+  .title {
+    display: block;
+    font-family: var(--fd);
+    font-size: 18px;
+    color: var(--paper);
+    margin-bottom: 6px;
+  }
+  .desc {
+    display: block;
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.45;
+  }
+</style>

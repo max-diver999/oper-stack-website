@@ -216,6 +216,35 @@ import Favicon from '../components/Favicon.astro';
     box-shadow: 0 0 8px var(--teal-glow);
   }
 
+  .site-links {
+    position: fixed;
+    z-index: 6;
+    right: 44px;
+    bottom: 28px;
+    display: flex;
+    gap: 16px;
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    pointer-events: auto;
+  }
+
+  .site-links a {
+    color: rgba(235, 238, 242, 0.75);
+    text-decoration: none;
+    text-shadow: var(--label-halo);
+  }
+
+  .site-links a:hover { color: var(--teal-soft); }
+
+  body.is-mobile .site-links {
+    right: 18px;
+    bottom: 14px;
+    gap: 12px;
+    font-size: 8px;
+  }
+
   #core {
     position: absolute;
     width: 108px;
@@ -781,6 +810,19 @@ import Favicon from '../components/Favicon.astro';
     box-shadow: 0 14px 36px -8px var(--teal-glow);
   }
 
+  .p-cta-alt {
+    display: inline-block;
+    margin-top: 12px;
+    font-family: var(--fm);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+  }
+
+  .p-cta-alt:hover { color: var(--teal-soft); }
+
   body.panel-open .hud,
   body.panel-open .hint,
   body.panel-open .legend { opacity: 0; }
@@ -1025,6 +1067,12 @@ import Favicon from '../components/Favicon.astro';
 
 <p class="hint"><span class="d"></span> Hover for sources · click any node</p>
 
+<nav class="site-links" aria-label="Site pages">
+  <a href="/pricing/">Pricing</a>
+  <a href="/guides/">Guides</a>
+  <a href="/audit/">Audit</a>
+</nav>
+
 <nav class="mob-list" id="mob-list" aria-label="Module list">
   <div class="mob-list-head">
     <span class="mob-list-title">System map</span>
@@ -1063,6 +1111,7 @@ import Favicon from '../components/Favicon.astro';
   <p class="p-foot" id="p-foot"></p>
   <div class="p-cta">
     <a href="#" id="p-cta-link"><span id="p-cta-text">Book a system audit</span> →</a>
+    <a class="p-cta-alt" href="/pricing/">View pricing</a>
   </div>
 </aside>
 

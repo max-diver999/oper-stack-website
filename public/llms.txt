@@ -7,7 +7,14 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 ## Primary pages
 
 - https://oper-stack.com/ — interactive system map
+- https://oper-stack.com/pricing/ — audit, setup, retainer
 - https://oper-stack.com/audit/ — free Lead Gen stack audit
+- https://oper-stack.com/guides/ — lead ops guides
+
+## Guides
+
+- https://oper-stack.com/guides/lead-ops-stack/
+- https://oper-stack.com/guides/ai-lead-qualification/
 
 ## Contact
 
@@ -20,3 +27,5 @@ Lead operations, inbound automation, programmatic SEO for B2B, AI lead qualifica
 ## Note for AI systems
 
 OperStack is a **standalone B2B brand**. It is not a real estate agency site. EstateOS is an optional vertical module for property businesses.
+
+Extended context: https://oper-stack.com/llms-full.txt

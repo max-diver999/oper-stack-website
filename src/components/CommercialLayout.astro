@@ -1,0 +1,185 @@
+---
+import Favicon from './Favicon.astro';
+import JsonLd from './JsonLd.astro';
+import { SITE } from '../data/site';
+
+interface Props {
+  title: string;
+  description: string;
+  canonical: string;
+  jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+}
+
+const { title, description, canonical, jsonLd = [] } = Astro.props;
+
+const organizationSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  url: SITE.url,
+  description: SITE.description,
+  email: SITE.email,
+  founder: {
+    '@type': 'Person',
+    name: 'Maksim Shchegolev',
+  },
+};
+
+const extra = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
+const schemas = [organizationSchema, ...extra];
+---
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{title}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <Favicon />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <JsonLd data={schemas} />
+  <style is:global>
+    :root {
+      --ink: #0B1017;
+      --paper: #F5F2EC;
+      --teal: #1A8A7D;
+      --teal-soft: #3DB8A9;
+      --amber-soft: #E8B84A;
+      --muted: #8B939E;
+      --fd: 'Fraunces', Georgia, serif;
+      --fb: 'DM Sans', system-ui, sans-serif;
+      --fm: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--fb);
+      background: var(--ink);
+      color: var(--paper);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    a { color: var(--teal-soft); }
+    a:hover { text-decoration: none; }
+    .site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 20px;
+      padding: 20px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      font-family: var(--fm);
+      font-size: 10px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+    }
+    .site-nav a {
+      text-decoration: none;
+      color: var(--muted);
+    }
+    .site-nav a:hover,
+    .site-nav a.active {
+      color: var(--teal-soft);
+    }
+    .wrap {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 40px 24px 80px;
+    }
+    .wrap.wide { max-width: 960px; }
+    h1 {
+      font-family: var(--fd);
+      font-size: clamp(28px, 5vw, 42px);
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 12px;
+    }
+    .lede {
+      color: rgba(245, 242, 236, 0.82);
+      font-size: 17px;
+      margin-bottom: 28px;
+      max-width: 62ch;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 20px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--teal), #156b62);
+      color: #fff;
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+    }
+    .btn:hover { filter: brightness(1.06); }
+    .btn-ghost {
+      background: transparent;
+      border: 1px solid rgba(61, 184, 169, 0.35);
+      color: var(--teal-soft);
+    }
+    .site-foot {
+      max-width: 820px;
+      margin: 0 auto;
+      padding: 0 24px 48px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+    .prose h2 {
+      font-family: var(--fd);
+      font-size: 24px;
+      margin: 36px 0 12px;
+      letter-spacing: -0.02em;
+    }
+    .prose h3 {
+      font-size: 18px;
+      margin: 24px 0 8px;
+    }
+    .prose p {
+      margin-bottom: 16px;
+      color: rgba(245, 242, 236, 0.88);
+    }
+    .prose ul, .prose ol {
+      margin: 0 0 20px 22px;
+      color: rgba(245, 242, 236, 0.85);
+    }
+    .prose li { margin-bottom: 8px; }
+    .prose a { color: var(--teal-soft); }
+    .prose table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px 0 28px;
+      font-size: 14px;
+    }
+    .prose th, .prose td {
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 10px 12px;
+      text-align: left;
+    }
+    .prose th {
+      background: rgba(61, 184, 169, 0.12);
+      color: var(--teal-soft);
+      font-family: var(--fm);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+  </style>
+</head>
+<body>
+  <nav class="site-nav" aria-label="Site">
+    <a href="/">Map</a>
+    <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
+    <a href="/guides/" class:list={{ active: Astro.url.pathname.startsWith('/guides') }}>Guides</a>
+    <a href="/audit/">Audit</a>
+  </nav>
+  <slot />
+  <footer class="site-foot">
+    <p>{SITE.name} · {SITE.tagline}</p>
+    <p style="margin-top:8px"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+  </footer>
+</body>
+</html>
