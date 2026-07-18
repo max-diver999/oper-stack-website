@@ -380,7 +380,7 @@
     letter-spacing: -0.01em;
     text-align: center;
     line-height: 1.18;
-    color: #F3F0EA;
+    color: #fff;
     max-width: 128px;
     text-shadow: var(--label-halo);
     -webkit-font-smoothing: antialiased;
@@ -397,9 +397,8 @@
     max-width: 128px;
     line-height: 1.25;
     text-shadow: var(--label-halo);
-    opacity: 0;
-    transform: translateY(3px);
-    transition: opacity 0.22s ease, transform 0.22s ease;
+    opacity: 1;
+    transform: translateY(0);
     pointer-events: none;
   }
 
@@ -407,13 +406,6 @@
   .node:hover .name,
   .node.active .name {
     color: #fff;
-  }
-
-  .node.near .role,
-  .node:hover .role,
-  .node.active .role {
-    opacity: 1;
-    transform: translateY(0);
   }
 
   .node.dim { opacity: 0.2; }
@@ -973,7 +965,6 @@
     opacity: 0 !important;
   }
 
-  body.is-mobile .node.mob-focus .role,
   body.is-mobile .db.mob-focus .dn {
     opacity: 1;
     transform: translateY(0);
