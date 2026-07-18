@@ -1,0 +1,41 @@
+{
+  "$schema": "SEO site kit v3.1 — copy to project root as site.config.json",
+  "siteUrl": "https://YOURDOMAIN.com",
+  "siteHost": "YOURDOMAIN.com",
+  "market": "en",
+  "locale": "en",
+  "brandName": "Your Brand",
+  "indexNow": {
+    "key": "REPLACE_WITH_openssl_rand_hex_16",
+    "enBingEndpoint": "https://www.bing.com/indexnow",
+    "ruHubEndpoint": "https://api.indexnow.org"
+  },
+  "googleIndexingKeyPath": "scripts/google-indexing-key.json",
+  "yandex": {
+    "enabled": false,
+    "userId": "",
+    "hostId": "https:YOURDOMAIN.ru:443",
+    "tokenEnv": "YANDEX_WEBMASTER_TOKEN"
+  },
+  "commercialTiers": [
+    { "href": "/tier-entry/", "label": "Entry tier", "key": "entry" },
+    { "href": "/tier-mid/", "label": "Mid tier", "key": "mid" },
+    { "href": "/tier-premium/", "label": "Premium tier", "key": "premium" },
+    { "href": "/tier-relocation/", "label": "Relocation", "key": "relocation" }
+  ],
+  "commercialLadderTitle": "Browse by budget",
+  "contentCollections": {
+    "guides": { "dir": "guides", "urlPrefix": "/guides/", "minWords": 2000, "faqMin": 5 },
+    "news": { "dir": "news", "urlPrefix": "/news/", "minWords": 500, "faqMin": 0 },
+    "projects": { "dir": "projects", "urlPrefix": "/projects/", "minWords": 1200, "faqMin": 3 }
+  },
+  "smoke": {
+    "collections": [
+      { "hubPath": "/guides/", "contentDir": "guides" }
+    ],
+    "contactPath": "/contact/",
+    "extraHttpChecks": [
+      { "name": "main commercial landing", "path": "/tier-mid/", "expect": 200 }
+    ]
+  }
+}

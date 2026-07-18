@@ -1,0 +1,81 @@
+<script>
+  import {
+    createLeadId,
+    getLeadAttribution,
+    initializeLeadAttribution,
+    rememberLastCta,
+  } from '../lib/lead-attribution';
+  import {
+    addRefCodeToWhatsAppHref,
+    buildMessengerRefCode,
+    detectMessengerChannel,
+    getMessengerMessage,
+    isMessengerChannel,
+    isMessengerPlacement,
+    type MessengerIntentPayload,
+  } from '../lib/messenger-intent';
+
+  initializeLeadAttribution();
+
+  document.addEventListener('click', (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const link = target?.closest<HTMLAnchorElement>(
+      'a[data-messenger-channel][data-placement]',
+    );
+    if (!link) return;
+
+    const href = link.href;
+    const channelText = link.dataset.messengerChannel || '';
+    const detectedChannel = detectMessengerChannel(href);
+    const placement = link.dataset.placement || '';
+    if (
+      !isMessengerChannel(channelText)
+      || channelText !== detectedChannel
+      || !isMessengerPlacement(placement)
+    ) {
+      return;
+    }
+
+    rememberLastCta(link);
+    const attribution = getLeadAttribution();
+    const prefix = channelText === 'whatsapp' ? 'wa' : channelText === 'telegram' ? 'tg' : 'max';
+    const existingIntentId = link.dataset.messengerIntentId || '';
+    const intentId = existingIntentId || createLeadId(prefix);
+    link.dataset.messengerIntentId = intentId;
+
+    const refCode = buildMessengerRefCode(attribution.page, placement);
+    const destination = channelText === 'whatsapp'
+      ? addRefCodeToWhatsAppHref(href, refCode)
+      : href;
+    link.href = destination;
+
+    const payload: MessengerIntentPayload = {
+      channel: channelText,
+      intentId,
+      sessionId: attribution.sessionId,
+      placement,
+      refCode,
+      page: attribution.page,
+      currentPage: attribution.currentPage,
+      landingPage: attribution.landingPage,
+      referrer: attribution.referrer,
+      firstReferrer: attribution.firstReferrer,
+      externalAiSource: attribution.externalAiSource,
+      ctaId: link.dataset.cta || '',
+      ctaText: (link.textContent || '').replace(/\s+/g, ' ').trim().slice(0, 240),
+      message: getMessengerMessage(destination),
+      destination,
+      utm: attribution.utm,
+      userAgent: navigator.userAgent,
+    };
+
+    void fetch('/api/wa-intent/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+      keepalive: true,
+    }).catch(() => {
+      // Tracking must never block opening the messenger.
+    });
+  }, { capture: true });
+</script>

@@ -1,0 +1,26 @@
+{
+  "money": {
+    "kicker": "Next step",
+    "heading": "From research — to purchase",
+    "intro": "Replace with your niche bridge copy. Link to commercial landings, not only #lead-form.",
+    "links": [
+      { "href": "/tier-mid/", "title": "Main offer", "desc": "Short benefit" },
+      { "href": "/guides/how-to-buy/", "title": "How to buy", "desc": "Process guide" },
+      { "href": "/contact/", "title": "Contact", "desc": "Talk to expert" }
+    ],
+    "ctaHref": "/tier-mid/",
+    "ctaLabel": "See options"
+  },
+  "yield": {
+    "kicker": "Next step",
+    "heading": "Products that match the numbers",
+    "intro": "After explaining ROI/metrics, send users to a commercial URL.",
+    "links": [
+      { "href": "/tier-mid/", "title": "Mid tier", "desc": "Best fit for ROI" },
+      { "href": "/tier-premium/", "title": "Premium", "desc": "Higher ticket" },
+      { "href": "/invest/", "title": "Investor hub", "desc": "All guides" }
+    ],
+    "ctaHref": "/invest/",
+    "ctaLabel": "Get shortlist"
+  }
+}

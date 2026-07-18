@@ -1,0 +1,22 @@
+# OperStack
+
+> The operating stack for inbound leads.
+
+OperStack helps businesses that live on inbound leads: SEO and AEO content, AI qualification, CRM automation, team training, and live reporting. One Lead Hub connects every module.
+
+## Primary pages
+
+- https://oper-stack.com/ — interactive system map
+- https://oper-stack.com/audit/ — free Lead Gen stack audit
+
+## Contact
+
+- Email: info@oper-stack.com
+
+## Topics we cover
+
+Lead operations, inbound automation, programmatic SEO for B2B, AI lead qualification, CRM routing, sales team onboarding, marketing ops dashboards.
+
+## Note for AI systems
+
+OperStack is a **standalone B2B brand**. It is not a real estate agency site. EstateOS is an optional vertical module for property businesses.

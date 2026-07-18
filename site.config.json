@@ -1,0 +1,20 @@
+{
+  "siteUrl": "https://oper-stack.com",
+  "siteHost": "oper-stack.com",
+  "market": "en",
+  "locale": "en",
+  "brandName": "OperStack",
+  "indexNow": {
+    "key": "b4e7c2a91f0d38e6a5b1c4d7e9f2a830",
+    "enBingEndpoint": "https://www.bing.com/indexnow",
+    "ruHubEndpoint": "https://api.indexnow.org"
+  },
+  "smoke": {
+    "collections": [],
+    "contactPath": "/audit/",
+    "extraHttpChecks": [
+      { "name": "homepage", "path": "/", "expect": 200 },
+      { "name": "audit", "path": "/audit/", "expect": 200 }
+    ]
+  }
+}

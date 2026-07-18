@@ -1,0 +1,1917 @@
+---
+// Full-page interactive system map (OperStack homepage)
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OperStack · The operating stack for inbound leads</title>
+<meta name="description" content="OperStack: the operating stack for inbound leads. SEO, AEO, AI qualification, CRM, team training, reporting. Interactive system map.">
+<link rel="canonical" href="https://oper-stack.com/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0B1017;
+    --ink-soft: #141C28;
+    --paper: #F5F2EC;
+    --teal: #1A8A7D;
+    --teal-soft: #3DB8A9;
+    --teal-glow: rgba(61, 184, 169, 0.55);
+    --amber: #C9922A;
+    --amber-soft: #E8B84A;
+    --amber-glow: rgba(232, 184, 74, 0.45);
+    --muted: #8B939E;
+    --fd: 'Fraunces', Georgia, serif;
+    --fb: 'DM Sans', system-ui, sans-serif;
+    --fm: 'JetBrains Mono', ui-monospace, monospace;
+    --label-halo:
+      0 0 1px rgba(0, 0, 0, 1),
+      0 1px 3px rgba(0, 0, 0, 0.95),
+      0 0 14px rgba(0, 0, 0, 0.85),
+      0 0 28px rgba(0, 0, 0, 0.55);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    height: 100%;
+    background: var(--ink);
+    overflow: hidden;
+    font-family: var(--fb);
+    color: var(--paper);
+  }
+
+  #flow {
+    position: fixed;
+    inset: 0;
+    display: block;
+    transition: filter 0.5s ease;
+  }
+
+  #layer {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 2;
+  }
+
+  .vignette {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 3;
+    background: radial-gradient(130% 95% at 50% 45%, transparent 38%, rgba(5, 8, 12, 0.72) 100%);
+  }
+
+  .hud {
+    position: fixed;
+    z-index: 6;
+    left: 0;
+    right: 0;
+    top: 0;
+    padding: 36px 44px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    pointer-events: none;
+    transition: opacity 0.4s;
+  }
+
+  .brand {
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+    margin-bottom: 14px;
+  }
+
+  .eyebrow {
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .eyebrow .pip {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--teal-soft);
+    box-shadow: 0 0 14px 1px var(--teal);
+    animation: pip 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pip {
+    0%, 100% { opacity: 0.35; transform: scale(0.85); }
+    50% { opacity: 1; transform: scale(1); }
+  }
+
+  h1 {
+    margin-top: 12px;
+    font-family: var(--fd);
+    font-weight: 600;
+    font-size: clamp(24px, 3.2vw, 46px);
+    line-height: 0.98;
+    letter-spacing: -0.03em;
+    max-width: 14ch;
+    text-shadow: var(--label-halo);
+  }
+
+  h1 em {
+    font-style: normal;
+    color: var(--amber-soft);
+  }
+
+  .meta {
+    text-align: right;
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    line-height: 2;
+  }
+
+  .meta b { color: var(--paper); font-weight: 500; }
+
+  .legend {
+    position: fixed;
+    z-index: 6;
+    left: 44px;
+    bottom: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(235, 238, 242, 0.88);
+    pointer-events: none;
+    text-shadow: var(--label-halo);
+  }
+
+  .legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .legend .dot-core {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #fff, var(--teal-soft) 45%, var(--teal) 100%);
+    box-shadow: 0 0 12px var(--teal-glow);
+  }
+
+  .legend .dot-mod {
+    width: 10px;
+    height: 10px;
+    border-radius: 4px;
+    background: linear-gradient(145deg, #1e2836, #0f141c);
+    border: 1px solid rgba(61, 184, 169, 0.45);
+  }
+
+  .legend .dot-db {
+    width: 10px;
+    height: 10px;
+    border-radius: 3px;
+    background: rgba(201, 146, 42, 0.25);
+    border: 1px solid rgba(232, 184, 74, 0.5);
+  }
+
+  .hint {
+    position: fixed;
+    z-index: 6;
+    left: 50%;
+    bottom: 28px;
+    transform: translateX(-50%);
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: rgba(235, 238, 242, 0.82);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: var(--label-halo);
+  }
+
+  .hint .d {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: var(--teal-soft);
+    box-shadow: 0 0 8px var(--teal-glow);
+  }
+
+  #core {
+    position: absolute;
+    width: 108px;
+    height: 108px;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  .ball {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s;
+    background: radial-gradient(circle at 32% 26%, #5a9e96 0%, #1a5c54 28%, #0a1512 62%, #030605 100%);
+    box-shadow:
+      inset -8px -10px 22px rgba(0, 0, 0, 0.85),
+      inset 6px 6px 16px rgba(180, 240, 230, 0.12),
+      0 22px 50px -12px rgba(0, 0, 0, 0.75),
+      0 0 40px -8px var(--teal-glow);
+  }
+
+  #core:hover .ball,
+  #core.sel .ball {
+    transform: scale(1.07);
+    box-shadow:
+      inset -8px -10px 22px rgba(0, 0, 0, 0.85),
+      inset 6px 6px 16px rgba(180, 240, 230, 0.18),
+      0 0 70px -4px var(--teal-glow),
+      0 22px 50px -12px rgba(0, 0, 0, 0.75);
+  }
+
+  .ball::after {
+    content: "";
+    position: absolute;
+    top: 12%;
+    left: 18%;
+    width: 38%;
+    height: 28%;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 250, 240, 0.55), transparent 72%);
+    filter: blur(2px);
+  }
+
+  .disc {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 48px;
+    height: 48px;
+    transform: translate(-50%, -50%);
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 34%, #fff, #e8f5f2);
+    box-shadow: inset 0 -3px 5px rgba(0, 0, 0, 0.18);
+    display: grid;
+    place-items: center;
+  }
+
+  .disc span {
+    font-family: var(--fd);
+    font-weight: 700;
+    font-size: 22px;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .core-cap {
+    position: absolute;
+    top: 118px;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+    text-shadow: var(--label-halo);
+  }
+
+  .node {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    will-change: transform;
+    pointer-events: auto;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+    width: 132px;
+    transition: opacity 0.45s ease;
+    z-index: 2;
+    --lift: 0;
+  }
+
+  .node.near,
+  .node.active {
+    z-index: 5;
+  }
+
+  .node:hover .avatar,
+  .node.active .avatar,
+  .node.near .avatar {
+    transform: translateY(calc(-4px - var(--lift, 0) * 6px)) scale(calc(1.04 + var(--lift, 0) * 0.06));
+    border-color: rgba(61, 184, 169, calc(0.45 + var(--lift, 0) * 0.35));
+    box-shadow: 0 18px 40px -12px rgba(61, 184, 169, calc(0.25 + var(--lift, 0) * 0.45));
+  }
+
+  .avatar {
+    position: relative;
+    width: 56px;
+    height: 56px;
+    border-radius: 16px;
+    background: linear-gradient(158deg, #1a2430, #0d1218);
+    border: 1px solid rgba(61, 184, 169, 0.28);
+    box-shadow: 0 12px 28px -10px rgba(0, 0, 0, 0.72), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    display: grid;
+    place-items: center;
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.4s, box-shadow 0.4s;
+  }
+
+  .avatar svg {
+    width: 26px;
+    height: 26px;
+    stroke: var(--teal-soft);
+    stroke-width: 1.6;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .avatar .status {
+    position: absolute;
+    top: -3px;
+    right: -3px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: var(--amber-soft);
+    border: 2px solid var(--ink);
+    box-shadow: 0 0 8px var(--amber-glow);
+  }
+
+  .avatar .status::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: 50%;
+    border: 1.5px solid var(--amber-soft);
+    animation: ring2 2.6s ease-out infinite;
+  }
+
+  @keyframes ring2 {
+    0% { transform: scale(0.6); opacity: 0.9; }
+    100% { transform: scale(2.2); opacity: 0; }
+  }
+
+  .node .name {
+    font-family: var(--fd);
+    font-weight: 600;
+    font-size: 13px;
+    letter-spacing: -0.01em;
+    text-align: center;
+    line-height: 1.18;
+    color: #F3F0EA;
+    max-width: 128px;
+    text-shadow: var(--label-halo);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .node .role {
+    font-family: var(--fm);
+    font-size: 8px;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
+    color: rgba(190, 200, 210, 0.95);
+    margin-top: -2px;
+    text-align: center;
+    max-width: 128px;
+    line-height: 1.25;
+    text-shadow: var(--label-halo);
+    opacity: 0;
+    transform: translateY(3px);
+    transition: opacity 0.22s ease, transform 0.22s ease;
+    pointer-events: none;
+  }
+
+  .node.near .name,
+  .node:hover .name,
+  .node.active .name {
+    color: #fff;
+  }
+
+  .node.near .role,
+  .node:hover .role,
+  .node.active .role {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .node.dim { opacity: 0.2; }
+
+  .node.custom .avatar {
+    border-style: dashed;
+    border-color: rgba(232, 184, 74, 0.45);
+    background: linear-gradient(158deg, rgba(30, 28, 22, 0.6), rgba(14, 16, 12, 0.7));
+  }
+
+  .node.custom .avatar svg {
+    stroke: var(--amber-soft);
+    animation: plusPulse 2.8s ease-in-out infinite;
+  }
+
+  .node.custom .name { color: var(--amber-soft); }
+  .node.custom .status { display: none; }
+
+  .node.train .avatar {
+    border-color: rgba(232, 184, 74, 0.42);
+    background: linear-gradient(158deg, #2a2418, #14120e);
+  }
+
+  .node.train .avatar svg { stroke: var(--amber-soft); }
+
+  .node.train.near .avatar,
+  .node.train:hover .avatar,
+  .node.train.active .avatar {
+    border-color: rgba(232, 184, 74, calc(0.55 + var(--lift, 0) * 0.35));
+    box-shadow: 0 18px 40px -12px rgba(232, 184, 74, calc(0.2 + var(--lift, 0) * 0.4));
+  }
+
+  .node.train .name { color: #F5E8C8; }
+
+  @keyframes plusPulse {
+    0%, 100% { opacity: 0.55; transform: scale(0.9); }
+    50% { opacity: 1; transform: scale(1.08); }
+  }
+
+  .db {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    will-change: transform, opacity;
+    pointer-events: auto;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    width: 72px;
+    transition: opacity 0.45s ease;
+    z-index: 1;
+    --lift: 0;
+  }
+
+  .db.near,
+  .db.sel {
+    z-index: 4;
+  }
+
+  .db:hover .cyl,
+  .db.sel .cyl,
+  .db.near .cyl {
+    transform: scale(calc(1.1 + var(--lift, 0) * 0.12));
+    border-color: rgba(232, 184, 74, calc(0.75 + var(--lift, 0) * 0.25));
+    box-shadow: 0 10px 22px -8px rgba(232, 184, 74, calc(0.35 + var(--lift, 0) * 0.35));
+  }
+
+  .db .cyl {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: rgba(201, 146, 42, 0.18);
+    border: 1px solid rgba(232, 184, 74, 0.38);
+    display: grid;
+    place-items: center;
+    box-shadow: 0 6px 16px -8px rgba(0, 0, 0, 0.6);
+    transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.2, 1), border-color 0.35s, box-shadow 0.35s;
+  }
+
+  .db .cyl svg {
+    width: 15px;
+    height: 15px;
+    stroke: var(--amber-soft);
+    stroke-width: 1.5;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .db .dn {
+    font-family: var(--fm);
+    font-size: 8px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: rgba(240, 232, 210, 0.96);
+    text-align: center;
+    line-height: 1.2;
+    max-width: 76px;
+    text-shadow: var(--label-halo);
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease;
+    pointer-events: none;
+  }
+
+  .db.near .dn,
+  .db:hover .dn,
+  .db.sel .dn,
+  .db.lit .dn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .db.dim { opacity: 0.1; }
+
+  .dim-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 7;
+    background: rgba(6, 9, 14, 0.48);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s, visibility 0.4s;
+    backdrop-filter: blur(2px);
+  }
+
+  .dim-overlay.show { opacity: 1; visibility: visible; }
+
+  .panel {
+    position: fixed;
+    z-index: 8;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: min(480px, 94vw);
+    background: linear-gradient(180deg, rgba(18, 26, 36, 0.98), rgba(10, 14, 20, 0.99));
+    border-left: 1px solid rgba(61, 184, 169, 0.22);
+    box-shadow: -30px 0 80px -30px rgba(0, 0, 0, 0.85);
+    transform: translateX(102%);
+    transition: transform 0.5s cubic-bezier(0.2, 0.85, 0.25, 1);
+    padding: 44px 38px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+  }
+
+  .panel.show { transform: translateX(0); }
+
+  .panel .close {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    font-size: 18px;
+    display: grid;
+    place-items: center;
+    transition: all 0.25s;
+  }
+
+  .panel .close:hover {
+    border-color: var(--teal-soft);
+    color: var(--paper);
+    transform: rotate(90deg);
+  }
+
+  .panel .p-head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 4px;
+  }
+
+  .panel .p-ava {
+    width: 58px;
+    height: 58px;
+    border-radius: 16px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(158deg, #1e2836, #101820);
+    border: 1px solid rgba(61, 184, 169, 0.32);
+  }
+
+  .panel .p-ava svg {
+    width: 28px;
+    height: 28px;
+    stroke: var(--teal-soft);
+    stroke-width: 1.6;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .panel .p-ava.core {
+    background: #0a1210;
+    border-color: rgba(255, 255, 255, 0.18);
+  }
+
+  .panel .p-ava.core .b8 {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 35%, #fff, #e8f5f2);
+    display: grid;
+    place-items: center;
+    font-family: var(--fd);
+    font-weight: 700;
+    color: var(--ink);
+    font-size: 18px;
+  }
+
+  .panel .p-title {
+    font-family: var(--fd);
+    font-weight: 600;
+    font-size: 24px;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .panel .p-role {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--amber-soft);
+    margin-top: 4px;
+  }
+
+  .panel .p-lede {
+    font-size: 15px;
+    line-height: 1.55;
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .proof-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-radius: 100px;
+    background: rgba(61, 184, 169, 0.1);
+    border: 1px solid rgba(61, 184, 169, 0.25);
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    color: var(--teal-soft);
+    width: fit-content;
+  }
+
+  .sect .lbl {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+    margin-bottom: 12px;
+  }
+
+  .sect .lbl::before {
+    content: "";
+    width: 18px;
+    height: 2px;
+    background: var(--teal-soft);
+  }
+
+  .sect.feeds .lbl::before { background: var(--amber-soft); }
+
+  .sect ul {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+
+  .sect li {
+    font-size: 14px;
+    line-height: 1.4;
+    color: rgba(255, 255, 255, 0.9);
+    padding-left: 20px;
+    position: relative;
+  }
+
+  .sect li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 8px;
+    width: 7px;
+    height: 7px;
+    border-radius: 2px;
+    background: var(--teal);
+    box-shadow: 0 0 8px var(--teal-glow);
+  }
+
+  .feeds .dbs { display: flex; flex-direction: column; gap: 8px; }
+
+  .feeds .chip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 13px;
+    border-radius: 11px;
+    background: rgba(201, 146, 42, 0.12);
+    border: 1px solid rgba(232, 184, 74, 0.28);
+    font-size: 13px;
+  }
+
+  .feeds .chip svg {
+    width: 16px;
+    height: 16px;
+    stroke: var(--amber-soft);
+    stroke-width: 1.5;
+    fill: none;
+    flex-shrink: 0;
+  }
+
+  .feeds .chip b { font-weight: 600; }
+  .feeds .chip span {
+    margin-left: auto;
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .p-foot {
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--muted);
+    padding-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .p-foot b { color: rgba(255, 255, 255, 0.85); }
+
+  .p-cta {
+    margin-top: auto;
+    padding-top: 16px;
+  }
+
+  .p-cta a {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 22px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--teal), #156b62);
+    color: #fff;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 14px;
+    box-shadow: 0 10px 32px -8px var(--teal-glow);
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+
+  .p-cta a:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 36px -8px var(--teal-glow);
+  }
+
+  body.panel-open .hud,
+  body.panel-open .hint,
+  body.panel-open .legend { opacity: 0; }
+
+  body.panel-open #flow { filter: blur(3px) brightness(0.72); }
+
+  /* ── Mobile: list + focus zone (variant C) ── */
+  .mob-list {
+    display: none;
+  }
+
+  body.is-mobile {
+    overflow: hidden;
+  }
+
+  body.is-mobile #flow,
+  body.is-mobile #layer,
+  body.is-mobile .vignette {
+    bottom: auto;
+    height: var(--map-h, 42vh);
+  }
+
+  body.is-mobile .hud {
+    padding: 14px 18px 6px;
+    pointer-events: none;
+  }
+
+  body.is-mobile h1 {
+    font-size: 21px;
+    max-width: 18ch;
+    margin-top: 8px;
+  }
+
+  body.is-mobile .brand { margin-bottom: 8px; font-size: 9px; }
+  body.is-mobile .meta,
+  body.is-mobile .legend,
+  body.is-mobile .hint { display: none; }
+
+  body.is-mobile .mob-list {
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    left: 0;
+    right: 0;
+    top: var(--map-h, 42vh);
+    bottom: 0;
+    z-index: 10;
+    background: linear-gradient(180deg, #121a24 0%, var(--ink) 12%);
+    border-top: 1px solid rgba(61, 184, 169, 0.18);
+    overflow: hidden;
+  }
+
+  body.is-mobile.panel-open .mob-list {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .mob-list-head {
+    padding: 14px 18px 8px;
+    flex-shrink: 0;
+  }
+
+  .mob-list-title {
+    display: block;
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+  }
+
+  .mob-list-sub {
+    display: block;
+    margin-top: 4px;
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .mob-scroll {
+    flex: 1;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding: 0 12px 18px;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .mob-item {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 12px;
+    margin-bottom: 6px;
+    border: 1px solid rgba(255, 255, 255, 0.07);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--paper);
+    text-align: left;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s;
+  }
+
+  .mob-item:hover,
+  .mob-item.active {
+    border-color: rgba(61, 184, 169, 0.35);
+    background: rgba(61, 184, 169, 0.08);
+  }
+
+  .mob-item.mob-hub.active {
+    border-color: rgba(61, 184, 169, 0.45);
+    background: rgba(61, 184, 169, 0.1);
+  }
+
+  .mob-ava {
+    width: 40px;
+    height: 40px;
+    border-radius: 11px;
+    flex-shrink: 0;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(158deg, #1a2430, #0d1218);
+    border: 1px solid rgba(61, 184, 169, 0.28);
+  }
+
+  .mob-ava svg {
+    width: 20px;
+    height: 20px;
+    stroke: var(--teal-soft);
+    stroke-width: 1.6;
+    fill: none;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  .mob-ava.hub {
+    background: radial-gradient(circle at 40% 34%, #fff, #e8f5f2);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+
+  .mob-ava.hub span {
+    font-family: var(--fd);
+    font-weight: 700;
+    font-size: 17px;
+    color: var(--ink);
+    line-height: 1;
+  }
+
+  .mob-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+
+  .mob-copy b {
+    font-family: var(--fd);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: -0.01em;
+    line-height: 1.15;
+  }
+
+  .mob-copy small {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+
+  .mob-divider {
+    padding: 10px 12px 6px;
+    font-family: var(--fm);
+    font-size: 8px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: rgba(139, 147, 158, 0.85);
+  }
+
+  body.is-mobile .mob-off {
+    visibility: hidden !important;
+    pointer-events: none !important;
+    opacity: 0 !important;
+  }
+
+  body.is-mobile .node.mob-focus .role,
+  body.is-mobile .db.mob-focus .dn {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  body.is-mobile .core-cap {
+    top: 108px;
+  }
+
+  body.is-mobile .panel {
+    width: 100%;
+    max-width: 100%;
+    border-left: none;
+    border-top: 1px solid rgba(61, 184, 169, 0.22);
+    transform: translateY(102%);
+    height: min(88vh, 100%);
+    top: auto;
+    bottom: 0;
+    border-radius: 16px 16px 0 0;
+  }
+
+  body.is-mobile .panel.show {
+    transform: translateY(0);
+  }
+
+  @media (max-width: 760px) {
+    .hud { padding: 24px 20px; flex-direction: column; gap: 16px; }
+    .meta { text-align: left; }
+  }
+</style>
+</head>
+<body>
+
+<canvas id="flow" aria-hidden="true"></canvas>
+<div id="layer"></div>
+<div class="vignette" aria-hidden="true"></div>
+
+<header class="hud">
+  <div>
+    <div class="brand">OperStack</div>
+    <div class="eyebrow"><span class="pip"></span> Lead Ops System</div>
+    <h1>While you sleep, <em>leads get routed</em></h1>
+  </div>
+  <div class="meta">
+    <div><b>9</b> modules</div>
+    <div><b>1</b> hub</div>
+    <div>Production-tested</div>
+  </div>
+</header>
+
+<div class="legend" aria-hidden="true">
+  <span><i class="dot-core"></i> Lead Hub</span>
+  <span><i class="dot-mod"></i> Module</span>
+  <span><i class="dot-db"></i> Data source</span>
+</div>
+
+<p class="hint"><span class="d"></span> Hover for sources · click any node</p>
+
+<nav class="mob-list" id="mob-list" aria-label="Module list">
+  <div class="mob-list-head">
+    <span class="mob-list-title">System map</span>
+    <span class="mob-list-sub">Tap a module · map focuses above</span>
+  </div>
+  <div class="mob-scroll" id="mob-scroll"></div>
+</nav>
+
+<div id="core" role="button" tabindex="0" aria-label="Lead Hub core">
+  <div class="ball"></div>
+  <div class="disc"><span>H</span></div>
+  <div class="core-cap">Lead Hub</div>
+</div>
+
+<div class="dim-overlay" id="dim"></div>
+
+<aside class="panel" id="panel" aria-hidden="true">
+  <button class="close" id="pclose" type="button" aria-label="Close">×</button>
+  <div class="p-head">
+    <div class="p-ava" id="p-ava"></div>
+    <div>
+      <div class="p-title" id="p-title"></div>
+      <div class="p-role" id="p-role"></div>
+    </div>
+  </div>
+  <p class="p-lede" id="p-lede"></p>
+  <div class="proof-pill" id="p-proof" hidden></div>
+  <div class="sect">
+    <div class="lbl" id="lblDoes">What it does</div>
+    <ul id="p-does"></ul>
+  </div>
+  <div class="sect feeds">
+    <div class="lbl" id="lblFeeds">Connected sources</div>
+    <div class="dbs" id="p-feeds"></div>
+  </div>
+  <p class="p-foot" id="p-foot"></p>
+  <div class="p-cta">
+    <a href="#" id="p-cta-link"><span id="p-cta-text">Book a system audit</span> →</a>
+  </div>
+</aside>
+
+<script is:inline>
+(() => {
+  "use strict";
+
+  const canvas = document.getElementById("flow");
+  const ctx = canvas.getContext("2d", { alpha: false });
+  const layer = document.getElementById("layer");
+  const coreEl = document.getElementById("core");
+  const mobScroll = document.getElementById("mob-scroll");
+  const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const MOB_BP = 760;
+
+  const TEAL = [26, 138, 125];
+  const AMBER = [201, 146, 42];
+  const rgba = (c, a) => `rgba(${c[0]},${c[1]},${c[2]},${a})`;
+  const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+
+  const I = {
+    seo: '<path d="M4 5h16v14H4zM8 9h8M8 13h5"/>',
+    bot: '<path d="M12 3a4 4 0 014 4v1h2v8H6V8h2V7a4 4 0 014-4zM9 14h6"/>',
+    crm: '<path d="M4 6h16v12H4zM8 10h8M8 14h5"/>',
+    calls: '<path d="M3 12a9 9 0 0118 0M6.5 12a5.5 5.5 0 0111 0M10 12a2 2 0 014 0"/>',
+    report: '<path d="M4 20V4M4 20h16M8 16v-4M12 16V8M16 16v-6"/>',
+    content: '<path d="M16 4l4 4-11 11-4 1 1-4L16 4zM14 6l4 4"/>',
+    social: '<path d="M7 4h10v16l-5-3-5 3V4z"/>',
+    news: '<path d="M5 4h14v16H5zM8 8h8M8 12h8M8 16h5"/>',
+    train: '<path d="M2 9l10-5 10 5-10 5-10-5zM12 12v6M6 14v3c0 2 2.7 4 6 4s6-2 6-4v-3"/>',
+    custom: '<path d="M12 5v14M5 12h14"/>'
+  };
+
+  const DB = '<path d="M4 6c0-1.4 3.6-2.5 8-2.5s8 1.1 8 2.5-3.6 2.5-8 2.5S4 7.4 4 6zM4 6v12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5V6M4 12c0 1.4 3.6 2.5 8 2.5s8-1.1 8-2.5"/>';
+
+  function dbShort(full) {
+    const map = {
+      "Google Search Console": "GSC",
+      "MDX content repo": "MDX",
+      "IndexNow / Bing": "IndexNow",
+      "WhatsApp / Telegram": "WA / TG",
+      "Qualification script": "Qualify",
+      "Kommo CRM": "Kommo",
+      "Kommo API": "Kommo",
+      "Webhooks": "Hooks",
+      "Broker roster": "Roster",
+      "Call recordings": "Calls",
+      "Playbooks": "Scripts",
+      "Zoom / telephony": "Zoom",
+      "GA4": "GA4",
+      "GSC": "GSC",
+      "Keyword queue": "Keywords",
+      "Brand rules": "Brand",
+      "Notion / repo": "Notion",
+      "Site RSS": "RSS",
+      "LinkedIn / X": "LI / X",
+      "Telegram": "Telegram",
+      "News sources": "News in",
+      "Claude API": "Claude",
+      "Blog MDX": "Blog",
+      "Training library": "Library",
+      "Call Analytics": "Call QA",
+      "Your APIs": "APIs",
+      "Your team": "Team"
+    };
+    if (map[full]) return map[full];
+    if (full.length <= 11) return full;
+    return full.split(/[\s/]+/).filter(Boolean).map((w) => w[0]).join("").slice(0, 5).toUpperCase();
+  }
+
+  const MODULES = [
+    {
+      key: "seo", name: "SEO + AEO Site", role: "organic acquisition", proof: "1,260+ pages · 2M+ words",
+      lede: "Programmatic SEO site factory: area guides, FAQs, investment content. Indexed for Google, ChatGPT, Perplexity.",
+      does: ["Publishes at scale from MDX pipeline", "Auto sitemap + IndexNow", "Internal linking graph", "Compounds traffic month over month"],
+      feeds: [
+        ["Google Search Console", "search", "Queries, clicks, index coverage.", ["Top queries", "Index status"]],
+        ["MDX content repo", "pages", "Articles, guides, landing pages.", ["New URLs", "Content updates"]],
+        ["IndexNow / Bing", "ping", "Fast re-crawl after publish.", ["Submitted URLs"]]
+      ]
+    },
+    {
+      key: "bot", name: "AI Lead Qualification", role: "24/7 response", proof: "10 sec · chat + voice",
+      lede: "Qualifies inbound leads on WhatsApp, Telegram, web chat. Budget, timeline, intent. Routes hot leads to the right person.",
+      does: ["Replies in under 10 seconds", "Qualifies budget and timeline", "Hands off to human when ready", "Never misses inbound traffic"],
+      feeds: [
+        ["WhatsApp / Telegram", "channels", "Where leads message first.", ["Conversation history"]],
+        ["Qualification script", "rules", "Questions and scoring logic.", ["Score + tags"]],
+        ["Kommo CRM", "handoff", "Creates and updates deals.", ["Deal stage", "Owner routing"]]
+      ]
+    },
+    {
+      key: "crm", name: "CRM Automation", role: "pipeline ops", proof: "Kommo · multi-pipeline",
+      lede: "Automates deal stages, tags, assignments, follow-ups. Human stays in control on high-value steps.",
+      does: ["Auto-tags and routes leads", "Webhook integrations", "Stage rules and reminders", "Single source for sales ops"],
+      feeds: [
+        ["Kommo API", "crm", "Deals, contacts, pipelines.", ["Stage changes"]],
+        ["Webhooks", "events", "Form submits, bot events, site leads.", ["New lead payloads"]],
+        ["Broker roster", "routing", "Who owns which segment.", ["Assignment rules"]]
+      ]
+    },
+    {
+      key: "calls", name: "Call Analytics", role: "quality control", proof: "Zoom · call review",
+      lede: "Captures call context, summaries, next steps. Surfaces gaps in scripts and follow-up.",
+      does: ["Summarizes calls and meetings", "Flags missed follow-ups", "Feeds CRM with notes", "Supports QA workflows"],
+      feeds: [
+        ["Call recordings", "audio", "Stored conversations.", ["Transcripts"]],
+        ["Playbooks", "standard", "Scripts and checklists.", ["Compliance checks"]],
+        ["Zoom / telephony", "source", "New sessions to process.", ["Metadata"]]
+      ]
+    },
+    {
+      key: "report", name: "Reporting Engine", role: "visibility", proof: "GSC + GA4 + Kommo",
+      lede: "Live dashboards: organic, conversions, leads by source and broker. One screen for decisions.",
+      does: ["Pulls GSC + GA4 + CRM", "Weekly exec snapshots", "Highlights anomalies", "Export for stakeholders"],
+      feeds: [
+        ["GA4", "analytics", "Sessions, goals, landing pages.", ["Conversion paths"]],
+        ["GSC", "organic", "Queries and pages.", ["Traffic trends"]],
+        ["Kommo", "leads", "Pipeline and source attribution.", ["Lead counts"]]
+      ]
+    },
+    {
+      key: "content", name: "Content Engine", role: "editorial factory", proof: "validate · humanizer",
+      lede: "SEO articles, guides, landing copy. Agent draft, rules, validation, human approval before publish.",
+      does: ["MDX generation pipeline", "Duplicate and quality checks", "Brand voice enforcement", "Batch publish workflow"],
+      feeds: [
+        ["Keyword queue", "seo", "Topics and SERP targets.", ["Priority list"]],
+        ["Brand rules", "voice", "Tone, facts, compliance.", ["Style constraints"]],
+        ["Notion / repo", "drafts", "Editorial workflow.", ["Approved drafts"]]
+      ]
+    },
+    {
+      key: "social", name: "Social Distribution", role: "syndication", proof: "RSS · crosspost",
+      lede: "Site publishes once. Telegram, LinkedIn, X pull from the same source. No duplicate manual work.",
+      does: ["RSS hub from site", "Scheduled crosspost", "Platform-native formatting", "CTA back to site"],
+      feeds: [
+        ["Site RSS", "source", "Blog and news feed.", ["New posts"]],
+        ["LinkedIn / X", "channels", "B2B distribution.", ["Scheduled posts"]],
+        ["Telegram", "alerts", "Fast signals to audience.", ["Digest messages"]]
+      ]
+    },
+    {
+      key: "news", name: "News + Shorts", role: "signal layer", proof: "pipeline v2",
+      lede: "Curated AI and industry news with commentary. Auto digest to site and social. Shorts when video is ready.",
+      does: ["Perplexity + Claude digest", "Weekly publish batch", "Filters noise, adds opinion", "Feeds SEO freshness"],
+      feeds: [
+        ["News sources", "input", "Curated links and RSS.", ["Raw items"]],
+        ["Claude API", "editor", "Commentary and assembly.", ["Digest drafts"]],
+        ["Blog MDX", "output", "Published news pages.", ["Live URLs"]]
+      ]
+    },
+    {
+      key: "train", name: "Team Training", role: "onboard · enable", proof: "AI paths · CRM gates",
+      lede: "AI onboarding and training for new hires and ongoing enablement. Company intro, team, scripts, quizzes. Progress synced to CRM before live leads are assigned.",
+      does: [
+        "Turns PDFs, Notion, and Loom into role-based learning paths",
+        "Onboard track (days 1 to 14) plus ongoing script and product updates",
+        "Bot Q&A grounded in your knowledge base, not generic chat",
+        "CRM gates: certified status before routing inbound leads"
+      ],
+      feeds: [
+        ["Training library", "docs", "PDFs, Notion pages, playbooks, Loom and slide decks.", ["Lesson sources", "Version history"]],
+        ["Call Analytics", "examples", "Real call snippets and QA notes for practice.", ["Transcript highlights", "Script gaps"]],
+        ["Kommo CRM", "progress", "Onboarding stage, quiz scores, certification flags.", ["Completion %", "Ready for leads"]]
+      ]
+    },
+    {
+      key: "custom", name: "Your module", role: "custom build", custom: true,
+      lede: "After the core stack is live, we add modules for your market: payments, listings, custom APIs, vertical logic.",
+      does: ["Scoped to your workflow", "Same hub architecture", "Documented handoff", "Optional support plan"],
+      feeds: [
+        ["Your APIs", "data", "Any service with an endpoint.", ["Custom events"]],
+        ["Your team", "process", "Humans in the loop where it matters.", ["Approval steps"]]
+      ]
+    }
+  ];
+
+  const CORE = {
+    title: "Lead Hub",
+    role: "routing · CRM · analytics",
+    lede: "Single control point for every inbound lead. All modules read and write here. No lead lost between chat, site, CRM, and reports.",
+    why: ["Routes every lead to the right stage", "Connects bots, site forms, and CRM", "Feeds reporting in real time", "Human override always available"],
+    inside: [
+      ["Lead routing", "who gets what"],
+      ["Pipeline rules", "stages + tags"],
+      ["Attribution", "source tracking"],
+      ["SLA timers", "response targets"],
+      ["Audit log", "what changed"],
+      ["API layer", "integrations"]
+    ]
+  };
+
+  function makeGlow(rgb) {
+    const s = 48;
+    const cv = document.createElement("canvas");
+    cv.width = cv.height = s;
+    const c = cv.getContext("2d");
+    const g = c.createRadialGradient(s / 2, s / 2, 0, s / 2, s / 2, s / 2);
+    g.addColorStop(0, rgba(rgb, 1));
+    g.addColorStop(0.22, rgba(rgb, 0.5));
+    g.addColorStop(1, rgba(rgb, 0));
+    c.fillStyle = g;
+    c.fillRect(0, 0, s, s);
+    return cv;
+  }
+
+  const SPR = { teal: makeGlow(TEAL), amber: makeGlow(AMBER) };
+
+  const S = {
+    w: 0, h: 0, dpr: 1, last: 0, mobile: false, mobFocus: 0, mapH: 0,
+    core: { x: 0, y: 0, r: 52, px: 0, py: 0 },
+    active: null,
+    ptr: { x: -9999, y: -9999, sx: -9999, sy: -9999, heat: 0, active: false },
+    streams: [], dust: [], edges: [], bg: null
+  };
+
+  function buildMobList() {
+    if (!mobScroll) return;
+    mobScroll.innerHTML =
+      `<button type="button" class="mob-item mob-hub" data-focus="hub">
+        <span class="mob-ava hub"><span>H</span></span>
+        <span class="mob-copy"><b>Lead Hub</b><small>routing · CRM · analytics</small></span>
+      </button>
+      <div class="mob-divider">Modules</div>` +
+      MODULES.map((m, i) =>
+        `<button type="button" class="mob-item" data-focus="${i}">
+          <span class="mob-ava"><svg viewBox="0 0 24 24">${I[m.key]}</svg></span>
+          <span class="mob-copy"><b>${m.name}</b><small>${m.role}${m.proof ? " · " + m.proof : ""}</small></span>
+        </button>`
+      ).join("");
+    mobScroll.querySelectorAll(".mob-item").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.dataset.focus === "hub") {
+          setMobFocus(-1);
+          openCore();
+        } else {
+          const i = +btn.dataset.focus;
+          setMobFocus(i);
+          openModule(i);
+        }
+      });
+    });
+    updateMobListActive();
+  }
+
+  function updateMobListActive() {
+    if (!mobScroll) return;
+    mobScroll.querySelectorAll(".mob-item").forEach((btn) => {
+      const f = btn.dataset.focus;
+      btn.classList.toggle("active", f === "hub" ? S.mobFocus < 0 : +f === S.mobFocus);
+    });
+  }
+
+  function setMobFocus(i) {
+    S.mobFocus = i;
+    if (S.mobile) {
+      layoutMobile(S.mapH);
+      buildP();
+    }
+    updateMobListActive();
+  }
+
+  function clearMobClasses() {
+    nodes.forEach((n) => n.el.classList.remove("mob-off", "mob-focus"));
+    dbs.forEach((d) => d.el.classList.remove("mob-off", "mob-focus", "lit"));
+  }
+
+  function layoutMobile(mh) {
+    const cx = S.w * 0.5;
+    const cy = mh * 0.64;
+    S.core.x = cx;
+    S.core.y = cy;
+    S.core.r = clamp(Math.min(S.w, mh) * 0.075, 30, 44);
+
+    nodes.forEach((n, i) => {
+      const on = S.mobFocus >= 0 && i === S.mobFocus;
+      n.el.classList.toggle("mob-off", !on);
+      n.el.classList.toggle("mob-focus", on);
+      if (on) {
+        n.tx = cx;
+        n.ty = mh * 0.26;
+        n.x = n.tx;
+        n.y = n.ty;
+        n.vx = 0;
+        n.vy = 0;
+      }
+    });
+
+    if (S.mobFocus < 0) {
+      S.core.y = mh * 0.5;
+    }
+  }
+
+  function layoutDesktopOrbit() {
+    clearMobClasses();
+    const N = nodes.length;
+    const rad = clamp(Math.min(S.w, S.h) * 0.31, 185, 320);
+    const padX = 110;
+    const padTop = 125;
+    const padBot = 100;
+
+    nodes.forEach((n, i) => {
+      n.angle = -Math.PI / 2 + (i / N) * TAU;
+      const orbit = 0.78 + (i % 2) * 0.08;
+      n.tx = clamp(S.core.x + Math.cos(n.angle) * rad * orbit * 1.2, padX, S.w - padX);
+      n.ty = clamp(S.core.y + Math.sin(n.angle) * rad * orbit * 0.88, padTop, S.h - padBot);
+      if (!n.x) { n.x = n.tx; n.y = n.ty; }
+    });
+  }
+
+  function edgeVisible(e) {
+    if (!S.mobile) return true;
+    if (S.mobFocus < 0) return false;
+    if (e.k === "core") {
+      const mi = typeof e.a === "number" ? e.a : (typeof e.b === "number" ? e.b : -1);
+      return mi === S.mobFocus;
+    }
+    if (e.db && e.a && e.a.db != null) return dbs[e.a.db].mi === S.mobFocus;
+    return false;
+  }
+
+  const nodes = MODULES.map((m, i) => {
+    const el = document.createElement("div");
+    el.className = "node" + (m.custom ? " custom" : "") + (m.key === "train" ? " train" : "");
+    el.innerHTML = `<div class="avatar">${m.custom ? "" : '<span class="status"></span>'}<svg viewBox="0 0 24 24">${I[m.key]}</svg></div>
+      <div class="name">${m.name}</div><div class="role">${m.role}</div>`;
+    el.addEventListener("click", () => openModule(i));
+    layer.appendChild(el);
+    return { ...m, el, x: 0, y: 0, tx: 0, ty: 0, vx: 0, vy: 0, phase: i * 1.41, angle: 0 };
+  });
+
+  const dbs = [];
+  nodes.forEach((n, mi) => {
+    const arr = MODULES[mi].feeds;
+    arr.forEach((f, k) => {
+      const el = document.createElement("div");
+      el.className = "db";
+      el.innerHTML = `<div class="cyl"><svg viewBox="0 0 24 24">${DB}</svg></div><div class="dn">${dbShort(f[0])}</div>`;
+      const di = dbs.length;
+      el.addEventListener("click", (ev) => { ev.stopPropagation(); openDB(di); });
+      layer.appendChild(el);
+      dbs.push({
+        mi, el, x: 0, y: 0,
+        spread: (k - (arr.length - 1) / 2) * 0.55,
+        name: f[0], tag: f[1], lede: f[2], takes: f[3]
+      });
+    });
+  });
+
+  buildMobList();
+
+  function buildEdges() {
+    const n = nodes.length;
+    const M = dbs.length;
+    const E = [];
+    for (let i = 0; i < n; i++) E.push({ k: "core", a: i, b: "core", seed: i * 2.1 });
+    for (let i = 0; i < n; i++) E.push({ k: "ring", a: i, b: (i + 1) % n, ring: true, seed: i * 3.7 + 1 });
+    for (let i = 0; i < n; i++) E.push({ k: "ring", a: i, b: (i + 2) % n, ring: true, seed: i * 5.1 + 2 });
+    dbs.forEach((d, di) => E.push({ k: "db", a: { db: di }, b: d.mi, db: true, seed: di * 1.9 }));
+    for (let i = 0; i < M; i++) E.push({ k: "web", a: { db: i }, b: { db: (i + 1) % M }, web: true, seed: i * 1.3 });
+    for (let i = 0; i < M; i++) E.push({ k: "web", a: { db: i }, b: { db: (i + 4) % M }, web: true, seed: i * 1.7 + 9 });
+    S.edges = E;
+  }
+
+  const pt = (ref) => ref === "core"
+    ? { x: S.core.x + S.core.px, y: S.core.y + S.core.py }
+    : (ref && ref.db != null ? dbs[ref.db] : nodes[ref]);
+
+  const ownerOf = (ref) => (ref && ref.db != null) ? dbs[ref.db].mi : ref;
+  const inActive = (e) => S.active === null ? true : (ownerOf(e.a) === S.active || ownerOf(e.b) === S.active);
+  const edgeHot = (e) => S.active === null ? 1 : (inActive(e) ? 1.55 : 0.07);
+
+  const dim = document.getElementById("dim");
+  const panel = document.getElementById("panel");
+  const $ = (id) => document.getElementById(id);
+
+  function openModule(i) {
+    const m = MODULES[i];
+    S.active = i;
+    if (S.mobile) {
+      S.mobFocus = i;
+      layoutMobile(S.mapH);
+      updateMobListActive();
+    }
+    $("p-ava").className = "p-ava";
+    $("p-ava").innerHTML = `<svg viewBox="0 0 24 24">${I[m.key]}</svg>`;
+    $("p-title").textContent = m.name;
+    $("p-role").textContent = m.role;
+    $("p-lede").textContent = m.lede;
+    const proof = $("p-proof");
+    if (m.proof) {
+      proof.hidden = false;
+      proof.textContent = "Live proof · " + m.proof;
+    } else {
+      proof.hidden = true;
+    }
+    $("lblDoes").textContent = "What it does";
+    $("lblFeeds").textContent = "Connected sources";
+    $("p-does").innerHTML = m.does.map((d) => `<li>${d}</li>`).join("");
+    $("p-feeds").innerHTML = m.feeds.map((f) =>
+      `<div class="chip"><svg viewBox="0 0 24 24">${DB}</svg><b>${f[0]}</b><span>${f[1]}</span></div>`
+    ).join("");
+    $("p-foot").innerHTML = `<b>${m.name}</b> pulls from connected sources, processes through Lead Hub, and outputs measurable lead outcomes.`;
+    cta(m.custom ? "Scope a custom module" : "Get this module", "mod-" + m.key);
+    showPanel();
+    coreEl.classList.remove("sel");
+    nodes.forEach((n, j) => {
+      n.el.classList.toggle("dim", j !== i);
+      n.el.classList.toggle("active", j === i);
+    });
+    dbs.forEach((d) => {
+      d.el.classList.toggle("dim", d.mi !== i);
+      d.el.classList.remove("sel");
+      d.el.classList.toggle("lit", d.mi === i);
+    });
+  }
+
+  function openDB(di) {
+    const d = dbs[di];
+    const m = MODULES[d.mi];
+    S.active = d.mi;
+    if (S.mobile) {
+      S.mobFocus = d.mi;
+      layoutMobile(S.mapH);
+      updateMobListActive();
+    }
+    $("p-ava").className = "p-ava";
+    $("p-ava").innerHTML = `<svg viewBox="0 0 24 24" style="stroke:var(--amber-soft)">${DB}</svg>`;
+    $("p-title").textContent = d.name;
+    $("p-role").textContent = "source · " + m.name;
+    $("p-lede").textContent = d.lede;
+    $("p-proof").hidden = true;
+    $("lblDoes").textContent = "Data used by module";
+    $("lblFeeds").textContent = "Flow";
+    $("p-does").innerHTML = d.takes.map((t) => `<li>${t}</li>`).join("");
+    $("p-feeds").innerHTML =
+      `<div class="chip"><svg viewBox="0 0 24 24">${I[m.key]}</svg><b>${m.name}</b><span>processes</span></div>` +
+      `<div class="chip"><b>Lead Hub</b><span>stores</span></div>`;
+    $("p-foot").innerHTML = `<b>${d.name}</b> → <b>${m.name}</b> → <b>Lead Hub</b>.`;
+    cta("Connect your stack", "db-" + m.key);
+    showPanel();
+    coreEl.classList.remove("sel");
+    nodes.forEach((n, j) => {
+      n.el.classList.toggle("dim", j !== d.mi);
+      n.el.classList.toggle("active", j === d.mi);
+    });
+    dbs.forEach((x, j) => {
+      x.el.classList.toggle("dim", x.mi !== d.mi);
+      x.el.classList.toggle("sel", j === di);
+      x.el.classList.toggle("lit", x.mi === d.mi);
+    });
+  }
+
+  function openCore() {
+    S.active = "core";
+    if (S.mobile) {
+      S.mobFocus = -1;
+      layoutMobile(S.mapH);
+      updateMobListActive();
+    }
+    $("p-ava").className = "p-ava core";
+    $("p-ava").innerHTML = `<div class="b8">H</div>`;
+    $("p-title").textContent = CORE.title;
+    $("p-role").textContent = CORE.role;
+    $("p-lede").textContent = CORE.lede;
+    $("p-proof").hidden = false;
+    $("p-proof").textContent = "Battle-tested · live production stack";
+    $("lblDoes").textContent = "Why the hub matters";
+    $("lblFeeds").textContent = "What's inside";
+    $("p-does").innerHTML = CORE.why.map((d) => `<li>${d}</li>`).join("");
+    $("p-feeds").innerHTML = CORE.inside.map((f) =>
+      `<div class="chip"><b>${f[0]}</b><span>${f[1]}</span></div>`
+    ).join("");
+    $("p-foot").innerHTML = "Change routing rules once. Every module stays in sync. <b>One hub, zero lead leakage.</b>";
+    cta("Book a free Lead Gen audit", "core");
+    showPanel();
+    coreEl.classList.add("sel");
+    nodes.forEach((n) => n.el.classList.remove("dim", "active"));
+    dbs.forEach((d) => { d.el.classList.add("dim"); d.el.classList.remove("sel", "lit"); });
+  }
+
+  function cta(text, content) {
+    $("p-cta-text").textContent = text;
+    $("p-cta-link").href = "/audit/?utm=" + content;
+  }
+
+  function showPanel() {
+    document.body.classList.add("panel-open");
+    dim.classList.add("show");
+    panel.classList.add("show");
+    panel.setAttribute("aria-hidden", "false");
+  }
+
+  function closePanel() {
+    S.active = null;
+    document.body.classList.remove("panel-open");
+    dim.classList.remove("show");
+    panel.classList.remove("show");
+    panel.setAttribute("aria-hidden", "true");
+    coreEl.classList.remove("sel");
+    nodes.forEach((n) => n.el.classList.remove("dim", "active"));
+    dbs.forEach((d) => d.el.classList.remove("dim", "sel", "lit"));
+  }
+
+  coreEl.addEventListener("click", openCore);
+  coreEl.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openCore(); } });
+  dim.addEventListener("click", closePanel);
+  $("pclose").addEventListener("click", closePanel);
+  addEventListener("keydown", (e) => { if (e.key === "Escape") closePanel(); });
+
+  const TAU = Math.PI * 2;
+  const mix = (a, b, p) => a + (b - a) * p;
+  const ease3 = (p) => (p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2);
+
+  function bez(p0, p1, p2, p3, t) {
+    const u = 1 - t, uu = u * u, tt = t * t;
+    return {
+      x: uu * u * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + tt * t * p3.x,
+      y: uu * u * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + tt * t * p3.y
+    };
+  }
+
+  function resize() {
+    S.dpr = Math.min(devicePixelRatio || 1, 1.75);
+    S.w = innerWidth;
+    S.h = innerHeight;
+    S.mobile = S.w < MOB_BP;
+    document.body.classList.toggle("is-mobile", S.mobile);
+
+    S.mapH = S.mobile ? clamp(S.h * 0.4, 260, 360) : S.h;
+    document.documentElement.style.setProperty("--map-h", S.mapH + "px");
+
+    const ch = S.mobile ? S.mapH : S.h;
+    canvas.width = (S.w * S.dpr) | 0;
+    canvas.height = (ch * S.dpr) | 0;
+    canvas.style.width = S.w + "px";
+    canvas.style.height = ch + "px";
+    ctx.setTransform(S.dpr, 0, 0, S.dpr, 0, 0);
+
+    if (S.mobile) {
+      if (S.mobFocus === undefined) S.mobFocus = 0;
+      layoutMobile(S.mapH);
+    } else {
+      S.core.x = S.w * 0.5;
+      S.core.y = S.h * 0.54;
+      S.core.r = clamp(Math.min(S.w, S.h) * 0.048, 36, 52);
+      clearMobClasses();
+      layoutDesktopOrbit();
+      nodes.forEach((n) => { n.x = n.tx; n.y = n.ty; n.vx = 0; n.vy = 0; });
+    }
+
+    const bgR = Math.max(S.w, ch) * 0.72;
+    const bg = ctx.createRadialGradient(S.core.x, S.core.y, 0, S.core.x, S.core.y, bgR);
+    bg.addColorStop(0, rgba(TEAL, 0.18));
+    bg.addColorStop(0.16, rgba(TEAL, 0.11));
+    bg.addColorStop(0.38, rgba(AMBER, 0.06));
+    bg.addColorStop(0.68, rgba(TEAL, 0.02));
+    bg.addColorStop(1, "rgba(11, 16, 23, 0)");
+    S.bg = bg;
+
+    buildP();
+    if (reduce) draw(1800, 0);
+  }
+
+  function placeDBs() {
+    const mh = S.mapH || S.h;
+    dbs.forEach((d) => {
+      if (S.mobile) {
+        if (S.mobFocus < 0 || d.mi !== S.mobFocus) {
+          d.el.classList.add("mob-off");
+          d.el.classList.remove("mob-focus", "lit");
+          return;
+        }
+        d.el.classList.remove("mob-off");
+        d.el.classList.add("mob-focus", "lit");
+        const cx = S.w * 0.5;
+        const sibs = MODULES[d.mi].feeds.length;
+        const idx = dbs.filter((x) => x.mi === d.mi).indexOf(d);
+        d.x = cx + (idx - (sibs - 1) / 2) * 76;
+        d.y = mh * 0.06;
+        return;
+      }
+      d.el.classList.remove("mob-off", "mob-focus");
+      const n = nodes[d.mi];
+      let dx = n.x - (S.core.x + S.core.px);
+      let dy = n.y - (S.core.y + S.core.py);
+      const L = Math.hypot(dx, dy) || 1;
+      dx /= L; dy /= L;
+      const ang = Math.atan2(dy, dx) + d.spread * 0.95;
+      const dist = 152;
+      d.x = n.x + Math.cos(ang) * dist;
+      d.y = n.y + Math.sin(ang) * dist;
+    });
+  }
+
+  function buildP() {
+    buildEdges();
+    S.streams.length = 0;
+    const area = S.w * (S.mobile ? S.mapH : S.h);
+    const cnt = reduce
+      ? (S.mobile ? 100 : 360)
+      : Math.min(S.mobile ? 280 : 950, Math.max(S.mobile ? 180 : 620, (area / 1500) | 0));
+    const pool = S.edges.filter(edgeVisible);
+    const use = pool.length ? pool : S.edges;
+    for (let i = 0; i < cnt; i++) {
+      const e = use[i % use.length];
+      S.streams.push({
+        e, lane: i % 9, p: Math.random(),
+        sp: (reduce ? 0 : mix(0.00013, 0.00045, Math.random())) * (e.db ? 1 : (i % 2 ? 1 : -1)),
+        r: mix(0.7, 2.5, Math.random()) * (e.ring ? 0.78 : (e.db ? 0.7 : 1)),
+        phase: Math.random() * TAU,
+        flick: mix(0.55, 1.6, Math.random()),
+        warm: Math.random(),
+        tail: mix(0.025, 0.08, Math.random())
+      });
+    }
+    S.dust.length = 0;
+    const dc = reduce ? (S.mobile ? 40 : 70) : (S.mobile ? 90 : 220);
+    const dh = S.mobile ? S.mapH : S.h;
+    for (let i = 0; i < dc; i++) {
+      S.dust.push({
+        x: Math.random() * S.w,
+        y: Math.random() * dh,
+        vx: mix(-0.05, 0.05, Math.random()),
+        vy: mix(-0.04, 0.04, Math.random()),
+        r: mix(0.35, 1.2, Math.random()),
+        a: mix(0.05, 0.16, Math.random()),
+        phase: Math.random() * TAU
+      });
+    }
+  }
+
+  function curve(e, lane, time) {
+    const p0 = pt(e.a);
+    const p3 = pt(e.b);
+    const dx = p3.x - p0.x;
+    const dy = p3.y - p0.y;
+    const L = Math.hypot(dx, dy) || 1;
+    const nx = -dy / L;
+    const ny = dx / L;
+    const wave = Math.sin(time * 0.0011 + e.seed + lane * 0.7);
+    const baseBow = e.ring ? 24 : (e.db ? 6 : 0);
+    const bow = (lane - 4) * 6 + wave * (e.db ? 6 : 15) + baseBow;
+    const nc = 0.34 + 0.04 * Math.sin(e.seed + time * 0.0007);
+    return [
+      p0,
+      { x: p0.x + dx * nc + nx * (40 + bow), y: p0.y + dy * nc + ny * (40 + bow) },
+      { x: p0.x + dx * 0.72 - nx * (28 - bow * 0.35), y: p0.y + dy * 0.72 - ny * (28 - bow * 0.35) },
+      p3
+    ];
+  }
+
+  function forces(dt) {
+    if (S.mobile) {
+      layoutMobile(S.mapH);
+      return;
+    }
+    for (const n of nodes) {
+      n.vx += (n.tx - n.x) * 0.08 * dt;
+      n.vy += (n.ty - n.y) * 0.08 * dt;
+      const dxp = n.x - S.ptr.sx;
+      const dyp = n.y - S.ptr.sy;
+      const dp = Math.hypot(dxp, dyp);
+      if (dp < 180) {
+        const push = (1 - dp / 180) * S.ptr.heat * 1.75;
+        n.vx += (dxp / (dp + 1)) * push;
+        n.vy += (dyp / (dp + 1)) * push;
+      }
+    }
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const a = nodes[i], b = nodes[j];
+        const dx = b.x - a.x, dy = b.y - a.y;
+        const d = Math.hypot(dx, dy) || 1;
+        if (d < 150) {
+          const k = ((150 - d) / d) * 0.013 * dt;
+          a.vx -= dx * k; a.vy -= dy * k;
+          b.vx += dx * k; b.vy += dy * k;
+        }
+      }
+    }
+    for (const n of nodes) {
+      n.vx *= Math.pow(0.84, dt);
+      n.vy *= Math.pow(0.84, dt);
+      n.x += n.vx * dt;
+      n.y += n.vy * dt;
+    }
+  }
+
+  function applyProximity() {
+    const reach = 200;
+    nodes.forEach((n) => {
+      const d = Math.hypot(n.x - S.ptr.sx, n.y - S.ptr.sy);
+      const lift = clamp(1 - d / reach, 0, 1) * S.ptr.heat;
+      n.el.style.setProperty("--lift", lift.toFixed(3));
+      const near = lift > 0.08;
+      n.el.classList.toggle("near", near);
+      n.el.style.zIndex = near ? 5 : 2;
+    });
+    dbs.forEach((d) => {
+      const dpx = Math.hypot(d.x - S.ptr.sx, d.y - S.ptr.sy);
+      const lift = clamp(1 - dpx / (reach * 0.85), 0, 1) * S.ptr.heat;
+      d.el.style.setProperty("--lift", lift.toFixed(3));
+      const near = lift > 0.08;
+      d.el.classList.toggle("near", near);
+      d.el.style.zIndex = near || d.el.classList.contains("sel") ? 4 : 1;
+    });
+  }
+
+  function draw(now, dt) {
+    const ch = S.mobile ? S.mapH : S.h;
+    ctx.fillStyle = "#0B1017";
+    ctx.fillRect(0, 0, S.w, ch);
+    if (S.bg) { ctx.fillStyle = S.bg; ctx.fillRect(0, 0, S.w, ch); }
+
+    placeDBs();
+
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    for (const d of S.dust) {
+      if (!reduce) {
+        d.x += d.vx * dt;
+        d.y += d.vy * dt;
+        if (d.x < -10) d.x = S.w + 10;
+        if (d.x > S.w + 10) d.x = -10;
+        if (d.y < -10) d.y = ch + 10;
+        if (d.y > ch + 10) d.y = -10;
+      }
+      const alpha = d.a * (0.55 + 0.45 * Math.sin(now * 0.001 + d.phase));
+      ctx.fillStyle = rgba(TEAL, alpha);
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, d.r, 0, TAU);
+      ctx.fill();
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.lineCap = "round";
+    for (const e of S.edges) {
+      if (!edgeVisible(e)) continue;
+      const act = edgeHot(e);
+      for (let lane = 0; lane < 2; lane++) {
+        const c = curve(e, lane + 3, now);
+        const al = (0.055 + 0.03 * Math.sin(now * 0.0012 + e.seed + lane)) * act * (e.ring ? 0.65 : (e.db ? 0.7 : 1));
+        ctx.strokeStyle = (e.ring || e.db || e.web) ? rgba(AMBER, al) : rgba(TEAL, al);
+        ctx.lineWidth = e.ring ? 0.8 : (e.db ? 0.7 : 1);
+        ctx.beginPath();
+        ctx.moveTo(c[0].x, c[0].y);
+        ctx.bezierCurveTo(c[1].x, c[1].y, c[2].x, c[2].y, c[3].x, c[3].y);
+        ctx.stroke();
+      }
+    }
+    ctx.restore();
+
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    for (const s of S.streams) {
+      if (!edgeVisible(s.e)) continue;
+      if (!reduce) s.p = (s.p + s.sp * dt * 16.67 + 1) % 1;
+      const act = edgeHot(s.e);
+      if (act < 0.12) continue;
+      const t = ease3(s.p);
+      const c = curve(s.e, s.lane, now);
+      const P = bez(c[0], c[1], c[2], c[3], t);
+      const dpt = Math.hypot(P.x - S.ptr.sx, P.y - S.ptr.sy);
+      const heat = dpt < 140 ? (1 - dpt / 140) * S.ptr.heat : 0;
+      const pulse = 0.68 + 0.32 * Math.sin(now * 0.004 * s.flick + s.phase);
+      const np = 0.75 + 0.25 * Math.sin(now * 0.002 + s.e.seed);
+      const al = clamp(((0.24 + 0.5 * pulse) * np + heat * 0.7) * act, 0, 1);
+      const spr = (s.e.db || s.e.web) ? SPR.amber : (s.warm > 0.8 ? SPR.amber : SPR.teal);
+      const r = s.r * (1 + heat * 1.6) * (reduce ? 1.3 : 1);
+      const d = r * 7;
+      ctx.globalAlpha = al;
+      ctx.drawImage(spr, P.x - d * 0.5, P.y - d * 0.5, d, d);
+    }
+    ctx.globalAlpha = 1;
+    ctx.restore();
+
+    const cx = S.core.x + S.core.px;
+    const cy = S.core.y + S.core.py;
+    const pl = 0.5 + 0.5 * Math.sin(now * 0.0018);
+    const rr = S.core.r;
+    const R = rr * 4.6 * (1 + pl * 0.05);
+    const cg = ctx.createRadialGradient(cx, cy, rr * 0.3, cx, cy, R);
+    cg.addColorStop(0, "rgba(230, 255, 250, 0.55)");
+    cg.addColorStop(0.08, "rgba(120, 210, 195, 0.32)");
+    cg.addColorStop(0.2, "rgba(61, 184, 169, 0.19)");
+    cg.addColorStop(0.38, "rgba(26, 138, 125, 0.1)");
+    cg.addColorStop(0.62, "rgba(26, 138, 125, 0.035)");
+    cg.addColorStop(1, "rgba(26, 138, 125, 0)");
+    ctx.save();
+    ctx.globalCompositeOperation = "lighter";
+    ctx.fillStyle = cg;
+    ctx.beginPath();
+    ctx.arc(cx, cy, R, 0, TAU);
+    ctx.fill();
+    ctx.restore();
+
+    coreEl.style.transform = `translate(${cx}px,${cy}px) translate(-50%,-50%)`;
+    nodes.forEach((n) => {
+      n.el.style.transform = `translate(${n.x}px,${n.y}px) translate(-50%,-50%)`;
+    });
+    dbs.forEach((d) => {
+      d.el.style.transform = `translate(${d.x}px,${d.y}px) translate(-50%,-50%)`;
+    });
+    applyProximity();
+  }
+
+  function frame(now) {
+    if (!S.last) S.last = now;
+    const dt = Math.min(42, now - S.last) / 16.67;
+    S.last = now;
+    S.ptr.sx += (S.ptr.x - S.ptr.sx) * 0.12;
+    S.ptr.sy += (S.ptr.y - S.ptr.sy) * 0.12;
+    S.ptr.heat += ((S.ptr.active ? 1 : 0) - S.ptr.heat) * 0.045;
+    if (S.mobile) {
+      S.core.px = 0;
+      S.core.py = 0;
+    } else {
+      S.core.px += (((S.ptr.active ? S.ptr.sx : S.core.x) - S.core.x) * 0.018 - S.core.px) * 0.05;
+      S.core.py += (((S.ptr.active ? S.ptr.sy : S.core.y) - S.core.y) * 0.018 - S.core.py) * 0.05;
+    }
+    forces(dt);
+    draw(now, dt);
+    requestAnimationFrame(frame);
+  }
+
+  addEventListener("resize", resize, { passive: true });
+  addEventListener("pointermove", (e) => {
+    S.ptr.x = e.clientX;
+    S.ptr.y = e.clientY;
+    S.ptr.active = true;
+  }, { passive: true });
+  addEventListener("pointerleave", () => { S.ptr.active = false; });
+  addEventListener("blur", () => { S.ptr.active = false; });
+
+  resize();
+  coreEl.style.transform = `translate(${S.core.x}px,${S.core.y}px) translate(-50%,-50%)`;
+  if (!reduce) requestAnimationFrame(frame);
+  else draw(1800, 0);
+})();
+</script>
+</body>
+</html>

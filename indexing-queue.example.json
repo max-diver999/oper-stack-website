@@ -1,0 +1,18 @@
+{
+  "created": "YYYY-MM-DD",
+  "note": "Explicit URLs only. Run after owner says «отправляй». EN: never api.indexnow.org (hits Yandex).",
+  "en": {
+    "googleLimit": 20,
+    "urls": [
+      "https://YOURDOMAIN.com/tier-mid/",
+      "https://YOURDOMAIN.com/guides/your-top-gsc-page/"
+    ]
+  },
+  "ru": {
+    "googleLimit": 15,
+    "urls": [
+      "https://YOURDOMAIN.ru/gajdy/your-top-page/",
+      "https://YOURDOMAIN.ru/tier-mid/"
+    ]
+  }
+}

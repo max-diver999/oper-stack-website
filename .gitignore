@@ -1,0 +1,21 @@
+# build
+dist/
+.vercel/
+.astro/
+
+# deps
+node_modules/
+
+# env
+.env
+.env.*
+!.env.example
+
+# keys
+scripts/google-indexing-key.json
+
+# os
+.DS_Store
+
+# seo kit reference
+_seo-kit-reference/

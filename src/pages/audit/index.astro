@@ -1,0 +1,181 @@
+---
+import { SITE } from '../../data/site';
+const utm = Astro.url.searchParams.get('utm') || 'audit-page';
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Free Lead Gen Audit · {SITE.name}</title>
+  <meta name="description" content="Free Lead Gen stack audit: SEO, AEO, AI bots, CRM routing, reporting. OperStack." />
+  <link rel="canonical" href="https://oper-stack.com/audit/" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Fraunces:wght@600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink: #0B1017;
+      --paper: #F5F2EC;
+      --teal: #1A8A7D;
+      --teal-soft: #3DB8A9;
+      --muted: #8B939E;
+      --fd: 'Fraunces', Georgia, serif;
+      --fb: 'DM Sans', system-ui, sans-serif;
+      --fm: 'JetBrains Mono', ui-monospace, monospace;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--fb);
+      background: var(--ink);
+      color: var(--paper);
+      line-height: 1.55;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 720px; margin: 0 auto; padding: 48px 24px 80px; }
+    .back {
+      font-family: var(--fm);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--teal-soft);
+      text-decoration: none;
+    }
+    .back:hover { text-decoration: underline; }
+    h1 {
+      font-family: var(--fd);
+      font-size: clamp(28px, 5vw, 40px);
+      line-height: 1.05;
+      margin: 20px 0 12px;
+      letter-spacing: -0.02em;
+    }
+    .lede { color: rgba(245, 242, 236, 0.82); font-size: 17px; margin-bottom: 28px; }
+    ul.bullets { margin: 0 0 32px 20px; color: var(--muted); }
+    ul.bullets li { margin-bottom: 8px; }
+    form {
+      display: grid;
+      gap: 16px;
+      padding: 28px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(61, 184, 169, 0.22);
+    }
+    label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: rgba(245, 242, 236, 0.9); }
+    input, textarea, select {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: rgba(0, 0, 0, 0.25);
+      color: var(--paper);
+      font: inherit;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: 2px solid rgba(61, 184, 169, 0.45);
+      outline-offset: 1px;
+    }
+    .row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
+    @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+    button {
+      padding: 14px 20px;
+      border: none;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--teal), #156b62);
+      color: #fff;
+      font-weight: 600;
+      font-size: 15px;
+      cursor: pointer;
+    }
+    button:disabled { opacity: 0.6; cursor: wait; }
+    .hp { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
+    .msg { font-size: 14px; margin-top: 12px; }
+    .msg.ok { color: var(--teal-soft); }
+    .msg.err { color: #f5a962; }
+    .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); }
+    .consent input { width: auto; margin-top: 3px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="/">← System map</a>
+    <h1>Free Lead Gen audit</h1>
+    <p class="lede">We review your inbound stack: SEO, qualification, CRM routing, reporting. You get a short action list, not a sales deck.</p>
+    <ul class="bullets">
+      <li>Where leads leak between site, chat, and CRM</li>
+      <li>Which OperStack modules fit your stage</li>
+      <li>Battle-tested in live lead-gen operations</li>
+    </ul>
+
+    <form id="audit-form" novalidate>
+      <input type="hidden" name="source" value={`audit:${utm}`} />
+      <div class="row">
+        <div>
+          <label for="name">Name *</label>
+          <input id="name" name="name" required autocomplete="name" />
+        </div>
+        <div>
+          <label for="phone">WhatsApp / Phone *</label>
+          <input id="phone" name="phone" type="tel" required autocomplete="tel" />
+        </div>
+      </div>
+      <div>
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" />
+      </div>
+      <div>
+        <label for="message">What does your inbound look like today?</label>
+        <textarea id="message" name="message" rows="4" placeholder="Site, CRM, team size, market..."></textarea>
+      </div>
+      <div class="consent">
+        <input type="checkbox" id="consent" name="consent" required />
+        <label for="consent">I agree to be contacted about this audit request.</label>
+      </div>
+      <div class="hp" aria-hidden="true">
+        <label for="website">Website</label>
+        <input id="website" name="website" tabindex="-1" autocomplete="off" />
+      </div>
+      <button type="submit" id="submit">Request audit →</button>
+      <p class="msg" id="form-msg" hidden></p>
+    </form>
+    <p style="margin-top:24px;font-size:13px;color:var(--muted)">Or email <a href={`mailto:${SITE.email}`} style="color:var(--teal-soft)">{SITE.email}</a></p>
+  </div>
+
+  <script is:inline define:vars={{ utm }}>
+    const form = document.getElementById('audit-form');
+    const msg = document.getElementById('form-msg');
+    const btn = document.getElementById('submit');
+    const loadedAt = Date.now();
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      msg.hidden = true;
+      btn.disabled = true;
+      const fd = new FormData(form);
+      const payload = {
+        name: fd.get('name'),
+        phone: fd.get('phone'),
+        email: fd.get('email'),
+        message: fd.get('message'),
+        source: fd.get('source') || `audit:${utm}`,
+        website: fd.get('website'),
+        formLoadedAt: loadedAt,
+        formElapsedMs: Date.now() - loadedAt,
+      };
+      try {
+        const res = await fetch('/api/lead/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Request failed');
+        window.location.href = '/thanks/';
+      } catch (err) {
+        msg.textContent = err.message || 'Something went wrong. Email info@oper-stack.com';
+        msg.className = 'msg err';
+        msg.hidden = false;
+        btn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
