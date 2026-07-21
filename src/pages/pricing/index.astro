@@ -3,6 +3,7 @@ import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import { PRICING_TIERS, PRICING_FAQ, PRICING_INCLUDES } from '../../data/pricing';
+import { NETWORK_TOTALS, CASES_PERIOD } from '../../data/cases';
 import { SITE } from '../../data/site';
 
 const canonical = `${SITE.url}/pricing/`;
@@ -54,6 +55,19 @@ const faqSchema = {
         </article>
       ))}
     </div>
+
+    <aside class="proof-cta" aria-label="Client outcomes">
+      <div class="proof-copy">
+        <p class="proof-eyebrow">Verified portfolio metrics</p>
+        <p class="proof-stat">
+          {NETWORK_TOTALS.gscClicks.toLocaleString('en-GB')} GSC clicks ({NETWORK_TOTALS.gscClicksDelta}) across {NETWORK_TOTALS.liveSites} live inbound brands
+        </p>
+        <p class="proof-note">
+          Anonymized case snapshots from Google Search Console and GA4 · {CASES_PERIOD.current}
+        </p>
+      </div>
+      <a class="btn proof-btn" href="/cases/?utm=pricing-proof">See proof → Cases</a>
+    </aside>
 
     <section class="includes">
       <h2>What every plan includes</h2>
@@ -177,6 +191,44 @@ const faqSchema = {
     position: absolute;
     left: 0;
     color: var(--teal-soft);
+  }
+  .proof-cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    margin: 0 0 40px;
+    padding: 22px 24px;
+    border-radius: 14px;
+    border: 1px solid rgba(61, 184, 169, 0.28);
+    background: linear-gradient(135deg, rgba(61, 184, 169, 0.1), rgba(232, 184, 74, 0.06));
+  }
+  .proof-eyebrow {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+    margin-bottom: 8px;
+  }
+  .proof-stat {
+    font-family: var(--fd);
+    font-size: clamp(18px, 3vw, 22px);
+    letter-spacing: -0.02em;
+    color: var(--paper);
+    max-width: 36ch;
+    line-height: 1.25;
+  }
+  .proof-note {
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    max-width: 42ch;
+  }
+  .proof-btn {
+    flex-shrink: 0;
+    white-space: nowrap;
   }
   .guides-cta h2 {
     font-family: var(--fd);
