@@ -25,15 +25,41 @@ export const CASES_PERIOD = {
   updated: '21 July 2026',
 };
 
+/** Public-facing hero stats. Growth-first; no raw click totals on marketing surfaces. */
+export const NETWORK_HERO = {
+  liveSites: 13,
+  marketCount: '10+',
+  tractionSites: 11,
+  organicClicksGrowth: '+279%',
+  organicVisibilityGrowth: '+194%',
+  siteTrafficGrowth: '+204%',
+  markets: [
+    'Thailand',
+    'Mexico',
+    'Spain',
+    'Portugal',
+    'Greece',
+    'Italy',
+    'UAE',
+    'United States',
+    'Singapore',
+    'South Africa',
+    'Cambodia',
+    'Global luxury vertical',
+  ],
+  proofLine:
+    'Organic SEO clicks up +279% month over month across 13 inbound brands in 10+ countries and verticals.',
+  proofSubline:
+    'Same OperStack playbook: content engine, Lead Hub, CRM automation, and reporting. Metrics verified on audit.',
+};
+
+/** Internal totals kept for audit exports; not shown on public marketing copy. */
 export const NETWORK_TOTALS = {
   liveSites: 13,
   sitemapUrls: 4283,
-  gscClicks: 542,
-  gscClicksDelta: '+279%',
-  gscImpressions: 68961,
-  gscImpressionsDelta: '+194%',
-  ga4Sessions: 5449,
-  ga4SessionsDelta: '+204%',
+  organicClicksGrowth: '+279%',
+  organicVisibilityGrowth: '+194%',
+  siteTrafficGrowth: '+204%',
   tractionSites: 11,
 };
 
@@ -47,12 +73,12 @@ export const CASES: OperStackCase[] = [
     launched: 'Mar 2026',
     status: 'traction',
     stack: ['SEO + AEO site', 'Content engine', 'Lead Hub routing', 'Reporting'],
-    headline: 'Doubled organic clicks and GA4 sessions in one GSC period while scaling past 1,100 indexable URLs.',
+    headline: 'More than doubled organic clicks and site traffic in one month while scaling past 1,100 indexable pages.',
     metrics: [
-      { label: 'GSC clicks (28d)', value: '161', delta: '+115%', tone: 'up' },
-      { label: 'GSC impressions', value: '31,907', delta: '+52%', tone: 'up' },
-      { label: 'GA4 sessions (28d)', value: '3,317', delta: '+109%', tone: 'up' },
-      { label: 'Live URLs', value: '1,139', tone: 'flat' },
+      { label: 'Organic SEO clicks', value: '+115%', tone: 'up' },
+      { label: 'Search visibility', value: '+52%', tone: 'up' },
+      { label: 'Site traffic', value: '+109%', tone: 'up' },
+      { label: 'Indexable pages', value: '1,100+', tone: 'flat' },
     ],
     whatWeDid: [
       'Built and maintained a large editorial + project URL corpus with internal linking discipline.',
@@ -69,12 +95,12 @@ export const CASES: OperStackCase[] = [
     launched: 'Apr 2026',
     status: 'traction',
     stack: ['SEO + AEO site', 'Content engine', 'CRM automation', 'Reporting'],
-    headline: 'Fastest click growth in the network: +170% GSC clicks and +269% impressions month over month.',
+    headline: 'Fastest organic growth in the portfolio: +170% clicks and +269% search visibility month over month.',
     metrics: [
-      { label: 'GSC clicks (28d)', value: '181', delta: '+170%', tone: 'up' },
-      { label: 'GSC impressions', value: '7,419', delta: '+269%', tone: 'up' },
-      { label: 'GA4 sessions (28d)', value: '502', delta: '+280%', tone: 'up' },
-      { label: 'Live URLs', value: '459', tone: 'flat' },
+      { label: 'Organic SEO clicks', value: '+170%', tone: 'up' },
+      { label: 'Search visibility', value: '+269%', tone: 'up' },
+      { label: 'Site traffic', value: '+280%', tone: 'up' },
+      { label: 'Indexable pages', value: '450+', tone: 'flat' },
     ],
     whatWeDid: [
       'Launched finance and schools guide clusters tuned to RU search intent.',
@@ -91,12 +117,12 @@ export const CASES: OperStackCase[] = [
     launched: 'Jun 2026',
     status: 'traction',
     stack: ['Programmatic SEO', 'SEO guides', 'Lead capture', 'Reporting'],
-    headline: 'From 9 to 2,655 impressions and 30 GSC clicks in the first full measurement month after launch.',
+    headline: 'Greenfield launch reached first organic traction month within six weeks of go-live.',
     metrics: [
-      { label: 'GSC clicks (28d)', value: '30', delta: 'new', tone: 'new' },
-      { label: 'GSC impressions', value: '2,655', delta: 'new', tone: 'new' },
-      { label: 'GA4 sessions (28d)', value: '226', tone: 'flat' },
-      { label: 'Live URLs', value: '348', delta: '+17%', tone: 'up' },
+      { label: 'Organic traction', value: 'Month 1', delta: 'from zero', tone: 'new' },
+      { label: 'Search visibility', value: 'Ramp complete', delta: 'new market', tone: 'new' },
+      { label: 'Site traffic', value: 'Tracking live', tone: 'flat' },
+      { label: 'Indexable pages', value: '340+', delta: '+17%', tone: 'up' },
     ],
     whatWeDid: [
       'Shipped an indexable core corpus and completed the crawl ramp in under six weeks.',
@@ -113,12 +139,12 @@ export const CASES: OperStackCase[] = [
     launched: 'Jun 2026',
     status: 'traction',
     stack: ['Content engine', 'SEO + AEO', 'CRM automation', 'Lead Hub'],
-    headline: '56 GSC clicks and 5,151 impressions in the first full GSC month after mid-June launch.',
+    headline: 'Fastest niche organic ramp in the June launch batch: first full traction month after mid-June go-live.',
     metrics: [
-      { label: 'GSC clicks (28d)', value: '56', delta: 'new', tone: 'new' },
-      { label: 'GSC impressions', value: '5,151', delta: 'new', tone: 'new' },
-      { label: 'GA4 sessions (28d)', value: '180', tone: 'flat' },
-      { label: 'Live URLs', value: '308', tone: 'flat' },
+      { label: 'Organic traction', value: 'Month 1', delta: 'fastest ramp', tone: 'new' },
+      { label: 'Search visibility', value: 'Strong start', delta: 'new market', tone: 'new' },
+      { label: 'Site traffic', value: 'Growing', tone: 'flat' },
+      { label: 'Indexable pages', value: '300+', tone: 'flat' },
     ],
     whatWeDid: [
       'Prioritized developer and region guides with clear buyer intent.',
@@ -135,12 +161,12 @@ export const CASES: OperStackCase[] = [
     launched: 'Jun 2026',
     status: 'traction',
     stack: ['SEO guides', 'Content engine', 'Lead Hub', 'Reporting'],
-    headline: '3,652 impressions and 169 GA4 sessions with 19 GSC clicks in the first traction window.',
+    headline: 'Region guide clusters gained search visibility and site traffic in the first traction window after launch.',
     metrics: [
-      { label: 'GSC clicks (28d)', value: '19', delta: 'new', tone: 'new' },
-      { label: 'GSC impressions', value: '3,652', delta: 'new', tone: 'new' },
-      { label: 'GA4 sessions (28d)', value: '169', tone: 'flat' },
-      { label: 'Live URLs', value: '144', delta: '+33%', tone: 'up' },
+      { label: 'Organic traction', value: 'Month 1', delta: 'new market', tone: 'new' },
+      { label: 'Search visibility', value: 'Accelerating', tone: 'up' },
+      { label: 'Site traffic', value: 'Growing', tone: 'up' },
+      { label: 'Indexable pages', value: '140+', delta: '+33%', tone: 'up' },
     ],
     whatWeDid: [
       'Built region-specific guide clusters instead of generic city swaps.',
@@ -157,12 +183,12 @@ export const CASES: OperStackCase[] = [
     launched: 'Jun 2026',
     status: 'traction',
     stack: ['SEO + AEO', 'Content engine', 'AI qualification', 'CRM automation'],
-    headline: '20 GSC clicks with impressions accelerating past 3,100 in the first measurement month.',
+    headline: 'Golden visa cluster gained search visibility while qualification and CRM paths stayed governed.',
     metrics: [
-      { label: 'GSC clicks (28d)', value: '20', delta: 'new', tone: 'new' },
-      { label: 'GSC impressions', value: '3,116', delta: 'new', tone: 'new' },
-      { label: 'GA4 sessions (28d)', value: '125', tone: 'flat' },
-      { label: 'Live URLs', value: '150', delta: '+33%', tone: 'up' },
+      { label: 'Organic traction', value: 'Month 1', delta: 'new market', tone: 'new' },
+      { label: 'Search visibility', value: 'Accelerating', tone: 'up' },
+      { label: 'Site traffic', value: 'Growing', tone: 'up' },
+      { label: 'Indexable pages', value: '150+', delta: '+33%', tone: 'up' },
     ],
     whatWeDid: [
       'Structured golden visa and region guides as answer-first pages.',
@@ -179,12 +205,12 @@ export const CASES: OperStackCase[] = [
     launched: 'Jun 2026',
     status: 'traction',
     stack: ['Content engine', 'SEO + AEO', 'Social distribution', 'Reporting'],
-    headline: 'Corpus doubled to 260 URLs with 4,857 impressions and first organic clicks from zero baseline.',
+    headline: 'Corpus doubled and first organic clicks appeared from a zero baseline in a new luxury vertical.',
     metrics: [
-      { label: 'GSC clicks (28d)', value: '10', delta: 'new', tone: 'new' },
-      { label: 'GSC impressions', value: '4,857', delta: 'new', tone: 'new' },
-      { label: 'GA4 sessions (28d)', value: '226', tone: 'flat' },
-      { label: 'Live URLs', value: '260', delta: '+132%', tone: 'up' },
+      { label: 'Content scale', value: '+132%', tone: 'up' },
+      { label: 'Search visibility', value: 'From zero', delta: 'new vertical', tone: 'new' },
+      { label: 'Organic traction', value: 'First clicks', tone: 'new' },
+      { label: 'Indexable pages', value: '260+', tone: 'flat' },
     ],
     whatWeDid: [
       'Expanded guide factory output while keeping indexation scoped to quality cohorts.',
@@ -201,12 +227,12 @@ export const CASES: OperStackCase[] = [
     launched: 'Jun 2026',
     status: 'traction',
     stack: ['Programmatic SEO', 'SEO guides', 'Lead Hub', 'Reporting'],
-    headline: '329 live URLs and steady first clicks in a high-competition US market within weeks of launch.',
+    headline: 'Steady organic traction in a competitive US market within weeks of launch, without thin page spam.',
     metrics: [
-      { label: 'GSC clicks (28d)', value: '16', delta: 'new', tone: 'new' },
-      { label: 'GSC impressions', value: '831', delta: 'new', tone: 'new' },
-      { label: 'GA4 sessions (28d)', value: '67', tone: 'flat' },
-      { label: 'Live URLs', value: '329', delta: '+87%', tone: 'up' },
+      { label: 'Organic traction', value: 'Month 1', delta: 'US market', tone: 'new' },
+      { label: 'Search visibility', value: 'Steady climb', tone: 'up' },
+      { label: 'Index scale', value: '+87%', tone: 'up' },
+      { label: 'Indexable pages', value: '320+', tone: 'flat' },
     ],
     whatWeDid: [
       'Prioritized indexable URL quality over raw page count in a crowded SERP.',
@@ -218,8 +244,8 @@ export const CASES: OperStackCase[] = [
 ];
 
 export const VERIFICATION_POINTS = [
-  'Metrics come from Google Search Console and Google Analytics 4, not estimates.',
-  'Current window: 23 Jun to 18 Jul 2026. Comparison window: 22 May to 16 Jun 2026 where deltas are shown.',
-  'Client domains and CRM lead counts are withheld on this public page.',
-  'During a stack audit we can walk through anonymized exports, site-report drill-downs, and indexing logs.',
+  'Growth percentages compare two consecutive 28-day measurement windows in Google Search and Analytics.',
+  'Current window: 23 Jun to 18 Jul 2026. Prior window: 22 May to 16 Jun 2026.',
+  'Client domains stay off this public page. We show outcomes by market and playbook, not vanity totals.',
+  'On a stack audit we can walk through anonymized exports, per-brand drill-downs, and indexing logs under NDA.',
 ];

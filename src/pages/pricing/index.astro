@@ -3,7 +3,7 @@ import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import { PRICING_TIERS, PRICING_FAQ, PRICING_INCLUDES } from '../../data/pricing';
-import { NETWORK_TOTALS, CASES_PERIOD } from '../../data/cases';
+import { NETWORK_HERO } from '../../data/cases';
 import { SITE } from '../../data/site';
 
 const canonical = `${SITE.url}/pricing/`;
@@ -58,13 +58,9 @@ const faqSchema = {
 
     <aside class="proof-cta" aria-label="Client outcomes">
       <div class="proof-copy">
-        <p class="proof-eyebrow">Verified portfolio metrics</p>
-        <p class="proof-stat">
-          {NETWORK_TOTALS.gscClicks.toLocaleString('en-GB')} GSC clicks ({NETWORK_TOTALS.gscClicksDelta}) across {NETWORK_TOTALS.liveSites} live inbound brands
-        </p>
-        <p class="proof-note">
-          Anonymized case snapshots from Google Search Console and GA4 · {CASES_PERIOD.current}
-        </p>
+        <p class="proof-eyebrow">Verified portfolio outcomes</p>
+        <p class="proof-stat">{NETWORK_HERO.proofLine}</p>
+        <p class="proof-note">{NETWORK_HERO.proofSubline}</p>
       </div>
       <a class="btn proof-btn" href="/cases/?utm=pricing-proof">See proof → Cases</a>
     </aside>

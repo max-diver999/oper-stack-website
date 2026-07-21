@@ -1,7 +1,7 @@
 ---
 import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
-import { CASES, CASES_PERIOD, NETWORK_TOTALS, VERIFICATION_POINTS } from '../../data/cases';
+import { CASES, CASES_PERIOD, NETWORK_HERO, VERIFICATION_POINTS } from '../../data/cases';
 import { SITE } from '../../data/site';
 
 const canonical = `${SITE.url}/cases/`;
@@ -15,50 +15,56 @@ const statusLabel = {
 
 <CommercialLayout
   title={`Client outcomes · ${SITE.name}`}
-  description="Anonymized inbound operations results from live brands: GSC clicks, impressions, GA4 sessions, and stack modules deployed. Metrics verified on audit."
+  description="Anonymized inbound results from 13 live brands across 10+ markets: organic SEO growth, multi-country launches, and verified metrics on audit."
   canonical={canonical}
 >
   <div class="wrap wide">
     <p class="eyebrow">Verified portfolio outcomes</p>
-    <h1>Real inbound traction, without exposing client domains</h1>
+    <h1>One playbook. Thirteen markets. Measurable organic growth.</h1>
     <p class="lede">
-      OperStack runs SEO, content, qualification, and CRM routing as one system. These are anonymized snapshots from a live multi-brand portfolio updated {CASES_PERIOD.updated}.
+      OperStack runs SEO, content, qualification, and CRM routing as one system. These anonymized snapshots show the same stack working across countries, languages, and verticals. Updated {CASES_PERIOD.updated}.
     </p>
 
     <CitabilityBlock
-      text="OperStack has deployed inbound operating stacks across 13 live brands with 542 Google Search Console clicks (+279% period over period), 68,961 impressions (+194%), and 5,449 GA4 sessions (+204%) in the 28-day window ending 18 Jul 2026. Client names and URLs are withheld publicly; metric exports and site-report drill-downs are available during a stack audit."
+      text="OperStack increased portfolio-wide organic SEO clicks by +279% month over month across 13 live inbound brands in more than 10 countries and verticals, with search visibility up +194% and site traffic up +204% in the same 28-day comparison window. Client domains are withheld on this public page; anonymized exports are available during a stack audit."
     />
 
     <section class="kpi-grid" aria-label="Network totals">
       <article class="kpi">
-        <span class="kpi-val">{NETWORK_TOTALS.liveSites}</span>
+        <span class="kpi-val">{NETWORK_HERO.organicClicksGrowth}</span>
+        <span class="kpi-label">Organic SEO clicks vs prior month</span>
+        <span class="kpi-delta up">Portfolio-wide growth</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-val">{NETWORK_HERO.liveSites}</span>
         <span class="kpi-label">Live inbound brands</span>
-        <span class="kpi-delta up">{NETWORK_TOTALS.tractionSites} in traction</span>
+        <span class="kpi-delta up">{NETWORK_HERO.tractionSites} already in traction</span>
       </article>
       <article class="kpi">
-        <span class="kpi-val">{NETWORK_TOTALS.gscClicks.toLocaleString('en-GB')}</span>
-        <span class="kpi-label">GSC clicks (28d network sum)</span>
-        <span class="kpi-delta up">{NETWORK_TOTALS.gscClicksDelta} vs prior period</span>
+        <span class="kpi-val">{NETWORK_HERO.marketCount}</span>
+        <span class="kpi-label">Countries and verticals</span>
+        <span class="kpi-delta up">Same stack, different markets</span>
       </article>
       <article class="kpi">
-        <span class="kpi-val">{NETWORK_TOTALS.gscImpressions.toLocaleString('en-GB')}</span>
-        <span class="kpi-label">GSC impressions (28d)</span>
-        <span class="kpi-delta up">{NETWORK_TOTALS.gscImpressionsDelta} vs prior period</span>
-      </article>
-      <article class="kpi">
-        <span class="kpi-val">{NETWORK_TOTALS.ga4Sessions.toLocaleString('en-GB')}</span>
-        <span class="kpi-label">GA4 sessions (28d)</span>
-        <span class="kpi-delta up">{NETWORK_TOTALS.ga4SessionsDelta} vs prior period</span>
+        <span class="kpi-val">{NETWORK_HERO.siteTrafficGrowth}</span>
+        <span class="kpi-label">Site traffic vs prior month</span>
+        <span class="kpi-delta up">Search visibility {NETWORK_HERO.organicVisibilityGrowth}</span>
       </article>
     </section>
 
+    <ul class="market-pills" aria-label="Markets served">
+      {NETWORK_HERO.markets.map((market) => (
+        <li>{market}</li>
+      ))}
+    </ul>
+
     <p class="period-note">
-      Measurement: {CASES_PERIOD.current}. Comparison: {CASES_PERIOD.previous}. Sources: Google Search Console and GA4.
+      Growth compares {CASES_PERIOD.current} with {CASES_PERIOD.previous}. Percentages are period over period, not daily totals.
     </p>
 
     <h2 class="section-title">Selected cases</h2>
     <p class="section-lede">
-      Eight anonymized stories from the same operating playbook: content engine, Lead Hub, CRM automation, and reporting. No vanity traffic. Clicks, impressions, and sessions you can reconcile.
+      Eight anonymized stories from the same operating playbook. We lead with growth and market fit, not raw click counts that mean nothing without context.
     </p>
 
     <div class="case-grid">
@@ -191,6 +197,23 @@ const statusLabel = {
     font-size: 12px;
     color: var(--muted);
     margin-bottom: 36px;
+  }
+  .market-pills {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 12px;
+  }
+  .market-pills li {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 10px;
+    border-radius: 999px;
+    border: 1px solid rgba(61, 184, 169, 0.22);
+    color: rgba(245, 242, 236, 0.72);
   }
   .section-title {
     font-family: var(--fd);
