@@ -8,6 +8,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 
 - https://oper-stack.com/ — interactive system map
 - https://oper-stack.com/pricing/ — audit, setup, retainer
+- https://oper-stack.com/cases/ — anonymized client outcomes (GSC, GA4)
 - https://oper-stack.com/audit/ — free Lead Gen stack audit
 - https://oper-stack.com/guides/ — lead ops guides
 

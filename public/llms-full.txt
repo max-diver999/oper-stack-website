@@ -10,6 +10,7 @@ OperStack is a **standalone B2B brand**. It is not a real estate agency site. Es
 
 - https://oper-stack.com/ — interactive system map (9 modules + Lead Hub)
 - https://oper-stack.com/pricing/ — audit (free), setup, retainer
+- https://oper-stack.com/cases/ — anonymized portfolio outcomes with verified GSC and GA4 metrics
 - https://oper-stack.com/audit/ — free Lead Gen stack audit form
 - https://oper-stack.com/guides/ — lead operations guides index
 

@@ -1,0 +1,373 @@
+---
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import { CASES, CASES_PERIOD, NETWORK_TOTALS, VERIFICATION_POINTS } from '../../data/cases';
+import { SITE } from '../../data/site';
+
+const canonical = `${SITE.url}/cases/`;
+
+const statusLabel = {
+  traction: 'Traction',
+  early: 'Early signals',
+  indexing: 'Indexing',
+};
+---
+
+<CommercialLayout
+  title={`Client outcomes · ${SITE.name}`}
+  description="Anonymized inbound operations results from live brands: GSC clicks, impressions, GA4 sessions, and stack modules deployed. Metrics verified on audit."
+  canonical={canonical}
+>
+  <div class="wrap wide">
+    <p class="eyebrow">Verified portfolio outcomes</p>
+    <h1>Real inbound traction, without exposing client domains</h1>
+    <p class="lede">
+      OperStack runs SEO, content, qualification, and CRM routing as one system. These are anonymized snapshots from a live multi-brand portfolio updated {CASES_PERIOD.updated}.
+    </p>
+
+    <CitabilityBlock
+      text="OperStack has deployed inbound operating stacks across 13 live brands with 542 Google Search Console clicks (+279% period over period), 68,961 impressions (+194%), and 5,449 GA4 sessions (+204%) in the 28-day window ending 18 Jul 2026. Client names and URLs are withheld publicly; metric exports and site-report drill-downs are available during a stack audit."
+    />
+
+    <section class="kpi-grid" aria-label="Network totals">
+      <article class="kpi">
+        <span class="kpi-val">{NETWORK_TOTALS.liveSites}</span>
+        <span class="kpi-label">Live inbound brands</span>
+        <span class="kpi-delta up">{NETWORK_TOTALS.tractionSites} in traction</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-val">{NETWORK_TOTALS.gscClicks.toLocaleString('en-GB')}</span>
+        <span class="kpi-label">GSC clicks (28d network sum)</span>
+        <span class="kpi-delta up">{NETWORK_TOTALS.gscClicksDelta} vs prior period</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-val">{NETWORK_TOTALS.gscImpressions.toLocaleString('en-GB')}</span>
+        <span class="kpi-label">GSC impressions (28d)</span>
+        <span class="kpi-delta up">{NETWORK_TOTALS.gscImpressionsDelta} vs prior period</span>
+      </article>
+      <article class="kpi">
+        <span class="kpi-val">{NETWORK_TOTALS.ga4Sessions.toLocaleString('en-GB')}</span>
+        <span class="kpi-label">GA4 sessions (28d)</span>
+        <span class="kpi-delta up">{NETWORK_TOTALS.ga4SessionsDelta} vs prior period</span>
+      </article>
+    </section>
+
+    <p class="period-note">
+      Measurement: {CASES_PERIOD.current}. Comparison: {CASES_PERIOD.previous}. Sources: Google Search Console and GA4.
+    </p>
+
+    <h2 class="section-title">Selected cases</h2>
+    <p class="section-lede">
+      Eight anonymized stories from the same operating playbook: content engine, Lead Hub, CRM automation, and reporting. No vanity traffic. Clicks, impressions, and sessions you can reconcile.
+    </p>
+
+    <div class="case-grid">
+      {CASES.map((item) => (
+        <article class="case-card" id={item.id}>
+          <header class="case-head">
+            <div>
+              <h3>{item.title}</h3>
+              <p class="case-sub">{item.subtitle}</p>
+            </div>
+            <span class:list={['badge', item.status]}>{statusLabel[item.status]}</span>
+          </header>
+
+          <p class="case-headline">{item.headline}</p>
+
+          <dl class="metric-row">
+            {item.metrics.map((m) => (
+              <div class="metric">
+                <dt>{m.label}</dt>
+                <dd>
+                  <span class="metric-val">{m.value}</span>
+                  {m.delta && (
+                    <span class:list={['metric-delta', m.tone ?? 'flat']}>{m.delta}</span>
+                  )}
+                </dd>
+              </div>
+            ))}
+          </dl>
+
+          <div class="meta-row">
+            <span>{item.market}</span>
+            <span>Launched {item.launched}</span>
+          </div>
+
+          <ul class="stack-tags">
+            {item.stack.map((mod) => (
+              <li>{mod}</li>
+            ))}
+          </ul>
+
+          <details class="case-details">
+            <summary>What OperStack deployed</summary>
+            <ul>
+              {item.whatWeDid.map((line) => (
+                <li>{line}</li>
+              ))}
+            </ul>
+            <p class="proof">{item.proofNote}</p>
+          </details>
+        </article>
+      ))}
+    </div>
+
+    <section class="verify">
+      <h2>How we substantiate these numbers</h2>
+      <ul>
+        {VERIFICATION_POINTS.map((point) => (
+          <li>{point}</li>
+        ))}
+      </ul>
+      <p>
+        Want the full portfolio view with per-brand drill-down? Request an audit. We can share anonymized exports and live dashboards under NDA, not on this public page.
+      </p>
+      <p style="margin-top:20px">
+        <a class="btn" href="/audit/?utm=cases">Request stack audit →</a>
+        <a class="btn btn-ghost" href="/guides/lead-ops-stack/" style="margin-left:12px">Read the architecture</a>
+      </p>
+    </section>
+  </div>
+</CommercialLayout>
+
+<style>
+  .eyebrow {
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--teal-soft);
+    margin-bottom: 10px;
+  }
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 12px;
+    margin: 28px 0 12px;
+  }
+  @media (max-width: 900px) {
+    .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+  }
+  @media (max-width: 520px) {
+    .kpi-grid { grid-template-columns: 1fr; }
+  }
+  .kpi {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 18px 16px;
+  }
+  .kpi-val {
+    display: block;
+    font-family: var(--fd);
+    font-size: clamp(28px, 4vw, 36px);
+    font-weight: 600;
+    letter-spacing: -0.03em;
+    color: var(--teal-soft);
+    line-height: 1;
+  }
+  .kpi-label {
+    display: block;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+  .kpi-delta {
+    display: inline-block;
+    margin-top: 10px;
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 3px 8px;
+    border-radius: 999px;
+  }
+  .kpi-delta.up {
+    background: rgba(61, 184, 169, 0.15);
+    color: var(--teal-soft);
+  }
+  .period-note {
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 36px;
+  }
+  .section-title {
+    font-family: var(--fd);
+    font-size: 28px;
+    letter-spacing: -0.02em;
+    margin-bottom: 8px;
+  }
+  .section-lede {
+    color: rgba(245, 242, 236, 0.78);
+    max-width: 62ch;
+    margin-bottom: 24px;
+  }
+  .case-grid {
+    display: grid;
+    gap: 16px;
+  }
+  .case-card {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 22px 22px 18px;
+    background: linear-gradient(145deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));
+  }
+  .case-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  .case-head h3 {
+    font-family: var(--fd);
+    font-size: 22px;
+    letter-spacing: -0.02em;
+  }
+  .case-sub {
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+  .badge {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    padding: 5px 10px;
+    border-radius: 999px;
+    white-space: nowrap;
+  }
+  .badge.traction {
+    background: rgba(61, 184, 169, 0.18);
+    color: var(--teal-soft);
+  }
+  .badge.early {
+    background: rgba(96, 165, 250, 0.15);
+    color: #93c5fd;
+  }
+  .badge.indexing {
+    background: rgba(232, 184, 74, 0.15);
+    color: var(--amber-soft);
+  }
+  .case-headline {
+    font-size: 15px;
+    color: rgba(245, 242, 236, 0.9);
+    margin-bottom: 16px;
+    max-width: 70ch;
+  }
+  .metric-row {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  @media (max-width: 760px) {
+    .metric-row { grid-template-columns: repeat(2, 1fr); }
+  }
+  .metric {
+    background: rgba(0, 0, 0, 0.22);
+    border-radius: 10px;
+    padding: 10px 12px;
+  }
+  .metric dt {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .metric dd {
+    margin: 0;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .metric-val {
+    font-weight: 700;
+    font-size: 18px;
+    color: var(--paper);
+  }
+  .metric-delta {
+    font-family: var(--fm);
+    font-size: 10px;
+    padding: 2px 7px;
+    border-radius: 999px;
+  }
+  .metric-delta.up {
+    background: rgba(61, 184, 169, 0.15);
+    color: var(--teal-soft);
+  }
+  .metric-delta.new {
+    background: rgba(96, 165, 250, 0.15);
+    color: #93c5fd;
+  }
+  .meta-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 12px;
+  }
+  .stack-tags {
+    list-style: none;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .stack-tags li {
+    font-family: var(--fm);
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(61, 184, 169, 0.25);
+    color: rgba(245, 242, 236, 0.75);
+  }
+  .case-details {
+    border-top: 1px solid rgba(255, 255, 255, 0.06);
+    padding-top: 12px;
+  }
+  .case-details summary {
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--teal-soft);
+  }
+  .case-details ul {
+    margin: 12px 0 0 18px;
+    color: rgba(245, 242, 236, 0.82);
+    font-size: 14px;
+  }
+  .case-details li { margin-bottom: 6px; }
+  .proof {
+    margin-top: 10px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .verify {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .verify h2 {
+    font-family: var(--fd);
+    font-size: 26px;
+    margin-bottom: 12px;
+  }
+  .verify ul {
+    margin: 0 0 16px 20px;
+    color: rgba(245, 242, 236, 0.85);
+  }
+  .verify li { margin-bottom: 8px; }
+  .verify p {
+    color: rgba(245, 242, 236, 0.78);
+    max-width: 62ch;
+  }
+</style>
