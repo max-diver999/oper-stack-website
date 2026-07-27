@@ -2,10 +2,10 @@
   "trailingSlash": true,
   "redirects": [
     {
-      "source": "/:path*",
+      "source": "/(.*)",
       "has": [{ "type": "host", "value": "www.oper-stack.com" }],
-      "destination": "https://oper-stack.com/:path*",
-      "permanent": true
+      "destination": "https://oper-stack.com/$1",
+      "statusCode": 308
     }
   ],
   "headers": [
