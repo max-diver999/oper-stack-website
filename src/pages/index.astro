@@ -239,10 +239,7 @@ import Favicon from '../components/Favicon.astro';
   .site-links a:hover { color: var(--teal-soft); }
 
   body.is-mobile .site-links {
-    right: 18px;
-    bottom: 14px;
-    gap: 12px;
-    font-size: 8px;
+    display: none;
   }
 
   #core {
@@ -842,21 +839,43 @@ import Favicon from '../components/Favicon.astro';
   body.is-mobile #layer,
   body.is-mobile .vignette {
     bottom: auto;
-    height: var(--map-h, 42vh);
+    height: var(--map-h, 34vh);
   }
 
   body.is-mobile .hud {
-    padding: 14px 18px 6px;
+    padding: max(10px, env(safe-area-inset-top)) 16px 10px;
     pointer-events: none;
+    z-index: 9;
+    align-items: flex-start;
+    max-width: 100%;
+    background: linear-gradient(
+      180deg,
+      rgba(11, 16, 23, 0.97) 0%,
+      rgba(11, 16, 23, 0.88) 52%,
+      rgba(11, 16, 23, 0) 100%
+    );
+  }
+
+  body.is-mobile .hud-copy {
+    max-width: min(292px, 86vw);
+  }
+
+  body.is-mobile .eyebrow {
+    display: none;
   }
 
   body.is-mobile h1 {
-    font-size: 21px;
-    max-width: 18ch;
-    margin-top: 8px;
+    font-size: clamp(16px, 4.6vw, 19px);
+    line-height: 1.24;
+    max-width: 14ch;
+    margin-top: 4px;
   }
 
-  body.is-mobile .brand { margin-bottom: 8px; font-size: 9px; }
+  body.is-mobile .brand {
+    margin-bottom: 4px;
+    font-size: 8px;
+    letter-spacing: 0.2em;
+  }
   body.is-mobile .meta,
   body.is-mobile .legend,
   body.is-mobile .hint { display: none; }
@@ -1009,13 +1028,26 @@ import Favicon from '../components/Favicon.astro';
     opacity: 0 !important;
   }
 
-  body.is-mobile .db.mob-focus .dn {
-    opacity: 1;
-    transform: translateY(0);
+  body.is-mobile .node .name,
+  body.is-mobile .node .role {
+    display: none !important;
+  }
+
+  body.is-mobile .db .dn {
+    display: none !important;
   }
 
   body.is-mobile .core-cap {
-    top: 108px;
+    display: none;
+  }
+
+  body.is-mobile #core {
+    width: 92px;
+    height: 92px;
+  }
+
+  body.is-mobile .node.mob-focus {
+    z-index: 3;
   }
 
   body.is-mobile .panel {
@@ -1035,8 +1067,14 @@ import Favicon from '../components/Favicon.astro';
   }
 
   @media (max-width: 760px) {
-    .hud { padding: 24px 20px; flex-direction: column; gap: 16px; }
-    .meta { text-align: left; }
+    body:not(.is-mobile) .hud {
+      padding: 24px 20px;
+      flex-direction: column;
+      gap: 16px;
+    }
+    body:not(.is-mobile) .meta {
+      text-align: left;
+    }
   }
 </style>
 </head>
@@ -1322,7 +1360,7 @@ import Favicon from '../components/Favicon.astro';
   const SPR = { teal: makeGlow(TEAL), amber: makeGlow(AMBER) };
 
   const S = {
-    w: 0, h: 0, dpr: 1, last: 0, mobile: false, mobFocus: 0, mapH: 0,
+    w: 0, h: 0, dpr: 1, last: 0, mobile: false, mobFocus: -1, mapH: 0,
     core: { x: 0, y: 0, r: 52, px: 0, py: 0 },
     active: null,
     ptr: { x: -9999, y: -9999, sx: -9999, sy: -9999, heat: 0, active: false },
@@ -1382,10 +1420,10 @@ import Favicon from '../components/Favicon.astro';
 
   function layoutMobile(mh) {
     const cx = S.w * 0.5;
-    const cy = mh * 0.64;
+    const cy = mh * 0.58;
     S.core.x = cx;
     S.core.y = cy;
-    S.core.r = clamp(Math.min(S.w, mh) * 0.075, 30, 44);
+    S.core.r = clamp(Math.min(S.w, mh) * 0.068, 28, 40);
 
     nodes.forEach((n, i) => {
       const on = S.mobFocus >= 0 && i === S.mobFocus;
@@ -1393,7 +1431,7 @@ import Favicon from '../components/Favicon.astro';
       n.el.classList.toggle("mob-focus", on);
       if (on) {
         n.tx = cx;
-        n.ty = mh * 0.26;
+        n.ty = mh * 0.44;
         n.x = n.tx;
         n.y = n.ty;
         n.vx = 0;
@@ -1402,7 +1440,7 @@ import Favicon from '../components/Favicon.astro';
     });
 
     if (S.mobFocus < 0) {
-      S.core.y = mh * 0.5;
+      S.core.y = mh * 0.52;
     }
   }
 
@@ -1642,7 +1680,7 @@ import Favicon from '../components/Favicon.astro';
     S.mobile = S.w < MOB_BP;
     document.body.classList.toggle("is-mobile", S.mobile);
 
-    S.mapH = S.mobile ? clamp(S.h * 0.4, 260, 360) : S.h;
+    S.mapH = S.mobile ? clamp(S.h * 0.34, 200, 290) : S.h;
     document.documentElement.style.setProperty("--map-h", S.mapH + "px");
 
     const ch = S.mobile ? S.mapH : S.h;
@@ -1653,7 +1691,7 @@ import Favicon from '../components/Favicon.astro';
     ctx.setTransform(S.dpr, 0, 0, S.dpr, 0, 0);
 
     if (S.mobile) {
-      if (S.mobFocus === undefined) S.mobFocus = 0;
+      if (S.mobFocus === undefined) S.mobFocus = -1;
       layoutMobile(S.mapH);
     } else {
       S.core.x = S.w * 0.5;
@@ -1681,18 +1719,8 @@ import Favicon from '../components/Favicon.astro';
     const mh = S.mapH || S.h;
     dbs.forEach((d) => {
       if (S.mobile) {
-        if (S.mobFocus < 0 || d.mi !== S.mobFocus) {
-          d.el.classList.add("mob-off");
-          d.el.classList.remove("mob-focus", "lit");
-          return;
-        }
-        d.el.classList.remove("mob-off");
-        d.el.classList.add("mob-focus", "lit");
-        const cx = S.w * 0.5;
-        const sibs = MODULES[d.mi].feeds.length;
-        const idx = dbs.filter((x) => x.mi === d.mi).indexOf(d);
-        d.x = cx + (idx - (sibs - 1) / 2) * 76;
-        d.y = mh * 0.06;
+        d.el.classList.add("mob-off");
+        d.el.classList.remove("mob-focus", "lit");
         return;
       }
       d.el.classList.remove("mob-off", "mob-focus");
