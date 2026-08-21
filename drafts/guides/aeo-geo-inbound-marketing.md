@@ -259,7 +259,7 @@ Three requirements make that chain work:
 
 Then read the result by landing guide rather than by session count: how many qualified opportunities entered from `/guides/` paths this quarter, and which guides produce citations but no conversions. A guide that gets cited and never converts usually has a weak or missing next step, not a visibility problem.
 
-The mechanics of source capture, original versus latest touch, identity stitching, and the revenue join are owned by the [lead attribution guide](/guides/lead-attribution-inbound/). Use its model rather than building a parallel one here, and check scope and next steps on [pricing](/pricing/).
+The mechanics of source capture, original versus latest touch, identity stitching, and the revenue join are owned by the [lead attribution guide](/guides/lead-attribution-inbound/). Use its model rather than building a parallel one here, and check scope and next steps on [pricing](/pricing/). Whether the answer-engine work returns more than it costs to produce and maintain is a different calculation with its own inputs, and it is worked through in the guide on [inbound automation payback](/guides/inbound-automation-roi/).
 
 ## What goes wrong most often, and what can this work not do?
 

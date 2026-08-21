@@ -175,7 +175,7 @@ Qualification stops the moment the system has recorded an outcome and the eviden
 
 ## How should the handoff package be structured?
 
-The handoff should let a rep act without rereading a transcript, while preserving enough evidence that a wrong read can be corrected. Summaries must separate facts from interpretation. "Enterprise prospect" is an interpretation. "Team of 400, asked about single sign-on and a procurement timeline" is evidence.
+The handoff should let a rep act without rereading a transcript, while preserving enough evidence that a wrong read can be corrected. Whether a record is ready for a rep at all is a prior question: the acceptance criteria that separate a marketing-qualified record from one sales has agreed to work, and the return path when those criteria are not met, belong to the [MQL and SQL handoff guide](/guides/mql-sql-lead-handoff/). Summaries must separate facts from interpretation. "Enterprise prospect" is an interpretation. "Team of 400, asked about single sign-on and a procurement timeline" is evidence.
 
 | Handoff field | Example content | Rule |
 | --- | --- | --- |

@@ -83,6 +83,8 @@ Keep lifecycle and pipeline stage as two fields. Lifecycle answers "what is this
 | Lost | Closed negative, reason stored | Attempting contact, on a new event only | Keep the loss reason intact |
 | Nurture | Not ready in this period | Attempting contact | Sequence or stored revisit date |
 
+One row in that table depends on a definition this guide does not own. The Qualified stage fires on the written SQL definition, and where marketing qualification ends, what sales agrees to accept, and what a rep may send back are settled in the [MQL and SQL handoff guide](/guides/mql-sql-lead-handoff/); the state machine only enforces whatever that agreement says.
+
 Nine stages is a recommendation for a team with a defined sales motion, not a number to defend. Add one only when it changes the owner, the required evidence, the service expectation, or the next action. Everything outside the transition column is a forbidden move, and forbidding it pays: a jump from New inbound straight to Qualified means somebody skipped the evidence, and a manual move from Lost back to Engaged with no new event turns loss-reason data into fiction.
 
 HubSpot's [lead pipeline automation documentation](https://knowledge.hubspot.com/object-settings/set-up-lead-pipeline-automation) is a worked example of action-based progression, where logged outreach and a connected reply move a lead forward. Verify the current product behavior before depending on it. What transfers is the principle: movement follows recorded evidence.

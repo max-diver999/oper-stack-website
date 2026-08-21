@@ -224,7 +224,7 @@ The revenue join needs stable keys and an explicit grain. Person-level source ca
 
 For a simple sales motion, report original-source revenue using the primary contact present when the deal was created. For account-based selling, define a buying-group rule and show influenced pipeline separately. Never multiply full deal revenue across every associated contact: attributed revenue then exceeds actual revenue and nobody trusts the page afterwards.
 
-Fix the cohort basis and state it on every chart. Deals grouped by the month the person was created answer a demand-generation question; deals grouped by close month answer a cash question, and mixing them is how a good channel appears to collapse. Keep the CRM authoritative for the revenue amount even when the hub stores a copy. What this does to the economics of your inbound operation is a separate question; this guide stops at making the link reproducible.
+Fix the cohort basis and state it on every chart. Deals grouped by the month the person was created answer a demand-generation question; deals grouped by close month answer a cash question, and mixing them is how a good channel appears to collapse. Keep the CRM authoritative for the revenue amount even when the hub stores a copy. What this does to the economics of your inbound operation, including what the automation cost to build and when it pays that back, is worked through in the guide on [inbound automation payback](/guides/inbound-automation-roi/); this guide stops at making the link reproducible.
 
 ## Which system answers which question?
 
