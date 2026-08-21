@@ -8,47 +8,44 @@
 - Сестра (RU): `oper-stack-ru` → https://oper-stack.ru/
 - Программа: `more-group-content-os/programs/oper-stack.yaml`
 
-## Фаза 0 — аудит + fix-batch + roadmap (✅ 2026-08-21, ждёт «ок» Максима)
+## Фаза 0 — аудит и fix-batch (✅ 2026-08-21)
 
-Content OS pilot подключён **2026-08-21**, на GitHub `main`.
-
-| Задача Claude | Статус |
+| Задача | Статус |
 |---|---|
 | Полный аудит 10 EN-гайдов | ✅ отчёт в `oper-stack-ru/.content-os/reports/SITE-AUDIT-2026-08-21.md` |
-| Карта кластера vs `OPERSTACK_CONTENT_POLICY.md` | ✅ прямой каннибализации нет, пограничные зоны разведены |
-| Gap vs SERP briefs в content-os | ✅ закрыт по объёму и покрытию must-cover |
+| Карта кластера vs `OPERSTACK_CONTENT_POLICY.md` | ✅ границы владения разведены |
+| Gap vs SERP briefs | ✅ закрыт по объёму и покрытию must-cover |
 | Fix-batch 10 EN-гайдов | ✅ ветка `claude/operstack-en-content-fix` |
-| Roadmap новых статей EN (+ sync slug RU) | ✅ `oper-stack-ru/.content-os/batches/content-roadmap-2026-08-21.md` |
-| Dzen B2B темы (RU) | ✅ `dzen-roadmap-2026-08-21.md` |
-| Написание новых статей | ⛔ СТОП до «ок» Максима |
 
-### Опубликованный корпус (10 guides)
+Что дал fix-batch: заголовки сведены с 22–35 до 15–17 на статью (было по 70–100 слов на секцию, статьи читались как склейка чек-листов); служебный язык контент-движка убран из читательских заголовков; добавлены атрибутированные источники, 3–5 на статью, у `lead-hub-vs-crm` их было ноль; pillar получил секцию «LeadOps vs RevOps vs marketing automation», до этого RevOps не упоминался во всём корпусе; восстановлены CTA-ссылки `/audit/?utm=guide-*`, которые страница аудита читает как источник заявки.
 
-Pillar: `lead-ops-stack`. Supporting: ai-lead-qualification, crm-automation-inbound, programmatic-seo-lead-gen, lead-routing-playbook, aeo-geo-inbound-marketing, sales-team-onboarding-ai, lead-attribution-inbound, sla-speed-to-lead, lead-hub-vs-crm.
+## Фаза 1 — новые статьи (✅ одобрено Максимом 2026-08-21)
 
-### Что сделал fix-batch
+Одобрение и волны зафиксированы в `oper-stack-ru/.content-os/lock.json`.
 
-- Слияние фрагментированных секций: было 22–35 H2 на статью при ~2 300 словах (по 70–100 слов на секцию), стало 15–17 H2 при существенно большем объёме. Политика прямо запрещает статьи-склейки из чек-листов.
-- Служебный GEO-язык убран из читательских заголовков: «Citability block», «Probe query library for OperStack guides», «AI sub-query cluster map», «Monthly probe log». Содержание секций сохранено под нормальными вопросами.
-- Добавлены атрибутированные источники, 3–5 на статью. `lead-hub-vs-crm` был единственным гайдом с нулём источников, теперь их четыре. Старые исследования подаются с годом и ограничениями: HBR 2011 как отдельный аудит 2 241 компании со средним ответом около 42 часов среди ответивших, MIT/InsideSales как сравнение шансов внутри своего датасета.
-- Pillar получил секцию «LeadOps vs RevOps vs marketing automation» (пункт №1 must-cover брифа). До этого RevOps не упоминался во всём корпусе ни разу, то есть кластер был нецитируем по определяющему сравнению своей категории.
-- Границы владения темами приведены в соответствие с политикой: эскалация ушла к `sla-speed-to-lead`, аттестация к `sales-team-onboarding-ai`, дедупликация к `crm-automation-inbound`. В остальных статьях остались абзац и ссылка.
-- Проставлен `updatedDate: 2026-08-21`, FAQ доведены до 6–7 пунктов.
-- Восстановлены CTA-ссылки `/audit/?utm=guide-*`: страница `/audit/` читает эту метку и передаёт её в заявку.
+Восемь новых EN-slug: `inbound-automation-roi`, `lead-ops-vs-revops`, `mql-sql-lead-handoff`, `website-lead-capture`, `lead-follow-up-system`, `inbound-lead-audit`, `inbound-lead-reporting`, `ai-sdr-vs-human-sdr`. Английский корпус вырос с 10 до 18 гайдов.
 
-### Новый бриф
+Каждая статья написана по SERP-брифу с явным разделом «Ownership boundary», который запрещает забирать тему у существующего гайда. Аудит фазы 0 показал, что кластер ломается именно так, поэтому граница фиксировалась до написания, а не чинилась после.
 
-`lead-hub-vs-crm` был единственным опубликованным slug без SERP-брифа. Бриф создан в `more-group-content-os` (ветка `claude/operstack-briefs-fix`), там же переименован `inbound-sla-speed-to-lead.md` в `sla-speed-to-lead.md` под реальный slug.
+Чем закрываются дыры: кластер покрывал только середину воронки. Новые статьи закрывают приём заявки, дожим, отчётность, экономику и три позиционных провала (RevOps, граница MQL и SQL, решение о покупке ИИ-агента). `inbound-lead-audit` работает диагностической точкой входа и навигатором по кластеру, он же поддерживает страницу `/audit/`.
 
-### Что НЕ смешивать
+**Локальная политика:** тема, которая не имеет смысла на английском, на английском не пишется, и наоборот (`locale_only_slugs_allowed` в программе). Поэтому у двух русских slug (`amocrm-bitrix24-lead-ops`, `telegram-leads-crm`) английских пар нет и не будет. Ссылаться на них из английских файлов нельзя.
+
+## Что НЕ смешивать
 
 - **Не** контент moregroup.estate / moregroupestate.ru
 - **Не** Phuket Дzen (`dzen-registry.md`)
 - Технические паттерны MORE Group — только из playbook, не тексты
 
-### Следующий шаг
+## Ветки
 
-После «ок» Максима волна 1: `inbound-automation-roi`, `lead-ops-vs-revops`, `mql-sql-lead-handoff` (EN + RU). Сначала PR с briefs в `more-group-content-os`, затем PR с MDX в оба сайта.
+| Репозиторий | Ветка |
+|---|---|
+| oper-stack-website | `claude/operstack-en-content-fix` |
+| oper-stack-ru | `claude/operstack-content-audit-5g58sm` |
+| more-group-content-os | `claude/operstack-briefs-fix` |
+
+PR не открыты: открываю только по явной просьбе. Порядок обязателен: сначала PR в `more-group-content-os` с briefs, затем PR в оба сайта.
 
 ## Submodule
 
