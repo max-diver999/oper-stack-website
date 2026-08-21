@@ -10,7 +10,7 @@
 
 ## Фаза 0 — аудит + topic discovery (⏳ старт 2026-08-21)
 
-Content OS pilot подключён локально. **На GitHub ещё не выложено** — ждём «ок» / «выложи» от Максима.
+Content OS pilot подключён **2026-08-21**, на GitHub `main`.
 
 | Задача Claude | Статус |
 |---|---|
@@ -41,8 +41,8 @@ Pull main. oper-stack.com EN — Content OS pilot. Прочитай .content-os/
 ## Submodule
 
 ```bash
-git submodule add https://github.com/max-diver999/more-group-content-os.git more-group-content-os
+git pull origin main
 git submodule update --init --recursive
 ```
 
-(Submodule на GitHub — после merge content-os + site repos.)
+Submodule `more-group-content-os` → commit `7ebb62c` (program oper-stack).
