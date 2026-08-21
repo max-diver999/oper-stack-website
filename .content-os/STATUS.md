@@ -8,35 +8,44 @@
 - Сестра (RU): `oper-stack-ru` → https://oper-stack.ru/
 - Программа: `more-group-content-os/programs/oper-stack.yaml`
 
-## Фаза 0 — аудит + topic discovery (⏳ старт 2026-08-21)
+## Фаза 0 — аудит и fix-batch (✅ 2026-08-21)
 
-Content OS pilot подключён **2026-08-21**, на GitHub `main`.
-
-| Задача Claude | Статус |
+| Задача | Статус |
 |---|---|
-| Полный аудит 10 EN-гайдов | не начат |
-| Карта кластера vs `OPERSTACK_CONTENT_POLICY.md` | не начат |
-| Gap vs 10 SERP briefs в content-os | не начат |
-| Roadmap новых статей EN (+ sync slug RU) | не начат |
-| Dzen B2B темы (RU) | см. `dzen-registry-operstack.md` |
+| Полный аудит 10 EN-гайдов | ✅ отчёт в `oper-stack-ru/.content-os/reports/SITE-AUDIT-2026-08-21.md` |
+| Карта кластера vs `OPERSTACK_CONTENT_POLICY.md` | ✅ границы владения разведены |
+| Gap vs SERP briefs | ✅ закрыт по объёму и покрытию must-cover |
+| Fix-batch 10 EN-гайдов | ✅ ветка `claude/operstack-en-content-fix` |
 
-### Опубликованный корпус (10 guides)
+Что дал fix-batch: заголовки сведены с 22–35 до 15–17 на статью (было по 70–100 слов на секцию, статьи читались как склейка чек-листов); служебный язык контент-движка убран из читательских заголовков; добавлены атрибутированные источники, 3–5 на статью, у `lead-hub-vs-crm` их было ноль; pillar получил секцию «LeadOps vs RevOps vs marketing automation», до этого RevOps не упоминался во всём корпусе; восстановлены CTA-ссылки `/audit/?utm=guide-*`, которые страница аудита читает как источник заявки.
 
-Pillar: `lead-ops-stack`. Supporting: ai-lead-qualification, crm-automation-inbound, programmatic-seo-lead-gen, lead-routing-playbook, aeo-geo-inbound-marketing, sales-team-onboarding-ai, lead-attribution-inbound, sla-speed-to-lead, lead-hub-vs-crm.
+## Фаза 1 — новые статьи (✅ одобрено Максимом 2026-08-21)
 
-### Что НЕ смешивать
+Одобрение и волны зафиксированы в `oper-stack-ru/.content-os/lock.json`.
 
-- **Не** контент moregroup.estate / moregroupestate.ru  
-- **Не** Phuket Дzen (`dzen-registry.md`)  
+Восемь новых EN-slug: `inbound-automation-roi`, `lead-ops-vs-revops`, `mql-sql-lead-handoff`, `website-lead-capture`, `lead-follow-up-system`, `inbound-lead-audit`, `inbound-lead-reporting`, `ai-sdr-vs-human-sdr`. Английский корпус вырос с 10 до 18 гайдов.
+
+Каждая статья написана по SERP-брифу с явным разделом «Ownership boundary», который запрещает забирать тему у существующего гайда. Аудит фазы 0 показал, что кластер ломается именно так, поэтому граница фиксировалась до написания, а не чинилась после.
+
+Чем закрываются дыры: кластер покрывал только середину воронки. Новые статьи закрывают приём заявки, дожим, отчётность, экономику и три позиционных провала (RevOps, граница MQL и SQL, решение о покупке ИИ-агента). `inbound-lead-audit` работает диагностической точкой входа и навигатором по кластеру, он же поддерживает страницу `/audit/`.
+
+**Локальная политика:** тема, которая не имеет смысла на английском, на английском не пишется, и наоборот (`locale_only_slugs_allowed` в программе). Поэтому у двух русских slug (`amocrm-bitrix24-lead-ops`, `telegram-leads-crm`) английских пар нет и не будет. Ссылаться на них из английских файлов нельзя.
+
+## Что НЕ смешивать
+
+- **Не** контент moregroup.estate / moregroupestate.ru
+- **Не** Phuket Дzen (`dzen-registry.md`)
 - Технические паттерны MORE Group — только из playbook, не тексты
 
-### Следующий шаг для Claude (скопировать в чат)
+## Ветки
 
-```text
-Pull main. oper-stack.com EN — Content OS pilot. Прочитай .content-os/STATUS.md, site-passport, programs/oper-stack.yaml, docs/OPERSTACK_CONTENT_POLICY.md, SERP briefs oper-stack-website.
+| Репозиторий | Ветка |
+|---|---|
+| oper-stack-website | `claude/operstack-en-content-fix` |
+| oper-stack-ru | `claude/operstack-content-audit-5g58sm` |
+| more-group-content-os | `claude/operstack-briefs-fix` |
 
-Задача: полный аудит сайта + предложить roadmap новых гайдов (EN) и sync-тем для RU + идеи для Dzen B2B (отдельный реестр). Отчёт в .content-os/reports/ и roadmap в .content-os/batches/. СТОП до «ок». PR только после «ок».
-```
+PR не открыты: открываю только по явной просьбе. Порядок обязателен: сначала PR в `more-group-content-os` с briefs, затем PR в оба сайта.
 
 ## Submodule
 
@@ -44,5 +53,3 @@ Pull main. oper-stack.com EN — Content OS pilot. Прочитай .content-os/
 git pull origin main
 git submodule update --init --recursive
 ```
-
-Submodule `more-group-content-os` → commit `7ebb62c` (program oper-stack).
