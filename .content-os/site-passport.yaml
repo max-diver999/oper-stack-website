@@ -1,0 +1,47 @@
+content_os_version: "2.5.0-pilot"
+site_id: oper-stack-website
+domain: oper-stack.com
+github: max-diver999/oper-stack-website
+program: oper-stack
+sister_site: oper-stack-ru
+
+pilot_goal: "B2B inbound leads — audit EN corpus, propose new guides, sync topics with RU"
+pilot_mode: topic_discovery_and_expansion
+pilot_started: "2026-08-21"
+
+reference_for_patterns_only:
+  site: more-group-website
+  playbook: more-group-content-os/reference-sites/more-group-website/playbook.md
+  never_copy_content_from: [more-group-website, moregroupestate-ru]
+
+content:
+  collections:
+    guides: src/content/guides
+  published_guides: 10
+  pillar_slug: lead-ops-stack
+  cluster_map: docs/OPERSTACK_CONTENT_POLICY.md
+  serp_briefs: more-group-content-os/content-engine/serp-briefs/oper-stack-website
+  positioning: POSITIONING.md
+
+topic_discovery:
+  mode: auto_propose_then_approve
+  proposal_output: .content-os/batches/topics-proposal.json
+  roadmap_output: .content-os/batches/content-roadmap-{date}.md
+  audit_output: .content-os/reports/SITE-AUDIT-{date}.md
+  batch_size_default: 3
+  inputs:
+    - docs/OPERSTACK_CONTENT_POLICY.md
+    - more-group-content-os/programs/oper-stack.yaml
+    - sister_site: oper-stack-ru (same slugs, RU copy)
+
+analytics:
+  gsc_mcp: null
+  note: "Подключить GSC MCP когда property заведена в Cursor"
+  indexing_project: oper-stack-indexing
+
+quality:
+  validate_changed: npm run validate:content:changed
+  audit_drafts: npm run audit:drafts
+
+branch_prefix: cc/operstack-en-
+publishing_owner: cursor
