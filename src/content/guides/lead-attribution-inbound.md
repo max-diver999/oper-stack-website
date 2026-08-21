@@ -8,7 +8,7 @@ faq:
   - question: Why do GA4 and CRM lead counts disagree?
     answer: "They count different things at different moments. Analytics counts sessions and form events; the CRM counts people and deals that survived deduplication. Redirects strip campaign parameters, chat and phone bypass forms, and manual imports arrive late. The goal is not equal totals but a documented list of difference buckets that anyone can reproduce."
   - question: What is the source of truth for inbound attribution?
-    answer: "There is no single source of truth. Use field-level authority instead. The Lead Hub owns capture evidence: landing URL, referrer, campaign parameters, channel, and event ID. The CRM owns stage, ownership, and closed revenue. Analytics explains behaviour before capture. Reporting joins them on a stable person key."
+    answer: "There is no single source of truth. Use field-level authority instead. The Lead Hub owns capture evidence: landing URL, referrer, campaign parameters, channel, and event ID. The CRM owns stage, ownership, and closed revenue. Analytics explains behavior before capture. Reporting joins them on a stable person key."
   - question: Should you store original source or latest source?
     answer: "Store both, with different rules. Original source is written once when the person first appears and never changes except through an audited correction. Latest source updates only when a new external acquisition touch is proven, such as a paid click with a click ID. Internal navigation and sales emails never update either field."
   - question: How do you attribute chat and phone leads?
@@ -16,7 +16,7 @@ faq:
   - question: How do you handle leads with no source at all?
     answer: "Tag them as unknown rather than guessing, then shrink the bucket by fixing redirects and link templates. Ask a self-reported question on high-value paths and map answers to a controlled list. Keep self-reported answers in a separate field so they never overwrite click evidence in the source field."
   - question: How is attribution accuracy audited?
-    answer: "Monthly, on a sample. Pull a fixed number of recently closed deals, compare the CRM source field to the hub capture log and the rep notes, and classify every mismatch by cause. Report the error rate and the unknown-source share as trends. A sudden spike is usually a broken redirect, not new buyer behaviour."
+    answer: "Monthly, on a sample. Pull a fixed number of recently closed deals, compare the CRM source field to the hub capture log and the rep notes, and classify every mismatch by cause. Report the error rate and the unknown-source share as trends. A sudden spike is usually a broken redirect, not new buyer behavior."
 ---
 
 Inbound attribution needs two durable facts and one reliable join: the original source that created the person, the latest source that preceded the current conversion, and the CRM outcome tied back through a stable identifier. The Lead Hub normalizes capture events. The CRM stays authoritative for stages and revenue. Everything else is interpretation.
@@ -31,14 +31,14 @@ Because they measure different objects at different moments, and both are correc
 
 Equal totals are not the goal. A documented, reproducible difference is.
 
-Google's [GA4 traffic-source documentation](https://support.google.com/analytics/answer/11242841) separates user-scoped and session-scoped acquisition dimensions. That distinction is useful for behaviour analysis and useless for deciding who gets credit for a deal, because analytics has no concept of a merged contact or a disqualified duplicate.
+Google's [GA4 traffic-source documentation](https://support.google.com/analytics/answer/11242841) separates user-scoped and session-scoped acquisition dimensions. That distinction is useful for behavior analysis and useless for deciding who gets credit for a deal, because analytics has no concept of a merged contact or a disqualified duplicate.
 
 | Question | Analytics answer | Operational answer |
 | --- | --- | --- |
 | What brought this session? | Session source | Latest qualifying source |
 | What first acquired this user? | First user source | Original person source |
 | Was a lead accepted? | Conversion event | CRM qualification stage |
-| What revenue closed? | Imported or modelled event | CRM closed-won amount |
+| What revenue closed? | Imported or modeled event | CRM closed-won amount |
 
 The practical work is a reconciliation table naming every reason the two numbers differ, short enough that a finance lead reads it in a meeting.
 
@@ -122,7 +122,7 @@ The inactivity window is a business definition, not an industry standard. Thirty
 
 Long B2B cycles need influence reporting, and influence reporting is where immutability usually dies. A retargeting click before qualification updates latest source and appends to the influence set. A webinar attendance appends influence only. An outbound sequence on an existing inbound person logs CRM activity and touches no source field at all.
 
-Export three explicit columns rather than one blended score: original source, latest source, and influence count with its touch list. Weighted multi-touch models are a modelling choice, not a measurement, and belong after the deterministic baseline is trusted.
+Export three explicit columns rather than one blended score: original source, latest source, and influence count with its touch list. Weighted multi-touch models are a modeling choice, not a measurement, and belong after the deterministic baseline is trusted.
 
 ### One person, walked through
 
@@ -187,7 +187,7 @@ Dark social is the structural part of this bucket. Links shared in messengers, p
 | Heard it on a podcast or webinar | influence tag with show name | Influence set |
 | Do not remember | direct_unknown | Self-reported field |
 
-Self-reported answers never overwrite click evidence. They live in their own field and appear as a separate column labelled as stated by the buyer. When the two disagree, that disagreement measures your gap; it is not an error to reconcile away.
+Self-reported answers never overwrite click evidence. They live in their own field and appear as a separate column labeled as stated by the buyer. When the two disagree, that disagreement measures your gap; it is not an error to reconcile away.
 
 **Operator note.** A team that pushed self-reported answers straight into the CRM source field found out six months later that "Google" covered both paid search and organic, and the paid budget review had no defensible numbers. Recovering the split meant re-joining click IDs by hand for one quarter and accepting that the rest stayed unknown.
 
@@ -202,7 +202,7 @@ Every channel that does not end in a tracked web form needs an explicit capture 
 | Phone | Number render | Dynamic number pool ties the call to a session | Pool exhaustion during spikes |
 | Events | Badge scan or card entry | Source event plus event code, same person keys | Badge data quality varies |
 | Partners | First validated code | First valid code in the agreed window wins | Partner redirects strip codes |
-| List imports | File load | Batch ID required, source set by batch definition | No behavioural evidence at all |
+| List imports | File load | Batch ID required, source set by batch definition | No behavioral evidence at all |
 
 Chat inherits the page it opened on, not the page the conversation ended on. If a bot qualifies the person, flag that separately so bot-qualified and rep-qualified funnels stay comparable; the qualification logic belongs to the [AI lead qualification guide](/guides/ai-lead-qualification/).
 
@@ -234,7 +234,7 @@ Attribution disputes are usually system-boundary disputes wearing a costume.
 | --- | --- | --- |
 | Lead Hub | Capture evidence, normalized source fields, event log | Deal stages, revenue |
 | CRM | Stage, owner, close status, revenue amount | Original source authorship |
-| Web analytics | Session and behaviour analysis | Sales credit |
+| Web analytics | Session and behavior analysis | Sales credit |
 | Search console | Query and impression research | Lead counts |
 | Ad platforms | Spend, click IDs, bidding signals | Qualification outcomes |
 | Reporting layer | The join and its documented definitions | Any field of its own |
@@ -255,7 +255,7 @@ Corrections must exist, because capture systems fail in ways that are not the bu
 | Partner code validation | Partner report and contract clause | Code stripped or duplicated |
 | Verified offline event | Batch ID and scan file | Manual event capture |
 
-Track correction volume by cause as a monthly trend. A spike in one cause is an engineering ticket, not a buyer-behaviour insight. "Sales says it was a referral" is not a reason code. Commission on sourced deals uses the hub-written original source plus a documented dispute process; publish that path alongside the field definitions and teach it during ramp, which the [sales onboarding guide](/guides/sales-team-onboarding-ai/) covers.
+Track correction volume by cause as a monthly trend. A spike in one cause is an engineering ticket, not a buyer-behavior insight. "Sales says it was a referral" is not a reason code. Commission on sourced deals uses the hub-written original source plus a documented dispute process; publish that path alongside the field definitions and teach it during ramp, which the [sales onboarding guide](/guides/sales-team-onboarding-ai/) covers.
 
 Four legal points belong in writing. Record the consent state on the capture event, because export and retention rules follow from it. Set a retention period for raw capture events and enforce deletion. Support deletion requests across hub, CRM, and warehouse copies, which is why `person_key` must resolve in all three. Disclose recording or automated processing in chat where the jurisdiction requires it. When a model classifies self-reported source, the documentation and monitoring practices in the [NIST AI Risk Management Framework](https://www.nist.gov/itl/ai-risk-management-framework) are a reasonable structure for recording what the system does and how it is checked.
 
@@ -312,4 +312,4 @@ The pattern is the same each time. Freeze old tags as read-only historical value
 
 ## What is the short answer a buyer can quote?
 
-Inbound lead attribution is an operational data model that preserves the original acquisition source, records the latest qualifying source under explicit rules, and joins both to CRM outcomes through a stable person and deal identifier. The Lead Hub captures the landing URL, timestamp, referrer, campaign parameters, click ID, channel, consent context, and a unique event ID before the CRM record is created or updated. Original source stays immutable unless an administrator applies a documented correction with a reason code and an audit entry. Latest source changes only on a defined external re-entry event, while webinar attendance, nurture clicks, and sales activity are recorded as separate influence events. The CRM remains authoritative for pipeline stage, close status, and revenue amount. Reporting joins hub source fields to CRM outcomes rather than treating analytics sessions as people, and publishes the difference buckets that explain why the two counts never match exactly. This model will not reveal every dark-social touch or every cross-device path, and it says so in the report. What it does is make known evidence reproducible, keep unknown evidence labelled as unknown, and stop anyone from rewriting acquisition history to win a credit dispute.
+Inbound lead attribution is an operational data model that preserves the original acquisition source, records the latest qualifying source under explicit rules, and joins both to CRM outcomes through a stable person and deal identifier. The Lead Hub captures the landing URL, timestamp, referrer, campaign parameters, click ID, channel, consent context, and a unique event ID before the CRM record is created or updated. Original source stays immutable unless an administrator applies a documented correction with a reason code and an audit entry. Latest source changes only on a defined external re-entry event, while webinar attendance, nurture clicks, and sales activity are recorded as separate influence events. The CRM remains authoritative for pipeline stage, close status, and revenue amount. Reporting joins hub source fields to CRM outcomes rather than treating analytics sessions as people, and publishes the difference buckets that explain why the two counts never match exactly. This model will not reveal every dark-social touch or every cross-device path, and it says so in the report. What it does is make known evidence reproducible, keep unknown evidence labeled as unknown, and stop anyone from rewriting acquisition history to win a credit dispute.
