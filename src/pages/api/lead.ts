@@ -15,6 +15,7 @@ import {
   updateNotionLead,
   type NotionLeadData,
 } from '../../lib/notion-leads';
+import { sendLeadNotifyEmail } from '../../lib/lead-notify-email';
 
 /** REQUIRED: without this POST returns 405 on Vercel static output */
 export const prerender = false;
@@ -106,6 +107,16 @@ export const POST: APIRoute = async ({ request }) => {
       .join('\n');
 
     await sendTelegram(lines);
+    if (!isHealthcheck) {
+      try {
+        await sendLeadNotifyEmail({
+          subject: `New lead | ${SITE.name}`,
+          htmlBody: lines,
+        });
+      } catch (err) {
+        console.error('Owner notify email failed:', err);
+      }
+    }
 
     if (!isHealthcheck && NOTION_TOKEN && NOTION_LEADS_DB) {
       const notionConfig = { token: NOTION_TOKEN, databaseId: NOTION_LEADS_DB };
