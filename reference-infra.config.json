@@ -1,0 +1,33 @@
+{
+  "siteUrl": "https://oper-stack.com",
+  "brand": "OperStack",
+  "language": "en",
+  "trailingSlash": true,
+  "organization": {
+    "id": "https://oper-stack.com/#organization",
+    "name": "OperStack",
+    "url": "https://oper-stack.com",
+    "sameAs": []
+  },
+  "collections": [
+    {
+      "dir": "src/content/guides",
+      "urlPrefix": "/guides",
+      "label": "Guides"
+    }
+  ],
+  "robots": {
+    "disallow": ["/api/", "/thanks/"],
+    "allowSearchCrawlers": true,
+    "allowTrainingCrawlers": false
+  },
+  "markdownStructure": {
+    "prefixes": []
+  },
+  "llms": {
+    "enabled": false,
+    "path": "/llms.txt",
+    "title": "OperStack reference content",
+    "description": "Optional machine-readable index of selected public guides."
+  }
+}
