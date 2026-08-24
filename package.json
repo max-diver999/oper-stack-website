@@ -10,7 +10,12 @@
     "build": "astro build",
     "preview": "astro preview",
     "healthcheck": "node scripts/post-deploy-smoke.mjs --http-only",
-    "audit:drafts": "node scripts/audit-guide-drafts.mjs"
+    "audit:drafts": "node scripts/audit-guide-drafts.mjs",
+    "aeo:verify": "node scripts/reference-infra/verify-reference-infra.mjs --config reference-infra.config.json --robots public/robots.txt",
+    "aeo:dates": "node scripts/reference-infra/restore-real-updated-dates.mjs --config reference-infra.config.json",
+    "aeo:markdown": "node scripts/reference-infra/fix-markdown-structure.mjs --config reference-infra.config.json",
+    "aeo:robots": "node scripts/reference-infra/generate-robots.mjs --config reference-infra.config.json --output public/robots.txt",
+    "aeo:llms": "node scripts/reference-infra/generate-agent-markdown.mjs --config reference-infra.config.json --output-dir public"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.1",
