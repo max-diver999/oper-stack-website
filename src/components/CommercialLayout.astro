@@ -1,5 +1,6 @@
 ---
 import Favicon from './Favicon.astro';
+import GoogleAnalytics from './GoogleAnalytics.astro';
 import JsonLd from './JsonLd.astro';
 import { SITE } from '../data/site';
 
@@ -42,6 +43,7 @@ const schemas = [organizationSchema, ...extra];
   <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="/fonts/fonts.css" />
   <JsonLd data={schemas} />
+  <GoogleAnalytics />
   <style is:global>
     :root {
       --ink: #0B1017;

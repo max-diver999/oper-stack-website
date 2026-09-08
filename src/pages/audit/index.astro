@@ -90,6 +90,9 @@ const canonical = `${SITE.url}/audit/`;
         });
         const data = await res.json().catch(() => ({}));
         if (!res.ok) throw new Error(data.error || 'Request failed');
+        if (typeof window.operStackTrack === 'function') {
+          window.operStackTrack('lead_form_submit', { form_name: 'audit', source: payload.source });
+        }
         window.location.href = '/thanks/';
       } catch (err) {
         msg.textContent = err.message || 'Something went wrong. Email info@oper-stack.com';
