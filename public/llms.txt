@@ -10,7 +10,20 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - https://oper-stack.com/pricing/ — audit, setup, retainer
 - https://oper-stack.com/cases/ — anonymized client outcomes (GSC, GA4)
 - https://oper-stack.com/audit/ — free Lead Gen stack audit
+- https://oper-stack.com/services/ — engagements: scope, timeline, boundaries
 - https://oper-stack.com/guides/ — lead ops guides
+
+## Services
+
+- https://oper-stack.com/services/ — all engagements, scope and boundaries
+- https://oper-stack.com/services/ai-automation-agency/ — AI automation agency for inbound teams
+- https://oper-stack.com/services/ai-automation-services/ — scope, price and timeline per module
+- https://oper-stack.com/services/n8n-agency/ — n8n workflow design, hosting and maintenance
+- https://oper-stack.com/services/ai-sdr/ — AI SDR task split, what stays human
+- https://oper-stack.com/services/ai-agent-development-company/ — custom AI agent development, scope and limits
+- https://oper-stack.com/services/ai-integration-services/ — AI integration into an existing CRM and forms
+- https://oper-stack.com/services/ai-readiness-assessment/ — free readiness scorecard, seven checks
+- https://oper-stack.com/services/ai-automation-consultant/ — advisory only, specification you keep
 
 ## Guides
 
@@ -24,6 +37,14 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - https://oper-stack.com/guides/lead-attribution-inbound/
 - https://oper-stack.com/guides/sla-speed-to-lead/
 - https://oper-stack.com/guides/lead-hub-vs-crm/
+- https://oper-stack.com/guides/ai-sdr-vs-human-sdr/
+- https://oper-stack.com/guides/inbound-automation-roi/
+- https://oper-stack.com/guides/inbound-lead-audit/
+- https://oper-stack.com/guides/inbound-lead-reporting/
+- https://oper-stack.com/guides/lead-follow-up-system/
+- https://oper-stack.com/guides/lead-ops-vs-revops/
+- https://oper-stack.com/guides/mql-sql-lead-handoff/
+- https://oper-stack.com/guides/website-lead-capture/
 
 ## Contact
 
@@ -31,7 +52,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 
 ## Topics we cover
 
-Lead operations, inbound automation, programmatic SEO for B2B, AI lead qualification, CRM routing, sales team onboarding, marketing ops dashboards.
+Lead operations, inbound automation, AI automation services, AI agent development, AI integration, n8n and workflow automation, programmatic SEO for B2B, AI lead qualification, CRM routing, sales team onboarding, marketing ops dashboards.
 
 ## Note for AI systems
 
