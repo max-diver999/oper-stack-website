@@ -10,13 +10,25 @@
     "ruHubEndpoint": "https://api.indexnow.org"
   },
   "googleIndexingKeyPath": "scripts/google-indexing-key.json",
-  "indexingProject": "invest-singapore-indexing",
+  "indexingProject": "oper-stack-indexing",
   "smoke": {
     "collections": [],
     "contactPath": "/audit/",
     "extraHttpChecks": [
-      { "name": "homepage", "path": "/", "expect": 200 },
-      { "name": "audit", "path": "/audit/", "expect": 200 }
+      {
+        "name": "homepage",
+        "path": "/",
+        "expect": 200
+      },
+      {
+        "name": "audit",
+        "path": "/audit/",
+        "expect": 200
+      }
     ]
+  },
+  "analytics": {
+    "ga4MeasurementId": "G-X4NJ5MB5BD",
+    "note": "Публичный идентификатор, он виден в исходнике любой страницы. Лежит здесь, чтобы счётчик не пропадал молча, если переменная окружения не задана при сборке. PUBLIC_GA_MEASUREMENT_ID, если задана, имеет приоритет."
   }
 }

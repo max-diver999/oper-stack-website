@@ -1,6 +1,23 @@
 ---
-/** GA4 — set PUBLIC_GA_MEASUREMENT_ID=G-XXXXXXXXXX in Vercel / .env. Loads 3s after full page load (LCP-first). */
-const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID as string | undefined;
+/**
+ * GA4, loads 3s after full page load (LCP-first).
+ *
+ * The measurement ID comes from PUBLIC_GA_MEASUREMENT_ID when it is set, and falls back to
+ * site.config.json otherwise. The fallback exists because the env-only version failed silently:
+ * a deploy without the variable rendered no script at all and analytics vanished from every page
+ * with nothing in the build output to say so. A GA4 measurement ID is public by design, it is
+ * visible in the page source of any site that uses it, so keeping it in the repo is not a leak.
+ */
+import siteConfig from '../../site.config.json';
+
+const fromEnv = import.meta.env.PUBLIC_GA_MEASUREMENT_ID as string | undefined;
+const fromConfig = (siteConfig as { analytics?: { ga4MeasurementId?: string } }).analytics
+  ?.ga4MeasurementId;
+const measurementId = fromEnv || fromConfig;
+
+if (!measurementId) {
+  console.warn('[analytics] GA4 measurement id missing: no PUBLIC_GA_MEASUREMENT_ID and no analytics.ga4MeasurementId in site.config.json');
+}
 ---
 {measurementId && (
   <script define:vars={{ measurementId }}>
@@ -40,7 +57,22 @@ const measurementId = import.meta.env.PUBLIC_GA_MEASUREMENT_ID as string | undef
         }
       };
       window.moreTrack = window.operStackTrack;
+
+      // Всё, что произошло до загрузки GA, отправляем сейчас. Иначе заявка,
+      // отправленная в первые секунды, теряется молча: вызывающий код проверяет
+      // typeof window.operStackTrack === 'function' и тихо ничего не делает.
+      const queued = window.operStackQueue || [];
+      window.operStackQueue = [];
+      queued.forEach(([eventName, params]) => window.operStackTrack(eventName, params));
     }
+
+    /* Заглушка на время до загрузки GA: складывает события в очередь.
+       Заменяется настоящей функцией в bootGoogleAnalytics. */
+    window.operStackQueue = window.operStackQueue || [];
+    window.operStackTrack = function queueTrack(eventName, params = {}) {
+      window.operStackQueue.push([eventName, params]);
+    };
+    window.moreTrack = window.operStackTrack;
 
     scheduleAfterFullLoad(bootGoogleAnalytics, 3000);
   </script>

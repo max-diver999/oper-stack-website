@@ -167,6 +167,20 @@ const faqSchema = {
     const btn = document.getElementById('submit');
     const loadedAt = Date.now();
 
+    /* Funnel step between page view and submit: how many visitors actually start
+       filling the form. Fires once, on the first real input rather than on focus,
+       because focus also fires when someone just tabs through the page. */
+    let started = false;
+    const markStart = () => {
+      if (started) return;
+      started = true;
+      if (typeof window.operStackTrack === 'function') {
+        window.operStackTrack('lead_form_start', { form_name: 'audit', source: `audit:${utm}` });
+      }
+    };
+    form.addEventListener('input', markStart, { once: true });
+    form.addEventListener('change', markStart, { once: true });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       msg.hidden = true;

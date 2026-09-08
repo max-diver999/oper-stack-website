@@ -15,7 +15,10 @@ export default defineConfig({
   integrations: [
     sitemap({
       filter(page) {
-        return !page.includes('/thanks/');
+        // Страницы под noindex в карте сайта дают противоречивый сигнал:
+        // карта говорит «индексируй», мета на странице говорит «не индексируй».
+        const excluded = ['/thanks/', '/site-report/'];
+        return !excluded.some((path) => page.includes(path));
       },
       serialize(item) {
         const lastmod = lastmodByUrl.get(item.url);
