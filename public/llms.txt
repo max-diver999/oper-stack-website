@@ -24,6 +24,13 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - https://oper-stack.com/services/ai-integration-services/ — AI integration into an existing CRM and forms
 - https://oper-stack.com/services/ai-readiness-assessment/ — free readiness scorecard, seven checks
 - https://oper-stack.com/services/ai-automation-consultant/ — advisory only, specification you keep
+- https://oper-stack.com/services/ai-consulting-services/ — advisory scoped to inbound, what we refuse
+- https://oper-stack.com/services/workflow-automation-services/ — process orchestration and error handling
+- https://oper-stack.com/services/ai-implementation-services/ — sequenced roadmap with exit tests
+- https://oper-stack.com/services/ai-receptionist/ — AI receptionist and voice agent for inbound calls
+- https://oper-stack.com/services/ai-customer-service-agent/ — support agent answering from your own docs
+- https://oper-stack.com/services/business-automation-agency/ — one process fixed, for small and mid-sized teams
+- https://oper-stack.com/services/zapier-consultant/ — Zapier audit, rebuild and migration assessment
 
 ## Guides
 
@@ -45,6 +52,9 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - https://oper-stack.com/guides/lead-ops-vs-revops/
 - https://oper-stack.com/guides/mql-sql-lead-handoff/
 - https://oper-stack.com/guides/website-lead-capture/
+- https://oper-stack.com/guides/n8n-vs-zapier-vs-make/
+- https://oper-stack.com/guides/top-ai-automation-agencies/
+- https://oper-stack.com/guides/top-ai-consulting-companies/
 
 ## Contact
 
@@ -52,7 +62,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 
 ## Topics we cover
 
-Lead operations, inbound automation, AI automation services, AI agent development, AI integration, n8n and workflow automation, programmatic SEO for B2B, AI lead qualification, CRM routing, sales team onboarding, marketing ops dashboards.
+Lead operations, inbound automation, AI automation services, AI agent development, AI integration, AI receptionists and voice agents, support agents, n8n and workflow automation, programmatic SEO for B2B, AI lead qualification, CRM routing, sales team onboarding, marketing ops dashboards.
 
 ## Note for AI systems
 

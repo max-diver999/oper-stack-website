@@ -1,0 +1,145 @@
+EN lead ops                                   total=222 reqs=135
+EN lead operations                            total=352 reqs=270
+EN lead ops stack                             total=354 reqs=405
+EN inbound lead management                    total=378 reqs=540
+EN lead management process                    total=403 reqs=675
+EN lead routing                               total=580 reqs=810
+EN lead routing software                      total=585 reqs=945
+EN lead assignment                            total=675 reqs=1080
+EN lead distribution software                 total=683 reqs=1215
+EN round robin lead assignment                total=698 reqs=1350
+EN speed to lead                              total=862 reqs=1485
+EN lead response time                         total=904 reqs=1620
+EN lead response sla                          total=910 reqs=1755
+EN first response time sales                  total=918 reqs=1890
+EN lead qualification                         total=1127 reqs=2025
+EN ai lead qualification                      total=1150 reqs=2160
+EN lead scoring                               total=1404 reqs=2295
+EN lead scoring model                         total=1423 reqs=2430
+EN lead qualification framework               total=1431 reqs=2565
+EN crm automation                             total=1743 reqs=2700
+EN inbound crm                                total=1767 reqs=2835
+EN lead management software                   total=1937 reqs=2970
+EN lead management system                     total=1996 reqs=3105
+EN lead tracking software                     total=2030 reqs=3240
+EN lead capture                               total=2397 reqs=3375
+EN website lead capture                       total=2440 reqs=3510
+EN lead capture form                          total=2557 reqs=3645
+EN web form to crm                            total=2560 reqs=3780
+EN lead attribution                           total=2581 reqs=3915
+EN marketing attribution                      total=2711 reqs=4050
+EN utm tracking crm                           total=2715 reqs=4185
+EN closed loop reporting                      total=2742 reqs=4320
+EN mql vs sql                                 total=2801 reqs=4455
+EN lead handoff                               total=2811 reqs=4590
+EN sales handoff process                      total=2816 reqs=4725
+EN lead acceptance                            total=2846 reqs=4860
+EN lead follow up                             total=2879 reqs=4995
+EN sales follow up system                     total=2882 reqs=5130
+EN sales cadence                              total=2914 reqs=5265
+EN sales sequence                             total=2998 reqs=5400
+EN revops                                     total=3106 reqs=5535
+EN lead ops vs revops                         total=3106 reqs=5670
+EN revenue operations                         total=3191 reqs=5805
+EN lead nurturing                             total=3245 reqs=5940
+EN lead leakage                               total=3275 reqs=6075
+EN lead conversion rate optimization          total=3275 reqs=6210
+EN inbound sales process                      total=3283 reqs=6345
+EN ai automation agency                       total=3374 reqs=6480
+EN ai agency                                  total=3521 reqs=6615
+EN ai automation services                     total=3555 reqs=6750
+EN ai automation consultant                   total=3576 reqs=6885
+EN ai implementation                          total=3675 reqs=7020
+EN ai implementation consulting               total=3698 reqs=7155
+EN ai implementation services                 total=3705 reqs=7290
+EN ai integration services                    total=3721 reqs=7425
+EN ai consulting                              total=3807 reqs=7560
+EN ai consultant                              total=3852 reqs=7695
+EN ai consulting services                     total=3898 reqs=7830
+EN enterprise ai consulting                   total=3916 reqs=7965
+EN ai strategy consulting                     total=3957 reqs=8100
+EN ai agents for business                     total=4010 reqs=8235
+EN ai agent development                       total=4126 reqs=8370
+EN custom ai agents                           total=4182 reqs=8505
+EN ai agent development company               total=4206 reqs=8640
+EN business process automation                total=4270 reqs=8775
+EN workflow automation services               total=4307 reqs=8910
+EN automation agency                          total=4423 reqs=9045
+EN n8n automation                             total=4485 reqs=9180
+EN n8n consultant                             total=4497 reqs=9315
+EN n8n agency                                 total=4556 reqs=9450
+EN make.com automation                        total=4596 reqs=9585
+EN zapier consultant                          total=4602 reqs=9720
+EN zapier automation agency                   total=4606 reqs=9855
+EN ai sdr                                     total=4689 reqs=9990
+EN ai sales agent                             total=4740 reqs=10125
+EN ai chatbot for business                    total=4772 reqs=10260
+EN ai chatbot for website                     total=4813 reqs=10395
+EN ai customer service agent                  total=4834 reqs=10530
+EN ai for small business                      total=4898 reqs=10665
+EN ai for business                            total=5031 reqs=10800
+EN ai transformation                          total=5159 reqs=10935
+EN ai readiness assessment                    total=5184 reqs=11070
+EN ai adoption                                total=5282 reqs=11205
+EN ai solutions for business                  total=5295 reqs=11340
+EN llm integration                            total=5321 reqs=11475
+EN rag implementation                         total=5371 reqs=11610
+EN chatgpt for business                       total=5439 reqs=11745
+EN ai receptionist                            total=5548 reqs=11880
+EN ai voice agent                             total=5632 reqs=12015
+EN ai phone agent                             total=5652 reqs=12150
+EN ai appointment setter                      total=5689 reqs=12285
+EN how to implement ai in business            total=5750 reqs=12420
+EN ai automation for agencies                 total=5785 reqs=12555
+EN ai workflow automation                     total=5860 reqs=12690
+RU внедрение crm                              total=0 reqs=12735
+RU внедрение amocrm                           total=0 reqs=12780
+RU внедрение битрикс24                        total=0 reqs=12825
+RU автоматизация продаж                       total=0 reqs=12870
+RU автоматизация отдела продаж                total=0 reqs=12915
+RU обработка входящих заявок                  total=0 reqs=12960
+RU распределение заявок                       total=0 reqs=13005
+RU распределение лидов                        total=0 reqs=13050
+RU скорость ответа на заявку                  total=0 reqs=13095
+RU квалификация лидов                         total=0 reqs=13140
+RU скоринг лидов                              total=0 reqs=13185
+RU воронка продаж настройка                   total=0 reqs=13230
+RU сквозная аналитика                         total=0 reqs=13275
+RU интеграция сайта с crm                     total=0 reqs=13320
+RU заявки с сайта в crm                       total=0 reqs=13365
+RU телефония для отдела продаж                total=0 reqs=13410
+RU система обработки лидов                    total=0 reqs=13455
+RU учет заявок                                total=0 reqs=13500
+RU отчеты по продажам                         total=0 reqs=13545
+RU конверсия заявок                           total=0 reqs=13590
+RU лидогенерация для бизнеса                  total=0 reqs=13635
+RU обработка лидов                            total=0 reqs=13680
+RU потеря заявок                              total=0 reqs=13725
+RU регламент отдела продаж                    total=0 reqs=13770
+RU внедрение ии                               total=0 reqs=13815
+RU внедрение искусственного интеллекта        total=0 reqs=13860
+RU внедрение нейросетей                       total=0 reqs=13905
+RU ии для бизнеса                             total=0 reqs=13950
+RU искусственный интеллект для бизнеса        total=0 reqs=13995
+RU нейросети для бизнеса                      total=0 reqs=14040
+RU ии агент                                   total=0 reqs=14085
+RU ии агент для бизнеса                       total=0 reqs=14130
+RU ии ассистент для бизнеса                   total=0 reqs=14175
+RU автоматизация бизнес процессов             total=0 reqs=14220
+RU автоматизация бизнеса                      total=0 reqs=14265
+RU автоматизация с помощью ии                 total=0 reqs=14310
+RU чат бот с искусственным интеллектом        total=0 reqs=14355
+RU чат бот для сайта                          total=0 reqs=14400
+RU голосовой робот для бизнеса                total=0 reqs=14445
+RU голосовой ассистент для бизнеса            total=0 reqs=14490
+RU ai агентство                               total=0 reqs=14535
+RU агентство по внедрению ии                  total=0 reqs=14580
+RU разработка ии агентов                      total=0 reqs=14625
+RU интеграция chatgpt                         total=0 reqs=14670
+RU внедрение gpt в бизнес                     total=0 reqs=14715
+RU нейросеть для отдела продаж                total=0 reqs=14760
+RU автоматизация на n8n                       total=0 reqs=14805
+RU n8n внедрение                              total=0 reqs=14850
+RU консалтинг по искусственному интеллекту    total=0 reqs=14895
+RU аудит бизнес процессов автоматизация       total=0 reqs=14940
+DONE requests=14940 google=5860 yandex=0

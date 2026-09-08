@@ -1,0 +1,61 @@
+{
+ "EN": {
+  "pid": 32876110,
+  "regions": [
+   {
+    "searcher": 1,
+    "index": 159,
+    "key": 84,
+    "name": "США",
+    "lang": "en"
+   },
+   {
+    "searcher": 1,
+    "index": 737,
+    "key": 102,
+    "name": "Великобритания",
+    "lang": "en"
+   },
+   {
+    "searcher": 1,
+    "index": 901,
+    "key": 211,
+    "name": "Австралия",
+    "lang": "en"
+   },
+   {
+    "searcher": 1,
+    "index": 900,
+    "key": 95,
+    "name": "Канада",
+    "lang": "en"
+   },
+   {
+    "searcher": 1,
+    "index": 1867,
+    "key": 994,
+    "name": "Индия",
+    "lang": "en"
+   }
+  ]
+ },
+ "RU": {
+  "pid": 32876111,
+  "regions": [
+   {
+    "searcher": 0,
+    "index": 1,
+    "key": 213,
+    "name": "Москва",
+    "lang": "ru"
+   },
+   {
+    "searcher": 1,
+    "index": 7,
+    "key": 225,
+    "name": "Россия",
+    "lang": "ru"
+   }
+  ]
+ }
+}
