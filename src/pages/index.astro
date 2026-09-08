@@ -1,6 +1,11 @@
 ---
+import { getCollection } from 'astro:content';
 import Favicon from '../components/Favicon.astro';
 import GoogleAnalytics from '../components/GoogleAnalytics.astro';
+import { NETWORK_HERO } from '../data/cases';
+
+const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
+const featured = services.slice(0, 8);
 // Full-page interactive system map (OperStack homepage)
 ---
 <!DOCTYPE html>
@@ -9,8 +14,8 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#0B1017">
-<title>OperStack · The operating stack for inbound leads</title>
-<meta name="description" content="OperStack: the operating stack for inbound leads. SEO, AEO, AI qualification, CRM, team training, reporting. Interactive system map.">
+<title>AI Automation and Lead Operations for Inbound · OperStack</title>
+<meta name="description" content="AI automation, custom agents and lead operations for teams that run on inbound. Scope, timeline and boundaries stated on every service page.">
 <link rel="canonical" href="https://oper-stack.com/">
 <Favicon />
 <link rel="preload" href="/fonts/dm-sans-normal.woff2" as="font" type="font/woff2" crossorigin>
@@ -44,29 +49,35 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
   * { margin: 0; padding: 0; box-sizing: border-box; }
 
   html, body {
-    height: 100%;
     background: var(--ink);
-    overflow: hidden;
     font-family: var(--fb);
     color: var(--paper);
   }
 
+  /* Карта занимает первый экран. Всё, что было fixed, теперь absolute внутри неё,
+     поэтому страница прокручивается, а карта не прилипает к экрану. */
+  .stage {
+    position: relative;
+    height: 100dvh;
+    overflow: hidden;
+  }
+
   #flow {
-    position: fixed;
+    position: absolute;
     inset: 0;
     display: block;
     transition: filter 0.5s ease;
   }
 
   #layer {
-    position: fixed;
+    position: absolute;
     inset: 0;
     pointer-events: none;
     z-index: 2;
   }
 
   .vignette {
-    position: fixed;
+    position: absolute;
     inset: 0;
     pointer-events: none;
     z-index: 3;
@@ -74,7 +85,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
   }
 
   .hud {
-    position: fixed;
+    position: absolute;
     z-index: 6;
     left: 0;
     right: 0;
@@ -149,7 +160,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
   .meta b { color: var(--paper); font-weight: 500; }
 
   .legend {
-    position: fixed;
+    position: absolute;
     z-index: 6;
     left: 44px;
     bottom: 28px;
@@ -196,7 +207,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
   }
 
   .hint {
-    position: fixed;
+    position: absolute;
     z-index: 6;
     left: 50%;
     bottom: 28px;
@@ -222,7 +233,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
   }
 
   .site-links {
-    position: fixed;
+    position: absolute;
     z-index: 6;
     right: 44px;
     bottom: 28px;
@@ -836,7 +847,10 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
     display: none;
   }
 
-  body.is-mobile {
+  /* Раньше здесь было overflow:hidden: мобильная раскладка была двумя фиксированными
+     панелями на весь экран. Теперь карта и список живут внутри .stage, а страница
+     прокручивается к контенту под ней. */
+  body.is-mobile .stage {
     overflow: hidden;
   }
 
@@ -853,7 +867,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 
   body.is-mobile .mob-map-chrome {
     display: block;
-    position: fixed;
+    position: absolute;
     left: 0;
     right: 0;
     z-index: 9;
@@ -937,7 +951,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
   body.is-mobile .mob-list {
     display: flex;
     flex-direction: column;
-    position: fixed;
+    position: absolute;
     left: 0;
     right: 0;
     top: var(--map-h, 42vh);
@@ -1169,9 +1183,133 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
       text-align: left;
     }
   }
+
+  /* ── Below the map: real, crawlable, scrollable content ── */
+  .hud-lede {
+    margin-top: 10px;
+    max-width: 46ch;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--muted);
+    text-shadow: var(--label-halo);
+  }
+  .below {
+    position: relative;
+    z-index: 12;
+    background: var(--ink);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .wrapx {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 56px 24px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+  .below h2 {
+    font-family: var(--fd);
+    font-size: clamp(24px, 3.2vw, 32px);
+    line-height: 1.15;
+    font-weight: 600;
+    margin-bottom: 16px;
+    text-wrap: balance;
+  }
+  .below .lede {
+    font-size: 17px;
+    line-height: 1.65;
+    max-width: 68ch;
+    margin-bottom: 12px;
+  }
+  .below .muted { color: var(--muted); }
+  .below a { color: var(--teal-soft); }
+
+  .svc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 12px;
+    margin: 24px 0 18px;
+  }
+  .svc {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .svc:hover {
+    border-color: rgba(61, 184, 169, 0.45);
+    background: rgba(26, 138, 125, 0.07);
+  }
+  .svc-label {
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .svc-name {
+    font-family: var(--fd);
+    font-size: 17px;
+    line-height: 1.25;
+    color: var(--paper);
+  }
+  .svc-go {
+    font-family: var(--fm);
+    font-size: 11px;
+    color: var(--teal-soft);
+    margin-top: 2px;
+  }
+  .more { font-family: var(--fm); font-size: 13px; }
+
+  .steps {
+    margin: 20px 0 0 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-width: 68ch;
+  }
+  .steps li { line-height: 1.65; font-size: 16px; color: var(--muted); }
+  .steps li b { color: var(--paper); font-weight: 600; }
+
+  .cta { border-bottom: 0; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
+  .below .btn {
+    display: inline-block;
+    padding: 12px 20px;
+    border-radius: 10px;
+    background: var(--teal);
+    color: var(--paper);
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 15px;
+  }
+  .below .btn.ghost {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    color: var(--paper);
+  }
+  .foot {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 28px 24px 56px;
+    font-size: 14px;
+    color: var(--muted);
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  @media (max-width: 640px) {
+    .wrapx { padding: 40px 18px; }
+    .hud-lede { display: none; }
+  }
 </style>
 </head>
 <body>
+
+<div class="stage">
 
 <canvas id="flow" aria-hidden="true"></canvas>
 <div id="layer"></div>
@@ -1181,7 +1319,8 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
   <div>
     <div class="brand">OperStack</div>
     <div class="eyebrow"><span class="pip"></span> Lead Ops System</div>
-    <h1>While you sleep, <em>leads get routed</em></h1>
+    <h1>AI automation for teams that run on <em>inbound leads</em></h1>
+    <p class="hud-lede">While you sleep, requests get captured, qualified, routed and answered.</p>
   </div>
   <div class="meta">
     <div><b>9</b> modules</div>
@@ -1204,6 +1343,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 <p class="hint"><span class="d"></span> Hover for sources · click any node</p>
 
 <nav class="site-links" aria-label="Site pages">
+  <a href="/services/">Services</a>
   <a href="/pricing/">Pricing</a>
   <a href="/cases/">Cases</a>
   <a href="/guides/">Guides</a>
@@ -1223,6 +1363,8 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
   <div class="disc"><span>H</span></div>
   <div class="core-cap">Lead Hub</div>
 </div>
+
+</div><!-- /.stage -->
 
 <div class="dim-overlay" id="dim"></div>
 
@@ -1251,6 +1393,102 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
     <a class="p-cta-alt" href="/pricing/">View pricing</a>
   </div>
 </aside>
+
+<main class="below">
+  <section class="wrapx">
+    <h2>What OperStack does</h2>
+    <p class="lede">
+      OperStack builds and runs the layer between your traffic and your CRM. Capture,
+      qualification, routing, follow-up and reporting, wired into the systems you already own.
+      Every engagement is scoped per handoff, so you buy the two steps that leak rather than a
+      platform priced per seat.
+    </p>
+    <p class="lede muted">
+      Nothing here is sold as a subscription you cannot leave. The automations run in your
+      accounts, on your credentials, with runbooks written for whoever inherits them.
+    </p>
+  </section>
+
+  <section class="wrapx">
+    <h2>Services</h2>
+    <p class="lede muted">
+      Each page states what is included, what you keep, what it does not cover, and where the
+      engagement starts. Scope before a call, not after one.
+    </p>
+    <div class="svc-grid">
+      {featured.map((s) => (
+        <a class="svc" href={`/services/${s.id}/`}>
+          <span class="svc-label">{s.data.cardLabel}</span>
+          <span class="svc-name">{s.data.h1}</span>
+          <span class="svc-go">Read the scope</span>
+        </a>
+      ))}
+    </div>
+    <p class="more"><a href="/services/">All {services.length} services →</a></p>
+  </section>
+
+  <section class="wrapx">
+    <h2>How an engagement runs</h2>
+    <ol class="steps">
+      <li>
+        <b>Free audit.</b> Thirty to forty-five minutes. We reconcile four counts: requests that
+        arrived, records created, records with a live owner, records actually worked. The gaps
+        get ranked by what they cost. You keep the written list either way.
+      </li>
+      <li>
+        <b>Setup.</b> One module or several, quoted per handoff after the audit. Each step has an
+        exit test agreed before it is built, and a rollback with a named owner.
+      </li>
+      <li>
+        <b>Retainer, only if it earns it.</b> Automations rot: an API renames a field, a
+        credential expires, and nothing alerts because the workflow believes it ran. Somebody has
+        to read the failure log. That can be us or your team.
+      </li>
+    </ol>
+  </section>
+
+  <section class="wrapx">
+    <h2>Proof, with its limits stated</h2>
+    <p class="lede">
+      {NETWORK_HERO.proofLine}
+    </p>
+    <p class="lede muted">
+      {NETWORK_HERO.proofSubline} These are our own properties, not client averages, and they
+      are the numbers we can show end to end. Anonymised client outcomes are on the
+      <a href="/cases/">cases page</a>.
+    </p>
+  </section>
+
+  <section class="wrapx">
+    <h2>The method is published</h2>
+    <p class="lede muted">
+      Every service page points at the guide that owns the underlying method, because the
+      operating models are not the product. Twenty-one guides, written to be implemented without
+      hiring anyone: <a href="/guides/lead-ops-stack/">the lead ops stack</a>,
+      <a href="/guides/inbound-lead-audit/">the audit you can run yourself</a>,
+      <a href="/guides/lead-routing-playbook/">routing rules</a>, and
+      <a href="/guides/">the rest</a>.
+    </p>
+  </section>
+
+  <section class="wrapx cta">
+    <h2>Start with the audit</h2>
+    <p class="lede">
+      Free, no obligation, and the output is a written action list rather than a deck. If the
+      honest answer is that your funnel is fine and the problem is traffic, we will say so.
+    </p>
+    <p class="cta-row">
+      <a class="btn" href="/audit/?utm=home-below">Request free audit →</a>
+      <a class="btn ghost" href="/pricing/">See pricing</a>
+    </p>
+  </section>
+
+  <footer class="foot">
+    <p>OperStack · <a href="mailto:info@oper-stack.com">info@oper-stack.com</a></p>
+    <p class="muted">The operating stack for inbound leads.</p>
+  </footer>
+</main>
+
 
 <script is:inline>
 function runAfterPageLoad(fn) {

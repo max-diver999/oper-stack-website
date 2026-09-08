@@ -31,6 +31,13 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - https://oper-stack.com/services/ai-customer-service-agent/ — support agent answering from your own docs
 - https://oper-stack.com/services/business-automation-agency/ — one process fixed, for small and mid-sized teams
 - https://oper-stack.com/services/zapier-consultant/ — Zapier audit, rebuild and migration assessment
+- https://oper-stack.com/services/lead-management-system/ — stages, field ownership, deduplication before assignment
+- https://oper-stack.com/services/lead-qualification-setup/ — fit and intent separated, acceptance contract
+- https://oper-stack.com/services/crm-implementation/ — pipeline as a state machine, adoption measured
+- https://oper-stack.com/services/lead-routing-software/ — rule precedence, fallbacks, unassigned count to zero
+- https://oper-stack.com/services/speed-to-lead/ — clock definition, escalation before breach
+- https://oper-stack.com/services/lead-attribution-setup/ — source at intake, revenue join finance accepts
+- https://oper-stack.com/services/marketing-automation-agency/ — nurture stop rules, handoff on evidence
 
 ## Guides
 
