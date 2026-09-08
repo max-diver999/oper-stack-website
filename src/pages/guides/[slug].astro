@@ -18,6 +18,10 @@ const { Content } = await render(entry);
 const { title, description, pubDate, updatedDate, author, faq = [] } = entry.data;
 
 const canonical = `${SITE.url}/guides/${entry.id}/`;
+/* Бренд дописываем, только если итоговый title остаётся в пределах 60 знаков.
+   Иначе Google обрезает его в выдаче, и обрезается как раз бренд. */
+const withBrand = `${title} · ${SITE.name}`;
+const pageTitle = withBrand.length <= 60 ? withBrand : title;
 const isoDate = (updatedDate || pubDate).toISOString();
 const displayDate = (updatedDate || pubDate).toLocaleDateString('en-US', {
   year: 'numeric',
@@ -71,7 +75,7 @@ const citeMatch = entry.body?.match(/## In one sentence\s+\n+\*\*(.+?)\*\*/);
 const citeText = citeMatch?.[1] || description;
 ---
 
-<CommercialLayout title={`${title} · ${SITE.name}`} description={description} canonical={canonical} jsonLd={jsonLd}>
+<CommercialLayout title={pageTitle} description={description} canonical={canonical} jsonLd={jsonLd}>
   <article class="wrap prose">
     <p class="meta">
       <time datetime={isoDate}>{displayDate}</time> · {author}
