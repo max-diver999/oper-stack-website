@@ -57,7 +57,22 @@ if (!measurementId) {
         }
       };
       window.moreTrack = window.operStackTrack;
+
+      // Всё, что произошло до загрузки GA, отправляем сейчас. Иначе заявка,
+      // отправленная в первые секунды, теряется молча: вызывающий код проверяет
+      // typeof window.operStackTrack === 'function' и тихо ничего не делает.
+      const queued = window.operStackQueue || [];
+      window.operStackQueue = [];
+      queued.forEach(([eventName, params]) => window.operStackTrack(eventName, params));
     }
+
+    /* Заглушка на время до загрузки GA: складывает события в очередь.
+       Заменяется настоящей функцией в bootGoogleAnalytics. */
+    window.operStackQueue = window.operStackQueue || [];
+    window.operStackTrack = function queueTrack(eventName, params = {}) {
+      window.operStackQueue.push([eventName, params]);
+    };
+    window.moreTrack = window.operStackTrack;
 
     scheduleAfterFullLoad(bootGoogleAnalytics, 3000);
   </script>
