@@ -9,6 +9,8 @@
     "enBingEndpoint": "https://www.bing.com/indexnow",
     "ruHubEndpoint": "https://api.indexnow.org"
   },
+  "googleIndexingKeyPath": "scripts/google-indexing-key.json",
+  "indexingProject": "invest-singapore-indexing",
   "smoke": {
     "collections": [],
     "contactPath": "/audit/",
