@@ -1,0 +1,310 @@
+---
+import { getCollection, render } from 'astro:content';
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import { PRICING_TIERS } from '../../data/pricing';
+import { SITE } from '../../data/site';
+
+export async function getStaticPaths() {
+  const services = await getCollection('services');
+  return services.map((entry) => ({
+    params: { slug: entry.id },
+    props: { entry },
+  }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const {
+  title,
+  description,
+  h1,
+  answer,
+  pubDate,
+  updatedDate,
+  author,
+  scope,
+  deliverables,
+  notIncluded,
+  entryPoint,
+  timeline,
+  faq,
+  relatedGuides,
+  relatedServices,
+} = entry.data;
+
+const canonical = `${SITE.url}/services/${entry.id}/`;
+const isoDate = (updatedDate || pubDate).toISOString();
+
+const tier = PRICING_TIERS.find((t) => t.id === entryPoint.tier);
+
+const serviceSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Service',
+  name: h1,
+  description,
+  serviceType: title,
+  url: canonical,
+  provider: {
+    '@type': 'Organization',
+    name: SITE.name,
+    url: SITE.url,
+  },
+  areaServed: 'Worldwide',
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: `${h1} scope`,
+    itemListElement: scope.map((item) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: item },
+    })),
+  },
+};
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faq.map((item) => ({
+    '@type': 'Question',
+    name: item.question,
+    acceptedAnswer: { '@type': 'Answer', text: item.answer },
+  })),
+};
+
+const allGuides = await getCollection('guides');
+const guideLinks = relatedGuides
+  .map((slug) => allGuides.find((g) => g.id === slug))
+  .filter((g): g is NonNullable<typeof g> => Boolean(g));
+
+const allServices = await getCollection('services');
+const serviceLinks = relatedServices
+  .map((slug) => allServices.find((s) => s.id === slug))
+  .filter((s): s is NonNullable<typeof s> => Boolean(s));
+---
+
+<CommercialLayout
+  title={title}
+  description={description}
+  canonical={canonical}
+  jsonLd={[serviceSchema, faqSchema]}
+>
+  <article class="wrap prose">
+    <p class="crumb"><a href="/services/">Services</a></p>
+    <h1>{h1}</h1>
+    <p class="lede">{description}</p>
+
+    <CitabilityBlock text={answer} />
+
+    <div class="facts">
+      <div>
+        <span class="k">Entry point</span>
+        <span class="v">{tier ? `${tier.name} · ${tier.price}` : entryPoint.tier}</span>
+        <span class="n">{entryPoint.note}</span>
+      </div>
+      <div>
+        <span class="k">Typical timeline</span>
+        <span class="v">{timeline}</span>
+        <span class="n">Depends on how much of your data is already clean.</span>
+      </div>
+    </div>
+
+    <Content />
+
+    <section class="block">
+      <h2>What the engagement covers</h2>
+      <ul class="ticks">
+        {scope.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+
+    <section class="block">
+      <h2>What you keep</h2>
+      <ul class="ticks">
+        {deliverables.map((item) => <li>{item}</li>)}
+      </ul>
+    </section>
+
+    <section class="block warn">
+      <h2>What this does not cover</h2>
+      <ul class="ticks minus">
+        {notIncluded.map((item) => <li>{item}</li>)}
+      </ul>
+      <p class="n">
+        If one of these is the actual problem, say so on the audit call and we will point you
+        somewhere better rather than sell you the wrong module.
+      </p>
+    </section>
+
+    <section class="cta-box">
+      <h2>Start with the audit</h2>
+      <p>
+        Free, 30 to 45 minutes. We reconcile what arrived, what was created, what got an owner,
+        and what got worked, then rank the gaps by cost. No deck.
+      </p>
+      <p style="margin-top:14px">
+        <a class="btn" href={`/audit/?utm=service-${entry.id}`}>Request free audit →</a>
+        <a class="btn btn-ghost" href="/pricing/" style="margin-left:12px">Pricing</a>
+      </p>
+    </section>
+
+    {(guideLinks.length > 0 || serviceLinks.length > 0) && (
+      <section class="related">
+        {guideLinks.length > 0 && (
+          <>
+            <h2>The detail behind this work</h2>
+            <ul>
+              {guideLinks.map((g) => (
+                <li>
+                  <a href={`/guides/${g.id}/`}>{g.data.title}</a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+        {serviceLinks.length > 0 && (
+          <>
+            <h2 class="second">Related services</h2>
+            <ul>
+              {serviceLinks.map((s) => (
+                <li>
+                  <a href={`/services/${s.id}/`}>{s.data.h1}</a>
+                </li>
+              ))}
+            </ul>
+          </>
+        )}
+      </section>
+    )}
+
+    <FaqSection items={faq} />
+
+    <p class="meta">
+      Updated <time datetime={isoDate}>{(updatedDate || pubDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'long',
+        day: 'numeric',
+      })}</time> · {author}
+    </p>
+  </article>
+</CommercialLayout>
+
+<style>
+  .crumb {
+    font-family: var(--fm);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+  .crumb a { color: var(--muted); }
+  .meta {
+    font-family: var(--fm);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 36px;
+  }
+  .facts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 28px 0;
+  }
+  .facts > div {
+    background: var(--ink);
+    padding: 18px 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+  }
+  .facts .k {
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .facts .v {
+    font-family: var(--fd);
+    font-size: 20px;
+    color: var(--teal-soft);
+  }
+  .facts .n {
+    font-size: 13px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+  .block { margin: 36px 0; }
+  .block h2 {
+    font-family: var(--fd);
+    font-size: 22px;
+    margin-bottom: 14px;
+  }
+  .block .n {
+    font-size: 14px;
+    color: var(--muted);
+    margin-top: 12px;
+    line-height: 1.6;
+  }
+  ul.ticks {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+  }
+  ul.ticks li {
+    padding-left: 26px;
+    position: relative;
+    line-height: 1.6;
+  }
+  ul.ticks li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0.55em;
+    width: 12px;
+    height: 2px;
+    background: var(--teal-soft);
+  }
+  ul.ticks.minus li::before { background: var(--amber-soft); }
+  .related {
+    margin-top: 40px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+  .related h2 {
+    font-family: var(--fd);
+    font-size: 22px;
+    margin-bottom: 12px;
+  }
+  .related h2.second { margin-top: 24px; }
+  .related ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+  .related li { margin-bottom: 8px; }
+  .cta-box {
+    margin: 40px 0;
+    padding: 24px;
+    border-radius: 14px;
+    border: 1px solid rgba(61, 184, 169, 0.28);
+    background: rgba(26, 138, 125, 0.08);
+  }
+  .cta-box h2 {
+    font-family: var(--fd);
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+  @media (max-width: 640px) {
+    .facts { grid-template-columns: 1fr; }
+  }
+</style>

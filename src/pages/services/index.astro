@@ -1,0 +1,127 @@
+---
+import { getCollection } from 'astro:content';
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import { SITE } from '../../data/site';
+
+const canonical = `${SITE.url}/services/`;
+const services = (await getCollection('services')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+const itemListSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'OperStack services',
+  itemListElement: services.map((s, i) => ({
+    '@type': 'ListItem',
+    position: i + 1,
+    name: s.data.h1,
+    url: `${SITE.url}/services/${s.id}/`,
+  })),
+};
+---
+
+<CommercialLayout
+  title="AI Automation and Lead Operations Services · OperStack"
+  description="AI automation, agent development and lead operations engagements for inbound teams. Scope, timeline and boundaries stated on every page."
+  canonical={canonical}
+  jsonLd={itemListSchema}
+>
+  <div class="wrap wide">
+    <h1>Services</h1>
+    <p class="lede">
+      Every engagement starts the same way: a free audit that finds where inbound leads leak,
+      then one module or several, wired into one Lead Hub. Scope and boundaries are written on
+      each page before you talk to anyone.
+    </p>
+
+    <CitabilityBlock
+      text="OperStack builds and runs the operating layer for inbound leads: AI automation, custom agents, qualification, routing, and reporting, delivered as scoped engagements rather than seat licences."
+    />
+
+    <div class="grid">
+      {services.map((s) => (
+        <a class="card" href={`/services/${s.id}/`}>
+          <span class="label">{s.data.cardLabel}</span>
+          <span class="name">{s.data.h1}</span>
+          <span class="desc">{s.data.answer}</span>
+          <span class="go">Read the scope</span>
+        </a>
+      ))}
+    </div>
+
+    <section class="cta-box">
+      <h2>Not sure which one you need</h2>
+      <p>
+        That is what the audit is for. We look at what arrives, what gets created, what gets an
+        owner, and what actually gets worked, then say which module moves the number. If none of
+        them do, we say that too.
+      </p>
+      <p style="margin-top:14px">
+        <a class="btn" href="/audit/?utm=services-hub">Request free audit →</a>
+        <a class="btn btn-ghost" href="/guides/" style="margin-left:12px">Read the guides</a>
+      </p>
+    </section>
+  </div>
+</CommercialLayout>
+
+<style>
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 16px;
+    margin: 32px 0;
+  }
+  .card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 22px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .card:hover {
+    border-color: rgba(61, 184, 169, 0.45);
+    background: rgba(26, 138, 125, 0.06);
+  }
+  .card .label {
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .card .name {
+    font-family: var(--fd);
+    font-size: 20px;
+    line-height: 1.2;
+    color: var(--paper);
+  }
+  .card .desc {
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--muted);
+  }
+  .card .go {
+    font-family: var(--fm);
+    font-size: 12px;
+    color: var(--teal-soft);
+    margin-top: 4px;
+  }
+  .cta-box {
+    margin: 40px 0;
+    padding: 24px;
+    border-radius: 14px;
+    border: 1px solid rgba(61, 184, 169, 0.28);
+    background: rgba(26, 138, 125, 0.08);
+  }
+  .cta-box h2 {
+    font-family: var(--fd);
+    font-size: 22px;
+    margin-bottom: 10px;
+  }
+</style>
