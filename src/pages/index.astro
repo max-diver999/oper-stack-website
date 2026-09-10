@@ -3,9 +3,33 @@ import { getCollection } from 'astro:content';
 import Favicon from '../components/Favicon.astro';
 import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import { NETWORK_HERO } from '../data/cases';
+import JsonLd from '../components/JsonLd.astro';
+import { SITE } from '../data/site';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const featured = services.slice(0, 8);
+const homeSchemas = [
+  {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    '@id': `${SITE.url}/#organization`,
+    name: SITE.name,
+    url: `${SITE.url}/`,
+    description: SITE.description,
+    email: SITE.email,
+    logo: `${SITE.url}/og/og-default.png`,
+    founder: { '@type': 'Person', name: 'Maksim Shchegolev' },
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebSite',
+    '@id': `${SITE.url}/#website`,
+    name: SITE.name,
+    url: `${SITE.url}/`,
+    publisher: { '@id': `${SITE.url}/#organization` },
+    inLanguage: 'en',
+  },
+];
 // Full-page interactive system map (OperStack homepage)
 ---
 <!DOCTYPE html>
@@ -17,6 +41,20 @@ const featured = services.slice(0, 8);
 <title>AI Automation and Lead Operations for Inbound · OperStack</title>
 <meta name="description" content="AI automation, custom agents and lead operations for teams that run on inbound. Scope, timeline and boundaries stated on every service page.">
 <link rel="canonical" href="https://oper-stack.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="OperStack">
+<meta property="og:title" content="AI Automation and Lead Operations for Inbound · OperStack">
+<meta property="og:description" content="AI automation, custom agents and lead operations for teams that run on inbound. Scope, timeline and boundaries stated on every service page.">
+<meta property="og:url" content="https://oper-stack.com/">
+<meta property="og:image" content="https://oper-stack.com/og/og-default.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="AI Automation and Lead Operations for Inbound · OperStack">
+<meta name="twitter:description" content="AI automation, custom agents and lead operations for teams that run on inbound. Scope, timeline and boundaries stated on every service page.">
+<meta name="twitter:image" content="https://oper-stack.com/og/og-default.png">
+<JsonLd data={homeSchemas} />
 <Favicon />
 <link rel="preload" href="/fonts/dm-sans-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>

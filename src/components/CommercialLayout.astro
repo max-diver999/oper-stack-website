@@ -9,9 +9,14 @@ interface Props {
   description: string;
   canonical: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
+  /** Social card, absolute or site-relative. Defaults to the brand card. */
+  ogImage?: string;
+  /** Set on articles: emits og:type article and the published and modified times. */
+  article?: { published: string; modified: string };
 }
 
-const { title, description, canonical, jsonLd = [] } = Astro.props;
+const { title, description, canonical, jsonLd = [], ogImage = '/og/og-default.png', article } = Astro.props;
+const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE.url}${ogImage}`;
 
 const organizationSchema = {
   '@context': 'https://schema.org',
@@ -38,6 +43,21 @@ const schemas = [organizationSchema, ...extra];
   <title>{title}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
+  <meta property="og:type" content={article ? 'article' : 'website'} />
+  <meta property="og:site_name" content={SITE.name} />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta property="og:image" content={ogImageUrl} />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:locale" content="en_US" />
+  {article && <meta property="article:published_time" content={article.published} />}
+  {article && <meta property="article:modified_time" content={article.modified} />}
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={ogImageUrl} />
   <Favicon />
   <link rel="preload" href="/fonts/dm-sans-normal.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin />

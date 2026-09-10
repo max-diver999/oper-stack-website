@@ -57,30 +57,48 @@ Disallow: /thanks/
 # Model-training crawlers
 
 User-agent: GPTBot
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /thanks/
 
 User-agent: Google-Extended
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /thanks/
 
 User-agent: CCBot
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /thanks/
 
 User-agent: anthropic-ai
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /thanks/
 
 User-agent: ClaudeBot
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /thanks/
 
 User-agent: Applebot-Extended
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /thanks/
 
 User-agent: FacebookBot
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /thanks/
 
 User-agent: meta-externalagent
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /thanks/
 
 User-agent: Bytespider
-Disallow: /
+Allow: /
+Disallow: /api/
+Disallow: /thanks/
 
 Sitemap: https://oper-stack.com/sitemap-index.xml

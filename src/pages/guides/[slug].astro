@@ -75,7 +75,7 @@ const citeMatch = entry.body?.match(/## In one sentence\s+\n+\*\*(.+?)\*\*/);
 const citeText = citeMatch?.[1] || description;
 ---
 
-<CommercialLayout title={pageTitle} description={description} canonical={canonical} jsonLd={jsonLd}>
+<CommercialLayout title={pageTitle} description={description} canonical={canonical} jsonLd={jsonLd} article={{ published: pubDate.toISOString(), modified: isoDate }}>
   <article class="wrap prose">
     <p class="meta">
       <time datetime={isoDate}>{displayDate}</time> · {author}

@@ -17,7 +17,8 @@
     "aeo:robots": "node scripts/reference-infra/generate-robots.mjs --config reference-infra.config.json --output public/robots.txt",
     "aeo:llms": "node scripts/reference-infra/generate-agent-markdown.mjs --config reference-infra.config.json --output-dir public",
     "audit:design": "node more-group-content-os/scripts/audit-design.mjs --fail",
-    "audit:design:report": "node more-group-content-os/scripts/audit-design.mjs"
+    "audit:design:report": "node more-group-content-os/scripts/audit-design.mjs",
+    "postbuild": "node scripts/patch-vercel-output.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.1",
