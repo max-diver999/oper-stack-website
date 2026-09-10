@@ -1,0 +1,139 @@
+---
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { SITE } from '../../data/site';
+
+const canonical = `${SITE.url}/terms/`;
+const updated = '10 September 2026';
+---
+
+<CommercialLayout
+  title={`Terms of service · ${SITE.name}`}
+  description="The rules for using oper-stack.com, the free tools, the Site Kit licence and the audit: ordering, payment through a merchant of record, delivery, refunds, liability and governing law."
+  canonical={canonical}
+>
+  <div class="wrap prose">
+    <p class="eyebrow">Last updated {updated}</p>
+    <h1>Terms of service</h1>
+    <p class="lede">
+      The rules for using this site, the free tools, the paid products and the audit. Plain language, no surprises.
+    </p>
+
+    <h2>1. Who we are</h2>
+    <p>
+      OperStack is a trading name used by Maksim Shchegolev, who operates it as a sole trader from Argentina ("OperStack", "we").
+      Legal questions: <a href="mailto:legal@oper-stack.com">legal@oper-stack.com</a>. Support:
+      <a href="mailto:support@oper-stack.com">support@oper-stack.com</a>.
+    </p>
+
+    <h2>2. What these terms cover</h2>
+    <p>
+      The website oper-stack.com, the free tools published under the OperStack name (the fifteen gates, the Astro starter, the Claude Code
+      plugin, the AI visibility check), the paid products (the Site Kit) and the services ordered through the site (the SEO, AEO and GEO
+      audit and the fix packages quoted after it). By using the site or ordering a product you accept these terms. The Site Kit also has its
+      own end user licence agreement, shown at purchase; where the two differ, the licence agreement governs the kit.
+    </p>
+
+    <h2>3. Free and open-source products</h2>
+    <p>
+      The gates, the Astro starter and the Claude Code plugin are published under the MIT licence in their repositories. That licence governs
+      them, not these terms. They are provided as is, without warranty of any kind.
+    </p>
+    <p>
+      The AI visibility check reads public pages of the site you enter and returns a score. It is a free, best-effort tool: the score is a
+      reading of public signals on the day of the check, not a certification. You may run it on any public site; do not automate it beyond a
+      few checks a minute.
+    </p>
+
+    <h2>4. Paid products and services</h2>
+    <ul>
+      <li><strong>Site Kit.</strong> A licence to use the kit under its licence agreement: one licence per owner (Owner plan) or per agency (Agency plan), as written into the key, with updates for twelve months from purchase.</li>
+      <li><strong>Audit.</strong> A ten-page report delivered as a PDF plus a 30 minute call, within five working days of confirming scope and receiving payment. Fix packages are quoted in writing after the audit and start only when you accept the quote.</li>
+    </ul>
+    <p>
+      Descriptions, prices and what each product includes are on the product pages. Prices are in US dollars. Sales tax or VAT is added at
+      checkout where the merchant of record has to collect it.
+    </p>
+
+    <h2>5. Ordering and payment</h2>
+    <p>
+      Paid products are sold through a merchant of record: Paddle, Lemon Squeezy or Whop, depending on the product and your country. The
+      reseller's name is on the checkout page and on your receipt. It collects the payment, applies tax, issues the invoice and processes
+      refunds under our <a href="/refunds/">refund policy</a>. We never see your card number.
+    </p>
+    <p>
+      For the audit, we confirm scope by email first and send a payment link. Work starts when the payment clears.
+    </p>
+
+    <h2>6. Delivery</h2>
+    <p>
+      Licence keys go to the email on the order within minutes of payment; if nothing has arrived in an hour, write to support. Audits are
+      delivered by email as a PDF. Nothing is shipped physically.
+    </p>
+
+    <h2>7. Refunds</h2>
+    <p>
+      The <a href="/refunds/">refund policy</a> is part of these terms. In short: fourteen days for the Site Kit, and a full refund on the
+      audit until data collection starts.
+    </p>
+
+    <h2>8. Your responsibilities</h2>
+    <ul>
+      <li>You own the sites you build with the kit and the content you publish. You are responsible for its accuracy and for the laws of your market.</li>
+      <li>Keep your licence key private. Sharing it or removing the licence check ends the licence.</li>
+      <li>Do not use the site, the tools or the products for anything illegal, for spam, or to attack other sites.</li>
+      <li>Keep the details you give us (email, company, site) accurate so we can deliver and support.</li>
+    </ul>
+
+    <h2>9. Intellectual property</h2>
+    <p>
+      The OperStack name and logo, the texts on this site, the paid modules of the Site Kit and the audit reports are ours or licensed to
+      us. The MIT-licensed products are yours to use under that licence. An audit report is yours to use inside your company and with your
+      contractors. You may quote this site with attribution and a link.
+    </p>
+
+    <h2>10. No promises about rankings, traffic or leads</h2>
+    <p>
+      Search engines and AI answer engines change without notice. Our tools and reports describe what a site does today and what is likely to
+      help; they do not promise a ranking, a citation, a traffic figure or a number of leads, and nothing on this site is a forecast. The
+      products are provided as is, and to the extent the law allows we exclude implied warranties.
+    </p>
+
+    <h2>11. Liability</h2>
+    <p>
+      To the extent the law allows, our total liability for any claim connected with a product or service is limited to the amount you paid
+      us for it in the twelve months before the claim, and we are not liable for lost profit, lost data or indirect loss. Nothing here limits
+      liability that cannot be limited by law, including the protections consumers have under their own law.
+    </p>
+
+    <h2>12. Changes</h2>
+    <p>
+      We may update these terms; the date at the top changes with them. An order keeps the terms that were in force when it was placed.
+    </p>
+
+    <h2>13. Law and disputes</h2>
+    <p>
+      These terms are governed by the laws of the Argentine Republic. Before any court, write to
+      <a href="mailto:legal@oper-stack.com">legal@oper-stack.com</a>: most issues are solved by email within a week. If you are a consumer,
+      the mandatory protections of your own country stay in place.
+    </p>
+
+    <h2>14. Contact</h2>
+    <p>
+      Legal: <a href="mailto:legal@oper-stack.com">legal@oper-stack.com</a> · Support:
+      <a href="mailto:support@oper-stack.com">support@oper-stack.com</a> · Billing:
+      <a href="mailto:billing@oper-stack.com">billing@oper-stack.com</a>
+    </p>
+    <p><a href="/privacy/">Privacy policy</a> · <a href="/refunds/">Refund policy</a></p>
+  </div>
+</CommercialLayout>
+
+<style>
+  .eyebrow {
+    font-family: var(--fm);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+</style>

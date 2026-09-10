@@ -1,0 +1,121 @@
+---
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { SITE } from '../../data/site';
+
+const canonical = `${SITE.url}/privacy/`;
+const updated = '10 September 2026';
+---
+
+<CommercialLayout
+  title={`Privacy policy · ${SITE.name}`}
+  description="What OperStack collects on oper-stack.com, why, where it goes, how long it stays, and how to ask for a copy or deletion."
+  canonical={canonical}
+>
+  <div class="wrap prose">
+    <p class="eyebrow">Last updated {updated}</p>
+    <h1>Privacy policy</h1>
+    <p class="lede">
+      What OperStack collects when you use this site, why, where it goes, how long it stays, and how to ask for a copy or deletion.
+    </p>
+
+    <h2>Who is responsible</h2>
+    <p>
+      OperStack (oper-stack.com) is a trading name used by Maksim Shchegolev, who operates it as a sole trader from Argentina.
+      Questions about this policy go to <a href="mailto:legal@oper-stack.com">legal@oper-stack.com</a>.
+    </p>
+
+    <h2>What we collect and why</h2>
+    <table>
+      <thead>
+        <tr><th>What</th><th>When</th><th>Why</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Name, email, phone or WhatsApp number, your message, the page you sent it from</td>
+          <td>When you send a form: an audit request, a product order, a PDF request</td>
+          <td>To answer you, confirm scope and deliver what you asked for</td>
+        </tr>
+        <tr>
+          <td>The site URL you type into the AI visibility check</td>
+          <td>When you run the check</td>
+          <td>To fetch and score public pages of that site. The score is cached for ten minutes, then discarded</td>
+        </tr>
+        <tr>
+          <td>Order details: product, plan, price, receipt number, the email on the order</td>
+          <td>When you buy a paid product</td>
+          <td>To issue the licence key, give support and handle refunds. Card details go to the merchant of record and never reach us</td>
+        </tr>
+        <tr>
+          <td>Usage data: pages viewed, approximate location, device and browser, referring site</td>
+          <td>While you browse, through Google Analytics 4</td>
+          <td>To see which pages work and fix the ones that do not</td>
+        </tr>
+        <tr>
+          <td>Technical logs: IP address, user agent, request time</td>
+          <td>On every request, kept by our hosting provider</td>
+          <td>Security and error diagnosis</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>Where the data goes</h2>
+    <p>
+      Form submissions reach us in three places: the OperStack mailbox on Google Workspace, a private Telegram notification, and our lead
+      database in Notion. Paid orders are processed by a merchant of record (Paddle, Lemon Squeezy or Whop, named on your receipt), which
+      keeps the payment record under its own privacy policy. The site is hosted on Vercel; analytics run on Google Analytics 4.
+    </p>
+    <p>We do not sell personal data and we do not share it with advertisers.</p>
+
+    <h2>How long we keep it</h2>
+    <ul>
+      <li>Form submissions and lead records: until the request is closed, and for up to two years after the last contact, unless a contract requires longer.</li>
+      <li>Order records: for as long as tax law requires the merchant of record and us to keep invoices.</li>
+      <li>AI visibility results: ten minutes in a cache, then gone. Nothing is stored unless you request the PDF and leave an email.</li>
+      <li>Analytics: under the retention settings of our Google Analytics property. You can opt out with the Google Analytics opt-out browser add-on or by blocking cookies.</li>
+      <li>Server logs: for the short period our hosting provider keeps them.</li>
+    </ul>
+
+    <h2>Cookies</h2>
+    <p>
+      The site sets Google Analytics cookies (names starting with <code>_ga</code>) to tell returning visitors from new ones. There are no
+      advertising cookies. Blocking cookies in your browser does not break the site.
+    </p>
+
+    <h2>Your rights</h2>
+    <p>
+      Wherever you live, you can ask what we hold about you, have it corrected, or have it deleted, and you can object to analytics
+      processing. Write to <a href="mailto:legal@oper-stack.com">legal@oper-stack.com</a> from the address you used with us; we answer within
+      30 days. If you live in the EU, the UK, Brazil, California or another place with its own privacy law, the rights that law gives you apply
+      in addition.
+    </p>
+
+    <h2>Children</h2>
+    <p>The site and the products are for businesses and professionals. We do not knowingly collect data from anyone under 16.</p>
+
+    <h2>Changes</h2>
+    <p>When this policy changes, the date at the top changes with it. Material changes are announced on this page for 30 days.</p>
+
+    <h2>Contact</h2>
+    <p>
+      Privacy questions: <a href="mailto:legal@oper-stack.com">legal@oper-stack.com</a>. Everything else:
+      <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    </p>
+    <p><a href="/terms/">Terms of service</a> · <a href="/refunds/">Refund policy</a></p>
+  </div>
+</CommercialLayout>
+
+<style>
+  .eyebrow {
+    font-family: var(--fm);
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 10px;
+  }
+  code {
+    font-family: var(--fm);
+    font-size: 13px;
+    color: var(--teal-soft);
+  }
+</style>

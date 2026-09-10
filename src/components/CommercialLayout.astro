@@ -151,6 +151,9 @@ const schemas = [organizationSchema, ...extra];
       font-size: 13px;
       color: var(--muted);
     }
+    .site-foot .foot-links { margin-top: 8px; }
+    .site-foot .foot-links a { color: var(--muted); }
+    .site-foot .foot-links a:hover { color: var(--teal-soft); }
     .prose h2 {
       font-family: var(--fd);
       font-size: 24px;
@@ -206,6 +209,7 @@ const schemas = [organizationSchema, ...extra];
   <footer class="site-foot">
     <p>{SITE.name} · {SITE.tagline}</p>
     <p style="margin-top:8px"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
+    <p class="foot-links"><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>
   </footer>
 </body>
 </html>
