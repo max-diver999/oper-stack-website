@@ -17,9 +17,12 @@
     }
   ],
   "robots": {
-    "disallow": ["/api/", "/thanks/"],
+    "disallow": [
+      "/api/",
+      "/thanks/"
+    ],
     "allowSearchCrawlers": true,
-    "allowTrainingCrawlers": false
+    "allowTrainingCrawlers": true
   },
   "markdownStructure": {
     "prefixes": []
