@@ -35,6 +35,7 @@ const {
 
 const canonical = `${SITE.url}/services/${entry.id}/`;
 const isoDate = (updatedDate || pubDate).toISOString();
+const displayDate = (updatedDate || pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' });
 
 const tier = PRICING_TIERS.find((t) => t.id === entryPoint.tier);
 
@@ -105,18 +106,31 @@ const serviceLinks = relatedServices
     <h1>{h1}</h1>
     <p class="lede">{answer} Most engagements take {timeline}.</p>
 
-    <div class="facts">
-      <div>
-        <span class="k">Entry point</span>
-        <span class="v">{tier ? `${tier.name} · ${tier.price}` : entryPoint.tier}</span>
-        <span class="n">{entryPoint.note}</span>
-      </div>
-      <div>
-        <span class="k">Typical timeline</span>
-        <span class="v">{timeline}</span>
-        <span class="n">Depends on how much of your data is already clean.</span>
-      </div>
-    </div>
+    <table class="facts">
+      <tbody>
+        <tr>
+          <th scope="row">Entry point</th>
+          <td>
+            <span class="v">{tier ? `${tier.name} · ${tier.price}` : entryPoint.tier}</span>
+            <span class="n">{entryPoint.note}</span>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Typical timeline</th>
+          <td>
+            <span class="v">{timeline}</span>
+            <span class="n">Depends on how much of your data is already clean.</span>
+          </td>
+        </tr>
+        <tr>
+          <th scope="row">Updated</th>
+          <td>
+            <span class="v"><time datetime={isoDate}>{displayDate}</time></span>
+            <span class="n">Reviewed by {author}</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
 
     <Content />
 
@@ -188,13 +202,6 @@ const serviceLinks = relatedServices
 
     <FaqSection items={faq} />
 
-    <p class="meta">
-      Updated <time datetime={isoDate}>{(updatedDate || pubDate).toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-      })}</time> · {author}
-    </p>
   </article>
 </CommercialLayout>
 
@@ -207,47 +214,47 @@ const serviceLinks = relatedServices
     margin-bottom: 12px;
   }
   .crumb a { color: var(--muted); }
-  .meta {
-    font-family: var(--fm);
-    font-size: 11px;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 36px;
-  }
   .facts {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 1px;
-    background: rgba(255, 255, 255, 0.08);
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    margin: 28px 0;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 12px;
     overflow: hidden;
-    margin: 28px 0;
   }
-  .facts > div {
+  .facts th,
+  .facts td {
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 16px 20px;
+    text-align: left;
+    vertical-align: top;
     background: var(--ink);
-    padding: 18px 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
   }
-  .facts .k {
+  .facts tr:first-child th,
+  .facts tr:first-child td { border-top: 0; }
+  .facts th {
+    width: 32%;
     font-family: var(--fm);
     font-size: 10px;
+    font-weight: 500;
     letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
+    background: rgba(255, 255, 255, 0.02);
   }
   .facts .v {
+    display: block;
     font-family: var(--fd);
     font-size: 20px;
     color: var(--teal-soft);
   }
   .facts .n {
+    display: block;
     font-size: 13px;
     color: var(--muted);
-    line-height: 1.5;
+    margin-top: 4px;
   }
   .block { margin: 36px 0; }
   .block h2 {
@@ -314,6 +321,6 @@ const serviceLinks = relatedServices
     margin-bottom: 10px;
   }
   @media (max-width: 640px) {
-    .facts { grid-template-columns: 1fr; }
+    .facts th { width: 40%; }
   }
 </style>
