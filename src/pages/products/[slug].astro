@@ -31,6 +31,14 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
       <a class="btn" href={p.cta.href} target={p.cta.external ? '_blank' : undefined} rel={p.cta.external ? 'noopener' : undefined}>{p.cta.text} →</a>
     </div>
 
+    {p.slug === 'gates' && (
+      <p class="ph-badge">
+        <a href="https://www.producthunt.com/posts/operstack-gates?utm_source=badge-featured&utm_medium=badge" target="_blank" rel="noopener">
+          <img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1247096&theme=dark" alt="OperStack Gates on Product Hunt" width="250" height="54" loading="lazy" />
+        </a>
+      </p>
+    )}
+
     <h2>What you get</h2>
     <ul class="list">{p.get.map((g) => <li>{g}</li>)}</ul>
 
@@ -124,4 +132,6 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
   .hp { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
   .msg { font-size: 14px; } .msg.err { color: #f5a962; }
   .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); } .consent input { width: auto; margin-top: 3px; }
+  .ph-badge { margin: 4px 0 28px; }
+  .ph-badge img { display: block; }
 </style>
