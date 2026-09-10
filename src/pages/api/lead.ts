@@ -70,8 +70,12 @@ export const POST: APIRoute = async ({ request }) => {
       sourceText.includes('deployment-probe') ||
       String(contactText).toLowerCase() === 'healthcheck@bot';
 
-    if (!isHealthcheck && phoneDigits.length < 8) {
-      return new Response(JSON.stringify({ error: 'Valid phone required' }), { status: 400 });
+    // Lead magnets (the AI visibility check, the gates PDF) capture an email, not a phone.
+    const emailText = String(body.email || '').trim();
+    const emailOnlySource = /^(ai-visibility|gates-pdf)/.test(sourceText);
+    const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailText);
+    if (!isHealthcheck && phoneDigits.length < 8 && !(emailOnlySource && emailLooksValid)) {
+      return new Response(JSON.stringify({ error: emailOnlySource ? 'Valid email required' : 'Valid phone required' }), { status: 400 });
     }
 
     const spamVerdict = assessLeadSpam({
@@ -98,6 +102,8 @@ export const POST: APIRoute = async ({ request }) => {
       isHealthcheck ? '🧪 <b>Healthcheck lead</b>' : `📥 <b>New lead | ${escapeHtml(SITE.name)}</b>`,
       nameText ? `👤 ${escapeHtml(nameText)}` : null,
       resolvedPhone ? `📱 ${escapeHtml(resolvedPhone)}` : null,
+      emailText ? `✉️ ${escapeHtml(emailText)}` : null,
+      sourceText ? `🏷 ${escapeHtml(sourceText)}` : null,
       messageText ? `💬 ${escapeHtml(messageText)}` : null,
       body.page ? `🌐 ${escapeHtml(String(body.page))}` : null,
       intentIdText ? `🆔 ${escapeHtml(intentIdText)}` : null,

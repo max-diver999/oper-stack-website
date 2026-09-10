@@ -25,6 +25,25 @@ export type Product = {
 
 export const PRODUCTS: Product[] = [
   {
+    slug: 'ai-visibility',
+    label: 'Free tool',
+    name: 'AI visibility check',
+    title: 'AI Visibility Check: Can ChatGPT Cite Your Site?',
+    description: 'A free ten-second check of whether ChatGPT, Perplexity, Copilot, Claude and Gemini can read, understand and cite your site: crawler access, llms.txt, schema, quotable content, dates.',
+    answer: 'The AI visibility check reads a site\'s robots.txt per crawler, its llms.txt, its sitemap, its schema and a sample of three pages, and scores five things out of 100: whether AI crawlers are allowed in, whether there is a map for agents, whether the entity is clear, whether there is a quotable answer-first paragraph and a table, and whether pages carry dates and sources. It returns the three fixes that move the score most.',
+    price: 'Free',
+    priceNote: 'No account. Public signals only. Ten seconds.',
+    status: 'available',
+    cta: { text: 'Check a site', href: '/ai-visibility/' },
+    og: '/og/og-default.png',
+    order: 0,
+    get: ['A score out of 100 and a grade, with five area scores', 'The three fixes that move the score most, in plain words', 'Per-crawler verdicts for fourteen AI crawlers and fetchers from robots.txt', 'A table of the sampled pages: words, answer-first paragraph, dates, schema', 'The fifteen gates PDF by email if you want the method behind every check'],
+    how: [{ step: 'Enter a site', text: 'Any public address. The checker reads the homepage, robots.txt, llms.txt, the sitemap and up to three pages.' }, { step: 'Read the score', text: 'Five areas, weighted by what answer engines need first: access, a map, an entity, something to quote, dates.' }, { step: 'Fix the top three', text: 'Most sites move twenty points with robots.txt, llms.txt and an answer-first paragraph on the pages that matter.' }],
+    notFor: ['Measuring citations or traffic that already happen: that is in your analytics', 'Sites behind a login, or sites that block the checker'],
+    faq: [{ question: 'Is it really free?', answer: 'Yes. It is the automatic first two pages of the paid audit, offered so you can see whether you need the rest.' }, { question: 'Why does it sample only three pages?', answer: 'To answer in ten seconds. The fifteen gates read every page of your own repository; this check reads what a stranger can fetch.' }, { question: 'What is a good score?', answer: 'Eighty and above: engines can read and quote the site. Under forty-five: they mostly cannot. Between the two, the three fixes listed usually close the gap in a day.' }],
+    relatedGuides: [{ title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }, { title: 'Inbound lead audit', href: '/guides/inbound-lead-audit/' }],
+  },
+  {
     slug: 'gates',
     label: 'Free, open source',
     name: 'Fifteen gates',

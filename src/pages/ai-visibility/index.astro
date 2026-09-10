@@ -1,0 +1,203 @@
+---
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import { SITE } from '../../data/site';
+
+const canonical = `${SITE.url}/ai-visibility/`;
+const FAQ = [
+  { question: 'What does the check look at?', answer: 'Five things an answer engine needs before it can cite a site: whether its crawlers are allowed in robots.txt, whether there is an llms.txt map, whether schema names the entity, whether the sampled pages open with a quotable answer and carry tables, and whether pages expose dates and name sources. It reads the homepage, robots.txt, llms.txt, the sitemap and up to three pages.' },
+  { question: 'Does it measure traffic from ChatGPT or Perplexity?', answer: 'No. Traffic lives in your analytics. This check measures whether the site is readable and quotable in the first place, which is the part you control. The OperStack plugin for Claude Code has an ai-visibility command that reads the GA4 side.' },
+  { question: 'Is anything stored?', answer: 'The score is cached for ten minutes so a repeated check is instant. Nothing else is kept unless you ask for the PDF and leave an email.' },
+  { question: 'Why did my site score low on content when the pages are long?', answer: 'Length is not the signal. The check looks for an answer-first paragraph of 20 to 90 words with a figure right after the H1, at least three H2 sections and a table. Long pages that bury the answer score low because engines quote the opening, not the middle.' },
+  { question: 'What is the difference between this and the audit?', answer: 'This is the free, automatic, ten-second version of the first two pages of the audit. The audit adds an analyst, Search Console data, competitor pages, and a ten-page report with a price on every fix.' },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
+const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'OperStack AI Visibility Check', url: canonical, applicationCategory: 'SEO tool', operatingSystem: 'Web', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, provider: { '@type': 'Organization', name: SITE.name, url: SITE.url } };
+---
+<CommercialLayout title="AI Visibility Check: Can ChatGPT Cite Your Site? · OperStack" description="Free ten-second check of whether ChatGPT, Perplexity, Copilot, Claude and Gemini can read, understand and cite your site: crawler access, llms.txt, schema, quotable content, dates." canonical={canonical} jsonLd={[appSchema, faqSchema]}>
+  <div class="wrap">
+    <p class="label">Free tool</p>
+    <h1>Can AI assistants read and cite your site?</h1>
+    <p class="lede">Enter a site. In about ten seconds you get a score out of 100 across the five things an answer engine needs before it quotes a page, and the three fixes that move it most.</p>
+    <CitabilityBlock text="The OperStack AI visibility check reads a site's robots.txt, llms.txt, sitemap, schema and a sample of pages, and scores whether ChatGPT, Perplexity, Copilot, Claude and Gemini can read, understand and cite it. It is free and uses public signals only." />
+
+    <form id="vis-form" class="vis-form" novalidate>
+      <label for="vis-url" class="sr">Site address</label>
+      <input id="vis-url" name="url" type="text" inputmode="url" placeholder="example.com" autocomplete="url" required />
+      <button type="submit" class="btn" id="vis-btn">Check the site →</button>
+    </form>
+    <p class="note" id="vis-note">Public signals only. Nothing is stored except the score, for ten minutes.</p>
+
+    <section id="vis-result" class="result" hidden aria-live="polite"></section>
+
+    <section id="vis-capture" class="capture" hidden>
+      <h2>Get the method behind the score</h2>
+      <p>The fifteen gates PDF: each gate, the failure it was written for, and the fix. Eight pages, free, by email.</p>
+      <form id="pdf-form" novalidate>
+        <input type="hidden" name="source" id="pdf-source" value="ai-visibility" />
+        <div class="row">
+          <div><label for="pdf-name">Name</label><input id="pdf-name" name="name" autocomplete="name" /></div>
+          <div><label for="pdf-email">Email *</label><input id="pdf-email" name="email" type="email" required autocomplete="email" /></div>
+        </div>
+        <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive the PDF and, at most once a month, a note when a gate changes.</label></div>
+        <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
+        <button type="submit" class="btn" id="pdf-btn">Send me the PDF →</button>
+        <p class="msg" id="pdf-msg" hidden></p>
+      </form>
+    </section>
+
+    <h2>What the check measures</h2>
+    <ol class="areas-list">
+      <li><strong>Access, 25 points.</strong> robots.txt read per user agent for fourteen AI crawlers and fetchers. A blocked search fetcher costs more than a blocked training crawler, because the fetchers are the bots that cite pages live.</li>
+      <li><strong>Agent map, 15 points.</strong> llms.txt exists, is text, and links to the site's own pages rather than a template demo.</li>
+      <li><strong>Entity, 20 points.</strong> Organization or business schema, FAQPage and Article schema, a canonical tag and Open Graph on the homepage.</li>
+      <li><strong>Quotable content, 25 points.</strong> On up to three sampled pages: at least 300 words, an answer-first paragraph with a figure right after the H1, three or more H2 sections, a table.</li>
+      <li><strong>Dates and sources, 15 points.</strong> Publication dates in meta or schema, source phrases in the text, a sitemap with lastmod.</li>
+    </ol>
+
+    <h2>What it does not measure</h2>
+    <ul class="areas-list">
+      <li>Traffic or citations already happening: that is in your analytics, and the plugin's ai-visibility command reads it.</li>
+      <li>Rankings, backlinks or keyword demand.</li>
+      <li>Pages that need a login, or sites that block the checker itself.</li>
+    </ul>
+
+    <section class="cta-box">
+      <h2>Run the full gates on your own corpus</h2>
+      <p>The check reads a sample. The fifteen gates read every page in your repository, in one command, for free.</p>
+      <p style="margin-top:14px"><code class="cmd">npx @operstack/gates</code> · <a href="/products/gates/">What the gates check</a></p>
+    </section>
+
+    <FaqSection items={FAQ} />
+  </div>
+
+  <script>
+    const form = document.getElementById('vis-form') as HTMLFormElement;
+    const input = document.getElementById('vis-url') as HTMLInputElement;
+    const btn = document.getElementById('vis-btn') as HTMLButtonElement;
+    const note = document.getElementById('vis-note') as HTMLElement;
+    const out = document.getElementById('vis-result') as HTMLElement;
+    const capture = document.getElementById('vis-capture') as HTMLElement;
+    const pdfForm = document.getElementById('pdf-form') as HTMLFormElement;
+    const pdfSource = document.getElementById('pdf-source') as HTMLInputElement;
+    const pdfMsg = document.getElementById('pdf-msg') as HTMLElement;
+    const pdfBtn = document.getElementById('pdf-btn') as HTMLButtonElement;
+    const loadedAt = Date.now();
+    let last: any = null;
+
+    const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
+    const track = (name: string, params: Record<string, unknown>) => { const w = window as any; if (typeof w.operStackTrack === 'function') w.operStackTrack(name, params); };
+
+    function render(r: any) {
+      const ring = 2 * Math.PI * 54;
+      const areas = r.areas.map((a: any) => `
+        <div class="area">
+          <div class="area-head"><span>${esc(a.label)}</span><strong>${a.score}/${a.max}</strong></div>
+          <div class="bar"><i style="width:${Math.round((a.score / a.max) * 100)}%"></i></div>
+          <ul>${a.findings.map((f: any) => `<li class="f-${f.level}"><span class="chip">${f.level === 'pass' ? 'OK' : f.level === 'warn' ? 'Partial' : 'Problem'}</span>${esc(f.text)}</li>`).join('')}</ul>
+        </div>`).join('');
+      const fixes = r.fixes.length ? `<div class="fixes"><h3>Fix these first</h3><ol>${r.fixes.map((f: any) => `<li><strong>${esc(f.area)}.</strong> ${esc(f.text)}</li>`).join('')}</ol></div>` : '';
+      const pages = r.sample.length ? `<details class="more"><summary>Pages sampled (${r.sample.length})</summary><table><tr><th>Page</th><th>Words</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr>${r.sample.map((p: any) => `<tr><td><a href="${esc(p.url)}" rel="nofollow noopener" target="_blank">${esc(new URL(p.url).pathname)}</a></td><td>${p.words}</td><td>${p.answerFirst ? 'yes' : 'no'}</td><td>${p.dated ? 'yes' : 'no'}</td><td>${esc(p.schema.join(', ') || 'none')}</td></tr>`).join('')}</table></details>` : '';
+      const crawlers = `<details class="more"><summary>Crawlers checked (${r.crawlers.length})</summary><table><tr><th>Crawler</th><th>Kind</th><th>robots.txt</th></tr>${r.crawlers.map((c: any) => `<tr><td>${esc(c.label)}</td><td>${c.kind === 'search' ? 'search and citation' : 'training'}</td><td class="${c.verdict === 'blocked' ? 'bad' : 'ok'}">${c.verdict}</td></tr>`).join('')}</table></details>`;
+      out.innerHTML = `
+        <div class="score-row">
+          <svg viewBox="0 0 120 120" class="ring" aria-label="Score ${r.score} of 100"><circle cx="60" cy="60" r="54" class="ring-bg"/><circle cx="60" cy="60" r="54" class="ring-fg g-${r.grade}" stroke-dasharray="${ring}" stroke-dashoffset="${ring * (1 - r.score / 100)}"/><text x="60" y="56" text-anchor="middle" class="ring-num">${r.score}</text><text x="60" y="76" text-anchor="middle" class="ring-sub">of 100</text></svg>
+          <div>
+            <p class="label">Grade ${esc(r.grade)} · ${esc(r.host)}</p>
+            <h2 class="verdict">${r.score >= 80 ? 'AI systems can read and quote this site.' : r.score >= 65 ? 'Readable, with gaps that cost citations.' : r.score >= 45 ? 'Readable, but there is little to quote.' : 'Mostly invisible to answer engines.'}</h2>
+            <p class="note">Checked ${new Date(r.checkedAt).toLocaleString('en-GB')} in ${(r.ms / 1000).toFixed(1)} s. Sitemap: ${r.sitemap.found ? `${r.sitemap.count} URLs${r.sitemap.lastmod ? ', dated' : ', no dates'}` : 'not found'}.</p>
+          </div>
+        </div>
+        ${fixes}
+        <div class="areas">${areas}</div>
+        ${pages}${crawlers}`;
+      out.hidden = false;
+      capture.hidden = false;
+      pdfSource.value = `ai-visibility:${r.host}:${r.score}`;
+      out.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const url = input.value.trim();
+      if (!url) { input.focus(); return; }
+      btn.disabled = true; btn.textContent = 'Checking…'; note.textContent = 'Reading robots.txt, llms.txt, the sitemap and a few pages. Ten seconds at most.';
+      try {
+        const res = await fetch(`/api/ai-visibility/?url=${encodeURIComponent(url)}`);
+        const data = await res.json();
+        if (!data.ok) throw new Error(data.error || 'The check failed');
+        last = data; render(data);
+        track('ai_visibility_check', { host: data.host, score: data.score, grade: data.grade });
+        note.textContent = 'Public signals only. Nothing is stored except the score, for ten minutes.';
+      } catch (err: any) {
+        out.innerHTML = `<p class="err">${esc(err.message || 'The check failed')}</p>`; out.hidden = false;
+        note.textContent = 'Public signals only. Nothing is stored except the score, for ten minutes.';
+      } finally { btn.disabled = false; btn.textContent = 'Check the site →'; }
+    });
+
+    pdfForm.addEventListener('submit', async (e) => {
+      e.preventDefault(); pdfMsg.hidden = true; pdfBtn.disabled = true;
+      const fd = new FormData(pdfForm);
+      const payload = { name: fd.get('name'), email: fd.get('email'), message: last ? `AI visibility ${last.score}/100 (grade ${last.grade}) for ${last.url}` : 'AI visibility PDF request', source: pdfSource.value, website: fd.get('website'), page: location.pathname, formLoadedAt: loadedAt, formElapsedMs: Date.now() - loadedAt };
+      try {
+        const res = await fetch('/api/lead/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok) throw new Error(data.error || 'Request failed');
+        track('lead_form_submit', { form_name: 'ai_visibility_pdf', source: pdfSource.value });
+        location.href = '/thanks/gates-pdf/';
+      } catch (err: any) { pdfMsg.textContent = err.message || 'Something went wrong. Email info@oper-stack.com'; pdfMsg.className = 'msg err'; pdfMsg.hidden = false; pdfBtn.disabled = false; }
+    });
+  </script>
+</CommercialLayout>
+
+<style>
+  .label { font-family: var(--fm); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  h2 { font-family: var(--fd); font-size: 22px; margin: 36px 0 12px; }
+  h3 { font-family: var(--fd); font-size: 18px; margin: 0 0 8px; }
+  .sr { position: absolute; left: -9999px; }
+  .vis-form { display: flex; gap: 10px; margin: 8px 0 10px; flex-wrap: wrap; }
+  .vis-form input { flex: 1 1 280px; min-height: 48px; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(61,184,169,.35); background: rgba(0,0,0,.3); color: var(--paper); font: inherit; font-size: 16px; }
+  .vis-form input:focus { outline: 2px solid rgba(61,184,169,.45); outline-offset: 1px; }
+  .note { font-size: 13px; color: var(--muted); }
+  .result { margin-top: 28px; padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.02); }
+  .score-row { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+  .ring { width: 132px; height: 132px; flex-shrink: 0; transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 10; }
+  .ring-fg { fill: none; stroke: var(--teal-soft); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
+  .ring-fg.g-D, .ring-fg.g-E { stroke: #e07a5f; } .ring-fg.g-C { stroke: var(--amber-soft); }
+  .ring-num { font-family: var(--fd); font-size: 34px; fill: var(--paper); transform: rotate(90deg); transform-origin: 60px 60px; }
+  .ring-sub { font-family: var(--fm); font-size: 9px; fill: var(--muted); letter-spacing: .1em; text-transform: uppercase; transform: rotate(90deg); transform-origin: 60px 60px; }
+  .verdict { margin: 4px 0 8px; font-size: 24px; }
+  .fixes { margin: 22px 0; padding: 16px 18px; border-radius: 12px; border: 1px solid rgba(232,184,74,.35); background: rgba(232,184,74,.06); }
+  .fixes ol { margin: 0 0 0 18px; color: rgba(245,242,236,.88); } .fixes li { margin-bottom: 8px; line-height: 1.5; }
+  .areas { display: grid; gap: 14px; margin-top: 22px; }
+  .area { padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); }
+  .area-head { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; margin-bottom: 8px; }
+  .bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-bottom: 10px; }
+  .bar i { display: block; height: 100%; background: var(--teal-soft); }
+  .area ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .area li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: rgba(245,242,236,.85); }
+  .chip { flex-shrink: 0; font-family: var(--fm); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; border: 1px solid currentColor; margin-top: 3px; }
+  .f-pass .chip { color: var(--teal-soft); } .f-warn .chip { color: var(--amber-soft); } .f-fail .chip { color: #e07a5f; }
+  .more { margin-top: 14px; } .more summary { cursor: pointer; color: var(--teal-soft); font-family: var(--fm); font-size: 13px; padding: 8px 0; }
+  .more table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; display: block; overflow-x: auto; }
+  .more th { text-align: left; font-family: var(--fm); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .more td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.06); color: rgba(245,242,236,.85); }
+  .more td.bad { color: #e07a5f; } .more td.ok { color: var(--teal-soft); }
+  .err { color: #f5a962; margin: 0; }
+  .capture { margin-top: 28px; padding: 24px; border-radius: 16px; border: 1px solid rgba(61,184,169,.28); background: rgba(26,138,125,.08); }
+  .capture h2 { margin-top: 0; }
+  .capture form { display: grid; gap: 14px; margin-top: 12px; }
+  .capture label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: rgba(245,242,236,.9); }
+  .capture input:not([type=checkbox]) { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); color: var(--paper); font: inherit; }
+  .row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; } @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+  .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); } .consent input { width: auto; margin-top: 3px; }
+  .hp { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
+  .msg { font-size: 14px; } .msg.err { color: #f5a962; }
+  button:disabled { opacity: .6; cursor: wait; }
+  .areas-list { margin: 0 0 8px 20px; color: rgba(245,242,236,.85); } .areas-list li { margin-bottom: 10px; line-height: 1.55; }
+  .cta-box { margin: 40px 0; padding: 24px; border-radius: 14px; border: 1px solid rgba(61,184,169,.28); background: rgba(26,138,125,.08); }
+  .cta-box h2 { margin-top: 0; }
+  .cmd { font-family: var(--fm); font-size: 15px; color: var(--amber-soft); background: rgba(0,0,0,.3); padding: 8px 12px; border-radius: 8px; }
+</style>

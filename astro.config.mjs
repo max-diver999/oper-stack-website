@@ -11,7 +11,7 @@ export default defineConfig({
   site: 'https://oper-stack.com',
   output: 'static',
   trailingSlash: 'always',
-  adapter: vercel(),
+  adapter: vercel({ maxDuration: 30 }),
   integrations: [
     sitemap({
       filter(page) {
