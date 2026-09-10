@@ -1,0 +1,54 @@
+---
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import { PRODUCTS, PRODUCTS_FAQ } from '../../data/products';
+import { SITE } from '../../data/site';
+
+const canonical = `${SITE.url}/products/`;
+const products = [...PRODUCTS].sort((a, b) => a.order - b.order);
+const itemList = {
+  '@context': 'https://schema.org',
+  '@type': 'ItemList',
+  name: 'OperStack products',
+  itemListElement: products.map((p, i) => ({ '@type': 'ListItem', position: i + 1, name: p.name, url: `${SITE.url}/products/${p.slug}/` })),
+};
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: PRODUCTS_FAQ.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
+---
+<CommercialLayout title="Tools for Content Sites That Rank and Get Cited · OperStack" description="Fifteen free content gates, an Astro starter, a Claude Code plugin, a Site Kit and an SEO, AEO and GEO audit. Built from a pipeline that publishes to eleven sites." canonical={canonical} jsonLd={[itemList, faqSchema]}>
+  <div class="wrap wide">
+    <h1>Tools for content sites that have to rank, be cited and convert</h1>
+    <p class="lede">Every product on this page came out of one pipeline that publishes to eleven content sites. The free ones stay free. The paid ones have a price on the page, not in a call.</p>
+    <CitabilityBlock text="OperStack publishes five products for content sites: fifteen free quality gates, a free Astro starter, a free Claude Code plugin, a paid Site Kit at 79 USD, and an SEO, AEO and GEO audit at 249 USD." />
+    <div class="grid">
+      {products.map((p) => (
+        <a class="card" href={`/products/${p.slug}/`}>
+          <span class="label">{p.label}</span>
+          <span class="name">{p.name}</span>
+          <span class="desc">{p.description}</span>
+          <span class="price">{p.price}{p.status === 'soon' ? ' · coming soon' : ''}</span>
+          <span class="go">{p.status === 'soon' ? 'Read the scope' : p.price === 'Free' ? 'Get it' : 'See what you get'}</span>
+        </a>
+      ))}
+    </div>
+    <section class="cta-box">
+      <h2>Start with the gates</h2>
+      <p>One command on your own site tells you whether you need anything else on this page.</p>
+      <p style="margin-top:14px"><code class="cmd">npx @operstack/gates</code></p>
+    </section>
+    <FaqSection items={PRODUCTS_FAQ} />
+  </div>
+</CommercialLayout>
+<style>
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 32px 0; }
+  .card { display: flex; flex-direction: column; gap: 8px; padding: 22px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); text-decoration: none; transition: border-color .15s ease, background .15s ease; }
+  .card:hover { border-color: rgba(61,184,169,0.45); background: rgba(26,138,125,0.06); }
+  .card .label { font-family: var(--fm); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .card .name { font-family: var(--fd); font-size: 20px; line-height: 1.2; color: var(--paper); }
+  .card .desc { font-size: 14px; line-height: 1.6; color: var(--muted); }
+  .card .price { font-family: var(--fm); font-size: 13px; color: var(--amber-soft); margin-top: 4px; }
+  .card .go { font-family: var(--fm); font-size: 12px; color: var(--teal-soft); }
+  .cta-box { margin: 40px 0; padding: 24px; border-radius: 14px; border: 1px solid rgba(61,184,169,0.28); background: rgba(26,138,125,0.08); }
+  .cta-box h2 { font-family: var(--fd); font-size: 22px; margin-bottom: 10px; }
+  .cmd { font-family: var(--fm); font-size: 15px; color: var(--amber-soft); background: rgba(0,0,0,.3); padding: 8px 12px; border-radius: 8px; }
+</style>

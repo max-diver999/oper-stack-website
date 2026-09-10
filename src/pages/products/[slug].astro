@@ -1,0 +1,127 @@
+---
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import { PRODUCTS } from '../../data/products';
+import { SITE } from '../../data/site';
+
+export function getStaticPaths() {
+  return PRODUCTS.map((p) => ({ params: { slug: p.slug }, props: { product: p } }));
+}
+const { product: p } = Astro.props;
+const canonical = `${SITE.url}/products/${p.slug}/`;
+const offer = p.price === 'Free' ? { '@type': 'Offer', price: '0', priceCurrency: 'USD' } : { '@type': 'Offer', price: p.price.replace(/[^\d.]/g, ''), priceCurrency: 'USD', availability: p.status === 'soon' ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock' };
+const productSchema = { '@context': 'https://schema.org', '@type': p.slug === 'seo-audit' ? 'Service' : 'SoftwareApplication', name: `OperStack ${p.name}`, description: p.description, url: canonical, offers: offer, ...(p.slug !== 'seo-audit' ? { applicationCategory: 'DeveloperApplication', operatingSystem: 'Node.js 20+' } : { provider: { '@type': 'Organization', name: SITE.name } }) };
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: p.faq.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
+const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order - b.order);
+---
+<CommercialLayout title={`${p.title} · ${SITE.name}`} description={p.description} canonical={canonical} jsonLd={[productSchema, faqSchema]}>
+  <div class="wrap">
+    <p class="crumb"><a href="/products/">Products</a> / {p.name}</p>
+    <p class="label">{p.label}</p>
+    <h1>{p.title}</h1>
+    <p class="lede">{p.description}</p>
+    <CitabilityBlock text={p.answer} />
+
+    <div class="price-box">
+      <div>
+        <p class="price">{p.price}</p>
+        <p class="price-note">{p.priceNote}{p.status === 'soon' ? '. Coming soon.' : ''}</p>
+      </div>
+      <a class="btn" href={p.cta.href} target={p.cta.external ? '_blank' : undefined} rel={p.cta.external ? 'noopener' : undefined}>{p.cta.text} →</a>
+    </div>
+
+    <h2>What you get</h2>
+    <ul class="list">{p.get.map((g) => <li>{g}</li>)}</ul>
+
+    <h2>How it works</h2>
+    <ol class="steps">{p.how.map((h) => <li><strong>{h.step}.</strong> {h.text}</li>)}</ol>
+
+    {p.command && (
+      <section id="install" class="install">
+        <h2>Install</h2>
+        <pre><code>{p.command}</code></pre>
+        {p.slug === 'plugin' && <pre><code>/plugin install operstack-seo@operstack</code></pre>}
+        {p.slug === 'gates' && <p class="note">Runs on Node 20 or newer. The report lands in .gates/gates-report.md. Try <code>npx @operstack/gates --demo</code> to see every gate fire on the fictional demo site first.</p>}
+      </section>
+    )}
+
+    <h2>What it is not for</h2>
+    <ul class="list">{p.notFor.map((n) => <li>{n}</li>)}</ul>
+
+    {p.orderForm && (
+      <section id="order">
+        <h2>{p.orderForm.heading}</h2>
+        <form id="order-form" novalidate>
+          <input type="hidden" name="source" value={p.orderForm.source} />
+          <div class="row">
+            <div><label for="name">Name *</label><input id="name" name="name" required autocomplete="name" /></div>
+            <div><label for="phone">WhatsApp / Phone *</label><input id="phone" name="phone" type="tel" required autocomplete="tel" /></div>
+          </div>
+          <div><label for="email">Email *</label><input id="email" name="email" type="email" required autocomplete="email" /></div>
+          <div><label for="message">Site and tier *</label><textarea id="message" name="message" rows="4" required placeholder={p.orderForm.placeholder}></textarea></div>
+          <div class="consent"><input type="checkbox" id="consent" name="consent" required /><label for="consent">I agree to be contacted about this order.</label></div>
+          <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
+          <button type="submit" class="btn" id="submit">Send the order →</button>
+          <p class="msg" id="form-msg" hidden></p>
+        </form>
+        <p class="note">Payment link and invoice follow by email after scope is confirmed. No card on this page.</p>
+      </section>
+    )}
+
+    <FaqSection items={p.faq} />
+
+    <h2>Further reading</h2>
+    <ul class="list">{p.relatedGuides.map((g) => <li><a href={g.href}>{g.title}</a></li>)}</ul>
+
+    <h2>Other products</h2>
+    <ul class="list">{others.map((o) => <li><a href={`/products/${o.slug}/`}>{o.name}</a>: {o.price}{o.status === 'soon' ? ', coming soon' : ''}</li>)}</ul>
+  </div>
+
+  {p.orderForm && (
+    <script is:inline define:vars={{ source: p.orderForm.source }}>
+      const form = document.getElementById('order-form');
+      const msg = document.getElementById('form-msg');
+      const btn = document.getElementById('submit');
+      const loadedAt = Date.now();
+      let started = false;
+      const markStart = () => { if (started) return; started = true; if (typeof window.operStackTrack === 'function') window.operStackTrack('lead_form_start', { form_name: 'seo_audit_order', source }); };
+      form.addEventListener('input', markStart, { once: true });
+      form.addEventListener('submit', async (e) => {
+        e.preventDefault(); msg.hidden = true; btn.disabled = true;
+        const fd = new FormData(form);
+        const payload = { name: fd.get('name'), phone: fd.get('phone'), email: fd.get('email'), message: fd.get('message'), source, website: fd.get('website'), formLoadedAt: loadedAt, formElapsedMs: Date.now() - loadedAt };
+        try {
+          const res = await fetch('/api/lead/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
+          const data = await res.json().catch(() => ({}));
+          if (!res.ok) throw new Error(data.error || 'Request failed');
+          if (typeof window.operStackTrack === 'function') window.operStackTrack('lead_form_submit', { form_name: 'seo_audit_order', source });
+          window.location.href = '/thanks/';
+        } catch (err) { msg.textContent = err.message || 'Something went wrong. Email info@oper-stack.com'; msg.className = 'msg err'; msg.hidden = false; btn.disabled = false; }
+      });
+    </script>
+  )}
+</CommercialLayout>
+<style>
+  .crumb { font-family: var(--fm); font-size: 12px; color: var(--muted); margin-bottom: 18px; }
+  .crumb a { color: var(--teal-soft); text-decoration: none; }
+  .label { font-family: var(--fm); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  h2 { font-family: var(--fd); font-size: 22px; margin: 36px 0 12px; }
+  .list { margin: 0 0 8px 20px; color: rgba(245,242,236,.85); } .list li { margin-bottom: 8px; line-height: 1.55; }
+  .steps { margin: 0 0 8px 20px; color: rgba(245,242,236,.85); } .steps li { margin-bottom: 10px; line-height: 1.55; }
+  .price-box { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 28px 0 8px; padding: 22px; border-radius: 14px; border: 1px solid rgba(61,184,169,0.28); background: rgba(26,138,125,0.08); }
+  .price { font-family: var(--fd); font-size: 30px; line-height: 1; margin: 0 0 6px; }
+  .price-note { font-size: 13px; color: var(--muted); margin: 0; }
+  .install pre { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 14px 16px; overflow-x: auto; margin-bottom: 10px; }
+  .install code, .note code { font-family: var(--fm); font-size: 14px; color: var(--amber-soft); }
+  .note { font-size: 14px; color: var(--muted); margin-top: 10px; }
+  form { display: grid; gap: 16px; padding: 28px; border-radius: 16px; background: rgba(255,255,255,0.03); border: 1px solid rgba(61,184,169,0.22); }
+  label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: rgba(245,242,236,.9); }
+  input, textarea { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); color: var(--paper); font: inherit; }
+  input:focus, textarea:focus { outline: 2px solid rgba(61,184,169,.45); outline-offset: 1px; }
+  .row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; } @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+  button:disabled { opacity: .6; cursor: wait; }
+  .hp { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
+  .msg { font-size: 14px; } .msg.err { color: #f5a962; }
+  .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); } .consent input { width: auto; margin-top: 3px; }
+</style>

@@ -176,6 +176,7 @@ const schemas = [organizationSchema, ...extra];
   <nav class="site-nav" aria-label="Site">
     <a href="/">Map</a>
     <a href="/services/" class:list={{ active: Astro.url.pathname.startsWith('/services') }}>Services</a>
+    <a href="/products/" class:list={{ active: Astro.url.pathname.startsWith('/products') }}>Products</a>
     <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
     <a href="/cases/" class:list={{ active: Astro.url.pathname.startsWith('/cases') }}>Cases</a>
     <a href="/guides/" class:list={{ active: Astro.url.pathname.startsWith('/guides') }}>Guides</a>
