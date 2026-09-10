@@ -11,6 +11,8 @@ export type Product = {
   priceNote: string;
   status: 'available' | 'soon';
   cta: { text: string; href: string; external?: boolean };
+  /** Optional second button, for a live demo. */
+  demo?: { text: string; href: string };
   command?: string;
   og: string;
   order: number;
@@ -74,6 +76,7 @@ export const PRODUCTS: Product[] = [
     priceNote: 'MIT licence, clone and keep',
     status: 'available',
     cta: { text: 'Get the repository', href: 'https://github.com/oper-stack/astro-starter', external: true },
+    demo: { text: 'See the live demo', href: 'https://demo.oper-stack.com' },
     command: 'git clone https://github.com/oper-stack/astro-starter my-site',
     og: '/og/og-starter.png',
     order: 2,

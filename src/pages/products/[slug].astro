@@ -28,7 +28,10 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
         <p class="price">{p.price}</p>
         <p class="price-note">{p.priceNote}{p.status === 'soon' ? '. Coming soon.' : ''}</p>
       </div>
-      <a class="btn" href={p.cta.href} target={p.cta.external ? '_blank' : undefined} rel={p.cta.external ? 'noopener' : undefined}>{p.cta.text} →</a>
+      <span class="cta-group">
+        <a class="btn" href={p.cta.href} target={p.cta.external ? '_blank' : undefined} rel={p.cta.external ? 'noopener' : undefined}>{p.cta.text} →</a>
+        {p.demo && <a class="btn btn-ghost" href={p.demo.href} target="_blank" rel="noopener">{p.demo.text} →</a>}
+      </span>
     </div>
 
     {p.slug === 'gates' && (
@@ -134,4 +137,5 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
   .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); } .consent input { width: auto; margin-top: 3px; }
   .ph-badge { margin: 4px 0 28px; }
   .ph-badge img { display: block; }
+  .cta-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 </style>
