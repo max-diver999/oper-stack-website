@@ -97,7 +97,14 @@ function analysePage(html, url) {
   for (const block of ld) for (const m of block.matchAll(/"@type"\s*:\s*"([A-Za-z]+)"/g)) types.add(m[1]);
   const datePublished = attr(head, /<meta[^>]+property=["']article:published_time["'][^>]+content=["']([^"']*)["']/i) || (ld.join('\n').match(/"datePublished"\s*:\s*"([^"]+)"/) || [])[1] || '';
   const dateModified = attr(head, /<meta[^>]+property=["']article:modified_time["'][^>]+content=["']([^"']*)["']/i) || (ld.join('\n').match(/"dateModified"\s*:\s*"([^"]+)"/) || [])[1] || '';
-  const bodyHtml = (html.match(/<body[\s\S]*<\/body>/i) || [html])[0].replace(/<(nav|header|footer|aside)[\s\S]*?<\/\1>/gi, ' ');
+  // Site chrome is dropped so it cannot be counted as content, with one exception that matters:
+  // an article's title block is usually <header><h1>…</h1><p>the answer…</p></header>. Stripping
+  // every <header> deleted exactly the paragraph this check looks for, so a page that did open
+  // with an answer scored as if it had none. Keep any header that carries the H1.
+  const stripChrome = (h) => h
+    .replace(/<(nav|footer|aside)[\s\S]*?<\/\1>/gi, ' ')
+    .replace(/<header[\s\S]*?<\/header>/gi, (block) => (/<h1[\s>]/i.test(block) ? block : ' '));
+  const bodyHtml = stripChrome((html.match(/<body[\s\S]*<\/body>/i) || [html])[0]);
   const text = strip(bodyHtml);
   const words = (text.match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || []).length;
   const h1 = strip((bodyHtml.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i) || ['', ''])[1]);
