@@ -3,6 +3,7 @@ import Favicon from './Favicon.astro';
 import GoogleAnalytics from './GoogleAnalytics.astro';
 import JsonLd from './JsonLd.astro';
 import { SITE } from '../data/site';
+import { lastmodFor } from '../lib/page-lastmod';
 
 interface Props {
   title: string;
@@ -21,6 +22,7 @@ const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE.url}${ogImage}
 const organizationSchema = {
   '@context': 'https://schema.org',
   '@type': 'Organization',
+  '@id': `${SITE.url}/#organization`,
   name: SITE.name,
   url: SITE.url,
   description: SITE.description,
@@ -44,8 +46,27 @@ const organizationSchema = {
   },
 };
 
+// Every page type carries a modification date, not only the articles. Articles use
+// their own frontmatter date; the rest use the committed git-derived map.
+const modified = article?.modified ?? lastmodFor(canonical);
+const webPageSchema = modified
+  ? {
+      '@context': 'https://schema.org',
+      '@type': 'WebPage',
+      '@id': `${canonical}#webpage`,
+      url: canonical,
+      name: title,
+      description,
+      inLanguage: 'en',
+      isPartOf: { '@id': `${SITE.url}/#website` },
+      publisher: { '@id': `${SITE.url}/#organization` },
+      dateModified: modified,
+      ...(article?.published ? { datePublished: article.published } : {}),
+    }
+  : null;
+
 const extra = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
-const schemas = [organizationSchema, ...extra];
+const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), ...extra];
 ---
 
 <!DOCTYPE html>

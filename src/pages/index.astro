@@ -5,6 +5,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import { NETWORK_HERO } from '../data/cases';
 import JsonLd from '../components/JsonLd.astro';
 import { SITE } from '../data/site';
+import { lastmodFor } from '../lib/page-lastmod';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
 const featured = services.slice(0, 8);
@@ -41,6 +42,18 @@ const homeSchemas = [
     url: `${SITE.url}/`,
     publisher: { '@id': `${SITE.url}/#organization` },
     inLanguage: 'en',
+  },
+  {
+    '@context': 'https://schema.org',
+    '@type': 'WebPage',
+    '@id': `${SITE.url}/#webpage`,
+    url: `${SITE.url}/`,
+    name: SITE.name,
+    description: SITE.description,
+    inLanguage: 'en',
+    isPartOf: { '@id': `${SITE.url}/#website` },
+    publisher: { '@id': `${SITE.url}/#organization` },
+    dateModified: lastmodFor('/'),
   },
 ];
 // Full-page interactive system map (OperStack homepage)

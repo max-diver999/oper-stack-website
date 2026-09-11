@@ -20,3 +20,10 @@ scripts/google-indexing-key.json
 # seo kit reference
 _seo-kit-reference/
 .vercel
+
+# AI-visibility pack: generated at prebuild, never edited by hand
+public/guides/*.md
+public/services/*.md
+public/index.md
+public/llms-full.txt
+public/.well-known/

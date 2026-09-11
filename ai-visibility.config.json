@@ -1,0 +1,36 @@
+{
+  "siteUrl": "https://oper-stack.com",
+  "host": "oper-stack.com",
+  "brand": "OperStack",
+  "language": "en",
+  "title": "OperStack",
+  "tagline": "The operating stack for inbound leads",
+  "summary": "OperStack builds and measures the machine-readable surface a business needs to be found, quoted and attributed by AI search: crawler access, an agent index, entity clarity, answer-first copy and verifiable dates. Services, guides and products for teams that live on inbound leads.",
+  "entity": "OperStack is a B2B advisory and product studio for inbound lead operations, founded by Maksim Shchegolev. It is not operstack.com, which is a different company, and it is not a real estate brand.",
+  "contact": {
+    "email": "info@oper-stack.com",
+    "telegram": "https://t.me/operstack",
+    "page": "/contact/"
+  },
+  "collections": [
+    { "dir": "guides", "urlPrefix": "/guides", "label": "Guides" },
+    { "dir": "services", "urlPrefix": "/services", "label": "Services" }
+  ],
+  "keyPages": [
+    { "url": "/services/", "label": "Services: scope, timeline and boundaries" },
+    { "url": "/pricing/", "label": "Pricing: audit, setup, retainer" },
+    { "url": "/products/", "label": "Products: gates, starter, audit generator, Site Kit" },
+    { "url": "/cases/", "label": "Cases: anonymised client outcomes" },
+    { "url": "/guides/", "label": "Guides: lead operations and AI search" },
+    { "url": "/contact/", "label": "Contact" }
+  ],
+  "contentPolicy": {
+    "search": "yes",
+    "aiInput": "yes",
+    "aiTrain": "no"
+  },
+  "llms": {
+    "generated": false,
+    "note": "public/llms.txt is maintained by hand on this site and already answers 200. The pack never overwrites it; check-agent-index.mjs only verifies that nothing inside it is noindex or dead."
+  }
+}

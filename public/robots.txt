@@ -1,4 +1,8 @@
 User-agent: *
+# Content Signals (contentsignals.org / IETF draft-romm-aipref-contentsignals)
+# Citation in AI search and retrieval is allowed. Training on this content is not.
+Content-Signal: search=yes, ai-input=yes, ai-train=no
+Allow: /
 Disallow: /api/
 Disallow: /thanks/
 
@@ -100,5 +104,11 @@ User-agent: Bytespider
 Allow: /
 Disallow: /api/
 Disallow: /thanks/
+
+# Markdown renditions for agents: append .md to any guide or service URL,
+# or send `Accept: text/markdown`. Start here:
+# https://oper-stack.com/index.md
+# https://oper-stack.com/llms.txt
+# https://oper-stack.com/.well-known/agent.json
 
 Sitemap: https://oper-stack.com/sitemap-index.xml
