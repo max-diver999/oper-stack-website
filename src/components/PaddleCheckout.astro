@@ -1,0 +1,40 @@
+---
+/**
+ * Оверлей оплаты Paddle. Вставляется один раз на страницу и сам находит кнопки с data-price-id.
+ * Ничего не делает и ничего не грузит, пока в окружении нет клиентского токена.
+ */
+import { PADDLE_TOKEN } from '../lib/checkout';
+/** Ставится только на страницы, где есть что купить: на бесплатных продуктах скрипт оплаты не нужен. */
+const { priceId } = Astro.props as { priceId?: string | null };
+---
+{PADDLE_TOKEN && priceId && (
+  <script is:inline define:vars={{ token: PADDLE_TOKEN }}>
+    (function () {
+      var buttons = document.querySelectorAll('[data-price-id]');
+      if (!buttons.length) return;
+      var s = document.createElement('script');
+      s.src = 'https://cdn.paddle.com/paddle/v2/paddle.js';
+      s.async = true;
+      s.onload = function () {
+        if (!window.Paddle) return;
+        window.Paddle.Initialize({ token: token });
+        buttons.forEach(function (b) {
+          b.addEventListener('click', function (e) {
+            e.preventDefault();
+            if (typeof window.operStackTrack === 'function') {
+              window.operStackTrack('checkout_open', { price_id: b.getAttribute('data-price-id'), product: b.getAttribute('data-product') || '' });
+            }
+            window.Paddle.Checkout.open({
+              items: [{ priceId: b.getAttribute('data-price-id'), quantity: 1 }],
+              customData: { lang: 'en', source: b.getAttribute('data-product') || '' },
+              settings: { successUrl: 'https://oper-stack.com/thanks/' },
+            });
+          });
+        });
+      };
+      // Если скрипт не загрузился, кнопка остаётся обычной ссылкой на форму заказа: человек
+      // в любом случае может оставить заявку, а не упереться в мёртвую кнопку.
+      document.head.appendChild(s);
+    })();
+  </script>
+)}
