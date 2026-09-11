@@ -28,6 +28,7 @@ async function notifyTelegram(text: string): Promise<void> {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chat, text: `🔑 ${text}` }),
+      signal: AbortSignal.timeout(5_000),
     });
   } catch (err) {
     console.error('telegram notify failed:', err);
@@ -37,7 +38,7 @@ async function notifyTelegram(text: string): Promise<void> {
 async function getCustomerEmail(customerId: string): Promise<string | null> {
   const key = env('PADDLE_API_KEY');
   if (!key) return null;
-  const res = await fetch(`https://api.paddle.com/customers/${encodeURIComponent(customerId)}`, { headers: { Authorization: `Bearer ${key}` } });
+  const res = await fetch(`https://api.paddle.com/customers/${encodeURIComponent(customerId)}`, { headers: { Authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(8_000) });
   if (!res.ok) return null;
   const body = (await res.json()) as { data?: { email?: string } };
   return body.data?.email ? String(body.data.email) : null;

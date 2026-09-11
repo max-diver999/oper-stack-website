@@ -12,15 +12,30 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
   const user = env('SMTP_USER');
   const pass = env('SMTP_PASS');
   if (!user || !pass) throw new Error('SMTP_USER or SMTP_PASS is not set');
-  const transport = nodemailer.createTransport({ host: 'smtp.gmail.com', port: 465, secure: true, auth: { user, pass } });
-  const cc = env('LICENCE_NOTIFY_EMAIL', 'accounts@oper-stack.com');
-  await transport.sendMail({
-    from: env('LICENCE_FROM', `OperStack <${user}>`),
-    to: msg.to,
-    cc: cc && cc !== msg.to ? cc : undefined,
-    replyTo: 'support@oper-stack.com',
-    subject: msg.subject,
-    text: msg.text,
-    html: msg.html,
+  // No pool, explicit timeouts, and close() after the send: an open SMTP socket keeps a serverless
+  // function alive until the platform kills it, which is what a 504 after a delivered email looks like.
+  const transport = nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: 465,
+    secure: true,
+    auth: { user, pass },
+    pool: false,
+    connectionTimeout: 10_000,
+    greetingTimeout: 10_000,
+    socketTimeout: 15_000,
   });
+  const cc = env('LICENCE_NOTIFY_EMAIL', 'accounts@oper-stack.com');
+  try {
+    await transport.sendMail({
+      from: env('LICENCE_FROM', `OperStack <${user}>`),
+      to: msg.to,
+      cc: cc && cc !== msg.to ? cc : undefined,
+      replyTo: 'support@oper-stack.com',
+      subject: msg.subject,
+      text: msg.text,
+      html: msg.html,
+    });
+  } finally {
+    transport.close();
+  }
 }
