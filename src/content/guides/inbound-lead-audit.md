@@ -1,6 +1,7 @@
 ---
 title: "Inbound Lead Audit: Find Out Where Your Leads Are Lost"
 description: "Run the inbound lead audit yourself: reconcile arrived, created, owned and worked counts, trace every gap to one layer, and rank findings by cost."
+answer: "An inbound lead audit compares 4 counts over one fixed period: requests that arrived, records created, records with a named owner, and records with real work logged. Each gap is traced to one layer and confirmed with evidence the team can see, which is why the answer is almost never the layer everybody suspected at the start."
 pubDate: 2026-08-21
 author: Maksim Shchegolev
 faq:

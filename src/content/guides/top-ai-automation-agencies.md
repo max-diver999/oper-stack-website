@@ -1,6 +1,7 @@
 ---
 title: "Top AI Automation Agencies and How to Pick One"
 description: "How AI automation agencies differ: four business models behind one label, the proof to demand before signing, and the questions that sort them."
+answer: "The phrase AI automation agency describes 4 different businesses competing on one search term: implementation shops, workflow builders, custom development teams and advisory firms. The fastest way to tell them apart is to ask each one what they would recommend you not do, because only one of the 4 has an answer that costs them money."
 pubDate: 2026-09-08
 faq:
   - question: "What does an AI automation agency do?"

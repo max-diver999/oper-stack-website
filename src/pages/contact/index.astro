@@ -1,0 +1,122 @@
+---
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import { SITE } from '../../data/site';
+
+const canonical = `${SITE.url}/contact/`;
+const tgLink = `https://t.me/${SITE.telegram}`;
+
+const contactSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'ContactPage',
+  name: 'Contact OperStack',
+  url: canonical,
+  mainEntity: {
+    '@type': 'Organization',
+    name: SITE.name,
+    url: SITE.url,
+    email: SITE.email,
+    address: { '@type': 'PostalAddress', addressLocality: SITE.address.locality, addressCountry: SITE.address.country },
+    sameAs: [...SITE.sameAs, tgLink],
+  },
+};
+---
+
+<CommercialLayout
+  title="Contact OperStack"
+  description="Email and Telegram for OperStack. Orders are confirmed within 24 hours and an audit takes one to three working days, five at the most. Nothing here needs a call."
+  canonical={canonical}
+  jsonLd={contactSchema}
+>
+  <div class="wrap">
+    <h1>Contact</h1>
+
+    <p class="lede">
+      One person answers both of these, usually within 24 hours. An audit takes one to three
+      working days once the order is confirmed, and five at the most. There is no call to book:
+      everything we sell is delivered in writing.
+    </p>
+
+    <CitabilityBlock
+      text="OperStack is reached at info@oper-stack.com and on Telegram at @operstack. Orders are confirmed within 24 hours; an audit takes one to three working days and five at the most."
+    />
+
+    <div class="ways">
+      <a class="way" href={`mailto:${SITE.email}`}>
+        <span class="way-label">Email, best for anything with detail</span>
+        <span class="way-value">{SITE.email}</span>
+      </a>
+      <a class="way" href={tgLink} target="_blank" rel="noopener">
+        <span class="way-label">Telegram, best for a quick question</span>
+        <span class="way-value">@{SITE.telegram}</span>
+      </a>
+    </div>
+
+    <h2>What to send if you want an audit</h2>
+    <p>
+      The address of the site, and that is genuinely all for the 249 USD report. If you want the
+      349 USD tier, say so and we will send the two read-only access requests: one for your own
+      Google Search Console and one for your own Bing Webmaster Tools. Both are free and stay
+      yours. We never ask for administrator rights to anything.
+    </p>
+
+    <h2>What happens next</h2>
+    <ol class="steps">
+      <li><strong>Within 24 hours.</strong> A written confirmation of the scope and the price, or a reason why we are not the right people for it.</li>
+      <li><strong>One to three working days.</strong> The report, as a PDF, with every score computed from checks you can repeat yourself.</li>
+      <li><strong>Five working days at the most.</strong> If anything takes longer, we tell you before the deadline rather than after it.</li>
+    </ol>
+
+    <h2>Before you write</h2>
+    <p>
+      If you only want to know whether AI assistants can read your site, the
+      <a href="/ai-visibility/">free check</a> answers that in ten seconds without an email
+      address. If you want to see what we would look for, the <a href="/guides/">guides</a> are the
+      method written out, and the <a href="/products/">four free products</a> are the tools that
+      do it.
+    </p>
+
+    <p class="back"><a href="/about/">Who is behind this →</a></p>
+  </div>
+</CommercialLayout>
+
+<style>
+  .ways {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 14px;
+    margin: 28px 0 36px;
+  }
+  .way {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 20px;
+    border-radius: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    text-decoration: none;
+    transition: border-color 0.15s ease, background 0.15s ease;
+  }
+  .way:hover {
+    border-color: rgba(61, 184, 169, 0.45);
+    background: rgba(26, 138, 125, 0.06);
+  }
+  .way-label {
+    font-family: var(--fm);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .way-value {
+    font-size: 17px;
+    color: var(--paper);
+    word-break: break-word;
+  }
+  .back {
+    margin: 36px 0 0;
+    font-family: var(--fm);
+    font-size: 13px;
+  }
+</style>

@@ -1,6 +1,7 @@
 ---
 title: "AI Lead Qualification: Fit, Intent, and Human Handoff"
 description: "How AI qualification separates fit from intent, scores confidence, routes deterministically, and hands inbound conversations to a rep with evidence."
+answer: "AI lead qualification is an automated first response plus structured interpretation of fit, intent and urgency, after which deterministic rules choose the outcome and write it into the CRM with source and evidence. The case for it is delay: a Harvard Business Review audit of 2,241 companies found a median first response of 42 hours among the firms that answered at all."
 pubDate: 2026-07-18
 updatedDate: 2026-08-21
 author: Maksim Shchegolev

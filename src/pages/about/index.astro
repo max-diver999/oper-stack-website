@@ -1,0 +1,146 @@
+---
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import { NETWORK_HERO } from '../../data/cases';
+import { SITE } from '../../data/site';
+
+const canonical = `${SITE.url}/about/`;
+
+const FAQ = [
+  {
+    question: 'Who runs OperStack?',
+    answer:
+      'Maksim Shchegolev, who owns and operates the portfolio of content sites the tools were built for. There is no agency behind this and no team of account managers: the person who writes the code is the person who answers your email.',
+  },
+  {
+    question: 'Why are four of the six products free?',
+    answer:
+      'Because they were built to solve our own problem first and cost nothing to give away. The gates, the starter, the plugin and the AI visibility check are MIT licensed and stay free. The two paid products, Site Kit and the audit, are the parts that take our time.',
+  },
+  {
+    question: 'Do I need a paid subscription to anything to use your tools?',
+    answer:
+      'No, and this is a rule rather than a coincidence. Every score in an OperStack report is computed from what anyone can read on a site for free, without an account. Where a paid tool is quoted at all, the row is marked as a note and counted in no score, so you can re-run the same audit yourself and get the same numbers.',
+  },
+  {
+    question: 'Where do your figures come from?',
+    answer:
+      'Google Search Console and Google Analytics on our own properties, comparing two consecutive 28-day windows. We publish growth percentages rather than raw totals, we do not publish client domains, and we do not attribute sales to search, because deals come from several places at once.',
+  },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((f) => ({
+    '@type': 'Question',
+    name: f.question,
+    acceptedAnswer: { '@type': 'Answer', text: f.answer },
+  })),
+};
+
+const aboutSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'AboutPage',
+  name: 'About OperStack',
+  url: canonical,
+  mainEntity: {
+    '@type': 'Organization',
+    name: SITE.name,
+    url: SITE.url,
+    email: SITE.email,
+    founder: { '@type': 'Person', name: 'Maksim Shchegolev' },
+    sameAs: SITE.sameAs,
+  },
+};
+---
+
+<CommercialLayout
+  title="About OperStack: who builds these tools and why"
+  description="OperStack is built by one operator running a portfolio of content sites. The tools came out of that work: four are free and open source, two are paid. Every score we publish is computed from free public data."
+  canonical={canonical}
+  jsonLd={[aboutSchema, faqSchema]}
+>
+  <div class="wrap">
+    <h1>Who is behind OperStack</h1>
+
+    <p class="lede">
+      OperStack is run by one person, Maksim Shchegolev, who operates a portfolio of {NETWORK_HERO.liveSites} content
+      brands across more than {NETWORK_HERO.marketCount.replace('+','')} countries. In the last measured 28-day window those sites grew
+      organic clicks by {NETWORK_HERO.organicClicksGrowth} against the window before it, measured in
+      Google Search Console. Every tool on this site came out of running them, not out of a
+      product plan.
+    </p>
+
+    <p>
+      <a class="btn" href="/ai-visibility/">Check your own site free →</a>
+      <a class="btn btn-ghost" href={`mailto:${SITE.email}`} style="margin-left:12px">Email us</a>
+    </p>
+
+    <CitabilityBlock
+      text="OperStack is built and run by Maksim Shchegolev, a solo operator of 13 content brands in more than 10 countries. Four of its six products are free and MIT licensed; the paid ones are Site Kit at 79 USD and a site audit from 249 USD. No OperStack score depends on a paid data source."
+    />
+
+    <h2>Where the tools came from</h2>
+    <p>
+      Every site in the portfolio had the same problem: pages shipped with cut titles, copied
+      paragraphs, hollow sections, dead links and figures nobody could source. Catching that by
+      reading is impossible past a few hundred pages, so the checks were automated one at a time.
+      Fifteen of them turned out to be worth keeping, and those fifteen became the first product.
+    </p>
+    <p>
+      The rest followed the same way. The starter is the project skeleton that already passes
+      those checks. The audit is what we do to a site before deciding whether to invest in it.
+      The AI visibility check is the first two pages of that audit, made automatic and given away
+      so nobody has to buy an audit to learn they have a robots.txt problem.
+    </p>
+
+    <h2>What we publish and what we do not</h2>
+    <p>
+      Growth percentages compare two consecutive 28-day windows in Google Search Console and
+      Google Analytics, and the method is stated next to the number on the cases page. We publish
+      {NETWORK_HERO.organicVisibilityGrowth} search visibility and {NETWORK_HERO.siteTrafficGrowth} site
+      traffic on the same basis.
+    </p>
+    <p>
+      We do not publish client domains, raw click totals, or a number of deals attributed to
+      search. Deals arrive through several channels at once, and any single-channel attribution of
+      them would be a number we cannot defend. If a figure cannot be sourced, it does not go on
+      this site.
+    </p>
+
+    <h2>The rule behind every report</h2>
+    <p>
+      A number that costs money to obtain does not move a score. Every area score in an OperStack
+      audit is computed from signals anyone can read for free without an account, and each score
+      prints the count of checks behind it so a reader can recompute it. Google Search Console and
+      Bing Webmaster data appear in the written analysis of the larger audit tier, and both are
+      free with the site owner's own account. Paid tools, when quoted, are marked as notes and
+      counted in nothing.
+    </p>
+    <p>
+      This is not a marketing position. It is the only way a client can repeat the measurement
+      next quarter and see whether the work moved anything.
+    </p>
+
+    <h2>How to reach us</h2>
+    <p>
+      By email, at <a href={`mailto:${SITE.email}`}>{SITE.email}</a>. Orders are confirmed within
+      24 hours. An audit usually takes one to three working days and five at the most. There is no
+      call to book and no discovery meeting to sit through, because the deliverable is written.
+    </p>
+
+    <FaqSection items={FAQ} />
+
+    <p class="back"><a href="/products/">See the six products →</a></p>
+  </div>
+</CommercialLayout>
+
+<style>
+  .back {
+    margin: 36px 0 0;
+    font-family: var(--fm);
+    font-size: 13px;
+  }
+</style>

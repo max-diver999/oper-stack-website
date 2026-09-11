@@ -1,6 +1,7 @@
 ---
 title: "Website Lead Capture: Formats, Payload, and Consent"
 description: "Choose a lead capture format and define what every submit must emit: required payload, progressive fields, consent evidence, and the failure modes to test."
+answer: "Website lead capture is a data contract, not a form design: every entry point must emit the same minimum payload of 6 elements, an identity signal, a channel, a source, a timestamp, the request itself and consent evidence. A form that collects more fields than that buys you nothing and costs you replies."
 pubDate: 2026-08-21
 author: Maksim Shchegolev
 faq:

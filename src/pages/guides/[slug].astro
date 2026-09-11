@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const { title, description, pubDate, updatedDate, author, faq = [] } = entry.data;
+const { title, description, answer, pubDate, updatedDate, author, faq = [] } = entry.data;
 
 const canonical = `${SITE.url}/guides/${entry.id}/`;
 /* Бренд дописываем, только если итоговый title остаётся в пределах 60 знаков.
@@ -81,9 +81,14 @@ const citeText = citeMatch?.[1] || description;
       <time datetime={isoDate}>{displayDate}</time> · {author}
     </p>
     <h1>{title}</h1>
-    <p class="lede">{description}</p>
+    <p class="lede">{answer || description}</p>
 
     <CitabilityBlock text={citeText} />
+
+    <p class="top-cta">
+      Want this checked on your own site? <a href="/ai-visibility/">Run the free AI visibility check</a>,
+      or <a href={`/audit/?utm=guide-top-${entry.id}`}>order the full audit</a>.
+    </p>
 
     <Content />
 
@@ -154,5 +159,14 @@ const citeText = citeMatch?.[1] || description;
     color: var(--muted);
     font-size: 15px;
     margin: 0;
+  }
+
+  .top-cta {
+    margin: 0 0 28px;
+    padding: 12px 16px;
+    border-left: 2px solid var(--teal-soft);
+    background: rgba(26, 138, 125, 0.06);
+    font-size: 15px;
+    line-height: 1.6;
   }
 </style>

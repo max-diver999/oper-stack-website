@@ -1,6 +1,7 @@
 ---
 title: "MQL vs SQL: Handoff Agreement, Acceptance, Rejection"
 description: "MQL vs SQL without another glossary entry: acceptance criteria written as evidence, rejection reason codes, a recycling loop, and one joint report."
+answer: "An MQL is marketing's claim that a record meets criteria both teams wrote down; an SQL is sales confirming after contact that a real opportunity exists. The boundary holds only when 3 things are written: acceptance criteria stated as evidence, a rejection reason from a controlled list, and a deadline for the first contact attempt."
 pubDate: 2026-08-21
 author: Maksim Shchegolev
 faq:

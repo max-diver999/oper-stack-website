@@ -6,9 +6,18 @@ export const SITE = {
   description:
     'OperStack is the operating stack for businesses that live on inbound leads: SEO and AEO site factory, AI qualification, CRM automation, team training, and reporting. One Lead Hub.',
   email: 'info@oper-stack.com',
-  phone: '',
-  whatsapp: '',
+  /** No phone is published: we answer by email and on Telegram. */
+  telegram: 'operstack',
+  /** City and country only, no street. Rating systems and answer engines use this to tell one
+   *  business from another with a similar name; a street address would add nothing for them. */
+  address: { locality: 'Buenos Aires', country: 'AR' },
   editorial: 'OperStack',
-  /** Standalone brand. Parent studio mentioned in copy only, not cross-linked for SEO cannibalization. */
-  sameAs: [] as string[],
+  /** Standalone brand. Parent studio mentioned in copy only, not cross-linked for SEO cannibalization.
+   *  Only profiles that actually exist and answer 200. Never claim a profile we do not run. */
+  sameAs: [
+    'https://github.com/oper-stack',
+    'https://www.npmjs.com/org/operstack',
+    'https://apify.com/operstack',
+    'https://www.producthunt.com/products/operstack-gates',
+  ] as string[],
 } as const;

@@ -1,6 +1,7 @@
 ---
 title: "Marketing and Sales Automation ROI: An Auditable Model"
 description: "Build an inbound automation ROI model finance can check: baseline, cost register, incremental contribution, three scenarios, break-even, sensitivity, payback."
+answer: "Inbound automation ROI is the incremental contribution margin the change produces over a defined period, minus one-time and recurring costs, tested across 3 cases: conservative, base and upside. Build it on your own baseline rather than a vendor benchmark, value the hours released at a rate you actually pay, and state which assumption breaks the model first."
 pubDate: 2026-08-21
 author: Maksim Shchegolev
 faq:

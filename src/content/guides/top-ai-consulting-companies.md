@@ -1,6 +1,7 @@
 ---
 title: "Top AI Consulting Companies: How to Choose"
 description: "A category map of AI consulting firms: the four types that show up in search, what each is actually built to sell, and how to tell which one your problem needs."
+answer: "AI consulting is 4 different businesses competing on one search term: strategy advisory, systems integration, data engineering and applied build teams. Picking correctly means identifying which of the 4 your problem belongs to before you take a call, because each of them will honestly tell you that your problem is the kind they solve."
 pubDate: 2026-09-08
 faq:
   - question: "Who are the top AI consulting companies?"
