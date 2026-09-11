@@ -21,14 +21,14 @@
  */
 
 /**
- * Site Kit пока не продаётся кнопкой: выдача лицензионного ключа написана под события Paddle, и
- * пока она не переписана под Whop, покупатель заплатил бы и не получил ключ. Ссылка на его оплату
- * появится здесь ровно в тот день, когда выдача заработает.
+ * Site Kit продаётся с 11 сентября 2026: выдача ключа переписана под события Whop и проверена
+ * целиком на живом сервере. Подписанное событие об оплате принято, ключ выпущен, письмо дошло,
+ * подпись ключа сошлась открытым ключом из самого комплекта, ссылка на скачивание отдала архив.
  *
  * Ключи читаются по одному: Vite подставляет только те, что написаны в коде буквально.
  */
 const LINK_BY_SLUG: Record<string, string> = {
-  'site-kit': String(import.meta.env.PUBLIC_WHOP_CHECKOUT_SITE_KIT || '').trim(),
+  'site-kit': String(import.meta.env.PUBLIC_WHOP_CHECKOUT_SITE_KIT || 'https://whop.com/oper-stack/operstack-site-kit').trim(),
   'seo-audit': String(import.meta.env.PUBLIC_WHOP_CHECKOUT_AUDIT || 'https://whop.com/oper-stack/seo-aeo-and-geo-audit').trim(),
 };
 
