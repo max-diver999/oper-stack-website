@@ -5,6 +5,7 @@ import GoogleAnalytics from '../components/GoogleAnalytics.astro';
 import { NETWORK_HERO } from '../data/cases';
 import JsonLd from '../components/JsonLd.astro';
 import { SITE } from '../data/site';
+import { MAP_CORE, MAP_MODULES } from '../data/map-copy';
 import { lastmodFor } from '../lib/page-lastmod';
 
 const services = (await getCollection('services')).sort((a, b) => a.data.order - b.data.order);
@@ -63,6 +64,8 @@ const homeSchemas = [
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script is:inline>document.documentElement.className+=' js'</script>
+<style is:inline>#static-map-text{max-width:60rem;margin:0 auto;padding:0 1rem 2rem;line-height:1.5}#static-map-text li{margin:.6rem 0}.js #static-map-text{display:none}.map-failed #static-map-text{display:block}</style>
 <meta name="theme-color" content="#0B1017">
 <title>AI Automation and Lead Operations for Inbound · OperStack</title>
 <meta name="description" content="AI automation, custom agents and lead operations for teams that run on inbound. Scope, timeline and boundaries stated on every service page.">
@@ -1435,6 +1438,23 @@ const homeSchemas = [
 
 </div><!-- /.stage -->
 
+<!-- The same modules the map draws, served as HTML. Who needs it: ordinary search crawlers and
+     the fetchers that pull a page into an AI answer. They do not run scripts, and to them the map
+     is an empty rectangle. Who will not see it: anyone with JavaScript, because the js class is set
+     by the first script in the head and this section is hidden before paint. If the map fails to
+     load, body gets map-failed and the text comes back: then it is the only thing explaining what
+     we do. The words come from src/data/map-copy.ts, and the map script reads the same file
+     through the JSON below, so the two cannot drift apart. -->
+<section id="static-map-text">
+  <h2>{MAP_CORE.title}: {MAP_CORE.role}</h2>
+  <p>{MAP_CORE.lede}</p>
+  <h3>Modules</h3>
+  <ul>
+    {MAP_MODULES.map((m) => <li><b>{m.name}</b> · {m.role}{m.proof ? ` · ${m.proof}` : ''}<br />{m.lede}</li>)}
+  </ul>
+</section>
+<script type="application/json" id="map-copy" set:html={JSON.stringify({ core: MAP_CORE, modules: Object.fromEntries(MAP_MODULES.map((m) => [m.key, m])) })}></script>
+
 <div class="dim-overlay" id="dim"></div>
 
 <aside class="panel" id="panel" aria-hidden="true">
@@ -1765,6 +1785,15 @@ runAfterPageLoad(function () {
       ["API layer", "integrations"]
     ]
   };
+
+  // Тексты карточек берутся из src/data/map-copy.ts: та же строка, которую робот читает в HTML.
+  // Если файл почему-то не доехал, карта рисуется теми словами, что зашиты выше.
+  try {
+    const copy = JSON.parse(document.getElementById("map-copy").textContent);
+    Object.assign(CORE, copy.core || {});
+    MODULES.forEach((m) => Object.assign(m, copy.modules[m.key] || {}));
+  } catch (e) { /* оставляем зашитые тексты */ }
+
 
   function makeGlow(rgb) {
     const s = 48;
