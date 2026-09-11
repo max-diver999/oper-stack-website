@@ -13,8 +13,14 @@ import { fileURLToPath } from 'node:url';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const CONFIG_PATH = path.join(ROOT, '.vercel/output/config.json');
+const AI_CONFIG_PATH = path.join(ROOT, 'ai-visibility.config.json');
 const APEX = 'https://oper-stack.com';
 const WWW_HOST = 'www.oper-stack.com';
+
+/** Points agents at the machine-readable surface on every response. */
+const LINK_HEADER =
+  '</sitemap-index.xml>; rel="sitemap", </llms.txt>; rel="describedby"; type="text/markdown", ' +
+  '</.well-known/agent.json>; rel="service-desc"; type="application/json", </robots.txt>; rel="policy"';
 
 function toSrc(source) {
   // vercel.json path syntax to the regex the Build Output API expects
@@ -27,20 +33,54 @@ async function main() {
   if (!Array.isArray(config.routes)) { console.error('[patch-vercel] config.routes is not an array'); process.exit(1); }
   const vercel = JSON.parse(await fs.readFile(path.join(ROOT, 'vercel.json'), 'utf8'));
 
+  // Detect earlier injections by signature: the Vercel schema rejects custom marker
+  // properties inside a route object, so there is nothing else to key on.
   const injected = (r) => r.__operstack === undefined && (
     (r.headers?.Location && r.headers.Location.startsWith(APEX) && Array.isArray(r.has) && r.has.some((h) => h.type === 'host' && h.value === WWW_HOST)) ||
-    (r.continue === true && r.headers && ('X-Content-Type-Options' in r.headers || 'X-Robots-Tag' in r.headers || 'Cache-Control' in r.headers) && r.src && r.src.startsWith('^/'))
+    (r.continue === true && r.headers && ('X-Content-Type-Options' in r.headers || 'X-Robots-Tag' in r.headers || 'Cache-Control' in r.headers) && r.src && r.src.startsWith('^/')) ||
+    Boolean(r.headers?.Link && r.headers.Link.includes('llms.txt')) ||
+    (Array.isArray(r.has) && r.has.some((h) => h.key === 'accept' && String(h.value).includes('text/markdown'))) ||
+    (r.src === '^/$' && r.dest === '/index.md')
   );
   config.routes = config.routes.filter((r) => !injected(r));
+
+  // Collections that have markdown renditions in public/, from the same config the
+  // generator reads, so the two can never drift apart.
+  const aiCfg = JSON.parse(await fs.readFile(AI_CONFIG_PATH, 'utf8'));
+  const collections = (aiCfg.collections ?? []).map((c) => c.urlPrefix.replace(/^\//, ''));
 
   const pre = [
     { src: '^/(.*)$', has: [{ type: 'host', value: WWW_HOST }], headers: { Location: `${APEX}/$1` }, status: 308 },
     ...(vercel.headers || []).map((h) => ({ src: toSrc(h.source), headers: Object.fromEntries(h.headers.map((x) => [x.key, x.value])), continue: true })),
+    // Link and Vary on every response; `continue` lets the later routes still run.
+    { src: '^/(.*)$', headers: { Link: LINK_HEADER, Vary: 'Accept' }, continue: true },
+    // Markdown content negotiation. Only fires on an explicit Accept: text/markdown.
+    { src: '^/$', has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }], dest: '/index.md' },
+    ...collections.map((col) => ({
+      src: `^/${col}/([^/]+)/$`,
+      has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }],
+      dest: `/${col}/$1.md`,
+    })),
   ];
+  // A markdown rendition is a duplicate of the HTML page. Search engines must not index it.
+  const post = [
+    {
+      src: '^/(.+)\\.md$',
+      headers: {
+        'X-Robots-Tag': 'noindex, nofollow',
+        'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+      },
+      continue: true,
+    },
+  ];
+
   const fsIdx = config.routes.findIndex((r) => r.handle === 'filesystem');
   if (fsIdx === -1) { console.error('[patch-vercel] filesystem handler not found'); process.exit(1); }
   config.routes.splice(fsIdx, 0, ...pre);
+  const afterFsIdx = config.routes.findIndex((r) => r.handle === 'filesystem') + 1;
+  config.routes.splice(afterFsIdx, 0, ...post);
+
   await fs.writeFile(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
-  console.log(`[patch-vercel] injected www redirect and ${pre.length - 1} header rule(s) into ${path.relative(ROOT, CONFIG_PATH)}`);
+  console.log(`[patch-vercel] injected www redirect, ${pre.length - 1} pre-fs and ${post.length} post-fs rule(s) into ${path.relative(ROOT, CONFIG_PATH)} (collections: ${collections.join(', ') || 'none'})`);
 }
 main();

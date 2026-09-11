@@ -18,7 +18,13 @@
     "aeo:llms": "node scripts/reference-infra/generate-agent-markdown.mjs --config reference-infra.config.json --output-dir public",
     "audit:design": "node more-group-content-os/scripts/audit-design.mjs --fail",
     "audit:design:report": "node more-group-content-os/scripts/audit-design.mjs",
-    "postbuild": "node scripts/patch-vercel-output.mjs"
+    "postbuild": "node scripts/patch-vercel-output.mjs",
+    "prebuild": "node scripts/ai-visibility/page-lastmod.mjs && node scripts/ai-visibility/generate-agent-markdown.mjs && node scripts/ai-visibility/generate-agent-card.mjs && node scripts/ai-visibility/check-agent-index.mjs",
+    "ai:markdown": "node scripts/ai-visibility/generate-agent-markdown.mjs",
+    "ai:card": "node scripts/ai-visibility/generate-agent-card.mjs",
+    "ai:lastmod": "node scripts/ai-visibility/page-lastmod.mjs",
+    "ai:check": "node scripts/ai-visibility/check-agent-index.mjs",
+    "ai:verify": "node scripts/ai-visibility/verify-live.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.1",
