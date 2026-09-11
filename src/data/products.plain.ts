@@ -79,14 +79,15 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
 };
 
 /** The founder's note, first person, shown on the products index and on every product page.
- *  Facts in it are the ones already approved for the proof block: an expensive niche, leads from
- *  search and from AI assistants, more than 350 closed deals in the group, eleven sites on one pipeline. */
+ *  Figures are the ones already published on /cases/ (organic clicks +279% month over month across
+ *  13 brands, a greenfield site with organic traction within six weeks). No deal counts: the group's
+ *  deals came from paid advertising and must not be attributed to search or AI. */
 export const FOUNDER_STORY = {
   heading: 'Why I share this',
   paragraphs: [
-    'I sell property to international buyers. It is a niche where a single advertising lead costs more than most products on this page, and where the buyer reads for weeks before writing to anyone. Instead of buying clicks, I built content sites that answer the questions those buyers ask, and the buyers came: from Google first, then, more and more, from ChatGPT and Perplexity, which quote the pages when someone asks.',
-    'The same pipeline now publishes to eleven sites. Our group has closed more than 350 deals, most of them with people who found us online and bought without ever visiting an office. Every tool on this page is a piece of that pipeline, stripped of my data and packaged so you can run it in your own niche: the method for finding what a market actually searches for, the page shapes that get quoted, and the checks that stop a bad page from going live.',
-    'I am not a software company. I am an operator who got tired of paying for leads, and these are the tools I use every week. If they work for you the way they work for me, tell me; if they do not, the refund is seven days and no questions.',
+    'I sell property to international buyers. It is a niche where a single advertising lead costs more than most products on this page, and where the buyer reads for weeks before writing to anyone. For years the enquiries came from paid ads. Then I built content sites that answer the questions those buyers ask, and the enquiries started arriving on their own: from Google first, then, more and more, from ChatGPT and Perplexity, which quote the pages when someone asks.',
+    'The numbers are on the cases page: organic clicks up 279 percent month over month across thirteen brands in more than ten countries, and a brand-new site that reached its first organic traction within six weeks of going live. Every tool on this page is a piece of the pipeline behind those sites, stripped of my data and packaged so you can run it in your own niche: the method for finding what a market actually searches for, the page shapes that get quoted, and the checks that stop a bad page from going live.',
+    'I am not a software company. I am an operator who got tired of paying for every lead, and these are the tools I use every week. If they work for you the way they work for me, tell me; if they do not, the refund is seven days and no questions.',
   ],
   signature: 'Maksim Shchegolev, founder of OperStack',
 };
