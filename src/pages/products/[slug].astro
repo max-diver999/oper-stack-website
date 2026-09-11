@@ -3,12 +3,14 @@ import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import { PRODUCTS } from '../../data/products';
+import { PRODUCTS_PLAIN } from '../../data/products.plain';
 import { SITE } from '../../data/site';
 
 export function getStaticPaths() {
   return PRODUCTS.map((p) => ({ params: { slug: p.slug }, props: { product: p } }));
 }
 const { product: p } = Astro.props;
+const plain = PRODUCTS_PLAIN[p.slug];
 const canonical = `${SITE.url}/products/${p.slug}/`;
 const offer = p.price === 'Free' ? { '@type': 'Offer', price: '0', priceCurrency: 'USD' } : { '@type': 'Offer', price: p.price.replace(/[^\d.]/g, ''), priceCurrency: 'USD', availability: p.status === 'soon' ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock' };
 const productSchema = { '@context': 'https://schema.org', '@type': p.slug === 'seo-audit' ? 'Service' : 'SoftwareApplication', name: `OperStack ${p.name}`, description: p.description, url: canonical, offers: offer, ...(p.slug !== 'seo-audit' ? { applicationCategory: 'DeveloperApplication', operatingSystem: 'Node.js 20+' } : { provider: { '@type': 'Organization', name: SITE.name } }) };
@@ -21,7 +23,23 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
     <p class="label">{p.label}</p>
     <h1>{p.title}</h1>
     <p class="lede">{p.description}</p>
-    <CitabilityBlock text={p.answer} />
+
+    {plain && (
+      <section class="plain" aria-label="In plain words">
+        <p class="plain-label">In plain words</p>
+        <p class="plain-text">{plain.plain}</p>
+        <h2 class="plain-h">Who it is for</h2>
+        <ul class="list">{plain.who.map((w) => <li>{w}</li>)}</ul>
+        {plain.youDo && (
+          <>
+            <h2 class="plain-h">What you actually do</h2>
+            <ol class="steps">{plain.youDo.map((d) => <li>{d}</li>)}</ol>
+          </>
+        )}
+      </section>
+    )}
+
+    <CitabilityBlock label="For the technical reader" text={p.answer} />
 
     <div class="price-box">
       <div>
@@ -138,4 +156,8 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
   .ph-badge { margin: 4px 0 28px; }
   .ph-badge img { display: block; }
   .cta-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .plain { margin: 26px 0 10px; padding: 22px 24px; border-radius: 14px; border: 1px solid rgba(232,184,74,.3); background: rgba(232,184,74,.06); }
+  .plain-label { font-family: var(--fm); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber-soft); margin-bottom: 8px; }
+  .plain-text { font-size: 17px; line-height: 1.55; color: rgba(245,242,236,.92); margin-bottom: 6px; }
+  .plain .plain-h { font-size: 18px; margin: 18px 0 8px; }
 </style>

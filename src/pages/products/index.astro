@@ -19,6 +19,7 @@ const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
   <div class="wrap wide">
     <h1>Tools for content sites that have to rank, be cited and convert</h1>
     <p class="lede">Every product on this page came out of one pipeline that publishes to eleven content sites. The free ones stay free. The paid ones have a price on the page, not in a call.</p>
+    <p class="lede plain-lede">Not a developer? Start with the <a href="/products/ai-visibility/">free AI visibility check</a> (ten seconds, nothing to install), then read the <a href="/products/seo-audit/">audit</a> if your site already exists or the <a href="/products/site-kit/">Site Kit</a> if you are building one. Developers usually start with the <a href="/products/gates/">gates</a> and the <a href="/products/starter/">starter</a>.</p>
     <CitabilityBlock text="OperStack publishes five products for content sites: fifteen free quality gates, a free Astro starter, a free Claude Code plugin, a paid Site Kit at 79 USD, and an SEO, AEO and GEO audit at 249 USD." />
     <div class="grid">
       {products.map((p) => (
@@ -40,6 +41,7 @@ const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
   </div>
 </CommercialLayout>
 <style>
+  .plain-lede { font-size: 16px; color: rgba(245,242,236,.78); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 32px 0; }
   .card { display: flex; flex-direction: column; gap: 8px; padding: 22px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); text-decoration: none; transition: border-color .15s ease, background .15s ease; }
   .card:hover { border-color: rgba(61,184,169,0.45); background: rgba(26,138,125,0.06); }
