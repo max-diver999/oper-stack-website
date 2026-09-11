@@ -21,17 +21,34 @@ const cfg = loadConfig();
 const PUBLIC_DIR = path.join(ROOT, 'public');
 const CONTENT_DIR = path.join(ROOT, 'src/content');
 
+/** Field labels in the site's own language; English unless the config overrides them. */
+const L = {
+  source: 'Source', section: 'Section', author: 'Author', published: 'Published', updated: 'Updated',
+  homepage: 'Homepage', contact: 'Contact', email: 'Email', telegram: 'Telegram',
+  sitemap: 'Sitemap', agentIndex: 'Agent index', fullCorpus: 'Full corpus', agentCard: 'Agent card',
+  entity: 'Entity', keyPages: 'Key pages', index: 'Index',
+  policyHeading: 'Content policy for AI agents',
+  policyCite: 'Citation in AI search and retrieval is permitted',
+  policyTrainYes: 'Use as LLM training data is permitted',
+  policyTrainNo: 'Use as LLM training data is **not permitted**',
+  policyMarkdown: 'Any page here can be fetched as markdown by appending `.md` to its URL, or by sending `Accept: text/markdown`.',
+  fullCorpusTitle: 'full markdown corpus',
+  fullCorpusNote: 'Every indexable page of',
+  generated: 'Generated',
+  ...(cfg.labels || {}),
+};
+
 function buildPage({ fm, faq, body, canonical, label }) {
   const head = [
     `# ${fm.title || 'Untitled'}`,
     '',
     fm.description ? `> ${fm.description}` : null,
     '',
-    `**Source:** ${canonical}  `,
-    label ? `**Section:** ${label}  ` : null,
-    fm.author ? `**Author:** ${fm.author}  ` : null,
-    isoDay(fm.pubDate) ? `**Published:** ${isoDay(fm.pubDate)}  ` : null,
-    isoDay(fm.updatedDate || fm.pubDate) ? `**Updated:** ${isoDay(fm.updatedDate || fm.pubDate)}` : null,
+    `**${L.source}:** ${canonical}  `,
+    label ? `**${L.section}:** ${label}  ` : null,
+    fm.author ? `**${L.author}:** ${fm.author}  ` : null,
+    isoDay(fm.pubDate) ? `**${L.published}:** ${isoDay(fm.pubDate)}  ` : null,
+    isoDay(fm.updatedDate || fm.pubDate) ? `**${L.updated}:** ${isoDay(fm.updatedDate || fm.pubDate)}` : null,
     '',
     '---',
     '',
@@ -44,7 +61,7 @@ function buildPage({ fm, faq, body, canonical, label }) {
 
 async function processCollection(col) {
   const srcDir = path.join(CONTENT_DIR, col.dir);
-  const outDir = path.join(PUBLIC_DIR, col.dir);
+  const outDir = path.join(PUBLIC_DIR, col.urlPrefix.replace(/^\//, ''));
   let files;
   try {
     files = await fs.readdir(srcDir);
@@ -84,19 +101,19 @@ async function writeHomepage(perCollection) {
   lines.push(`# ${cfg.title}${cfg.tagline ? `: ${cfg.tagline}` : ''}`);
   lines.push('');
   if (cfg.summary) lines.push(`> ${cfg.summary}`, '');
-  if (cfg.entity) lines.push(`**Entity:** ${cfg.entity}`, '');
-  lines.push(`**Homepage:** ${cfg.siteUrl}/  `);
-  if (cfg.contact?.page) lines.push(`**Contact:** ${cfg.siteUrl}${cfg.contact.page}  `);
-  if (cfg.contact?.email) lines.push(`**Email:** ${cfg.contact.email}  `);
-  if (cfg.contact?.telegram) lines.push(`**Telegram:** ${cfg.contact.telegram}  `);
-  lines.push(`**Sitemap:** ${cfg.siteUrl}/sitemap-index.xml  `);
-  lines.push(`**Agent index:** ${cfg.siteUrl}/llms.txt  `);
-  lines.push(`**Full corpus:** ${cfg.siteUrl}/llms-full.txt  `);
-  lines.push(`**Agent card:** ${cfg.siteUrl}/.well-known/agent.json`);
+  if (cfg.entity) lines.push(`**${L.entity}:** ${cfg.entity}`, '');
+  lines.push(`**${L.homepage}:** ${cfg.siteUrl}/  `);
+  if (cfg.contact?.page) lines.push(`**${L.contact}:** ${cfg.siteUrl}${cfg.contact.page}  `);
+  if (cfg.contact?.email) lines.push(`**${L.email}:** ${cfg.contact.email}  `);
+  if (cfg.contact?.telegram) lines.push(`**${L.telegram}:** ${cfg.contact.telegram}  `);
+  lines.push(`**${L.sitemap}:** ${cfg.siteUrl}/sitemap-index.xml  `);
+  lines.push(`**${L.agentIndex}:** ${cfg.siteUrl}/llms.txt  `);
+  lines.push(`**${L.fullCorpus}:** ${cfg.siteUrl}/llms-full.txt  `);
+  lines.push(`**${L.agentCard}:** ${cfg.siteUrl}/.well-known/agent.json`);
   lines.push('');
 
   if (cfg.keyPages?.length) {
-    lines.push('## Key pages', '');
+    lines.push(`## ${L.keyPages}`, '');
     for (const k of cfg.keyPages) lines.push(`- [${k.label}](${cfg.siteUrl}${k.url})`);
     lines.push('');
   }
@@ -104,7 +121,7 @@ async function writeHomepage(perCollection) {
   for (const { col, entries } of perCollection) {
     if (!entries.length) continue;
     lines.push(`## ${col.label}`, '');
-    lines.push(`Index: ${cfg.siteUrl}${col.urlPrefix}/`, '');
+    lines.push(`${L.index}: ${cfg.siteUrl}${col.urlPrefix}/`, '');
     for (const e of entries) {
       const desc = e.description ? `: ${e.description}` : '';
       lines.push(`- [${e.title}](${e.mdUrl})${desc}`);
@@ -112,26 +129,26 @@ async function writeHomepage(perCollection) {
     lines.push('');
   }
 
-  lines.push('## Content policy for AI agents', '');
-  lines.push(`- Citation in AI search and retrieval is permitted (Content-Signal: \`search=${p.search ?? 'yes'}, ai-input=${p.aiInput ?? 'yes'}\`).`);
-  lines.push(`- Use as LLM training data is ${p.aiTrain === 'yes' ? 'permitted' : '**not permitted**'} (Content-Signal: \`ai-train=${p.aiTrain ?? 'no'}\`).`);
-  lines.push('- Any page here can be fetched as markdown by appending `.md` to its URL, or by sending `Accept: text/markdown`.');
+  lines.push(`## ${L.policyHeading}`, '');
+  lines.push(`- ${L.policyCite} (Content-Signal: \`search=${p.search ?? 'yes'}, ai-input=${p.aiInput ?? 'yes'}\`).`);
+  lines.push(`- ${p.aiTrain === 'yes' ? L.policyTrainYes : L.policyTrainNo} (Content-Signal: \`ai-train=${p.aiTrain ?? 'no'}\`).`);
+  lines.push(`- ${L.policyMarkdown}`);
   lines.push('');
   await fs.writeFile(path.join(PUBLIC_DIR, 'index.md'), lines.join('\n'), 'utf8');
 }
 
 async function writeFullCorpus(perCollection) {
   const chunks = [
-    `# ${cfg.title}: full markdown corpus\n`,
-    `> Every indexable page of ${cfg.siteUrl}, concatenated. Index: ${cfg.siteUrl}/llms.txt\n`,
-    `> Generated ${new Date().toISOString().slice(0, 10)}\n`,
+    `# ${cfg.title}: ${L.fullCorpusTitle}\n`,
+    `> ${L.fullCorpusNote} ${cfg.siteUrl}. ${L.agentIndex}: ${cfg.siteUrl}/llms.txt\n`,
+    `> ${L.generated} ${new Date().toISOString().slice(0, 10)}\n`,
   ];
   for (const { col, entries } of perCollection) {
     if (!entries.length) continue;
     chunks.push(`\n\n# ${col.label}\n`);
     for (const e of entries) {
       try {
-        chunks.push(`\n\n${await fs.readFile(path.join(PUBLIC_DIR, col.dir, `${e.slug}.md`), 'utf8')}\n`);
+        chunks.push(`\n\n${await fs.readFile(path.join(PUBLIC_DIR, col.urlPrefix.replace(/^\//, ''), `${e.slug}.md`), 'utf8')}\n`);
       } catch {
         /* a rendition that failed to write is already reported by the loop above */
       }
@@ -150,7 +167,7 @@ async function main() {
     const entries = await processCollection(col);
     perCollection.push({ col, entries });
     total += entries.length;
-    console.log(`  ${col.dir.padEnd(14)} ${String(entries.length).padStart(4)} .md`);
+    console.log(`  ${col.urlPrefix.padEnd(14)} ${String(entries.length).padStart(4)} .md`);
   }
   await writeHomepage(perCollection);
   const fullBytes = await writeFullCorpus(perCollection);

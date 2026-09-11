@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * /.well-known/agent.json — the agent card.
+ * /.well-known/agent.json, the agent card.
  *
  * Deliberately not an A2A service card: this site runs no JSON-RPC agent
  * endpoint, and claiming one would be a promise the site cannot keep. The card

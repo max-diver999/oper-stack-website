@@ -18,5 +18,8 @@ export function lastmodFor(pathnameOrUrl: string): string | null {
   }
   if (!pathname.startsWith('/')) pathname = `/${pathname}`;
   if (!pathname.endsWith('/')) pathname = `${pathname}/`;
-  return map[pathname] ?? null;
+  if (map[pathname]) return map[pathname];
+  // Pages built from a data module share that module's date under a wildcard key.
+  const wildcard = pathname.replace(/[^/]+\/$/, '*');
+  return map[wildcard] ?? null;
 }
