@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /**
- * src/data/page-lastmod.json — the honest "last changed" date for pages that are
+ * src/data/page-lastmod.json holds the honest "last changed" date for pages that are
  * not articles, so every page type can carry dateModified instead of only the
  * collections.
  *
@@ -67,11 +67,19 @@ function walk(dir, acc = []) {
   return acc;
 }
 
-/** src/pages/about/index.astro -> /about/ ; src/pages/index.astro -> / */
+/**
+ * src/pages/about/index.astro -> /about/ ; src/pages/index.astro -> /
+ * A dynamic route becomes a wildcard key: src/pages/produkty/[slug].astro -> /produkty/*
+ * Pages generated from a data module have no frontmatter date of their own, so the date
+ * of that module is the only honest answer for all of them.
+ */
 function routeFor(file) {
   const rel = path.relative(PAGES_DIR, file).split(path.sep).join('/');
-  if (/\[.+\]/.test(rel)) return null;
   const noExt = rel.replace(/\.astro$/, '');
+  if (/\[.+\]/.test(noExt)) {
+    const dir = noExt.replace(/\/?\[[^/]+\]$/, '');
+    return dir ? `/${dir}/*` : '/*';
+  }
   const clean = noExt.replace(/(^|\/)index$/, '');
   return clean ? `/${clean}/` : '/';
 }
