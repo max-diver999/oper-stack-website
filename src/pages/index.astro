@@ -903,13 +903,15 @@ const homeSchemas = [
     display: none;
   }
 
+  /* --hud-h ставит resize(): реальный низ текста шапки. Раньше тут были фиксированные 68px,
+     и при заголовке в три строки тег модуля рисовался поверх последней строки H1. */
   body.is-mobile .mob-map-chrome {
     display: block;
     position: absolute;
     left: 0;
     right: 0;
     z-index: 9;
-    top: calc(max(10px, env(safe-area-inset-top)) + 68px);
+    top: var(--hud-h, calc(max(10px, env(safe-area-inset-top)) + 68px));
     padding: 0 16px 6px;
     pointer-events: none;
   }
@@ -973,7 +975,8 @@ const homeSchemas = [
   body.is-mobile h1 {
     font-size: clamp(16px, 4.6vw, 19px);
     line-height: 1.24;
-    max-width: 14ch;
+    /* Ширина колонки шапки, не 14ch: заголовок держится в две строки и не растит шапку. */
+    max-width: min(292px, 86vw);
     margin-top: 4px;
   }
 
@@ -1550,6 +1553,8 @@ runAfterPageLoad(function () {
   const coreEl = document.getElementById("core");
   const mobScroll = document.getElementById("mob-scroll");
   const mobChrome = document.getElementById("mob-map-chrome");
+  const hud = document.querySelector(".hud");
+  const hudCopy = hud ? (hud.querySelector(".hud-copy") || hud.firstElementChild) : null;
   const mobModuleTag = document.getElementById("mob-module-tag");
   const mobFeedsEl = document.getElementById("mob-feeds");
   const reduce = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -2103,6 +2108,14 @@ runAfterPageLoad(function () {
     };
   }
 
+  // Низ текста шапки (бренд + H1) на мобильном: от него отсчитывается тег модуля и пилюли источников.
+  function measureHud() {
+    const root = document.documentElement.style;
+    if (!S.mobile || !hud || !hudCopy) { root.removeProperty("--hud-h"); return; }
+    const bottom = hud.offsetTop + hudCopy.offsetTop + hudCopy.offsetHeight + 6;
+    root.setProperty("--hud-h", Math.ceil(bottom) + "px");
+  }
+
   function resize() {
     S.dpr = Math.min(devicePixelRatio || 1, 1.75);
     S.w = innerWidth;
@@ -2112,6 +2125,7 @@ runAfterPageLoad(function () {
 
     S.mapH = S.mobile ? clamp(S.h * 0.38, 220, 310) : S.h;
     document.documentElement.style.setProperty("--map-h", S.mapH + "px");
+    measureHud();
 
     const ch = S.mobile ? S.mapH : S.h;
     canvas.width = (S.w * S.dpr) | 0;
@@ -2424,6 +2438,8 @@ runAfterPageLoad(function () {
 
   resize();
   updateMobChrome();
+  // Fraunces может докатиться после первого layout: перемерить шапку, иначе тег снова уедет под H1.
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(measureHud);
   coreEl.style.transform = `translate(${S.core.x}px,${S.core.y}px) translate(-50%,-50%)`;
   if (!reduce) requestAnimationFrame(frame);
   else draw(1800, 0);
