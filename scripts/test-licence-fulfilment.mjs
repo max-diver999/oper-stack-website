@@ -87,5 +87,53 @@ check('russian letter states the seven day refund', /семь дней/.test(ruM
 check('english letter is unchanged by the russian one', /Thank you for buying/.test(mail.text) && !/Спасибо/.test(mail.text));
 check('email HTML escapes nothing dangerous and mentions the agency plan', mail.html.includes('Agency plan') && !mail.html.includes('<script'));
 
+
+// 6. Whop: подпись, разбор события и выдача ключа по платежу.
+{
+  const { verifyWhopSignature, signWhopBody, readWhopPayment, handleWhopPayment } = await import('../src/lib/licence-fulfilment.ts');
+  const secret = 'ws_' + Buffer.from('a'.repeat(32)).toString('base64');
+  const body = JSON.stringify({ type: 'payment.succeeded', data: { id: 'pay_1', user_email: 'Buyer@Example.com', product_id: 'prod_kit' } });
+  const now = Math.floor(Date.now() / 1000);
+  const h = signWhopBody(body, secret, 'msg_1', now);
+
+  check('whop: своя подпись принимается', verifyWhopSignature(body, h, secret, now).ok);
+  check('whop: чужая подпись отклоняется', !verifyWhopSignature(body, { ...h, signature: 'v1,' + Buffer.from('nope').toString('base64') }, secret, now).ok);
+  check('whop: подменённое тело отклоняется', !verifyWhopSignature(body + ' ', h, secret, now).ok);
+  check('whop: старый запрос отклоняется', !verifyWhopSignature(body, h, secret, now + 3600).ok);
+  check('whop: без заголовков отклоняется', !verifyWhopSignature(body, { id: null, timestamp: null, signature: null }, secret, now).ok);
+  check('whop: несколько подписей в заголовке, одна наша', verifyWhopSignature(body, { ...h, signature: `v1,${Buffer.from('other').toString('base64')} ${h.signature}` }, secret, now).ok);
+
+  const idToPlan = { prod_kit: 'owner', plan_agency: 'agency' };
+  const read = readWhopPayment(JSON.parse(body), idToPlan);
+  check('whop: почта приведена к нижнему регистру', read.email === 'buyer@example.com', read.email ?? 'нет');
+  check('whop: тариф определён по товару', read.plan === 'owner');
+  check('whop: чужой товар не даёт тарифа', readWhopPayment({ type: 'payment.succeeded', data: { id: 'p', product_id: 'prod_other' } }, idToPlan).plan === null);
+  check('whop: почта видна и во вложенном объекте', readWhopPayment({ type: 'payment.succeeded', data: { user: { email: 'A@B.co' } } }, idToPlan).email === 'a@b.co');
+
+  const sent = [];
+  const deps = {
+    idToPlan,
+    getBuyerEmail: async () => 'fallback@example.com',
+    issue: () => ({ key: 'OSK1.x.y', expires: '2027-09-11' }),
+    downloadUrl: (email) => `https://oper-stack.com/api/kit-download/?t=${encodeURIComponent(email)}`,
+    sendMail: async (m) => sent.push(m),
+    notify: async () => {},
+    supportEmail: 'info@oper-stack.com',
+    siteUrl: 'https://oper-stack.com',
+  };
+  const done = await handleWhopPayment(JSON.parse(body), deps);
+  check('whop: ключ выдан', done.handled && done.email === 'buyer@example.com', done.reason);
+  check('whop: письмо ушло один раз', sent.length === 1 && sent[0].text.includes('OSK1.x.y'));
+
+  const noEmail = await handleWhopPayment({ type: 'payment.succeeded', data: { id: 'pay_2', user_id: 'user_1', product_id: 'prod_kit' } }, deps);
+  check('whop: почта добирается через API, если её не было', noEmail.handled && noEmail.email === 'fallback@example.com', noEmail.reason);
+
+  const other = await handleWhopPayment({ type: 'payment.succeeded', data: { id: 'pay_3', product_id: 'prod_other' } }, deps);
+  check('whop: чужой товар не выдаёт ключ', !other.handled && other.reason.includes('no Site Kit'));
+  const ignored = await handleWhopPayment({ type: 'membership.cancelled', data: {} }, deps);
+  check('whop: посторонние события игнорируются', !ignored.handled);
+  check('whop: лишних писем не ушло', sent.length === 2, `писем ${sent.length}`);
+}
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');
 process.exit(failures ? 1 : 0);
