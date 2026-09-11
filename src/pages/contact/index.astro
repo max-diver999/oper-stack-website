@@ -4,8 +4,7 @@ import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import { SITE } from '../../data/site';
 
 const canonical = `${SITE.url}/contact/`;
-const waLink = `https://wa.me/${SITE.whatsapp}`;
-const telLink = `tel:${SITE.phone.replace(/[^+\d]/g, '')}`;
+const tgLink = `https://t.me/${SITE.telegram}`;
 
 const contactSchema = {
   '@context': 'https://schema.org',
@@ -17,15 +16,14 @@ const contactSchema = {
     name: SITE.name,
     url: SITE.url,
     email: SITE.email,
-    telephone: SITE.phone,
-    sameAs: SITE.sameAs,
+    sameAs: [...SITE.sameAs, tgLink],
   },
 };
 ---
 
 <CommercialLayout
   title="Contact OperStack"
-  description="Email, phone and WhatsApp for OperStack. Orders are confirmed within 24 hours and an audit takes one to three working days, five at the most. Nothing here needs a call."
+  description="Email and Telegram for OperStack. Orders are confirmed within 24 hours and an audit takes one to three working days, five at the most. Nothing here needs a call."
   canonical={canonical}
   jsonLd={contactSchema}
 >
@@ -33,13 +31,13 @@ const contactSchema = {
     <h1>Contact</h1>
 
     <p class="lede">
-      One person answers all three of these, usually within 24 hours. An audit takes one to three
+      One person answers both of these, usually within 24 hours. An audit takes one to three
       working days once the order is confirmed, and five at the most. There is no call to book:
       everything we sell is delivered in writing.
     </p>
 
     <CitabilityBlock
-      text="OperStack is reached at info@oper-stack.com, on +54 11 7141-0632, and on WhatsApp at the same number. Orders are confirmed within 24 hours; an audit takes one to three working days and five at the most."
+      text="OperStack is reached at info@oper-stack.com and on Telegram at @operstack. Orders are confirmed within 24 hours; an audit takes one to three working days and five at the most."
     />
 
     <div class="ways">
@@ -47,13 +45,9 @@ const contactSchema = {
         <span class="way-label">Email, best for anything with detail</span>
         <span class="way-value">{SITE.email}</span>
       </a>
-      <a class="way" href={waLink} target="_blank" rel="noopener">
-        <span class="way-label">WhatsApp, best for a quick question</span>
-        <span class="way-value">{SITE.phone}</span>
-      </a>
-      <a class="way" href={telLink}>
-        <span class="way-label">Phone, Argentina time</span>
-        <span class="way-value">{SITE.phone}</span>
+      <a class="way" href={tgLink} target="_blank" rel="noopener">
+        <span class="way-label">Telegram, best for a quick question</span>
+        <span class="way-value">@{SITE.telegram}</span>
       </a>
     </div>
 
