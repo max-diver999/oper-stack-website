@@ -13,16 +13,16 @@ export type PricingTier = {
 export const PRICING_TIERS: PricingTier[] = [
   {
     id: 'audit',
-    name: 'Audit',
+    name: 'Assessment',
     tagline: 'See where inbound leads leak',
     price: 'Free',
     features: [
-      '30 to 45 min stack review',
-      'SEO, bots, CRM, reporting checklist',
-      'Module fit for your stage',
-      'Written action list, not a sales deck',
+      'Written reply within two working days',
+      'SEO, bots, CRM, reporting: the gap we see',
+      'Module fit for your stage, with a fixed price',
+      'No call at this stage, no sales deck',
     ],
-    cta: 'Request free audit',
+    cta: 'Send the form',
     href: '/audit/?utm=pricing-audit',
   },
   {
@@ -38,7 +38,7 @@ export const PRICING_TIERS: PricingTier[] = [
       'Integrations and handoff docs',
       'Go-live support window',
     ],
-    cta: 'Book setup call',
+    cta: 'Request a quote',
     href: '/audit/?utm=pricing-setup',
   },
   {
@@ -53,7 +53,7 @@ export const PRICING_TIERS: PricingTier[] = [
       'Reporting and SLA reviews',
       'Team training and onboarding paths',
     ],
-    cta: 'Talk retainer',
+    cta: 'Request a quote',
     href: '/audit/?utm=pricing-retainer',
   },
 ];

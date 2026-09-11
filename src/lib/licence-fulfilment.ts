@@ -106,7 +106,7 @@ export function buildLicenceEmail(input: { email: string; key: string; plan: Pla
     `2. npm run activate ${input.key}`,
     '3. Open QUICKSTART.md and follow it from step 2.',
     '',
-    `The key is tied to ${input.email}; keep it private. Questions and refunds (fourteen days, no questions asked): ${input.supportEmail}.`,
+    `The key is tied to ${input.email}; keep it private. Questions and refunds (seven days, no questions asked): ${input.supportEmail}.`,
     `Terms: ${input.siteUrl}/terms/ and the EULA inside the kit.`,
   ].join('\n');
   const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
@@ -120,7 +120,7 @@ export function buildLicenceEmail(input: { email: string; key: string; plan: Pla
 <li><code>npm run activate ${esc(input.key)}</code></li>
 <li>Open <code>QUICKSTART.md</code> and follow it from step 2.</li>
 </ol>
-<p>The key is tied to ${esc(input.email)}; keep it private. Questions and refunds (fourteen days, no questions asked): <a href="mailto:${input.supportEmail}">${input.supportEmail}</a>.<br>Terms: <a href="${input.siteUrl}/terms/">${input.siteUrl}/terms/</a> and the EULA inside the kit.</p>
+<p>The key is tied to ${esc(input.email)}; keep it private. Questions and refunds (seven days, no questions asked): <a href="mailto:${input.supportEmail}">${input.supportEmail}</a>.<br>Terms: <a href="${input.siteUrl}/terms/">${input.siteUrl}/terms/</a> and the EULA inside the kit.</p>
 </div>`;
   return { subject: 'Your OperStack Site Kit licence', text, html };
 }

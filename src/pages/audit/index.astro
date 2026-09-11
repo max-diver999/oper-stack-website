@@ -9,24 +9,24 @@ const canonical = `${SITE.url}/audit/`;
 
 const FAQ = [
   {
-    question: 'Is the inbound lead audit really free?',
+    question: 'Is the assessment free?',
     answer:
-      'Yes, and there is no obligation afterwards. Scoping without seeing data is guesswork, and guesswork gets priced defensively, so the audit is as much for us as for you. You keep the written action list whether or not you hire us.',
+      'Yes. You send the form, we reply in writing within two working days: which module moves your number, a fixed price for it, and, if the honest answer is that nothing we sell would help, that answer. No obligation either way.',
   },
   {
     question: 'What do you need from us?',
     answer:
-      'A read-only export of inbound records from the last full month, a look at your form and routing configuration, and forty-five minutes with someone who knows how leads actually get worked. We do not ask for admin access to production.',
+      'The site address, a few lines about how inbound works today (site, forms, chat, CRM, who follows up), and the number you want to move. Screenshots help; access to production systems is never needed at this stage.',
   },
   {
-    question: 'What does the audit actually measure?',
+    question: 'Is there a call?',
     answer:
-      'Four counts, reconciled: requests that arrived, records created, records with a live owner, and records actually worked. The gaps between them are where revenue leaks, and they are rarely where the org chart suggests.',
+      'Not at this stage: everything is in writing, so you can read it when it suits you and forward it to whoever decides. A working call is part of fix packages and setups from 1,000 USD.',
   },
   {
-    question: 'How long does it take?',
+    question: 'What do I get back?',
     answer:
-      'One call of thirty to forty-five minutes, then three to five working days for the written findings. Longer only if the export needs work before it can be reconciled.',
+      'A written reply with the gap we see, the module that addresses it, what it costs and what it does not cover. Paid work is quoted with a fixed scope and a fixed price; nothing starts without your yes.',
   },
   {
     question: 'What if the answer is that we do not need you?',
@@ -34,9 +34,9 @@ const FAQ = [
       'Then we say so. If the fix is a setting in software you already pay for, we name the setting. If your funnel converts fine and the constraint is traffic, no automation changes that arithmetic and you should know it early.',
   },
   {
-    question: 'Is this a sales call in disguise?',
+    question: 'Can we check the site ourselves first?',
     answer:
-      'The output is a written list you keep. We do quote for implementation when it is warranted, and we take no commission from any tool we recommend, which is why the recommendation is sometimes to change nothing.',
+      'Yes. The free AI visibility check scores any site in ten seconds, and the inbound lead audit guide publishes the full method, so you can reconcile your own numbers before writing to us.',
   },
 ];
 
@@ -52,27 +52,29 @@ const faqSchema = {
 ---
 
 <CommercialLayout
-  title="Free Inbound Lead Audit: Scope and Output · OperStack"
-  description="A free inbound lead audit: four reconciled counts, gaps ranked by what they cost, and a written action list you keep. No deck, no obligation."
+  title="Free Written Assessment: Where Your Inbound Leaks · OperStack"
+  description="Send your site and how inbound works today; get a written reply within two working days: the gap we see, the module that fixes it, a fixed price. No call, no obligation."
   canonical={canonical}
   jsonLd={faqSchema}
 >
   <div class="wrap audit-wrap">
-    <h1>Free inbound lead audit</h1>
+    <h1>Free written assessment</h1>
     <p class="lede">
-      Forty-five minutes and a written action list. We reconcile what arrived against what
-      actually got worked, rank the gaps by what they cost you, and name the two worth fixing
-      first. No deck, no obligation, and you keep the list either way.
+      Send your site and a few lines about how inbound works today. Within two working days you
+      get a written reply: where leads leak, which module fixes it, and a fixed price. No call,
+      no deck, no obligation, and you keep the reply either way.
     </p>
 
     <CitabilityBlock
-      text="OperStack runs a free inbound lead audit: four reconciled counts covering requests that arrived, records created, records with an owner, and records actually worked, with the gaps ranked by cost."
+      text="OperStack's assessment is free and in writing: you describe your site and inbound process, and within two working days you receive the gap we see, the module that addresses it and a fixed price for it."
     />
 
     <h2>The four counts</h2>
     <p>
       Almost every inbound problem shows up as a gap between two of these. Teams usually know one
-      of the numbers and assume the other three.
+      of the numbers and assume the other three. If you have them, put them in the form; if not,
+      the <a href="/guides/inbound-lead-audit/">inbound lead audit guide</a> shows how to get them
+      from your own systems in an afternoon.
     </p>
     <ol class="numbers">
       <li><b>Arrived.</b> Requests submitted across every channel, including the ones that never reached a system.</li>
@@ -83,21 +85,22 @@ const faqSchema = {
 
     <h2>What you get</h2>
     <ul class="bullets">
-      <li>The four counts for your last full month, reconciled, with each gap traced to one layer</li>
-      <li>Findings ranked by the cost of the current failure, not by how easy they are to fix</li>
-      <li>The two things to change first, and an explicit list of what not to bother with</li>
-      <li>A build, buy, or configure call per finding, including when the answer is a setting you already own</li>
+      <li>A written reply within two working days, not a meeting invitation</li>
+      <li>The gap we see from what you sent, traced to one layer: capture, routing, follow-up or reporting</li>
+      <li>The module that addresses it, with a fixed price and an explicit list of what it does not cover</li>
+      <li>A build, buy, or configure verdict, including when the answer is a setting you already own</li>
     </ul>
 
     <h2>What we need from you</h2>
     <ul class="bullets">
-      <li>A read-only export of inbound records from the last full month</li>
-      <li>A look at your form and routing configuration, screenshots are fine</li>
-      <li>Forty-five minutes with someone who knows how leads actually get worked, not how the process is documented</li>
+      <li>The site address and the market you sell in</li>
+      <li>A few lines on how inbound works today: forms, chat, CRM, who follows up and how fast</li>
+      <li>The number you want to move, and the four counts above if you have them</li>
     </ul>
     <p class="note">
-      We do not ask for admin access to production systems, and you should be sceptical of anyone
-      who does at this stage.
+      We do not ask for access to production systems, and you should be sceptical of anyone
+      who does at this stage. Want an instant reading first? The
+      <a href="/ai-visibility/">free AI visibility check</a> scores any site in ten seconds.
     </p>
 
     <h2>What this is not</h2>
@@ -105,13 +108,10 @@ const faqSchema = {
       Not a maturity score. Scoring an organisation from one to five creates a gap and positions
       the scorer to fill it. Not a vendor shortlist either: we take no commission from any tool,
       which is why a recommendation is sometimes to change a setting rather than buy anything.
-    </p>
-    <p class="note">
-      If the honest finding is that your funnel converts adequately and the constraint is traffic,
-      we will say that. It is a short call and it saves you a quarter.
+      And not a call: a working session is part of fix packages and setups from 1,000 USD.
     </p>
 
-    <h2>After the audit</h2>
+    <h2>After the assessment</h2>
     <p>
       If something is worth building, it is quoted per module against
       <a href="/services/">the services</a> and priced on
@@ -119,12 +119,11 @@ const faqSchema = {
       <a href="/services/lead-routing-software/">lead routing setup</a>,
       <a href="/services/ai-automation-services/">AI automation services</a>, and
       <a href="/services/lead-management-system/">lead management system setup</a>.
-      The method behind the audit itself is published in full in the
-      <a href="/guides/inbound-lead-audit/">inbound lead audit guide</a>, and you are welcome to
-      run it without us.
+      For search and AI visibility there is the written
+      <a href="/products/seo-audit/">SEO, AEO and GEO audit</a> with a price on the page.
     </p>
 
-    <h2>Request the audit</h2>
+    <h2>Send the request</h2>
 
     <form id="audit-form" novalidate>
       <input type="hidden" name="source" value={`audit:${utm}`} />
@@ -148,13 +147,13 @@ const faqSchema = {
       </div>
       <div class="consent">
         <input type="checkbox" id="consent" name="consent" required />
-        <label for="consent">I agree to be contacted about this audit request.</label>
+        <label for="consent">I agree to be contacted about this request.</label>
       </div>
       <div class="hp" aria-hidden="true">
         <label for="website">Website</label>
         <input id="website" name="website" tabindex="-1" autocomplete="off" />
       </div>
-      <button type="submit" class="btn" id="submit">Request audit →</button>
+      <button type="submit" class="btn" id="submit">Send the request →</button>
       <p class="msg" id="form-msg" hidden></p>
     </form>
 
