@@ -8,6 +8,9 @@ export const SITE = {
   email: 'info@oper-stack.com',
   /** No phone is published: we answer by email and on Telegram. */
   telegram: 'operstack',
+  /** City and country only, no street. Rating systems and answer engines use this to tell one
+   *  business from another with a similar name; a street address would add nothing for them. */
+  address: { locality: 'Buenos Aires', country: 'AR' },
   editorial: 'OperStack',
   /** Standalone brand. Parent studio mentioned in copy only, not cross-linked for SEO cannibalization.
    *  Only profiles that actually exist and answer 200. Never claim a profile we do not run. */

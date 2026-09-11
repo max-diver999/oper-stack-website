@@ -29,6 +29,11 @@ const organizationSchema = {
     '@type': 'Person',
     name: 'Maksim Shchegolev',
   },
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: SITE.address.locality,
+    addressCountry: SITE.address.country,
+  },
   sameAs: [...SITE.sameAs, `https://t.me/${SITE.telegram}`],
   contactPoint: {
     '@type': 'ContactPoint',
