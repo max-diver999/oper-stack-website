@@ -11,8 +11,14 @@ export function getStaticPaths() {
 }
 const { product: p } = Astro.props;
 const plain = PRODUCTS_PLAIN[p.slug];
+/** Site Kit checkout: set PUBLIC_SITE_KIT_CHECKOUT_URL (a Paddle checkout link) once the domain is approved;
+ *  until then the page shows the launch-list button from products.ts. */
+const checkoutUrl = String(import.meta.env.PUBLIC_SITE_KIT_CHECKOUT_URL || '').trim();
+const sellingKit = p.slug === 'site-kit' && checkoutUrl.length > 0;
+const cta = sellingKit ? { text: 'Buy for 79 USD', href: checkoutUrl, external: true } : p.cta;
+const status = sellingKit ? 'available' : p.status;
 const canonical = `${SITE.url}/products/${p.slug}/`;
-const offer = p.price === 'Free' ? { '@type': 'Offer', price: '0', priceCurrency: 'USD' } : { '@type': 'Offer', price: p.price.replace(/[^\d.]/g, ''), priceCurrency: 'USD', availability: p.status === 'soon' ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock' };
+const offer = p.price === 'Free' ? { '@type': 'Offer', price: '0', priceCurrency: 'USD' } : { '@type': 'Offer', price: p.price.replace(/[^\d.]/g, ''), priceCurrency: 'USD', availability: (p.slug === 'site-kit' && String(import.meta.env.PUBLIC_SITE_KIT_CHECKOUT_URL || '').trim() ? 'available' : p.status) === 'soon' ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock' };
 const productSchema = { '@context': 'https://schema.org', '@type': p.slug === 'seo-audit' ? 'Service' : 'SoftwareApplication', name: `OperStack ${p.name}`, description: p.description, url: canonical, offers: offer, ...(p.slug !== 'seo-audit' ? { applicationCategory: 'DeveloperApplication', operatingSystem: 'Node.js 20+' } : { provider: { '@type': 'Organization', name: SITE.name } }) };
 const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: p.faq.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
 const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order - b.order);
@@ -44,10 +50,10 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
     <div class="price-box">
       <div>
         <p class="price">{p.price}</p>
-        <p class="price-note">{p.priceNote}{p.status === 'soon' ? '. Coming soon.' : ''}</p>
+        <p class="price-note">{p.priceNote}{status === 'soon' ? '. Coming soon.' : ''}</p>
       </div>
       <span class="cta-group">
-        <a class="btn" href={p.cta.href} target={p.cta.external ? '_blank' : undefined} rel={p.cta.external ? 'noopener' : undefined}>{p.cta.text} →</a>
+        <a class="btn" href={cta.href} target={cta.external ? '_blank' : undefined} rel={cta.external ? 'noopener' : undefined}>{cta.text} →</a>
         {p.demo && <a class="btn btn-ghost" href={p.demo.href} target="_blank" rel="noopener">{p.demo.text} →</a>}
       </span>
     </div>
