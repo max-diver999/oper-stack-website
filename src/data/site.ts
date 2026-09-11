@@ -9,6 +9,12 @@ export const SITE = {
   phone: '',
   whatsapp: '',
   editorial: 'OperStack',
-  /** Standalone brand. Parent studio mentioned in copy only, not cross-linked for SEO cannibalization. */
-  sameAs: [] as string[],
+  /** Standalone brand. Parent studio mentioned in copy only, not cross-linked for SEO cannibalization.
+   *  Only profiles that actually exist and answer 200. Never claim a profile we do not run. */
+  sameAs: [
+    'https://github.com/oper-stack',
+    'https://www.npmjs.com/org/operstack',
+    'https://apify.com/operstack',
+    'https://www.producthunt.com/products/operstack-gates',
+  ] as string[],
 } as const;

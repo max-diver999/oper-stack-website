@@ -85,6 +85,11 @@ const citeText = citeMatch?.[1] || description;
 
     <CitabilityBlock text={citeText} />
 
+    <p class="top-cta">
+      Want this checked on your own site? <a href="/ai-visibility/">Run the free AI visibility check</a>,
+      or <a href={`/audit/?utm=guide-top-${entry.id}`}>order the full audit</a>.
+    </p>
+
     <Content />
 
     {related.length > 0 && (
@@ -154,5 +159,14 @@ const citeText = citeMatch?.[1] || description;
     color: var(--muted);
     font-size: 15px;
     margin: 0;
+  }
+
+  .top-cta {
+    margin: 0 0 28px;
+    padding: 12px 16px;
+    border-left: 2px solid var(--teal-soft);
+    background: rgba(26, 138, 125, 0.06);
+    font-size: 15px;
+    line-height: 1.6;
   }
 </style>

@@ -19,6 +19,7 @@ const homeSchemas = [
     email: SITE.email,
     logo: `${SITE.url}/og/og-default.png`,
     founder: { '@type': 'Person', name: 'Maksim Shchegolev' },
+    ...(SITE.sameAs.length ? { sameAs: SITE.sameAs } : {}),
   },
   {
     '@context': 'https://schema.org',
@@ -1385,9 +1386,11 @@ const homeSchemas = [
 
 <nav class="site-links" aria-label="Site pages">
   <a href="/services/">Services</a>
+  <a href="/products/">Products</a>
   <a href="/pricing/">Pricing</a>
   <a href="/cases/">Cases</a>
   <a href="/guides/">Guides</a>
+  <a href="/about/">About</a>
   <a href="/audit/">Audit</a>
 </nav>
 
@@ -1527,6 +1530,7 @@ const homeSchemas = [
   <footer class="foot">
     <p>OperStack · <a href="mailto:info@oper-stack.com">info@oper-stack.com</a></p>
     <p class="muted">The operating stack for inbound leads.</p>
+    <p class="muted"><a href="/about/">About</a> · <a href="/products/">Products</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>
   </footer>
 </main>
 

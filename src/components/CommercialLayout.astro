@@ -29,6 +29,7 @@ const organizationSchema = {
     '@type': 'Person',
     name: 'Maksim Shchegolev',
   },
+  ...(SITE.sameAs.length ? { sameAs: SITE.sameAs } : {}),
 };
 
 const extra = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
@@ -203,13 +204,14 @@ const schemas = [organizationSchema, ...extra];
     <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
     <a href="/cases/" class:list={{ active: Astro.url.pathname.startsWith('/cases') }}>Cases</a>
     <a href="/guides/" class:list={{ active: Astro.url.pathname.startsWith('/guides') }}>Guides</a>
+    <a href="/about/" class:list={{ active: Astro.url.pathname.startsWith('/about') }}>About</a>
     <a href="/audit/">Audit</a>
   </nav>
   <slot />
   <footer class="site-foot">
     <p>{SITE.name} · {SITE.tagline}</p>
     <p style="margin-top:8px"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
-    <p class="foot-links"><a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>
+    <p class="foot-links"><a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>
   </footer>
 </body>
 </html>
