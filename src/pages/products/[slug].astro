@@ -66,6 +66,12 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
       </p>
     )}
 
+    <h2>What you need before you start</h2>
+    <table class="needs">
+      <thead><tr><th>What</th><th>Cost</th><th>Why</th></tr></thead>
+      <tbody>{p.needs.map((n) => <tr><td>{n.item}</td><td>{n.cost}</td><td>{n.why}</td></tr>)}</tbody>
+    </table>
+
     <h2>What you get</h2>
     <ul class="list">{p.get.map((g) => <li>{g}</li>)}</ul>
 
@@ -176,4 +182,9 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
   .story h2 { margin-top: 0; }
   .story p { color: rgba(245,242,236,.88); line-height: 1.6; margin-bottom: 12px; }
   .story-sig { font-family: var(--fm); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
+  .needs { width: 100%; border-collapse: collapse; margin: 0 0 2rem; font-size: .95rem; }
+  .needs th { text-align: left; padding: .5rem .75rem .5rem 0; border-bottom: 2px solid currentColor; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; opacity: .7; }
+  .needs td { padding: .7rem .75rem .7rem 0; border-bottom: 1px solid rgba(128,128,128,.25); vertical-align: top; }
+  .needs td:nth-child(2) { white-space: nowrap; font-weight: 600; }
+  @media (max-width: 640px) { .needs, .needs tbody, .needs tr, .needs td { display: block; width: 100%; } .needs thead { display: none; } .needs tr { padding: .6rem 0; border-bottom: 1px solid rgba(128,128,128,.25); } .needs td { border: 0; padding: .15rem 0; } .needs td:nth-child(2) { white-space: normal; } }
 </style>
