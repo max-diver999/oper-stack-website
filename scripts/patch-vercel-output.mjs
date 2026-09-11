@@ -54,16 +54,9 @@ async function main() {
     ...(vercel.headers || []).map((h) => ({ src: toSrc(h.source), headers: Object.fromEntries(h.headers.map((x) => [x.key, x.value])), continue: true })),
     // Link and Vary on every response; `continue` lets the later routes still run.
     { src: '^/(.*)$', headers: { Link: LINK_HEADER, Vary: 'Accept' }, continue: true },
-    // Markdown content negotiation. Only fires on an explicit Accept: text/markdown.
-    { src: '^/$', has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }], dest: '/index.md' },
-    ...collections.map((col) => ({
-      src: `^/${col}/([^/]+)/$`,
-      has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }],
-      dest: `/${col}/$1.md`,
-    })),
-  ];
-  // A markdown rendition is a duplicate of the HTML page. Search engines must not index it.
-  const post = [
+    // A markdown rendition duplicates the HTML page, so it must never be indexed.
+    // This has to sit before the filesystem handler: a request for an existing static
+    // file stops there, and routes placed after it never run.
     {
       src: '^/(.+)\\.md$',
       headers: {
@@ -72,15 +65,19 @@ async function main() {
       },
       continue: true,
     },
+    // Markdown content negotiation. Only fires on an explicit Accept: text/markdown.
+    { src: '^/$', has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }], dest: '/index.md' },
+    ...collections.map((col) => ({
+      src: `^/${col}/([^/]+)/$`,
+      has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }],
+      dest: `/${col}/$1.md`,
+    })),
   ];
-
   const fsIdx = config.routes.findIndex((r) => r.handle === 'filesystem');
   if (fsIdx === -1) { console.error('[patch-vercel] filesystem handler not found'); process.exit(1); }
   config.routes.splice(fsIdx, 0, ...pre);
-  const afterFsIdx = config.routes.findIndex((r) => r.handle === 'filesystem') + 1;
-  config.routes.splice(afterFsIdx, 0, ...post);
 
   await fs.writeFile(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
-  console.log(`[patch-vercel] injected www redirect, ${pre.length - 1} pre-fs and ${post.length} post-fs rule(s) into ${path.relative(ROOT, CONFIG_PATH)} (collections: ${collections.join(', ') || 'none'})`);
+  console.log(`[patch-vercel] injected www redirect and ${pre.length - 1} pre-filesystem rule(s) into ${path.relative(ROOT, CONFIG_PATH)} (collections: ${collections.join(', ') || 'none'})`);
 }
 main();
