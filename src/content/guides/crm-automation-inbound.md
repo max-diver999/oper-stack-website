@@ -1,6 +1,7 @@
 ---
 title: "CRM Automation for Inbound Leads: Stages, Fields, Dedupe"
 description: "Design inbound CRM automation that holds up: lifecycle stages as a state machine, field ownership, deduplication before assignment, and safe retries."
+answer: "Inbound CRM automation is a contract, not a pile of workflows: 1 deduplicated record per accepted request, 1 lifecycle state with defined transitions, controlled values with a named owner per field, and an assigned person with a clock. Without that contract, response lag is what shows: Harvard Business Review measured a 42 hour median first response across 2,241 companies."
 pubDate: 2026-07-18
 updatedDate: 2026-08-21
 author: Maksim Shchegolev

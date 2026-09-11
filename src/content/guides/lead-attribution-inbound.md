@@ -1,6 +1,7 @@
 ---
 title: "Inbound Lead Attribution: Join Source Data to Revenue"
 description: "How inbound attribution works in practice: original and latest source, UTM rules, identity stitching, and a revenue join your finance team will accept."
+answer: "Inbound attribution works when authority is assigned field by field across 2 systems: the Lead Hub preserves capture evidence, the CRM owns pipeline stages and closed revenue, and reporting joins them on a stable person key. It stops working the moment one system is asked to be the truth for a field the other one owns."
 pubDate: 2026-07-18
 updatedDate: 2026-08-21
 author: Maksim Shchegolev

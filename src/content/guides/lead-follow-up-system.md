@@ -1,6 +1,7 @@
 ---
 title: "Lead Follow-Up System: Cadence, Stop Rules, Ownership"
 description: "Build follow-up as a state machine: three situations after the first reply, cadence windows, stop rules, CRM writeback, and honest automation limits."
+answer: "A lead follow-up system is a state machine that starts after the first meaningful response and sorts every waiting lead into 1 of 3 situations, each with a window rather than a fixed script, a named owner and a written next step. A lead with no state and no owner is not being followed up, whatever the activity log says."
 pubDate: 2026-08-21
 author: Maksim Shchegolev
 faq:

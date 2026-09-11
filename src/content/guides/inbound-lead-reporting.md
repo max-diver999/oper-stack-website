@@ -1,6 +1,7 @@
 ---
 title: "Inbound Lead Reporting: Reports That Cause Decisions"
 description: "Design inbound lead reports backwards from the decision: three audiences, leading and lagging signals, failure metrics, cadence, and definition ownership."
+answer: "An inbound lead report is designed backwards from a decision: name the decision, the person who makes it and the moment it gets made, then publish only the numbers that change it. In practice that is 3 to 5 figures split by one dimension, not a dashboard nobody opens between meetings."
 pubDate: 2026-08-21
 author: Maksim Shchegolev
 faq:

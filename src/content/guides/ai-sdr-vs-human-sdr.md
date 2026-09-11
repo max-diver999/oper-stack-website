@@ -1,6 +1,7 @@
 ---
 title: "AI SDR vs Human SDR: Task Split, Limits, and Testing"
 description: "What an AI SDR really does today, task by task, the conditions where each task degrades, how to test a vendor on your own data, and what stays human."
+answer: "An AI SDR is a bundle of automated tasks, not a person. It reliably handles first response, structured qualification, note taking and follow-up scheduling, and degrades on judgment and anything requiring commitment. The 42 hour median first response that Harvard Business Review measured across 2,241 companies is the part software fixes; the rest is still a person."
 pubDate: 2026-08-21
 author: Maksim Shchegolev
 faq:

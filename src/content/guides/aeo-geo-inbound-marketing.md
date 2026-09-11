@@ -1,6 +1,7 @@
 ---
 title: "AEO vs GEO: How B2B Content Earns AI Search Citations"
 description: "Practical AEO and GEO for inbound teams: quotable answer blocks, consistent entities, honest measurement of AI citations, and the link to real pipeline."
+answer: "AEO and GEO are the editorial disciplines that make inbound content easy for answer systems to retrieve, quote correctly and attribute. They are measured, not asserted: a site scores 0 to 100 across 5 areas, crawler access, an agent index, a clear entity, a quotable answer-first paragraph and a verifiable date. Under 45, assistants mostly cannot use the site at all."
 pubDate: 2026-07-18
 updatedDate: 2026-08-21
 author: Maksim Shchegolev

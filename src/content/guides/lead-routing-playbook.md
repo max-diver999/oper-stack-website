@@ -1,6 +1,7 @@
 ---
 title: "Lead Routing Playbook: Rule Order, Owners, Fallbacks"
 description: "How to assign inbound leads reliably: rule precedence, dedupe, account ownership, round robin and capacity, fallback queues, retries, and event logs."
+answer: "Lead routing is the enforced rule set that decides who owns each qualified inbound lead, and the rules run in a fixed order of 5 steps: remove duplicates, match an existing account owner, filter for eligible reps, distribute among the remaining candidates, then escalate when nobody acts. Order matters more than the distribution method."
 pubDate: 2026-07-18
 updatedDate: 2026-08-21
 author: Maksim Shchegolev

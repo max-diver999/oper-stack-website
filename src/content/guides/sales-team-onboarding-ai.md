@@ -1,6 +1,7 @@
 ---
 title: "AI Sales Onboarding: Certify Reps Before Live Leads"
 description: "How AI-assisted practice, CRM sandbox evidence, and certification gates decide when a new sales rep becomes eligible for live inbound lead assignment."
+answer: "AI sales onboarding turns training into evidence: scored simulations, sandbox CRM records and a versioned rubric produce 1 certification status that the assignment layer reads before it gives a new rep a live inbound lead. The point is not faster training, it is that the routing rules can finally tell who is ready."
 pubDate: 2026-07-18
 updatedDate: 2026-08-21
 author: Maksim Shchegolev

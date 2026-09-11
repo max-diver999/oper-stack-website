@@ -6,6 +6,10 @@ const guides = defineCollection({
   schema: z.object({
     title: z.string(),
     description: z.string(),
+    /** The paragraph a reader and an answer engine both get first: 20 to 90 words, carrying one
+     *  concrete figure this guide can defend. Kept apart from `description`, which is the meta
+     *  description and has to stay short enough for a search result. */
+    answer: z.string().optional(),
     pubDate: z.coerce.date(),
     updatedDate: z.coerce.date().optional(),
     author: z.string().default('Maksim Shchegolev'),

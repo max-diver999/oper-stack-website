@@ -15,7 +15,7 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
-const { title, description, pubDate, updatedDate, author, faq = [] } = entry.data;
+const { title, description, answer, pubDate, updatedDate, author, faq = [] } = entry.data;
 
 const canonical = `${SITE.url}/guides/${entry.id}/`;
 /* Бренд дописываем, только если итоговый title остаётся в пределах 60 знаков.
@@ -81,7 +81,7 @@ const citeText = citeMatch?.[1] || description;
       <time datetime={isoDate}>{displayDate}</time> · {author}
     </p>
     <h1>{title}</h1>
-    <p class="lede">{description}</p>
+    <p class="lede">{answer || description}</p>
 
     <CitabilityBlock text={citeText} />
 

@@ -1,6 +1,7 @@
 ---
 title: "Speed-to-Lead SLA: Timers, Escalation, and Reporting"
 description: "Set speed-to-lead targets by channel, define when the timer starts and pauses, escalate before a lead goes silent, and report numbers nobody can game."
+answer: "A speed-to-lead SLA is a written contract about timers: what starts the clock, what stops it, who answers when the primary owner cannot, and which numbers get reviewed weekly. The famous 5 minute rule comes from one 2007 dataset and is an odds comparison, not a conversion rate, so cite it honestly and set your own target from your own data."
 pubDate: 2026-07-18
 updatedDate: 2026-08-21
 author: Maksim Shchegolev

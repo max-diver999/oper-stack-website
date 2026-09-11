@@ -30,6 +30,15 @@ const organizationSchema = {
     name: 'Maksim Shchegolev',
   },
   ...(SITE.sameAs.length ? { sameAs: SITE.sameAs } : {}),
+  ...(SITE.phone ? { telephone: SITE.phone } : {}),
+  contactPoint: {
+    '@type': 'ContactPoint',
+    contactType: 'customer support',
+    email: SITE.email,
+    ...(SITE.phone ? { telephone: SITE.phone } : {}),
+    url: `${SITE.url}/contact/`,
+    availableLanguage: ['English', 'Russian'],
+  },
 };
 
 const extra = Array.isArray(jsonLd) ? jsonLd : jsonLd ? [jsonLd] : [];
@@ -211,7 +220,7 @@ const schemas = [organizationSchema, ...extra];
   <footer class="site-foot">
     <p>{SITE.name} · {SITE.tagline}</p>
     <p style="margin-top:8px"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
-    <p class="foot-links"><a href="/about/">About</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>
+    <p class="foot-links"><a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>
   </footer>
 </body>
 </html>

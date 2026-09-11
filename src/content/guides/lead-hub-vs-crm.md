@@ -1,6 +1,7 @@
 ---
 title: "Lead Hub vs CRM: Define the System Ownership Boundary"
 description: "Where the OperStack Lead Hub ends and your CRM begins: capture, routing and SLA in the hub, pipeline and revenue in CRM, plus a staged migration path."
+answer: "A Lead Hub and a CRM own 2 different jobs. The hub owns cross-channel capture, identity resolution, routing and response timers, on a clock measured in minutes. The CRM owns pipeline stages, rep activity, communications and revenue, on a clock measured in weeks. Most inbound problems are the hub's job being done by neither."
 pubDate: 2026-07-18
 updatedDate: 2026-08-21
 author: Maksim Shchegolev
