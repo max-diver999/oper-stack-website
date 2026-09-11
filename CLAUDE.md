@@ -27,3 +27,7 @@ One-line prompts: **`CLAUDE-CODE-START.md`**.
 - push main, deploy, index without Maxim + Cursor
 - MORE Group / Phuket / listing content
 - copy from moregroup.estate corpora
+
+## Licence fulfilment (Site Kit)
+
+`src/pages/api/paddle-webhook.ts` receives Paddle `transaction.completed`, verifies the signature, issues an Ed25519 licence key (`src/lib/licence-fulfilment.ts`) and emails it with a signed 30-day download link (`src/pages/api/kit-download.ts`, which redirects to the private GitHub release asset). Mail goes out over Workspace SMTP (`src/lib/mail-smtp.ts`). Offline tests: `node scripts/test-licence-fulfilment.mjs`. Production env: PADDLE_WEBHOOK_SECRET, PADDLE_API_KEY, PADDLE_SITE_KIT_PRICE_IDS, OPERSTACK_LICENCE_PRIVATE_KEY_B64, KIT_DOWNLOAD_SECRET, KIT_GITHUB_TOKEN, KIT_GITHUB_REPO, SMTP_USER, SMTP_PASS, LICENCE_FROM, LICENCE_NOTIFY_EMAIL. Values live in `MORE_Group/.secrets/` (paddle.env, google.env). Never log keys or tokens.
