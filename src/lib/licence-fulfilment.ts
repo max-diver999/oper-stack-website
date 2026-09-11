@@ -90,39 +90,81 @@ export function verifyDownloadToken(token: string, secret: string, nowSec: numbe
   return { ok: true, email: claims.email };
 }
 
-export function buildLicenceEmail(input: { email: string; key: string; plan: Plan; expires: string; downloadUrl: string; supportEmail: string; siteUrl: string }) {
-  const planLabel = input.plan === 'agency' ? 'Agency plan' : 'Owner plan';
+/**
+ * Письмо с лицензионным ключом. Язык покупателя решает всё: кто купил на русском сайте или через
+ * российского провайдера, получает русское письмо, кто на английском, английское. Смешивать нельзя:
+ * человек, купивший по-русски, не должен получать инструкцию на языке, которого может не знать.
+ */
+export function buildLicenceEmail(input: {
+  email: string; key: string; plan: Plan; expires: string; downloadUrl: string;
+  supportEmail: string; siteUrl: string; lang?: 'en' | 'ru';
+}) {
+  const ru = input.lang === 'ru';
+  const planLabel = ru
+    ? (input.plan === 'agency' ? 'тариф «Агентство»' : 'тариф «Владелец»')
+    : (input.plan === 'agency' ? 'Agency plan' : 'Owner plan');
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+  const t = ru
+    ? {
+        subject: 'Ваш лицензионный ключ OperStack Site Kit',
+        thanks: 'Спасибо за покупку OperStack Site Kit.',
+        keyLabel: 'Лицензионный ключ',
+        keyMeta: `${planLabel}, обновления до ${input.expires}`,
+        dlLabel: 'Скачать комплект',
+        dlMeta: 'ссылка работает 30 дней, новую можно попросить в любой момент',
+        startLabel: 'С чего начать',
+        steps: [
+          'Распакуйте архив и откройте папку в терминале: npm install',
+          `npm run activate ${input.key}`,
+          'Откройте QUICKSTART.md и идите по нему со второго шага.',
+        ],
+        tail: `Ключ привязан к адресу ${input.email}, никому его не передавайте. Вопросы и возврат, семь дней без объяснения причин: ${input.supportEmail}.`,
+        terms: `Условия: ${input.siteUrl}/terms/ и лицензионное соглашение внутри комплекта.`,
+      }
+    : {
+        subject: 'Your OperStack Site Kit licence',
+        thanks: 'Thank you for buying the OperStack Site Kit.',
+        keyLabel: 'Licence key',
+        keyMeta: `${planLabel}, updates until ${input.expires}`,
+        dlLabel: 'Download the kit',
+        dlMeta: 'the link works for 30 days; ask for a new one any time',
+        startLabel: 'Get started',
+        steps: [
+          'Unzip the archive and open the folder in a terminal: npm install',
+          `npm run activate ${input.key}`,
+          'Open QUICKSTART.md and follow it from step 2.',
+        ],
+        tail: `The key is tied to ${input.email}; keep it private. Questions and refunds (seven days, no questions asked): ${input.supportEmail}.`,
+        terms: `Terms: ${input.siteUrl}/terms/ and the EULA inside the kit.`,
+      };
+
   const text = [
-    'Thank you for buying the OperStack Site Kit.',
+    t.thanks,
     '',
-    `Licence key (${planLabel}, updates until ${input.expires}):`,
+    `${t.keyLabel} (${t.keyMeta}):`,
     input.key,
     '',
-    'Download the kit (the link works for 30 days; ask for a new one any time):',
+    `${t.dlLabel} (${t.dlMeta}):`,
     input.downloadUrl,
     '',
-    'Get started:',
-    '1. Unzip the archive and open the folder in a terminal: npm install',
-    `2. npm run activate ${input.key}`,
-    '3. Open QUICKSTART.md and follow it from step 2.',
+    `${t.startLabel}:`,
+    ...t.steps.map((s, i) => `${i + 1}. ${s}`),
     '',
-    `The key is tied to ${input.email}; keep it private. Questions and refunds (seven days, no questions asked): ${input.supportEmail}.`,
-    `Terms: ${input.siteUrl}/terms/ and the EULA inside the kit.`,
+    t.tail,
+    t.terms,
   ].join('\n');
-  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
   const html = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.55;color:#111">
-<p>Thank you for buying the OperStack Site Kit.</p>
-<p><strong>Licence key</strong> (${planLabel}, updates until ${input.expires}):<br><code style="font-size:13px;word-break:break-all">${esc(input.key)}</code></p>
-<p><strong>Download the kit</strong> (the link works for 30 days; ask for a new one any time):<br><a href="${esc(input.downloadUrl)}">${esc(input.downloadUrl)}</a></p>
-<p><strong>Get started</strong></p>
-<ol>
-<li>Unzip the archive and open the folder in a terminal: <code>npm install</code></li>
-<li><code>npm run activate ${esc(input.key)}</code></li>
-<li>Open <code>QUICKSTART.md</code> and follow it from step 2.</li>
-</ol>
-<p>The key is tied to ${esc(input.email)}; keep it private. Questions and refunds (seven days, no questions asked): <a href="mailto:${input.supportEmail}">${input.supportEmail}</a>.<br>Terms: <a href="${input.siteUrl}/terms/">${input.siteUrl}/terms/</a> and the EULA inside the kit.</p>
+<p>${t.thanks}</p>
+<p><strong>${t.keyLabel}</strong> (${esc(t.keyMeta)}):<br><code style="font-size:13px;word-break:break-all">${esc(input.key)}</code></p>
+<p><strong>${t.dlLabel}</strong> (${esc(t.dlMeta)}):<br><a href="${esc(input.downloadUrl)}">${esc(input.downloadUrl)}</a></p>
+<p><strong>${t.startLabel}</strong></p>
+<ol>${t.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
+<p>${esc(t.tail)}<br>${esc(t.terms)}</p>
 </div>`;
-  return { subject: 'Your OperStack Site Kit licence', text, html };
+
+  return { subject: t.subject, text, html };
 }
 
 export interface FulfilmentDeps {
@@ -134,6 +176,8 @@ export interface FulfilmentDeps {
   notify: (text: string) => Promise<void>;
   supportEmail: string;
   siteUrl: string;
+  /** Язык покупателя. Задаётся тем, откуда пришла покупка, а не догадками. */
+  lang?: 'en' | 'ru';
 }
 
 export interface FulfilmentResult {
@@ -160,7 +204,8 @@ export async function handleTransactionCompleted(event: any, deps: FulfilmentDep
     return { handled: false, reason: 'customer email not found', transactionId, plan };
   }
   const { key, expires } = deps.issue(email, plan);
-  const mail = buildLicenceEmail({ email, key, plan, expires, downloadUrl: deps.downloadUrl(email), supportEmail: deps.supportEmail, siteUrl: deps.siteUrl });
+  const lang = deps.lang ?? (typeof event?.data?.custom_data?.lang === 'string' && event.data.custom_data.lang === 'ru' ? 'ru' : 'en');
+  const mail = buildLicenceEmail({ email, key, plan, expires, downloadUrl: deps.downloadUrl(email), supportEmail: deps.supportEmail, siteUrl: deps.siteUrl, lang });
   await deps.sendMail({ to: email, ...mail });
   await deps.notify(`Site Kit licence issued: ${email}, ${plan} plan, updates until ${expires}, transaction ${transactionId}.`);
   return { handled: true, reason: 'licence issued', email, plan, transactionId };
