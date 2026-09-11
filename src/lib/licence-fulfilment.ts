@@ -210,3 +210,102 @@ export async function handleTransactionCompleted(event: any, deps: FulfilmentDep
   await deps.notify(`Site Kit licence issued: ${email}, ${plan} plan, updates until ${expires}, transaction ${transactionId}.`);
   return { handled: true, reason: 'licence issued', email, plan, transactionId };
 }
+
+/**
+ * Whop подписывает вебхук по спецификации Standard Webhooks: HMAC-SHA256 от строки
+ * `{webhook-id}.{webhook-timestamp}.{тело}`, результат в base64 в заголовке `webhook-signature`
+ * в виде `v1,<подпись>`. Ключ это секрет вида `ws_...`.
+ *
+ * В документации Whop сказано брать секрет как есть, а спецификация Standard Webhooks требует
+ * отбросить префикс и раскодировать остаток из base64. Разбираться на живом платеже поздно,
+ * поэтому проверяем оба варианта ключа: подпись, сошедшаяся хоть по одному, настоящая, а чужая
+ * не сойдётся ни по одному.
+ */
+export function verifyWhopSignature(
+  rawBody: string,
+  headers: { id: string | null; timestamp: string | null; signature: string | null },
+  secret: string,
+  nowSec: number = Math.floor(Date.now() / 1000),
+  toleranceSec = 300,
+): { ok: boolean; reason?: string } {
+  const { id, timestamp, signature } = headers;
+  if (!id || !timestamp || !signature) return { ok: false, reason: 'missing webhook-id, webhook-timestamp or webhook-signature' };
+  const ts = Number(timestamp);
+  if (!Number.isFinite(ts)) return { ok: false, reason: 'webhook-timestamp is not a number' };
+  if (Math.abs(nowSec - ts) > toleranceSec) return { ok: false, reason: 'timestamp outside tolerance' };
+
+  const signed = `${id}.${timestamp}.${rawBody}`;
+  const keys: Buffer[] = [Buffer.from(secret, 'utf8')];
+  const bare = secret.replace(/^ws_/, '');
+  try { const decoded = Buffer.from(bare, 'base64'); if (decoded.length) keys.push(decoded); } catch { /* пропускаем */ }
+
+  // Заголовок может нести несколько подписей через пробел, пока идёт смена секрета.
+  const given = signature.split(' ').map((part) => part.trim().replace(/^v1,?/, '')).filter(Boolean);
+  for (const key of keys) {
+    const expected = createHmac('sha256', key).update(signed).digest();
+    for (const one of given) {
+      let mine: Buffer;
+      try { mine = Buffer.from(one, 'base64'); } catch { continue; }
+      if (mine.length === expected.length && timingSafeEqual(mine, expected)) return { ok: true };
+    }
+  }
+  return { ok: false, reason: 'signature mismatch' };
+}
+
+/** Подписанный запрос Whop: нужен тестам и нашим собственным прогонам. */
+export function signWhopBody(rawBody: string, secret: string, id: string, ts: number): { id: string; timestamp: string; signature: string } {
+  const signed = `${id}.${ts}.${rawBody}`;
+  return { id, timestamp: String(ts), signature: `v1,${createHmac('sha256', Buffer.from(secret, 'utf8')).update(signed).digest('base64')}` };
+}
+
+/** Достаём из события то, что нужно для выдачи ключа. Поля ищем по нескольким путям: форма
+ *  события у Whop зависит от версии API, и терять покупку из-за переименованного поля нельзя. */
+export function readWhopPayment(event: any, idToPlan: Record<string, Plan>): {
+  type: string; paymentId: string; email: string | null; userId: string | null; plan: Plan | null; matchedId: string | null;
+} {
+  const d = event?.data ?? {};
+  const first = (...values: unknown[]) => values.find((v) => typeof v === 'string' && v.trim().length > 0) as string | undefined;
+  const email = first(d.user_email, d.email, d.user?.email, d.member?.email, d.membership?.user?.email, d.checkout_session?.email, d.metadata?.email) ?? null;
+  const userId = first(d.user_id, d.user?.id, d.member?.user_id, d.membership?.user_id) ?? null;
+  const candidates = [d.product_id, d.plan_id, d.access_pass_id, d.product?.id, d.plan?.id, d.access_pass?.id, d.membership?.product_id, d.membership?.plan_id]
+    .filter((x): x is string => typeof x === 'string' && x.length > 0);
+  const matchedId = candidates.find((id) => idToPlan[id]) ?? null;
+  return {
+    type: String(event?.type ?? event?.event ?? ''),
+    paymentId: String(d.id ?? event?.id ?? ''),
+    email: email ? email.trim().toLowerCase() : null,
+    userId,
+    plan: matchedId ? idToPlan[matchedId] : null,
+    matchedId,
+  };
+}
+
+export interface WhopFulfilmentDeps extends Omit<FulfilmentDeps, 'priceToPlan' | 'getCustomerEmail'> {
+  idToPlan: Record<string, Plan>;
+  /** Почта покупателя по его id в Whop, если её не было в событии. */
+  getBuyerEmail: (userId: string) => Promise<string | null>;
+}
+
+/** Успешный платёж в Whop: выдать один ключ на купленный товар и отправить его покупателю. */
+export async function handleWhopPayment(event: any, deps: WhopFulfilmentDeps): Promise<FulfilmentResult> {
+  const paid = readWhopPayment(event, deps.idToPlan);
+  if (!['payment.succeeded', 'membership.went_valid', 'membership_went_valid'].includes(paid.type)) {
+    return { handled: false, reason: `ignored event ${paid.type || 'unknown'}` };
+  }
+  if (!paid.plan) return { handled: false, reason: 'no Site Kit product in this payment', transactionId: paid.paymentId };
+
+  const email = paid.email ?? (paid.userId ? await deps.getBuyerEmail(paid.userId) : null);
+  if (!email) {
+    await deps.notify(`Site Kit paid on Whop (${paid.paymentId}) but no buyer email in the event or the API: issue the key by hand.`);
+    return { handled: false, reason: 'buyer email not found', transactionId: paid.paymentId, plan: paid.plan };
+  }
+
+  const { key, expires } = deps.issue(email, paid.plan);
+  const mail = buildLicenceEmail({
+    email, key, plan: paid.plan, expires,
+    downloadUrl: deps.downloadUrl(email), supportEmail: deps.supportEmail, siteUrl: deps.siteUrl, lang: deps.lang ?? 'en',
+  });
+  await deps.sendMail({ to: email, ...mail });
+  await deps.notify(`Site Kit licence issued from Whop: ${email}, ${paid.plan} plan, updates until ${expires}, payment ${paid.paymentId}.`);
+  return { handled: true, reason: 'licence issued', email, plan: paid.plan, transactionId: paid.paymentId };
+}
