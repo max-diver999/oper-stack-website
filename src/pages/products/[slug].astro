@@ -3,7 +3,7 @@ import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import { PRODUCTS } from '../../data/products';
-import { PRODUCTS_PLAIN } from '../../data/products.plain';
+import { PRODUCTS_PLAIN, FOUNDER_STORY } from '../../data/products.plain';
 import { SITE } from '../../data/site';
 
 export function getStaticPaths() {
@@ -77,6 +77,12 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
 
     <h2>What it is not for</h2>
     <ul class="list">{p.notFor.map((n) => <li>{n}</li>)}</ul>
+
+    <section class="story" aria-label="Why I share this">
+      <h2>{FOUNDER_STORY.heading}</h2>
+      {FOUNDER_STORY.paragraphs.map((t) => <p>{t}</p>)}
+      <p class="story-sig">{FOUNDER_STORY.signature} · <a href="/cases/">the numbers behind this</a></p>
+    </section>
 
     {p.orderForm && (
       <section id="order">
@@ -160,4 +166,8 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
   .plain-label { font-family: var(--fm); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--amber-soft); margin-bottom: 8px; }
   .plain-text { font-size: 17px; line-height: 1.55; color: rgba(245,242,236,.92); margin-bottom: 6px; }
   .plain .plain-h { font-size: 18px; margin: 18px 0 8px; }
+  .story { margin: 34px 0 10px; padding: 24px 26px; border-radius: 14px; border: 1px solid rgba(61,184,169,.25); background: rgba(61,184,169,.05); }
+  .story h2 { margin-top: 0; }
+  .story p { color: rgba(245,242,236,.88); line-height: 1.6; margin-bottom: 12px; }
+  .story-sig { font-family: var(--fm); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-top: 6px; }
 </style>

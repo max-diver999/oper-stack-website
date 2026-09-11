@@ -3,6 +3,7 @@ import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import { PRODUCTS, PRODUCTS_FAQ } from '../../data/products';
+import { FOUNDER_STORY } from '../../data/products.plain';
 import { SITE } from '../../data/site';
 
 const canonical = `${SITE.url}/products/`;
@@ -32,6 +33,11 @@ const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
         </a>
       ))}
     </div>
+    <section class="story" aria-label="Why I share this">
+      <h2>{FOUNDER_STORY.heading}</h2>
+      {FOUNDER_STORY.paragraphs.map((t) => <p>{t}</p>)}
+      <p class="story-sig">{FOUNDER_STORY.signature} · <a href="/cases/">the numbers behind this</a></p>
+    </section>
     <section class="cta-box">
       <h2>Start with the gates</h2>
       <p>One command on your own site tells you whether you need anything else on this page.</p>
@@ -41,6 +47,10 @@ const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
   </div>
 </CommercialLayout>
 <style>
+  .story { margin: 8px 0 28px; padding: 24px 26px; border-radius: 14px; border: 1px solid rgba(61,184,169,.25); background: rgba(61,184,169,.05); }
+  .story h2 { margin-top: 0; }
+  .story p { color: rgba(245,242,236,.88); line-height: 1.6; margin-bottom: 12px; max-width: 70ch; }
+  .story-sig { font-family: var(--fm); font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
   .plain-lede { font-size: 16px; color: rgba(245,242,236,.78); }
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; margin: 32px 0; }
   .card { display: flex; flex-direction: column; gap: 8px; padding: 22px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.02); text-decoration: none; transition: border-color .15s ease, background .15s ease; }
