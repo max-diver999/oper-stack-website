@@ -19,6 +19,9 @@ export type Product = {
   get: string[];
   how: { step: string; text: string }[];
   notFor: string[];
+  /** Everything a buyer must have before this is useful, with what each one costs. Honesty first:
+   *  nobody should pay us and then discover they also need an account or a key nobody mentioned. */
+  needs: { item: string; cost: string; why: string }[];
   faq: { question: string; answer: string }[];
   relatedGuides: { title: string; href: string }[];
   /** Renders an order form that posts to /api/lead/ with this source. */
@@ -41,6 +44,9 @@ export const PRODUCTS: Product[] = [
     order: 0,
     get: ['A score out of 100 and a grade, with five area scores', 'The three fixes that move the score most, in plain words', 'Per-crawler verdicts for fourteen AI crawlers and fetchers from robots.txt', 'A table of the sampled pages: words, answer-first paragraph, dates, schema', 'The fifteen gates PDF by email if you want the method behind every check'],
     how: [{ step: 'Enter a site', text: 'Any public address. The checker reads the homepage, robots.txt, llms.txt, the sitemap and up to three pages.' }, { step: 'Read the score', text: 'Five areas, weighted by what answer engines need first: access, a map, an entity, something to quote, dates.' }, { step: 'Fix the top three', text: 'Most sites move twenty points with robots.txt, llms.txt and an answer-first paragraph on the pages that matter.' }],
+    needs: [
+      { item: 'Nothing at all', cost: 'Free', why: 'Paste a web address and read the score. No account, no card, no install, nothing to download.' },
+    ],
     notFor: ['Measuring citations or traffic that already happen: that is in your analytics', 'Sites behind a login, or sites that block the checker'],
     faq: [{ question: 'Is it really free?', answer: 'Yes. It is the automatic first two pages of the paid audit, offered so you can see whether you need the rest.' }, { question: 'Why does it sample only three pages?', answer: 'To answer in ten seconds. The fifteen gates read every page of your own repository; this check reads what a stranger can fetch.' }, { question: 'What is a good score?', answer: 'Eighty and above: engines can read and quote the site. Under forty-five: they mostly cannot. Between the two, the three fixes listed usually close the gap in a day.' }],
     relatedGuides: [{ title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }, { title: 'Inbound lead audit', href: '/guides/inbound-lead-audit/' }],
@@ -61,6 +67,10 @@ export const PRODUCTS: Product[] = [
     order: 1,
     get: ['The npm package with all fifteen gates and a fixture site where every gate fires', 'One JSON config: collections, word minimums, currency codes, place names, allowed sources, thresholds', 'Terminal table, Markdown and JSON reports, exit codes for CI', 'A rules file for Cursor and Claude Code so the model stops producing what the gates reject', 'The eight-page PDF: each gate, the failure it was written for, the fix'],
     how: [{ step: 'Install', text: 'npm i -D @operstack/gates in any Astro, Next or MDX project on Node 20 or newer.' }, { step: 'Describe the site', text: 'Copy gates.config.example.json, set the collections and the currency. Or skip it: src/content is detected.' }, { step: 'Run', text: 'npx gates. Fix in gate order: mechanical first, corpus debt second, links and routing third, trust last.' }],
+    needs: [
+      { item: 'Node.js, version 20 or newer', cost: 'Free', why: 'The gates run on your own computer with one command. Node.js is free software from nodejs.org.' },
+      { item: 'A content site whose text lives in files', cost: 'Free', why: 'The gates read Markdown or MDX files. If your text lives inside WordPress or Tilda, they have nothing to read.' },
+    ],
     notFor: ['Rankings, traffic or citations: it measures the corpus, not the results', 'Rewriting prose: the only automatic fix is characters', 'Sites without a content folder of Markdown or MDX'],
     faq: [{ question: 'Does it work outside Astro?', answer: 'Any folder of MDX or Markdown files with frontmatter. Gate 08 needs a static build for the exact link check and otherwise checks source links.' }, { question: 'Why are the thresholds what they are?', answer: 'They are the values one pipeline settled on across eleven sites. Every one lives in gates.config.json; change them for your corpus and tell us which were wrong.' }, { question: 'Is the demo data real?', answer: 'No. The fixture market, Isla Verde, is fictional. Every number was invented for the tests.' }, { question: 'What does it cost?', answer: 'Nothing. It is MIT. The paid products on this page are the starter kit and the audit; the gates stay free.' }],
     relatedGuides: [{ title: 'Programmatic SEO for lead generation', href: '/guides/programmatic-seo-lead-gen/' }, { title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }],
@@ -82,6 +92,11 @@ export const PRODUCTS: Product[] = [
     order: 2,
     get: ['site.config.mjs as the single source of truth: names, places, currency, navigation, contact, the agent summary', 'Guides, districts, comparisons, project data cards and news, with one schema each', 'Generated llms.txt, llms-full.txt and robots.txt; sitemap that excludes noindex, draft and redirect sources', 'Twelve Cursor rules and a CLAUDE.md written for the starter', 'Eighteen demo pages for the fictional market Isla Verde, every one passing the gates'],
     how: [{ step: 'Clone', text: 'git clone, npm install, npm run dev.' }, { step: 'Make it yours', text: 'Edit site.config.mjs and gates.config.json. Delete the demo content. Scaffold pages with npm run new.' }, { step: 'Verify and deploy', text: 'npm run verify builds and runs the gates. Deploy the dist folder to Vercel, Netlify or Cloudflare Pages.' }],
+    needs: [
+      { item: 'Node.js, version 20 or newer', cost: 'Free', why: 'You run the site on your own computer before it goes live. Free from nodejs.org.' },
+      { item: 'A hosting account when you are ready to publish', cost: 'Free to start', why: 'Vercel, Netlify and Cloudflare all host a site this size on their free plan. You can build and preview the whole site without one.' },
+      { item: 'A domain name, only when you want your own address', cost: 'Paid, about 10 to 15 USD a year', why: 'Bought from any registrar. Until then the free hosting address works.' },
+    ],
     notFor: ['Sites that need a CMS with an editor interface', 'E-commerce', 'Anyone who wants the demo figures reused: Isla Verde does not exist'],
     faq: [{ question: 'Which Astro version?', answer: 'Astro 7 with the MDX and sitemap integrations, Tailwind 4 for utilities, and two variable fonts. Node 20 or newer.' }, { question: 'Can I add a collection?', answer: 'Three registrations: the schema, the config entry, and a pair of routes copied from an existing collection. The sitemap, llms.txt and the gates follow the config.' }, { question: 'Does it include the gates?', answer: 'The gates run through npx from the npm package; the starter ships the config, the templates and the rules that make pages pass them.' }, { question: 'What is the difference from Site Kit?', answer: 'Site Kit adds the page generator, the niche discovery module, indexing runbooks and support. The starter is the free foundation both share.' }],
     relatedGuides: [{ title: 'Programmatic SEO for lead generation', href: '/guides/programmatic-seo-lead-gen/' }, { title: 'Website lead capture', href: '/guides/website-lead-capture/' }],
@@ -94,7 +109,7 @@ export const PRODUCTS: Product[] = [
     description: 'Five commands, two skills, a reviewer agent and a post-edit hook that runs the fast gates on every content file Claude touches. Free.',
     answer: 'The operstack-seo plugin gives Claude Code five commands (seo-gates, content-preflight, llms-index, indexnow, ai-visibility), two skills that apply on their own when content is written, a content-reviewer agent, and a hook that runs gates 1, 2, 3, 4, 7 and 15 after every edit under src/content and prints the findings for that file.',
     price: 'Free',
-    priceNote: 'MIT licence, installs from the OperStack marketplace',
+    priceNote: 'MIT licence, installs from the OperStack marketplace. Useful only if you already pay for Claude Code',
     status: 'available',
     cta: { text: 'Install instructions', href: '#install' },
     command: '/plugin marketplace add oper-stack/claude-plugins',
@@ -102,6 +117,10 @@ export const PRODUCTS: Product[] = [
     order: 3,
     get: ['/seo-gates: build if needed, run the gates, read the full report, fix in gate order until exit 0', '/content-preflight: search the corpus, pick the archetype, write the brief with sourced facts, then the page', '/llms-index, /indexnow, /ai-visibility: the agent index, submission, and AI-referral measurement from GA4', 'Skills content-gates and answer-first-writing, active whenever a page is drafted', 'A post-edit hook that never blocks and stays silent outside the content folder'],
     how: [{ step: 'Add the marketplace', text: '/plugin marketplace add oper-stack/claude-plugins' }, { step: 'Install', text: '/plugin install operstack-seo@operstack' }, { step: 'Install the gates in the site', text: 'npm i -D @operstack/gates so the hook runs without a network fetch.' }],
+    needs: [
+      { item: 'Claude Code', cost: 'Paid, Anthropic subscription', why: 'The plugin runs inside Claude Code, so it is only useful if you already pay for Claude Code. We do not sell it and we get nothing from it.' },
+      { item: 'Node.js, version 20 or newer', cost: 'Free', why: 'The gates the plugin calls run on Node.js.' },
+    ],
     notFor: ['Editors who do not use Claude Code; the rules file in the gates package covers Cursor', 'Indexing without an explicit request: the indexnow command refuses to run as a side effect'],
     faq: [{ question: 'Does the hook slow editing down?', answer: 'It runs six offline gates on the site after a Write or Edit under src/content, usually under two seconds on a few hundred pages, and prints only the findings for the file you touched.' }, { question: 'Can it publish or index on its own?', answer: 'No. Deploy and indexing run only when you ask in the current task. The rules say so and the commands check it.' }, { question: 'Where does the AI-visibility data come from?', answer: 'A GA4 MCP server in the session, or a CSV you export. Without either it explains how to get the data and stops; it never estimates.' }],
     relatedGuides: [{ title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }, { title: 'Inbound lead reporting', href: '/guides/inbound-lead-reporting/' }],
@@ -114,13 +133,19 @@ export const PRODUCTS: Product[] = [
     description: 'The starter plus the page generator, the niche discovery module, indexing runbooks and support: everything one person needs to launch a content site that passes the gates.',
     answer: 'Site Kit is the full pipeline the gates came from, packaged for one person: the Astro starter, a generator that turns a topic list into gate-passing pages through Claude, a niche discovery module that finds the queries a market actually types, indexing runbooks for Google, Bing and answer engines, a quick start and a licence key. It is a one-time purchase per site owner.',
     price: '79 USD',
-    priceNote: 'One licence per owner, unlimited sites, updates for a year',
+    priceNote: 'One licence per owner, unlimited sites, updates for a year. The page generator runs on your own OpenAI or Anthropic key, paid to them, a few cents a page',
     status: 'soon',
     cta: { text: 'Join the launch list', href: '/audit/?utm=products-site-kit' },
     og: '/og/og-default.png',
     order: 4,
     get: ['Everything in the free starter', 'The page generator: topic list to briefs to MDX, with the gates in the loop until each page passes', 'Niche discovery: seed terms to autocomplete and SERP shapes to a page plan with volumes where a source exists', 'Indexing runbooks: Search Console, Bing, IndexNow, the Google Indexing API on a per-site project, llms.txt', 'Quick start, EULA, licence key and email support for the first month'],
     how: [{ step: 'Buy', text: 'One payment through the checkout; the licence key arrives by email.' }, { step: 'Activate', text: 'npm run activate with the key. The generator and the discovery module unlock.' }, { step: 'Launch', text: 'Discover the niche, generate the first thirty pages, verify with the gates, deploy, submit.' }],
+    needs: [
+      { item: 'Node.js, version 20 or newer', cost: 'Free', why: 'Everything in the kit runs on your own computer. Free from nodejs.org.' },
+      { item: 'An API key from OpenAI or Anthropic, if you want the generator to write pages', cost: 'Paid, and you pay them directly', why: "The kit ships the prompts, the templates and the checks, not the words. A page typically costs a few cents of the provider's tokens. You can also write the pages yourself and use everything else in the kit, including the gates and the licence." },
+      { item: 'A hosting account when you publish', cost: 'Free to start', why: 'Vercel, Netlify and Cloudflare all host a site this size on their free plan.' },
+      { item: 'A domain name, only when you want your own address', cost: 'Paid, about 10 to 15 USD a year', why: 'Bought from any registrar.' },
+    ],
     notFor: ['Agencies running it for clients: that is the agency licence, quoted separately', 'Anyone expecting the generator to invent figures: pages without sources fail gate 15 by design'],
     faq: [{ question: 'When does it ship?', answer: 'The starter, the gates and the plugin are live now. Site Kit follows once the checkout is open; the launch list is told first.' }, { question: 'Which model does the generator use?', answer: 'Claude or an OpenAI model, through your own API key: pick the provider with one flag. The kit ships prompts, templates and the gates loop, not tokens. A page costs a few cents of tokens and usually passes the gates in the first round.' }, { question: 'Is there a refund?', answer: 'Seven days from purchase, in full. Tell us in one line what did not work.' }],
     relatedGuides: [{ title: 'Programmatic SEO for lead generation', href: '/guides/programmatic-seo-lead-gen/' }, { title: 'Inbound automation ROI', href: '/guides/inbound-automation-roi/' }],
@@ -133,13 +158,19 @@ export const PRODUCTS: Product[] = [
     description: 'A ten-page audit of your site: public signals collected automatically, findings priced per fix, a 90 day plan. 249 USD external, 349 USD with Search Console access. Usually one to three working days, five at most.',
     answer: 'The audit collects the public signals of your site with the same tooling behind the gates, adds an analyst\'s reading of the content, the answer-engine readiness and the AI-system visibility, and delivers a ten-page report with a scorecard, the critical issues, a technical checklist, and a roadmap in three phases. Every finding has a price to fix it.',
     price: '249 USD',
-    priceNote: '349 USD with read-only Search Console access; usually one to three working days, five at most',
+    priceNote: '349 USD with read-only access to your own free Search Console and Bing Webmaster accounts; usually one to three working days, five at most',
     status: 'available',
     cta: { text: 'Order the audit', href: '#order' },
     og: '/og/og-audit.png',
     order: 5,
     get: ['Scorecard for six areas: technical, content, AEO, GEO, off-page, conversion', 'Critical issues to fix first, with what each one costs you today', 'Technical and on-page checklist with a status and a finding per row', 'AEO and GEO: what answer engines can quote, what blocks them, how the brand is understood', 'Roadmap: week 1, weeks 2 to 4, months 2 to 3, and a fixed price for each fix package'],
     how: [{ step: 'Order', text: 'Send the site and how to reach you. We confirm scope and the tier within 24 hours.' }, { step: 'Collect and read', text: 'Public signals are collected automatically; the analyst reads the content and the pages that outrank it.' }, { step: 'Deliver', text: 'The PDF report by email, usually within one to three working days and never later than five. Fix packages are quoted in the same letter.' }],
+    needs: [
+      { item: 'Your site address', cost: 'Free', why: 'That is the whole requirement for the 249 USD report. Every score in it is computed from what anyone can read on your site for nothing.' },
+      { item: 'Google Search Console, for the 349 USD tier', cost: 'Free, but you need your own free Google account', why: 'Read-only access to your own property. It adds your real queries, impressions and positions to the report. Setting it up takes about ten minutes and is worth having whether you buy an audit or not.' },
+      { item: 'Bing Webmaster Tools, for the 349 USD tier', cost: 'Free, but you need your own free Microsoft account', why: 'Bing shows the conversational questions AI assistants retrieve your site for, which Google does not.' },
+      { item: 'No paid tool, ever', cost: 'Free', why: 'No score in your report comes from a service you would have to subscribe to. If we ever quote a paid tool, that row is marked as a note and counted in nothing, so you can re-run the audit yourself and get the same numbers.' },
+    ],
     notFor: ['Sites with fewer than ten pages: run the free gates instead', 'Keyword research and backlink audits: separate work, quoted on request'],
     faq: [{ question: 'What do you need from us?', answer: 'The URL. For the 349 USD tier, read-only access to Search Console and, if you have it, GA4.' }, { question: 'What are the fix packages?', answer: 'Fix (critical items, five working days), Foundation (Fix plus the missing pages and schema, ten days) and Growth (Foundation plus content and three months of reporting). Prices are in the letter that comes with the audit. Packages from 1,000 USD include a working call; the audit itself is delivered in writing.' }, { question: 'Is the report generic?', answer: 'The checklist rows are collected from your site; the narrative is written for it. A sample audit of a fictional site is available on request so you can see the shape before paying.' }],
     relatedGuides: [{ title: 'Inbound lead audit', href: '/guides/inbound-lead-audit/' }, { title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }],
