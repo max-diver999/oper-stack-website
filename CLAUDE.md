@@ -35,3 +35,19 @@ One-line prompts: **`CLAUDE-CODE-START.md`**.
 ## Site Kit checkout
 
 `PUBLIC_SITE_KIT_CHECKOUT_URL` (Vercel env) turns the Site Kit page from "Join the launch list" into "Buy for 79 USD" pointing at the Paddle checkout link. Leave it unset until Paddle approves oper-stack.com; the fulfilment webhook then emails the key.
+
+## Card payment (Paddle)
+
+`src/lib/checkout.ts` switches the buy buttons on from the environment, so nothing changes on the
+site until Paddle approves the account. Set on Vercel (production):
+
+| Variable | Where it comes from |
+|---|---|
+| `PUBLIC_PADDLE_CLIENT_TOKEN` | Paddle > Developer tools > Authentication (client-side token, safe to publish) |
+| `PUBLIC_PADDLE_PRICE_SITE_KIT` | the Site Kit price id, `pri_...` |
+| `PUBLIC_PADDLE_PRICE_AUDIT` | the audit price id |
+
+Only Site Kit and the audit get a button: they are bought without anything being agreed first.
+Fix and Foundation never get one, because their pages promise the list of work is agreed in writing
+before payment; a payment link is sent by hand once the client has approved the list. The server API
+key never goes into a `PUBLIC_` variable: it can issue refunds and read other people's purchases.

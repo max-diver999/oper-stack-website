@@ -1,5 +1,7 @@
 ---
 import CommercialLayout from '../../components/CommercialLayout.astro';
+import PaddleCheckout from '../../components/PaddleCheckout.astro';
+import { priceFor, buyLabel, KIT_CHECKOUT_URL } from '../../lib/checkout';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import FaqSection from '../../components/FaqSection.astro';
 import { PRODUCTS } from '../../data/products';
@@ -11,14 +13,16 @@ export function getStaticPaths() {
 }
 const { product: p } = Astro.props;
 const plain = PRODUCTS_PLAIN[p.slug];
-/** Site Kit checkout: set PUBLIC_SITE_KIT_CHECKOUT_URL (a Paddle checkout link) once the domain is approved;
- *  until then the page shows the launch-list button from products.ts. */
-const checkoutUrl = String(import.meta.env.PUBLIC_SITE_KIT_CHECKOUT_URL || '').trim();
-const sellingKit = p.slug === 'site-kit' && checkoutUrl.length > 0;
-const cta = sellingKit ? { text: 'Buy for 79 USD', href: checkoutUrl, external: true } : p.cta;
-const status = sellingKit ? 'available' : p.status;
+/** Card payment, off until Paddle approves the account: see src/lib/checkout.ts. A product sells
+ *  when its price id is in the environment; otherwise the page keeps the order form it has today. */
+const priceId = priceFor(p.slug);
+const sellingKit = p.slug === 'site-kit' && KIT_CHECKOUT_URL.length > 0 && !priceId;
+const cta = priceId
+  ? { text: buyLabel(p.price), href: '#order', external: false }
+  : sellingKit ? { text: 'Buy for 79 USD', href: KIT_CHECKOUT_URL, external: true } : p.cta;
+const status = priceId || sellingKit ? 'available' : p.status;
 const canonical = `${SITE.url}/products/${p.slug}/`;
-const offer = p.price === 'Free' ? { '@type': 'Offer', price: '0', priceCurrency: 'USD' } : { '@type': 'Offer', price: p.price.replace(/[^\d.]/g, ''), priceCurrency: 'USD', availability: (p.slug === 'site-kit' && String(import.meta.env.PUBLIC_SITE_KIT_CHECKOUT_URL || '').trim() ? 'available' : p.status) === 'soon' ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock' };
+const offer = p.price === 'Free' ? { '@type': 'Offer', price: '0', priceCurrency: 'USD' } : { '@type': 'Offer', price: p.price.replace(/[^\d.]/g, ''), priceCurrency: 'USD', availability: status === 'soon' ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock' };
 const productSchema = { '@context': 'https://schema.org', '@type': p.slug === 'seo-audit' ? 'Service' : 'SoftwareApplication', name: `OperStack ${p.name}`, description: p.description, url: canonical, offers: offer, ...(p.slug !== 'seo-audit' ? { applicationCategory: 'DeveloperApplication', operatingSystem: 'Node.js 20+' } : { provider: { '@type': 'Organization', name: SITE.name } }) };
 const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: p.faq.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
 const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order - b.order);
@@ -53,7 +57,7 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
         <p class="price-note">{p.priceNote}{status === 'soon' ? '. Coming soon.' : ''}</p>
       </div>
       <span class="cta-group">
-        <a class="btn" href={cta.href} target={cta.external ? '_blank' : undefined} rel={cta.external ? 'noopener' : undefined}>{cta.text} →</a>
+        <a class="btn" href={cta.href} data-price-id={priceId || undefined} data-product={priceId ? p.slug : undefined} target={cta.external ? '_blank' : undefined} rel={cta.external ? 'noopener' : undefined}>{cta.text} →</a>
         {p.demo && <a class="btn btn-ghost" href={p.demo.href} target="_blank" rel="noopener">{p.demo.text} →</a>}
       </span>
     </div>
@@ -148,6 +152,7 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
       });
     </script>
   )}
+  <PaddleCheckout priceId={priceId} />
 </CommercialLayout>
 <style>
   .crumb { font-family: var(--fm); font-size: 12px; color: var(--muted); margin-bottom: 18px; }
