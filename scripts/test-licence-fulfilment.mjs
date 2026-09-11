@@ -78,6 +78,13 @@ check('missing customer email notifies the owner instead of failing silently', !
 const r4 = await handleTransactionCompleted({ event_type: 'transaction.updated', data: {} }, deps);
 check('other events ignored', !r4.handled);
 const mail = buildLicenceEmail({ email: 'a@b.c', key: 'OSK1.x.y', plan: 'agency', expires: '2027-01-01', downloadUrl: 'https://x/y?t=1', supportEmail: 's@x', siteUrl: 'https://x' });
+
+const ruMail = buildLicenceEmail({ email: 'a@b.c', key: 'OSK1.x.y', plan: 'owner', expires: '2027-01-01', downloadUrl: 'https://x/y?t=1', supportEmail: 's@x', siteUrl: 'https://x', lang: 'ru' });
+check('russian letter has a russian subject', /лицензионный ключ/i.test(ruMail.subject));
+check('russian letter has no english sentences', !/Thank you for buying|Get started|Download the kit/.test(ruMail.text));
+check('russian letter still carries the key and the link', ruMail.text.includes('OSK1.x.y') && ruMail.text.includes('https://x/y?t=1'));
+check('russian letter states the seven day refund', /семь дней/.test(ruMail.text));
+check('english letter is unchanged by the russian one', /Thank you for buying/.test(mail.text) && !/Спасибо/.test(mail.text));
 check('email HTML escapes nothing dangerous and mentions the agency plan', mail.html.includes('Agency plan') && !mail.html.includes('<script'));
 
 console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');
