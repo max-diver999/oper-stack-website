@@ -1,0 +1,157 @@
+---
+/**
+ * Бесплатная проверка llms.txt.
+ *
+ * Зачем она нам: спрос на «llms txt checker», «llms txt validator» и «llms txt generator» уже есть,
+ * а отвечать на него толком некому. Инструмент бесплатный и работает без регистрации, и он же
+ * первая ступень лестницы: человек проверил один файл, увидел, что у него не так, и дальше ему
+ * нужен весь сайт целиком.
+ *
+ * Страница без адреса в запросе индексируется, страница с результатом нет: тысячи страниц с чужими
+ * доменами в индексе никому не нужны. Работает без скриптов: обычная форма, обычный переход.
+ */
+import CommercialLayout from '../../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../../components/CitabilityBlock.astro';
+import FaqSection from '../../../components/FaqSection.astro';
+import { SITE } from '../../../data/site';
+import { checkLlms, normaliseSite, type LlmsCheck } from '../../../lib/llms-check';
+
+export const prerender = false;
+
+const canonical = `${SITE.url}/tools/llms-txt-checker/`;
+const asked = Astro.url.searchParams.get('site') || '';
+
+let result: LlmsCheck | null = null;
+let error = '';
+if (asked) {
+  const site = normaliseSite(asked);
+  if (!site.ok) error = site.reason;
+  else {
+    try { result = await checkLlms(site.origin, { budgetMs: 7000 }); }
+    catch { error = 'The check did not finish in time. Try again, or run it on a smaller site.'; }
+  }
+}
+
+const FAQ = [
+  { question: 'What is llms.txt?', answer: 'A plain text file at the root of a site, /llms.txt, that lists the pages worth reading with one line each. It is a map written for programs: an assistant reads it instead of crawling the whole site, and decides from it what you have. The format asks for one heading naming the site, a short summary, and sections of links.' },
+  { question: 'Does llms.txt do anything for rankings?', answer: 'Not for Google rankings. It matters to assistants that fetch a site to answer a question: with a map they read the right pages, without one they read whatever the HTML gives them and often quote the wrong thing. No engine has promised to honour it, and anyone who tells you otherwise is selling something.' },
+  { question: 'Why check it at all?', answer: 'Because nobody ever opens that URL. The file is written once and the site keeps moving: pages get renamed, sections disappear. Six months later half the map leads nowhere and the only reader affected is a machine that cannot complain.' },
+  { question: 'What does this check look at?', answer: 'Whether the file exists, whether it starts with a heading as the format asks, whether it carries a summary and sections, how many links it lists, and where up to twelve of those links actually lead: a page, a redirect, or nothing. It also looks for llms-full.txt beside it.' },
+  { question: 'Do you store the address I check?', answer: 'No. The check runs while the page loads and nothing is written down. There is no account and no cookie for it.' },
+  { question: 'How do I write one?', answer: 'Generate it from your own content rather than by hand, so it cannot drift. The free OperStack Astro starter builds llms.txt and llms-full.txt from the corpus on every build, which is why its map cannot go stale. Any generator that reads your sitemap will do the same job.' },
+];
+const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
+const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'OperStack llms.txt checker', url: canonical, applicationCategory: 'SEO tool', operatingSystem: 'Web', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, provider: { '@type': 'Organization', name: SITE.name, url: SITE.url } };
+
+const chip = (level: string) => (level === 'fail' ? 'bad' : level === 'warn' ? 'warn' : 'ok');
+const statusWord = (s: number | null) => (s === null ? 'no answer' : s >= 400 ? `${s}` : s >= 300 ? `${s}, redirect` : `${s}`);
+---
+<CommercialLayout
+  title="Free llms.txt Checker: Does Your Map for AI Actually Work? · OperStack"
+  description="Paste a site and see whether its llms.txt exists, follows the format, and whether the links in it still lead anywhere. Free, no account, nothing stored."
+  canonical={canonical}
+  noindex={Boolean(asked)}
+  jsonLd={[appSchema, faqSchema]}
+>
+  <div class="wrap">
+    <p class="label">Free tool</p>
+    <h1>Does your llms.txt still lead anywhere?</h1>
+    <p class="lede">
+      llms.txt is the map of your site written for assistants rather than people. Nobody ever opens
+      that URL, so it is written once and then quietly rots: pages get renamed, sections disappear,
+      and the only reader who notices is a machine that cannot tell you.
+    </p>
+    <CitabilityBlock text="The OperStack llms.txt checker reads a site's /llms.txt, checks it against the format (one heading naming the site, a summary, sections of links) and follows up to twelve of its links to see whether each one still leads to a page, a redirect or nothing. It is free, needs no account and stores nothing." />
+
+    <form method="GET" action="/tools/llms-txt-checker/" class="vis-form">
+      <label for="site" class="sr">Site address</label>
+      <input id="site" name="site" type="text" inputmode="url" placeholder="example.com" autocomplete="url" autocapitalize="off" spellcheck="false" value={asked} required />
+      <button type="submit" class="btn">Check the file →</button>
+    </form>
+    <p class="note">Public files only. The address you type is not stored.</p>
+
+    {error && <p class="err">{error}</p>}
+
+    {result && (
+      <section class="result-box">
+        <h2>{result.site}</h2>
+        <p class="verdict"><b>{result.verdict === 'good' ? 'The map works' : result.verdict === 'needs work' ? 'The map works, with gaps' : result.verdict === 'broken' ? 'The map is broken' : 'No map'}</b>{result.found ? ` · ${result.bytes} bytes · ${result.linkCount} link(s) listed, ${result.checked} checked` : ''}</p>
+
+        <ul class="findings">
+          {result.findings.map((f) => <li class={chip(f.level)}>{f.message}</li>)}
+        </ul>
+
+        {result.links.length > 0 && (
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th scope="col">Listed as</th><th scope="col">Address</th><th scope="col">Answer</th></tr></thead>
+              <tbody>
+                {result.links.map((l) => (
+                  <tr>
+                    <td>{l.title}</td>
+                    <td class="u">{l.url}{l.redirectedTo && <><br /><span class="muted">→ {l.redirectedTo}</span></>}</td>
+                    <td class={l.status === null || l.status >= 400 ? 'bad' : l.status >= 300 ? 'warn' : 'ok'}>{statusWord(l.status)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+
+        <p class="next">
+          This reads one file. If you want the whole site read the way a search engine and an AI read
+          it, the <a href="/ai-visibility/">free visibility check</a> scores five areas in ten seconds,
+          and the <a href="/products/site-report/">automatic site report</a> covers up to twenty pages.
+        </p>
+      </section>
+    )}
+
+    <h2>What a working llms.txt looks like</h2>
+    <pre class="code"># Isla Verde Property
+
+&gt; Independent buyer guides for Isla Verde: what condos cost by district, the fees at completion, the title checks that matter.
+
+## Buyer guides
+
+- [Fees and taxes at completion](https://example.com/guides/fees-and-taxes-at-completion/): every fee a buyer pays, with worked examples at three prices
+- [Service charges in condo buildings](https://example.com/guides/service-charges/): what the monthly charge covers and how it is set</pre>
+    <p>
+      One H1 naming the site. One blockquote saying what it is. Sections of links, each with a line
+      explaining what the reader will find. Nothing else is required, and nothing else is read.
+    </p>
+
+    <h2>The three ways it goes wrong</h2>
+    <ol class="steps">
+      <li><b>It does not exist.</b> The most common case by far. An assistant that wants a map finds nothing and reads whatever your HTML happens to give it.</li>
+      <li><b>It was written by hand.</b> A hand-written map is accurate on the day it is written. Generate it from the same content that builds your pages and it cannot drift.</li>
+      <li><b>It points at pages that moved.</b> Links rot silently here because no human opens the file. This is what the check above is for.</li>
+    </ol>
+
+    <FaqSection items={FAQ} />
+  </div>
+</CommercialLayout>
+
+<style>
+  .wrap { max-width: 52rem; margin: 0 auto; padding: 2rem 1rem 4rem; }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .vis-form { display: flex; gap: .6rem; flex-wrap: wrap; margin-top: 1.4rem; }
+  .vis-form input { flex: 1 1 16rem; padding: .8rem 1rem; font: inherit; border-radius: 8px; border: 1px solid rgba(128,128,128,.35); background: transparent; color: inherit; }
+  .note { font-size: .9rem; opacity: .7; margin-top: .5rem; }
+  .err { margin-top: 1rem; padding-left: .8rem; border-left: 3px solid #C9922A; }
+  .result-box { margin: 2rem 0; padding: 1.2rem 1.4rem; border: 1px solid rgba(128,128,128,.28); border-radius: 10px; }
+  .verdict { margin: .2rem 0 1rem; }
+  .findings { list-style: none; padding: 0; margin: 0 0 1.2rem; }
+  .findings li { padding: .45rem 0 .45rem .9rem; border-left: 3px solid rgba(128,128,128,.4); margin-bottom: .5rem; }
+  .findings li.bad { border-left-color: #C0392B; }
+  .findings li.warn { border-left-color: #C9922A; }
+  .findings li.ok { border-left-color: #1A8A7D; }
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; }
+  th, td { text-align: left; padding: .5rem .7rem; border-bottom: 1px solid rgba(128,128,128,.22); vertical-align: top; }
+  td.u { word-break: break-all; }
+  td.bad { color: #C0392B; } td.warn { color: #C9922A; } td.ok { color: #1A8A7D; }
+  .muted { opacity: .6; }
+  .next { margin-top: 1rem; font-size: .95rem; }
+  .code { background: rgba(128,128,128,.12); padding: 1rem; border-radius: 8px; overflow-x: auto; font-size: .88rem; line-height: 1.5; }
+  .steps li { margin: .6rem 0; }
+</style>

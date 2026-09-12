@@ -14,9 +14,11 @@ interface Props {
   ogImage?: string;
   /** Set on articles: emits og:type article and the published and modified times. */
   article?: { published: string; modified: string };
+  /** Страницы с чужим адресом в запросе: результат проверки не место в индексе. */
+  noindex?: boolean;
 }
 
-const { title, description, canonical, jsonLd = [], ogImage = '/og/og-default.png', article } = Astro.props;
+const { title, description, canonical, jsonLd = [], ogImage = '/og/og-default.png', article, noindex = false } = Astro.props;
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE.url}${ogImage}`;
 
 const organizationSchema = {
@@ -76,7 +78,9 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>{title}</title>
   <meta name="description" content={description} />
-  <link rel="canonical" href={canonical} />
+  {noindex
+    ? <meta name="robots" content="noindex,follow" />
+    : <link rel="canonical" href={canonical} />}
   <meta property="og:type" content={article ? 'article' : 'website'} />
   <meta property="og:site_name" content={SITE.name} />
   <meta property="og:title" content={title} />
