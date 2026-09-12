@@ -13,6 +13,7 @@
 import type { APIRoute } from 'astro';
 import { SITE } from '../../data/site';
 import { handleWhopPayment, issueLicenceKey, makeDownloadToken, parsePriceMap, verifyWhopSignature } from '../../lib/licence-fulfilment';
+import { buildReportWelcomeEmail, makeReportToken, readWhopReport, reportTierMap, TOKEN_DAYS } from '../../lib/report-fulfilment';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 
 export const prerender = false;
@@ -82,6 +83,29 @@ export const POST: APIRoute = async ({ request }) => {
   if (!privatePem.includes('PRIVATE KEY') || !downloadSecret) {
     await notifyTelegram(`Whop payment ${event?.data?.id ?? ''} arrived but the licence signing key or download secret is missing on the server: issue the key by hand.`);
     return json({ ok: true, handled: false, reason: 'fulfilment not configured' });
+  }
+
+  // Отчёт за 9 и за 29: другой товар, другая выдача. Письмо со ссылкой на форму, где покупатель
+  // называет свой сайт. Проверяем это раньше кита: у кита свои идентификаторы, они не пересекаются.
+  const report = readWhopReport(event, reportTierMap(env('WHOP_REPORT_IDS')));
+  if (report.tier && ['payment.succeeded', 'membership.went_valid', 'membership_went_valid'].includes(report.type)) {
+    const buyer = report.email ?? (report.userId ? await getBuyerEmail(report.userId) : null);
+    if (!buyer) {
+      await notifyTelegram(`Отчёт за ${report.tier} оплачен на Whop (${report.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать вручную.`);
+      return json({ ok: true, handled: false, reason: 'buyer email not found' });
+    }
+    const lang = env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en';
+    const token = makeReportToken({ email: buyer, tier: report.tier, lang, exp: Math.floor(Date.now() / 1000) + TOKEN_DAYS * 24 * 3600 }, downloadSecret);
+    const link = `${SITE.url}/report/?t=${encodeURIComponent(token)}${lang === 'ru' ? '&lang=ru' : ''}`;
+    try {
+      await sendTransactionalMail({ to: buyer, ...buildReportWelcomeEmail({ tier: report.tier, lang, link }) });
+      await notifyTelegram(`📄 Отчёт за ${report.tier}: ${buyer} получил ссылку на форму.`);
+      return json({ ok: true, handled: true, product: 'report', tier: report.tier });
+    } catch (err) {
+      console.error('report welcome mail failed:', err);
+      await notifyTelegram(`Отчёт за ${report.tier} оплачен (${report.paymentId}), но письмо ${buyer} не ушло: ${(err as Error).message}. Отправить ссылку вручную.`);
+      return json({ ok: true, handled: false, reason: 'welcome mail failed' });
+    }
   }
 
   try {

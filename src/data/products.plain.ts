@@ -51,6 +51,16 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
     ],
     youDo: ['Add the OperStack marketplace to Claude Code with one command', 'Install the plugin', 'Write pages as usual; the checks run by themselves'],
   },
+  'site-report': {
+    plain:
+      'You pay nine dollars, type the address of your site into one field, and a report arrives by email. It reads up to twenty of your pages the way a search engine and an AI read them, and tells you in plain words what they can and cannot see: which pages are too thin to quote, how much of your text disappears if scripts do not run, whether the files an AI assistant looks for exist on your site at all. Nobody reads the report for you: every number in it is measured, and the wording is assembled from those measurements.',
+    who: [
+      'An owner who ran the free check, saw a bad score on one page, and wants to know how bad the whole site is',
+      'A marketer who needs the real numbers before asking for a budget',
+      'Anyone weighing up the full audit and wanting to see the measurements first',
+    ],
+    youDo: ['Pay by card', 'Open the link from the email and type your site address', 'Read the PDF that arrives'],
+  },
   'site-kit': {
     plain:
       'Everything one person needs to launch a content website that brings clients from Google and AI assistants, without hiring a developer or a writer. The kit finds what your market actually searches for, writes the first pages from the facts you give it, checks every page with the gates, and walks you through putting the site online and getting it into Google. You follow numbered steps; the instructions explain every word.',
