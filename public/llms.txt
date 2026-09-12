@@ -56,27 +56,27 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 
 ## Guides
 
-- [Stack/](https://oper-stack.com/guides/lead-ops)
-- [Qualification/](https://oper-stack.com/guides/ai-lead)
-- [Inbound/](https://oper-stack.com/guides/crm-automation)
-- [Gen/](https://oper-stack.com/guides/programmatic-seo-lead)
-- [Playbook/](https://oper-stack.com/guides/lead-routing)
-- [Marketing/](https://oper-stack.com/guides/aeo-geo-inbound)
-- [Ai/](https://oper-stack.com/guides/sales-team-onboarding)
-- [Inbound/](https://oper-stack.com/guides/lead-attribution)
-- [Lead/](https://oper-stack.com/guides/sla-speed-to)
-- [Crm/](https://oper-stack.com/guides/lead-hub-vs)
-- [Sdr/](https://oper-stack.com/guides/ai-sdr-vs-human)
-- [Roi/](https://oper-stack.com/guides/inbound-automation)
-- [Audit/](https://oper-stack.com/guides/inbound-lead)
-- [Reporting/](https://oper-stack.com/guides/inbound-lead)
-- [System/](https://oper-stack.com/guides/lead-follow-up)
-- [Revops/](https://oper-stack.com/guides/lead-ops-vs)
-- [Handoff/](https://oper-stack.com/guides/mql-sql-lead)
-- [Capture/](https://oper-stack.com/guides/website-lead)
-- [Make/](https://oper-stack.com/guides/n8n-vs-zapier-vs)
-- [Agencies/](https://oper-stack.com/guides/top-ai-automation)
-- [Companies/](https://oper-stack.com/guides/top-ai-consulting)
+- [What Is a Lead Ops Stack (and Why Inbound Teams Need One)](https://oper-stack.com/guides/lead-ops-stack/): A lead ops stack connects inbound capture, qualification, CRM routing, and reporting through a governed control layer. Learn the architecture and tradeoffs.
+- [AI Lead Qualification: Fit, Intent, and Human Handoff](https://oper-stack.com/guides/ai-lead-qualification/): How AI qualification separates fit from intent, scores confidence, routes deterministically, and hands inbound conversations to a rep with evidence.
+- [CRM Automation for Inbound Leads: Stages, Fields, Dedupe](https://oper-stack.com/guides/crm-automation-inbound/): Design inbound CRM automation that holds up: lifecycle stages as a state machine, field ownership, deduplication before assignment, and safe retries.
+- [Programmatic SEO for Lead Gen: Pages That Earn Pipeline](https://oper-stack.com/guides/programmatic-seo-lead-gen/): How lead-gen teams build templated pages from governed data, pass quality gates, control indexing, and measure qualified pipeline by template cohort.
+- [Lead Routing Playbook: Rule Order, Owners, Fallbacks](https://oper-stack.com/guides/lead-routing-playbook/): How to assign inbound leads reliably: rule precedence, dedupe, account ownership, round robin and capacity, fallback queues, retries, and event logs.
+- [AEO vs GEO: How B2B Content Earns AI Search Citations](https://oper-stack.com/guides/aeo-geo-inbound-marketing/): Practical AEO and GEO for inbound teams: quotable answer blocks, consistent entities, honest measurement of AI citations, and the link to real pipeline.
+- [AI Sales Onboarding: Certify Reps Before Live Leads](https://oper-stack.com/guides/sales-team-onboarding-ai/): How AI-assisted practice, CRM sandbox evidence, and certification gates decide when a new sales rep becomes eligible for live inbound lead assignment.
+- [Inbound Lead Attribution: Join Source Data to Revenue](https://oper-stack.com/guides/lead-attribution-inbound/): How inbound attribution works in practice: original and latest source, UTM rules, identity stitching, and a revenue join your finance team will accept.
+- [Speed-to-Lead SLA: Timers, Escalation, and Reporting](https://oper-stack.com/guides/sla-speed-to-lead/): Set speed-to-lead targets by channel, define when the timer starts and pauses, escalate before a lead goes silent, and report numbers nobody can game.
+- [Lead Hub vs CRM: Define the System Ownership Boundary](https://oper-stack.com/guides/lead-hub-vs-crm/): Where the OperStack Lead Hub ends and your CRM begins: capture, routing and SLA in the hub, pipeline and revenue in CRM, plus a staged migration path.
+- [AI SDR vs Human SDR: Task Split, Limits, and Testing](https://oper-stack.com/guides/ai-sdr-vs-human-sdr/): What an AI SDR really does today, task by task, the conditions where each task degrades, how to test a vendor on your own data, and what stays human.
+- [Marketing and Sales Automation ROI: An Auditable Model](https://oper-stack.com/guides/inbound-automation-roi/): Build an inbound automation ROI model finance can check: baseline, cost register, incremental contribution, three scenarios, break-even, sensitivity, payback.
+- [Inbound Lead Audit: Find Out Where Your Leads Are Lost](https://oper-stack.com/guides/inbound-lead-audit/): Run the inbound lead audit yourself: reconcile arrived, created, owned and worked counts, trace every gap to one layer, and rank findings by cost.
+- [Inbound Lead Reporting: Reports That Cause Decisions](https://oper-stack.com/guides/inbound-lead-reporting/): Design inbound lead reports backwards from the decision: three audiences, leading and lagging signals, failure metrics, cadence, and definition ownership.
+- [Lead Follow-Up System: Cadence, Stop Rules, Ownership](https://oper-stack.com/guides/lead-follow-up-system/): Build follow-up as a state machine: three situations after the first reply, cadence windows, stop rules, CRM writeback, and honest automation limits.
+- [Lead Ops vs RevOps: Scope, Artifacts, and Who Owns What](https://oper-stack.com/guides/lead-ops-vs-revops/): Lead ops vs RevOps compared by accountability, not tools: what each function optimizes, which artifact it owns, and the failure signature of a wrong boundary.
+- [MQL vs SQL: Handoff Agreement, Acceptance, Rejection](https://oper-stack.com/guides/mql-sql-lead-handoff/): MQL vs SQL without another glossary entry: acceptance criteria written as evidence, rejection reason codes, a recycling loop, and one joint report.
+- [Website Lead Capture: Formats, Payload, and Consent](https://oper-stack.com/guides/website-lead-capture/): Choose a lead capture format and define what every submit must emit: required payload, progressive fields, consent evidence, and the failure modes to test.
+- [n8n vs Zapier vs Make: Which Automation Tool](https://oper-stack.com/guides/n8n-vs-zapier-vs-make/): n8n, Zapier and Make compared on the things that decide it in production: error handling, pricing shape, hosting, and who owns the instance when it breaks.
+- [Top AI Automation Agencies and How to Pick One](https://oper-stack.com/guides/top-ai-automation-agencies/): How AI automation agencies differ: four business models behind one label, the proof to demand before signing, and the questions that sort them.
+- [Top AI Consulting Companies: How to Choose](https://oper-stack.com/guides/top-ai-consulting-companies/)
 
 ## Contact
 

@@ -39,6 +39,17 @@ function knownRoutes() {
   };
   if (fs.existsSync(pagesDir)) walk(pagesDir);
 
+  // Страницы, которые рисует один файл [slug].astro по данным из кода. Обход папок их не видит:
+  // он пропускает всё с квадратными скобками в имени, потому что не знает, какие slug существуют.
+  // Пока этого не было, llms.txt не мог сослаться ни на одну страницу продукта.
+  for (const d of cfg.dataRoutes ?? []) {
+    const file = path.join(ROOT, d.file);
+    if (!fs.existsSync(file)) continue;
+    const src = fs.readFileSync(file, 'utf8');
+    const re = new RegExp(d.pattern || "slug:\\s*'([a-z0-9-]+)'", 'g');
+    for (const m of src.matchAll(re)) routes.add(`${d.urlPrefix}/${m[1]}/`);
+  }
+
   for (const col of cfg.collections ?? []) {
     const dir = path.join(ROOT, 'src/content', col.dir);
     if (!fs.existsSync(dir)) continue;

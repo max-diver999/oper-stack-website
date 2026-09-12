@@ -13,16 +13,42 @@
     "page": "/contact/"
   },
   "collections": [
-    { "dir": "guides", "urlPrefix": "/guides", "label": "Guides" },
-    { "dir": "services", "urlPrefix": "/services", "label": "Services" }
+    {
+      "dir": "guides",
+      "urlPrefix": "/guides",
+      "label": "Guides"
+    },
+    {
+      "dir": "services",
+      "urlPrefix": "/services",
+      "label": "Services"
+    }
   ],
   "keyPages": [
-    { "url": "/services/", "label": "Services: scope, timeline and boundaries" },
-    { "url": "/pricing/", "label": "Pricing: audit, setup, retainer" },
-    { "url": "/products/", "label": "Products: gates, starter, audit generator, Site Kit" },
-    { "url": "/cases/", "label": "Cases: anonymised client outcomes" },
-    { "url": "/guides/", "label": "Guides: lead operations and AI search" },
-    { "url": "/contact/", "label": "Contact" }
+    {
+      "url": "/services/",
+      "label": "Services: scope, timeline and boundaries"
+    },
+    {
+      "url": "/pricing/",
+      "label": "Pricing: audit, setup, retainer"
+    },
+    {
+      "url": "/products/",
+      "label": "Products: gates, starter, audit generator, Site Kit"
+    },
+    {
+      "url": "/cases/",
+      "label": "Cases: anonymised client outcomes"
+    },
+    {
+      "url": "/guides/",
+      "label": "Guides: lead operations and AI search"
+    },
+    {
+      "url": "/contact/",
+      "label": "Contact"
+    }
   ],
   "contentPolicy": {
     "search": "yes",
@@ -32,5 +58,11 @@
   "llms": {
     "generated": false,
     "note": "public/llms.txt is maintained by hand on this site and already answers 200. The pack never overwrites it; check-agent-index.mjs only verifies that nothing inside it is noindex or dead."
-  }
+  },
+  "dataRoutes": [
+    {
+      "file": "src/data/products.ts",
+      "urlPrefix": "/products"
+    }
+  ]
 }
