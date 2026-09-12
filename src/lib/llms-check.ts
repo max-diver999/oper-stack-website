@@ -105,7 +105,12 @@ export function normaliseSite(raw: string): { ok: true; origin: string } | { ok:
   let u: URL;
   try { u = new URL(/^https?:\/\//i.test(s) ? s : `https://${s}`); } catch { return { ok: false, reason: 'That does not look like a web address.' }; }
   if (!/^[a-z0-9.-]+\.[a-z]{2,}$/i.test(u.hostname)) return { ok: false, reason: 'That does not look like a domain name.' };
-  if (/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[)/i.test(u.hostname)) return { ok: false, reason: 'A local address is not reachable from the outside.' };
+  // Зарезервированные имена ловим и с конца: internal.localhost и box.local проходят проверку на
+  // домен, но всегда указывают внутрь машины или сети.
+  if (/^(localhost|127\.|10\.|192\.168\.|172\.(1[6-9]|2\d|3[01])\.|0\.|\[)/i.test(u.hostname)
+    || /\.(localhost|local|internal|test|example|invalid|home|lan|intranet)$/i.test(u.hostname)) {
+    return { ok: false, reason: 'A local address is not reachable from the outside.' };
+  }
   return { ok: true, origin: u.origin };
 }
 

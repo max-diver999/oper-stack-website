@@ -126,6 +126,49 @@ export const PRODUCTS: Product[] = [
     relatedGuides: [{ title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }, { title: 'Inbound lead reporting', href: '/guides/inbound-lead-reporting/' }],
   },
   {
+    slug: 'mcp',
+    label: 'Free, open source',
+    name: 'MCP server',
+    title: 'MCP Server: Let Claude and Cursor Measure a Site Themselves',
+    description: 'Four tools for any MCP client: score a site across six areas, check the llms.txt map and where its links lead, compare rivals side by side, and run the sixteen gates on a local folder. Free, MIT, no account.',
+    answer: 'The OperStack MCP server is a stdio server for Claude Desktop, Cursor and any other MCP client. It exposes four tools: audit_site scores six areas from public signals, check_llms_txt follows the map a site offers to machines, compare_sites puts two to four sites side by side on the same measurement, and run_gates runs the sixteen content gates on a folder of Markdown on your own machine. Every measurement runs through the same package as the paid reports, so the numbers agree.',
+    price: 'Free',
+    priceNote: 'MIT licence, no account, no key, nothing stored. Node 20 or newer',
+    status: 'available',
+    cta: { text: 'Copy the command', href: '#install' },
+    command: 'npx -y @operstack/mcp',
+    og: '/og/og-default.png',
+    order: 4,
+    get: [
+      'Four tools your assistant can call by itself, in plain conversation',
+      'A six-area score of any public site, with every failing check and what was found on the page',
+      'The llms.txt map checked and its links followed: dead, redirecting or fine',
+      'Two to four sites compared on the same measurement, so the question stops being "am I bad" and becomes "where am I worse"',
+      'The sixteen gates on a local folder, reading your files without sending them anywhere',
+    ],
+    how: [
+      { step: 'Add one block', text: 'Paste the server into claude_desktop_config.json or .cursor/mcp.json. Nothing to install: npx fetches it.' },
+      { step: 'Ask in words', text: 'Why does ChatGPT recommend my competitor? Is my llms.txt correct? The assistant picks the tool and reads the result.' },
+      { step: 'Act on it', text: 'Every finding names what was found on the page, so the next step is a change rather than a guess.' },
+    ],
+    needs: [
+      { item: 'Node.js 20 or newer', cost: 'Free', why: 'The server runs on your own machine. Node.js is free software from nodejs.org, and most people who use Claude Desktop or Cursor already have it.' },
+      { item: 'An MCP client', cost: 'Free', why: 'Claude Desktop, Cursor, or anything else that speaks MCP. The server is not tied to any one of them.' },
+    ],
+    notFor: [
+      'Measuring traffic or citations that already happened: that lives in your analytics',
+      'Sites behind a login, and sites that block automated readers',
+      'Anyone who wants a person to read the findings: that is the 149 USD audit',
+    ],
+    faq: [
+      { question: 'Does it send my files anywhere?', answer: 'No. The gates tool reads files on your own machine and reports back in the same conversation. The site tools fetch public pages, which is exactly what a search engine does.' },
+      { question: 'Do I need an API key?', answer: 'No. There is no account and no key. Every figure comes from what any stranger can read on a site for nothing.' },
+      { question: 'Will the numbers match your paid report?', answer: 'Yes, they run through the same package. A free tool that disagrees with the paid one is the fastest way to lose the reader.' },
+      { question: 'What happens if I mistype the address?', answer: 'It refuses. A site that did not answer gets a refusal rather than a page of findings about nothing.' },
+    ],
+    relatedGuides: [{ title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }],
+  },
+  {
     slug: 'site-report',
     label: 'Paid, per site',
     name: 'Automatic site report',
@@ -139,7 +182,7 @@ export const PRODUCTS: Product[] = [
     // Как только ссылка на оплату появится в checkout.ts, кнопка сама станет «Buy for 9 USD».
     cta: { text: 'Start with the free check', href: '/ai-visibility/' },
     og: '/og/og-audit.png',
-    order: 4,
+    order: 5,
     get: [
       'A PDF report on your whole site, not a single page',
       'Six area scores with the count of checks behind each one, and "not measured" wherever something was not tested',
@@ -184,7 +227,7 @@ export const PRODUCTS: Product[] = [
     status: 'soon',
     cta: { text: 'Start with the free check', href: '/ai-visibility/' },
     og: '/og/og-audit.png',
-    order: 5,
+    order: 6,
     get: [
       'Everything in the 9 USD report, on your own site',
       'The same measurement on up to three rivals, in one table beside yours',
@@ -227,7 +270,7 @@ export const PRODUCTS: Product[] = [
     status: 'soon',
     cta: { text: 'Join the launch list', href: '/audit/?utm=products-site-kit' },
     og: '/og/og-default.png',
-    order: 6,
+    order: 7,
     get: ['Everything in the free starter', 'A WordPress importer: your export becomes pages of the new site, and the report names which old texts are too short, undescribed or undated', 'The page generator: topic list to briefs to MDX, with the gates in the loop until each page passes', 'Niche discovery: seed terms to autocomplete and SERP shapes to a page plan with volumes where a source exists', 'Indexing runbooks: Search Console, Bing, IndexNow, the Google Indexing API on a per-site project, llms.txt', 'Quick start, EULA, licence key and email support for the first month'],
     how: [{ step: 'Buy', text: 'One payment through the checkout; the licence key arrives by email.' }, { step: 'Activate', text: 'npm run activate with the key. The generator and the discovery module unlock.' }, { step: 'Launch', text: 'Discover the niche, generate the first thirty pages, verify with the gates, deploy, submit.' }],
     needs: [
@@ -252,7 +295,7 @@ export const PRODUCTS: Product[] = [
     status: 'available',
     cta: { text: 'Order the audit', href: '#order' },
     og: '/og/og-audit.png',
-    order: 7,
+    order: 8,
     get: ['Scorecard for six areas: technical, content, AEO, GEO, off-page, conversion', 'Critical issues to fix first, with what each one costs you today', 'Technical and on-page checklist with a status and a finding per row', 'AEO and GEO: what answer engines can quote, what blocks them, how the brand is understood', 'Every finding also written as a task you paste into Cursor or Claude Code: the state now, what to change, how to know it is done', 'How much of your text is invisible without JavaScript, measured in a real browser, because the fetchers that quote you do not run scripts', 'Whether the files an AI agent reads exist at all: the agent card and a markdown copy of your pages', 'Roadmap in three phases: week one, weeks two to four, months two and three'],
     how: [{ step: 'Order', text: 'Send the site and how to reach you. We confirm scope and the tier within 24 hours.' }, { step: 'Collect and read', text: 'Public signals are collected automatically; the analyst reads the content and the pages that outrank it.' }, { step: 'Deliver', text: 'The PDF report by email, usually within one to three working days and never later than five. The two packages are quoted in the same letter.' }],
     needs: [
@@ -278,7 +321,7 @@ export const PRODUCTS: Product[] = [
     status: 'available',
     cta: { text: 'Get the list for your site', href: '#order' },
     og: '/og/og-audit.png',
-    order: 8,
+    order: 9,
     get: [
       'The checks from your audit that do not need your subject knowledge, closed. Thirty-six of the forty-four the audit can raise fall in that group; a typical site has around forty of them open or passing, and only the open ones enter your list',
       'The sixteen quality gates run over every page of your corpus, not a sample: cut titles, copied paragraphs, hollow sections, dead links, stale llms.txt, figures with no source',
@@ -325,7 +368,7 @@ export const PRODUCTS: Product[] = [
     status: 'available',
     cta: { text: 'Ask for a quote', href: '#order' },
     og: '/og/og-audit.png',
-    order: 9,
+    order: 10,
     get: [
       'Everything in Fix, on the same terms',
       'An answer-first opening on the pages that already earn impressions: twenty to ninety words, one real figure, the source beside it',
