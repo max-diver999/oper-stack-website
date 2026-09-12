@@ -12,7 +12,7 @@
  */
 import type { APIRoute } from 'astro';
 import { verifyReportToken } from '../../lib/report-fulfilment';
-import { buildProspectBody, buildProspectSubject, MAX_SITES, parsePasted } from '../../lib/prospect-request';
+import { buildProspectBody, buildProspectSubject, MAX_SITES, parseBrand, parsePasted } from '../../lib/prospect-request';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 
 export const prerender = false;
@@ -48,7 +48,13 @@ export const POST: APIRoute = async ({ request }) => {
     return page(400, 'No site addresses in that', '<p>Paste one address per line, like <code>example.com</code>. Go back and try again.</p>');
   }
 
-  const job = { email: check.claims.email, sites, lang: (String(form.get('lang') || 'en') === 'ru' ? 'ru' : 'en') as 'en' | 'ru' };
+  const brand = parseBrand(String(form.get('by') || ''), String(form.get('color') || ''), String(form.get('logo') || ''));
+  const job = {
+    email: check.claims.email,
+    sites,
+    lang: (String(form.get('lang') || 'en') === 'ru' ? 'ru' : 'en') as 'en' | 'ru',
+    ...(brand ? { brand } : {}),
+  };
   const body = buildProspectBody(job, secret);
   try {
     await sendTransactionalMail({ to: env('OPS_MAILBOX', env('SMTP_USER')), subject: buildProspectSubject(job), ...body });

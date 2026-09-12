@@ -30,6 +30,11 @@ const t = ru
       hint: 'Можно просто адреса, можно адрес и через запятую название клиента. Строки, начинающиеся с решётки, пропускаются.',
       button: 'Проверить список',
       after: 'Таблица придёт письмом на ту же почту, обычно за пятнадцать-тридцать минут. Каждый сайт читается по-настоящему, поэтому не мгновенно.',
+      brandTitle: 'Своё оформление (для агентского плана)',
+      brandHint: 'Если у вас агентский план, отчёты выйдут под вашим именем. Без плана эти поля можно не трогать.',
+      brandName: 'Название вашего агентства',
+      brandLogo: 'Ссылка на ваш логотип',
+      brandColor: 'Ваш цвет',
       bad: 'Ссылка не подошла',
       badText: 'Ссылки живут тридцать дней. Напишите на support@oper-stack.com, пришлём новую.',
     }
@@ -40,6 +45,11 @@ const t = ru
       hint: 'Addresses alone are fine, or an address and the client name after a comma. Lines starting with a hash are skipped.',
       button: 'Check the list',
       after: 'The table arrives by email at the same address, usually in fifteen to thirty minutes. Every site is read properly, which is why it is not instant.',
+      brandTitle: 'Your own branding (agency plan)',
+      brandLogo: 'Link to your logo',
+      brandHint: 'On the agency plan the reports come out under your name. Without the plan, leave these empty.',
+      brandName: 'Your agency name',
+      brandColor: 'Your colour',
       bad: 'This link is not valid',
       badText: 'Links last thirty days. Write to support@oper-stack.com and we will send a fresh one.',
     };
@@ -69,6 +79,18 @@ const placeholder = ru
           <label for="sites">{t.label}</label>
           <textarea id="sites" name="sites" rows="12" required placeholder={placeholder}></textarea>
           <p class="hint">{t.hint}</p>
+
+          <details class="brand">
+            <summary>{t.brandTitle}</summary>
+            <p class="hint">{t.brandHint}</p>
+            <label for="by">{t.brandName}</label>
+            <input id="by" name="by" type="text" maxlength="60" placeholder="Harper & Vale Digital" />
+            <label for="logo">{t.brandLogo}</label>
+            <input id="logo" name="logo" type="url" placeholder="https://your-site.com/logo.svg" />
+            <label for="color">{t.brandColor}</label>
+            <input id="color" name="color" type="text" maxlength="7" placeholder="#7b3fa0" />
+          </details>
+
           <button type="submit">{t.button}</button>
         </form>
         <p class="after">{t.after}</p>
@@ -101,6 +123,14 @@ const placeholder = ru
   textarea::placeholder { color: #5c6b6f; }
   textarea:focus-visible { outline: 2px solid var(--teal-soft); outline-offset: 2px; }
   .hint, .after { color: var(--muted); font-size: 14px; }
+  details.brand { margin-top: 22px; border-top: 1px solid rgba(255, 255, 255, .1); padding-top: 16px; }
+  details.brand summary { cursor: pointer; color: var(--teal-soft); font-size: 15px; }
+  details.brand label { margin-top: 14px; }
+  details.brand input {
+    width: 100%; box-sizing: border-box; padding: 11px 14px; font: 15px/1.5 inherit; color: var(--paper);
+    background: rgba(0, 0, 0, .3); border: 1px solid rgba(255, 255, 255, .14); border-radius: 10px;
+  }
+  details.brand input:focus-visible { outline: 2px solid var(--teal-soft); outline-offset: 2px; }
   button {
     margin-top: 18px; padding: 13px 26px; font: 600 16px/1 inherit; color: #fff; cursor: pointer;
     background: var(--teal); border: 0; border-radius: 10px;

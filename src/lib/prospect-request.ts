@@ -14,7 +14,24 @@ export type ProspectJob = {
   email: string;
   sites: { url: string; name: string }[];
   lang: 'en' | 'ru';
+  /** Оформление агентского плана. Логотип берётся по адресу с его же сайта: хранить чужие файлы
+   *  мы не хотим, а логотип у агентства почти всегда уже лежит в открытом доступе. */
+  brand?: { by: string; color: string; logo: string };
 };
+
+const HEX = /^#?[0-9a-f]{6}$/i;
+
+/** Оформление из формы. Пустые поля просто не применяются, кривые не роняют заявку. */
+export function parseBrand(by: string, color: string, logo: string): ProspectJob['brand'] | undefined {
+  const name = String(by || '').trim().slice(0, 60);
+  if (!name) return undefined;
+  let logoUrl = '';
+  try {
+    const u = new URL(String(logo || '').trim());
+    if (/^https?:$/.test(u.protocol) && /\.(svg|png|jpe?g|webp)$/i.test(u.pathname)) logoUrl = u.toString();
+  } catch { /* логотип необязателен */ }
+  return { by: name, color: HEX.test(String(color || '').trim()) ? String(color).trim() : '', logo: logoUrl };
+}
 
 /** Сколько сайтов принимаем за раз. Двадцать это и обещание курса, и потолок разумного прогона. */
 export const MAX_SITES = 20;
@@ -61,7 +78,8 @@ export function buildProspectBody(job: ProspectJob, secret: string): { text: str
   const payload = Buffer.from(JSON.stringify(job)).toString('base64url');
   const line = `PROSPECT-RUN v1 ${payload} ${createHmac('sha256', secret).update(payload).digest('base64url')}`;
   const list = job.sites.map((s) => `  ${s.url}${s.name && s.name !== s.url ? `, ${s.name}` : ''}`);
-  const text = [line, '', `Buyer: ${job.email}`, `Sites: ${job.sites.length}`, ...list, '',
+  const brand = job.brand ? [`Brand: ${job.brand.by}${job.brand.color ? ` ${job.brand.color}` : ''}${job.brand.logo ? ' + logo' : ''}`] : [];
+  const text = [line, '', `Buyer: ${job.email}`, ...brand, `Sites: ${job.sites.length}`, ...list, '',
     'Служебная заявка. Её читает очередь, отвечать не нужно.'].join('\n');
   const html = [
     `<pre style="font:12px ui-monospace,monospace;color:#888;white-space:pre-wrap;word-break:break-all">${line}</pre>`,
