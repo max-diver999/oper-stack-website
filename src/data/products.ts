@@ -434,7 +434,7 @@ export const PRODUCTS: Product[] = [
     notFor: [
       'Anyone who wants pages written without supplying any facts: that produces text nobody can cite',
       'Rankings and traffic promises: we make none',
-      'Sites with nothing to say yet: start with the free tools and the course instead',
+      'Sites with nothing to say yet: start with the free tools instead',
     ],
     faq: [
       { question: 'Why is there no fixed price?', answer: 'Because the work is writing, and the amount depends on how many of your pages earn impressions and how much of the text is already usable. A fixed price would mean overcharging the small sites to cover the large ones.' },
