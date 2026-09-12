@@ -7,12 +7,13 @@
  * not carry services, so the shop moved to Whop. The licence format, the email and the download
  * link are unchanged, only the event that triggers them.
  *
- * Env: WHOP_WEBHOOK_SECRET (ws_...), WHOP_API_KEY, WHOP_SITE_KIT_IDS (prod_x:owner,plan_y:agency),
+ * Env: WHOP_WEBHOOK_SECRET (ws_...), WHOP_API_KEY, WHOP_SITE_KIT_IDS (prod_x:owner,plan_y:agency), WHOP_AGENCY_IDS,
  * OPERSTACK_LICENCE_PRIVATE_KEY_B64, KIT_DOWNLOAD_SECRET, plus the SMTP and Telegram variables.
  */
 import type { APIRoute } from 'astro';
 import { SITE } from '../../data/site';
-import { buildLicenceEmail, handleWhopPayment, issueLicenceKey, makeDownloadToken, parsePriceMap, readWhopPayment, verifyWhopSignature } from '../../lib/licence-fulfilment';
+import { buildAgencyEmail,
+  buildLicenceEmail, handleWhopPayment, issueLicenceKey, makeDownloadToken, parsePriceMap, readWhopPayment, verifyWhopSignature } from '../../lib/licence-fulfilment';
 import { buildReportWelcomeEmail, makeReportToken, readWhopReport, reportTierMap, TOKEN_DAYS } from '../../lib/report-fulfilment';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 
@@ -105,6 +106,36 @@ export const POST: APIRoute = async ({ request }) => {
       console.error('report welcome mail failed:', err);
       await notifyTelegram(`Отчёт за ${report.tier} оплачен (${report.paymentId}), но письмо ${buyer} не ушло: ${(err as Error).message}. Отправить ссылку вручную.`);
       return json({ ok: true, handled: false, reason: 'welcome mail failed' });
+    }
+  }
+
+  // Агентский план: подписка, а не покупка. Ключ живёт месяц, и новый уходит при каждом
+  // успешном платеже, поэтому продление здесь это обычное событие, а не отдельная ветка логики.
+  const agencyIds = env('WHOP_AGENCY_IDS').split(',').map((s) => s.trim()).filter(Boolean);
+  const agencyPaid = agencyIds.length
+    ? readWhopPayment(event, Object.fromEntries(agencyIds.map((id) => [id, 'agency' as const])))
+    : { plan: null as null | 'agency', type: '', email: null as string | null, userId: null as string | null, paymentId: '' };
+  if (agencyPaid.plan && ['payment.succeeded', 'membership.went_valid', 'membership_went_valid'].includes(agencyPaid.type)) {
+    const buyer = agencyPaid.email ?? (agencyPaid.userId ? await getBuyerEmail(agencyPaid.userId) : null);
+    if (!buyer) {
+      await notifyTelegram(`Агентский план оплачен (${agencyPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать ключ вручную.`);
+      return json({ ok: true, handled: false, reason: 'buyer email not found' });
+    }
+    // 35 дней, а не 30: платёж может задержаться на сутки, и оформление не должно отваливаться
+    // у того, кто заплатил вовремя.
+    const { key, expires } = issueLicenceKey({ email: buyer, plan: 'agency', days: 35 }, privatePem);
+    const renewal = agencyPaid.type === 'payment.succeeded';
+    try {
+      await sendTransactionalMail({ to: buyer, ...buildAgencyEmail({
+        email: buyer, key, expires, renewal,
+        supportEmail: 'support@oper-stack.com', siteUrl: SITE.url,
+      }) });
+      await notifyTelegram(`🔑 Агентский план${renewal ? ' продлён' : ''}: ключ отправлен на ${buyer}, действует до ${expires}, платёж ${agencyPaid.paymentId}.`);
+      return json({ ok: true, handled: true, product: 'agency' });
+    } catch (err) {
+      console.error('agency mail failed:', err);
+      await notifyTelegram(`Агентский план оплачен (${agencyPaid.paymentId}), но письмо ${buyer} не ушло: ${(err as Error).message}. Отправить ключ вручную.`);
+      return json({ ok: true, handled: false, reason: 'agency mail failed' });
     }
   }
 

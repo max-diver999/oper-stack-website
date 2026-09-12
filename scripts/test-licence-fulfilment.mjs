@@ -135,5 +135,32 @@ check('email HTML escapes nothing dangerous and mentions the agency plan', mail.
   check('whop: лишних писем не ушло', sent.length === 2, `писем ${sent.length}`);
 }
 
+
+// ── Агентский план ────────────────────────────────────────────────────────────
+// Правило: ключ подписки живёт месяц с запасом, а письмо ведёт в npm, а не в архив.
+const { buildAgencyEmail } = await import('../src/lib/licence-fulfilment.ts');
+
+const month = issueLicenceKey({ email: 'agency@example.com', plan: 'agency', days: 35 }, privatePem);
+const daysBetween = (a, b) => Math.round((new Date(b) - new Date(a)) / 864e5);
+check('ключ подписки живёт 35 дней', daysBetween(month.issued, month.expires) === 35);
+
+const year = issueLicenceKey({ email: 'owner@example.com', plan: 'owner' }, privatePem);
+check('разовая покупка по-прежнему на год', daysBetween(year.issued, year.expires) >= 365);
+
+const claim = JSON.parse(Buffer.from(month.key.split('.')[1], 'base64url').toString('utf8'));
+check('в ключе записан агентский план', claim.plan === 'agency');
+check('почта в ключе приведена к нижнему регистру', claim.email === 'agency@example.com');
+
+const first = buildAgencyEmail({ email: 'a@b.c', key: month.key, expires: month.expires, supportEmail: 's@x', siteUrl: 'https://x' });
+check('первое письмо не называется продлением', !/renewed/i.test(first.subject));
+check('письмо ведёт в npm, а не в архив', first.text.includes('npm install -g @operstack/audit'));
+check('в письме есть сама команда прогона', first.text.includes('operstack-audit batch'));
+check('ключ в письме целиком', first.text.includes(month.key));
+check('в письме нет ссылки на скачивание архива', !/kit-download/.test(first.text));
+
+const again = buildAgencyEmail({ email: 'a@b.c', key: month.key, expires: month.expires, supportEmail: 's@x', siteUrl: 'https://x', renewal: true });
+check('продление названо продлением', /renewed/i.test(again.subject) && /renewed/i.test(again.text));
+
+
 console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');
 process.exit(failures ? 1 : 0);

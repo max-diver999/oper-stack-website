@@ -14,12 +14,16 @@ const isoDay = (d: Date) => d.toISOString().slice(0, 10);
 
 /** Issue a licence key for an email address. `privatePem` is the Ed25519 private key in PEM form. */
 export function issueLicenceKey(
-  input: { email: string; plan: Plan; years?: number; issued?: Date },
+  input: { email: string; plan: Plan; years?: number; days?: number; issued?: Date },
   privatePem: string,
 ): { key: string; issued: string; expires: string } {
   const issued = input.issued ?? new Date();
   const expires = new Date(issued);
-  expires.setFullYear(expires.getFullYear() + (input.years ?? 1));
+  // Подписка продлевается помесячно, поэтому ключу нужен срок в днях, а не в годах. Запас в
+  // несколько дней сверх месяца закрывает задержку платежа: иначе оформление отвалится у человека,
+  // который платит вовремя, просто банк подумал лишний день.
+  if (input.days) expires.setDate(expires.getDate() + input.days);
+  else expires.setFullYear(expires.getFullYear() + (input.years ?? 1));
   const payload = Buffer.from(
     JSON.stringify({ email: input.email.trim().toLowerCase(), plan: input.plan, issued: isoDay(issued), expires: isoDay(expires) }),
   );
@@ -330,4 +334,43 @@ export async function handleWhopPayment(event: any, deps: WhopFulfilmentDeps): P
   await deps.sendMail({ to: email, ...mail });
   await deps.notify(`Site Kit licence issued from Whop: ${email}, ${paid.plan} plan, updates until ${expires}, payment ${paid.paymentId}.`);
   return { handled: true, reason: 'licence issued', email, plan: paid.plan, transactionId: paid.paymentId };
+}
+
+/**
+ * Письмо агентского плана. У него нет архива для скачивания: инструмент ставится из npm, а
+ * покупается право выпускать отчёты под своим брендом. Поэтому и шаги другие, и ключ здесь
+ * живёт месяц, а не год: каждый успешный платёж присылает новый.
+ */
+export function buildAgencyEmail(input: {
+  email: string; key: string; expires: string; supportEmail: string; siteUrl: string; renewal?: boolean;
+}) {
+  const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  const steps = [
+    'npm install -g @operstack/audit',
+    `export OPERSTACK_LICENCE="${input.key}"`,
+    'operstack-audit batch clients.txt --by "Your Agency" --logo logo.svg --color "#7b3fa0" --no-tool-line --pdf',
+  ];
+  const lines = [
+    input.renewal
+      ? 'Your OperStack agency plan renewed. Here is the key for the next month.'
+      : 'Your OperStack agency plan is active. Here is your key.',
+    '',
+    `Licence key: ${input.key}`,
+    `Valid until: ${input.expires} (a new key arrives with every renewal)`,
+    '',
+    'Three commands to your first branded report:',
+    ...steps.map((s, i) => `  ${i + 1}. ${s}`),
+    '',
+    'clients.txt holds one site per line, either "example.com" or "example.com, Client Name".',
+    'Reports land in reports/ as HTML and PDF, carrying your logo, your colour and your name.',
+    '',
+    `Docs: ${input.siteUrl}/products/agency/`,
+    `Questions: ${input.supportEmail}`,
+  ];
+  const text = lines.join('\n');
+  return {
+    subject: input.renewal ? 'OperStack agency plan renewed' : 'Your OperStack agency licence key',
+    text,
+    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6;color:#111">${esc(text).replace(/\n/g, '<br>')}</div>`,
+  };
 }
