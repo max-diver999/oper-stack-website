@@ -58,6 +58,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 
 ## Guides
 
+- [llms.txt: What It Is, How to Write One, and Why Most of Them Rot](https://oper-stack.com/guides/llms-txt-guide/): A practical guide to llms.txt: what the format actually asks for, a working example, how to generate it so it cannot drift, and how to check whether the links in yours still lead anywhere.
 - [What Is a Lead Ops Stack (and Why Inbound Teams Need One)](https://oper-stack.com/guides/lead-ops-stack/): A lead ops stack connects inbound capture, qualification, CRM routing, and reporting through a governed control layer. Learn the architecture and tradeoffs.
 - [AI Lead Qualification: Fit, Intent, and Human Handoff](https://oper-stack.com/guides/ai-lead-qualification/): How AI qualification separates fit from intent, scores confidence, routes deterministically, and hands inbound conversations to a rep with evidence.
 - [CRM Automation for Inbound Leads: Stages, Fields, Dedupe](https://oper-stack.com/guides/crm-automation-inbound/): Design inbound CRM automation that holds up: lifecycle stages as a state machine, field ownership, deduplication before assignment, and safe retries.

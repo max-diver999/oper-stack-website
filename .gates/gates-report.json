@@ -1,0 +1,974 @@
+{
+  "meta": {
+    "generatedAt": "2026-09-12T02:59:53.228Z",
+    "siteUrl": "",
+    "files": 44
+  },
+  "results": [
+    {
+      "id": 1,
+      "name": "characters",
+      "status": "pass",
+      "summary": "corpus clean",
+      "findings": [],
+      "stats": {
+        "currencyLines": 0,
+        "pictoLines": 0,
+        "dashLines": 0,
+        "fixed": 0
+      }
+    },
+    {
+      "id": 2,
+      "name": "mdx-compile",
+      "status": "pass",
+      "summary": "44 file(s) compile",
+      "findings": [],
+      "stats": {
+        "files": 44,
+        "failing": 0
+      }
+    },
+    {
+      "id": 3,
+      "name": "frontmatter",
+      "status": "fail",
+      "summary": "132 issue(s)",
+      "findings": [
+        {
+          "file": "src/content/guides/aeo-geo-inbound-marketing.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/ai-lead-qualification.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/ai-sdr-vs-human-sdr.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/ai-sdr-vs-human-sdr.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/crm-automation-inbound.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/inbound-automation-roi.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/inbound-automation-roi.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/lead-attribution-inbound.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/lead-follow-up-system.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/lead-follow-up-system.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/lead-hub-vs-crm.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/lead-ops-stack.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/lead-ops-vs-revops.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/lead-ops-vs-revops.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/lead-ops-vs-revops.md",
+          "message": "title ends mid-phrase: \"Lead Ops vs RevOps: Scope, Artifacts, and Who Owns What\""
+        },
+        {
+          "file": "src/content/guides/lead-routing-playbook.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/llms-txt-guide.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/llms-txt-guide.md",
+          "message": "title length 64, expected 40 to 60"
+        },
+        {
+          "file": "src/content/guides/llms-txt-guide.md",
+          "message": "description length 188, expected 70 to 160"
+        },
+        {
+          "file": "src/content/guides/llms-txt-guide.md",
+          "message": "word count 1076 below guides minimum 1200"
+        },
+        {
+          "file": "src/content/guides/mql-sql-lead-handoff.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/mql-sql-lead-handoff.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/n8n-vs-zapier-vs-make.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/n8n-vs-zapier-vs-make.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/guides/n8n-vs-zapier-vs-make.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/n8n-vs-zapier-vs-make.md",
+          "message": "word count 975 below guides minimum 1200"
+        },
+        {
+          "file": "src/content/guides/programmatic-seo-lead-gen.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/sales-team-onboarding-ai.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/sla-speed-to-lead.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/top-ai-automation-agencies.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/top-ai-automation-agencies.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/guides/top-ai-automation-agencies.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/top-ai-automation-agencies.md",
+          "message": "word count 1045 below guides minimum 1200"
+        },
+        {
+          "file": "src/content/guides/top-ai-consulting-companies.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/top-ai-consulting-companies.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/guides/top-ai-consulting-companies.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/guides/website-lead-capture.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/guides/website-lead-capture.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-agent-development-company.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-agent-development-company.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-agent-development-company.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-agent-development-company.md",
+          "message": "word count 315 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-automation-agency.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-automation-agency.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-automation-agency.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-automation-agency.md",
+          "message": "word count 346 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-automation-consultant.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-automation-consultant.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-automation-consultant.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-automation-consultant.md",
+          "message": "word count 297 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-automation-services.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-automation-services.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-automation-services.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-automation-services.md",
+          "message": "word count 276 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-consulting-services.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-consulting-services.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-consulting-services.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-consulting-services.md",
+          "message": "word count 374 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-customer-service-agent.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-customer-service-agent.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-customer-service-agent.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-customer-service-agent.md",
+          "message": "word count 311 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-implementation-services.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-implementation-services.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-implementation-services.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-implementation-services.md",
+          "message": "word count 339 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-integration-services.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-integration-services.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-integration-services.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-integration-services.md",
+          "message": "description ends on a stop word (cut)"
+        },
+        {
+          "file": "src/content/services/ai-integration-services.md",
+          "message": "word count 275 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-readiness-assessment.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-readiness-assessment.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-readiness-assessment.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-readiness-assessment.md",
+          "message": "word count 302 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-receptionist.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-receptionist.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-receptionist.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-receptionist.md",
+          "message": "word count 321 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/ai-sdr.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/ai-sdr.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/ai-sdr.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/ai-sdr.md",
+          "message": "word count 295 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/business-automation-agency.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/business-automation-agency.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/business-automation-agency.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/business-automation-agency.md",
+          "message": "word count 284 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/crm-implementation.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/crm-implementation.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/crm-implementation.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/crm-implementation.md",
+          "message": "word count 352 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/lead-attribution-setup.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/lead-attribution-setup.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/lead-attribution-setup.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/lead-attribution-setup.md",
+          "message": "word count 388 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/lead-management-system.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/lead-management-system.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/lead-management-system.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/lead-management-system.md",
+          "message": "word count 364 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/lead-qualification-setup.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/lead-qualification-setup.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/lead-qualification-setup.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/lead-qualification-setup.md",
+          "message": "word count 323 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/lead-routing-software.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/lead-routing-software.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/lead-routing-software.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/lead-routing-software.md",
+          "message": "word count 318 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/marketing-automation-agency.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/marketing-automation-agency.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/marketing-automation-agency.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/marketing-automation-agency.md",
+          "message": "word count 413 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/n8n-agency.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/n8n-agency.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/n8n-agency.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/n8n-agency.md",
+          "message": "word count 304 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/speed-to-lead.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/speed-to-lead.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/speed-to-lead.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/speed-to-lead.md",
+          "message": "word count 395 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/workflow-automation-services.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/workflow-automation-services.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/workflow-automation-services.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/workflow-automation-services.md",
+          "message": "word count 311 below services minimum 1200"
+        },
+        {
+          "file": "src/content/services/zapier-consultant.md",
+          "message": "missing frontmatter \"updatedDate\""
+        },
+        {
+          "file": "src/content/services/zapier-consultant.md",
+          "message": "missing frontmatter \"author\""
+        },
+        {
+          "file": "src/content/services/zapier-consultant.md",
+          "message": "missing frontmatter \"tags\""
+        },
+        {
+          "file": "src/content/services/zapier-consultant.md",
+          "message": "description ends on a stop word (cut)"
+        },
+        {
+          "file": "src/content/services/zapier-consultant.md",
+          "message": "word count 302 below services minimum 1200"
+        }
+      ],
+      "stats": {}
+    },
+    {
+      "id": 4,
+      "name": "structure",
+      "status": "fail",
+      "summary": "21 structural issue(s)",
+      "findings": [
+        {
+          "file": "src/content/guides/aeo-geo-inbound-marketing.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-aeo-geo"
+        },
+        {
+          "file": "src/content/guides/ai-lead-qualification.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-ai-qual"
+        },
+        {
+          "file": "src/content/guides/ai-sdr-vs-human-sdr.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-ai-sdr"
+        },
+        {
+          "file": "src/content/guides/crm-automation-inbound.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-crm-auto"
+        },
+        {
+          "file": "src/content/guides/inbound-automation-roi.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-roi"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-lead-audit"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-reporting"
+        },
+        {
+          "file": "src/content/guides/lead-attribution-inbound.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-attribution"
+        },
+        {
+          "file": "src/content/guides/lead-follow-up-system.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-follow-up"
+        },
+        {
+          "file": "src/content/guides/lead-hub-vs-crm.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-hub-crm"
+        },
+        {
+          "file": "src/content/guides/lead-ops-stack.md",
+          "message": "draft or source marker left in text ([VERIFY], TODO, source needed)"
+        },
+        {
+          "file": "src/content/guides/lead-ops-stack.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-lead-ops-stack"
+        },
+        {
+          "file": "src/content/guides/lead-ops-vs-revops.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-revops"
+        },
+        {
+          "file": "src/content/guides/lead-routing-playbook.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-routing"
+        },
+        {
+          "file": "src/content/guides/llms-txt-guide.md",
+          "message": "markdown H1 in body, the layout renders the title as H1"
+        },
+        {
+          "file": "src/content/guides/mql-sql-lead-handoff.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-mql-sql"
+        },
+        {
+          "file": "src/content/guides/programmatic-seo-lead-gen.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-pseo"
+        },
+        {
+          "file": "src/content/guides/sales-team-onboarding-ai.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-onboarding"
+        },
+        {
+          "file": "src/content/guides/sla-speed-to-lead.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-sla"
+        },
+        {
+          "file": "src/content/guides/website-lead-capture.md",
+          "message": "internal links without trailing slash: /audit/?utm=guide-capture"
+        },
+        {
+          "file": "src/content/services/ai-agent-development-company.md",
+          "message": "draft or source marker left in text ([VERIFY], TODO, source needed)"
+        }
+      ],
+      "stats": {}
+    },
+    {
+      "id": 5,
+      "name": "duplication",
+      "status": "pass",
+      "summary": "0 shared block(s) on 0 page(s), 0 near-duplicate, 0 in-page repeat(s)",
+      "findings": [],
+      "stats": {
+        "cross": 0,
+        "near": 0,
+        "inPage": 0,
+        "pagesAffected": 0
+      }
+    },
+    {
+      "id": 6,
+      "name": "shared-sentences",
+      "status": "pass",
+      "summary": "0 sentence(s) and 0 fragment(s) on 3+ pages",
+      "findings": [],
+      "stats": {
+        "sentences": 0,
+        "fragments": 0
+      }
+    },
+    {
+      "id": 7,
+      "name": "hollow-sections",
+      "status": "warn",
+      "summary": "0 hollow section(s), 1 finding(s)",
+      "findings": [
+        {
+          "file": "src/content/guides/llms-txt-guide.md",
+          "message": "1 heading marker(s) buried inside a line"
+        }
+      ],
+      "stats": {
+        "hollow": 0
+      }
+    },
+    {
+      "id": 8,
+      "name": "internal-links",
+      "status": "pass",
+      "summary": "no broken links in 72 built pages",
+      "findings": [],
+      "stats": {
+        "mode": "build",
+        "pages": 72,
+        "broken": 0
+      }
+    },
+    {
+      "id": 9,
+      "name": "link-semantics",
+      "status": "warn",
+      "summary": "28 anchor(s) disagree with their target",
+      "findings": [
+        {
+          "file": "src/content/guides/aeo-geo-inbound-marketing.md",
+          "message": "/guides/lead-ops-stack/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/ai-lead-qualification.md",
+          "message": "/guides/lead-routing-playbook/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/ai-sdr-vs-human-sdr.md",
+          "message": "/guides/ai-lead-qualification/ linked 5 times on one page"
+        },
+        {
+          "file": "src/content/guides/crm-automation-inbound.md",
+          "message": "/guides/lead-routing-playbook/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-automation-roi.md",
+          "message": "/guides/inbound-lead-audit/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "/guides/sla-speed-to-lead/ linked 7 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "/guides/inbound-automation-roi/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "/guides/lead-attribution-inbound/ linked 4 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "/guides/website-lead-capture/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "/guides/crm-automation-inbound/ linked 4 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "/guides/lead-routing-playbook/ linked 4 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "/guides/lead-follow-up-system/ linked 6 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "/guides/inbound-lead-reporting/ linked 6 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "/guides/sla-speed-to-lead/ linked 6 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "/guides/lead-attribution-inbound/ linked 6 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "/guides/lead-routing-playbook/ linked 6 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "/guides/inbound-automation-roi/ linked 4 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "/guides/lead-follow-up-system/ linked 5 times on one page"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "/guides/crm-automation-inbound/ linked 5 times on one page"
+        },
+        {
+          "file": "src/content/guides/lead-follow-up-system.md",
+          "message": "/guides/sla-speed-to-lead/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/lead-follow-up-system.md",
+          "message": "/guides/mql-sql-lead-handoff/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/lead-routing-playbook.md",
+          "message": "/guides/ai-lead-qualification/ linked 4 times on one page"
+        },
+        {
+          "file": "src/content/guides/lead-routing-playbook.md",
+          "message": "/guides/crm-automation-inbound/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/lead-routing-playbook.md",
+          "message": "/guides/sla-speed-to-lead/ linked 4 times on one page"
+        },
+        {
+          "file": "src/content/guides/mql-sql-lead-handoff.md",
+          "message": "/guides/crm-automation-inbound/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/mql-sql-lead-handoff.md",
+          "message": "/guides/ai-lead-qualification/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/website-lead-capture.md",
+          "message": "/guides/lead-attribution-inbound/ linked 3 times on one page"
+        },
+        {
+          "file": "src/content/guides/website-lead-capture.md",
+          "message": "/guides/ai-lead-qualification/ linked 3 times on one page"
+        }
+      ],
+      "stats": {}
+    },
+    {
+      "id": 10,
+      "name": "meta",
+      "status": "pass",
+      "summary": "titles and descriptions clean",
+      "findings": [],
+      "stats": {}
+    },
+    {
+      "id": 11,
+      "name": "readability",
+      "status": "warn",
+      "summary": "18 readability flag(s)",
+      "findings": [
+        {
+          "file": "src/content/guides/aeo-geo-inbound-marketing.md",
+          "message": "12 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/ai-lead-qualification.md",
+          "message": "14 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/ai-sdr-vs-human-sdr.md",
+          "message": "9 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/crm-automation-inbound.md",
+          "message": "15 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/inbound-automation-roi.md",
+          "message": "12 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-audit.md",
+          "message": "13 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/inbound-lead-reporting.md",
+          "message": "13 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/lead-attribution-inbound.md",
+          "message": "14 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/lead-follow-up-system.md",
+          "message": "11 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/lead-hub-vs-crm.md",
+          "message": "10 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/lead-ops-stack.md",
+          "message": "12 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/lead-ops-vs-revops.md",
+          "message": "14 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/lead-routing-playbook.md",
+          "message": "13 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/mql-sql-lead-handoff.md",
+          "message": "13 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/programmatic-seo-lead-gen.md",
+          "message": "13 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/sales-team-onboarding-ai.md",
+          "message": "14 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/sla-speed-to-lead.md",
+          "message": "11 sentences over 45 words"
+        },
+        {
+          "file": "src/content/guides/website-lead-capture.md",
+          "message": "15 sentences over 45 words"
+        }
+      ],
+      "stats": {}
+    },
+    {
+      "id": 12,
+      "name": "images",
+      "status": "pass",
+      "summary": "2 image URL(s) return 200",
+      "findings": [],
+      "stats": {
+        "checked": 2,
+        "ok": 2
+      }
+    },
+    {
+      "id": 13,
+      "name": "redirects",
+      "status": "pass",
+      "summary": "0 redirects, no cycles or chains",
+      "findings": [],
+      "stats": {
+        "rules": 0
+      }
+    },
+    {
+      "id": 14,
+      "name": "ai-index",
+      "status": "pass",
+      "summary": "64 entries match the site",
+      "findings": [],
+      "stats": {
+        "advertised": 64
+      }
+    },
+    {
+      "id": 15,
+      "name": "claims",
+      "status": "pass",
+      "summary": "every figure is sourced or framed as an example",
+      "findings": [],
+      "stats": {}
+    },
+    {
+      "id": 16,
+      "name": "agent-surface",
+      "status": "pass",
+      "summary": "agent card present, 44 page(s) offer markdown",
+      "findings": [],
+      "stats": {
+        "agentCard": true,
+        "markdownPages": 44
+      }
+    }
+  ]
+}
