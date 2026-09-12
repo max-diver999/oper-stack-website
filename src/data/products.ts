@@ -409,7 +409,7 @@ export const PRODUCTS: Product[] = [
     description: 'We close the mechanical findings on your site: robots, sitemap, llms.txt, schema, headings, contact path, redirects, caching, plus the sixteen gates over every page. The list is agreed before you pay, and anything we do not close comes back as a refund of its share.',
     answer: 'Fix closes the findings that do not need to know anything about your business: crawler access, the sitemap and its hygiene, llms.txt, structured data, headings and descriptions, the contact path and the form, redirects, caching headers, broken internal links and duplicate images. Thirty-six of the forty-four checks the audit can raise fall in this group, thirty-three of them on a hosted site builder where we cannot touch the source. We name the exact list for your site before you pay, and we re-check the site thirty days later and email you what moved.',
     price: '249 USD',
-    priceNote: 'The list of checks is agreed in writing before payment. Anything on that list we do not close comes back as a refund of its share',
+    priceNote: '249 USD covers a site of up to about fifty pages. Larger corpora are quoted on the list, because the gates run over every page rather than a sample. The list is agreed in writing before payment, and anything on it we do not close comes back as a refund of its share',
     status: 'available',
     cta: { text: 'Get the list for your site', href: '#order' },
     og: '/og/og-audit.png',
@@ -433,6 +433,7 @@ export const PRODUCTS: Product[] = [
       { item: 'Text that lives in files, for the gates', cost: 'Free', why: 'The sixteen gates read Markdown or MDX files. On WordPress, Tilda and similar the gates cannot run, so they never enter your list and you are not charged for them. Everything else on this page works on any platform.' },
       { item: 'Your site address', cost: 'Free', why: 'That is all we need to produce the list and the price.' },
       { item: 'No paid tool, ever', cost: 'Free', why: 'Nothing we close depends on a service you would have to subscribe to. You can re-run every check yourself with the free tool and see the same result.' },
+      { item: 'A site of up to about fifty pages', cost: 'Included in the 249', why: 'The gates run over every page rather than a sample, so a larger corpus is more work. Above that we quote on the list before you pay, and the quote is part of the agreement.' },
     ],
     notFor: [
       'Writing: the opening paragraphs, the sources and the missing pages need your facts, and that is Foundation',
