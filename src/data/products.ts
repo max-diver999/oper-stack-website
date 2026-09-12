@@ -54,9 +54,9 @@ export const PRODUCTS: Product[] = [
   {
     slug: 'gates',
     label: 'Free, open source',
-    name: 'Fifteen gates',
-    title: 'Fifteen Content Gates for MDX Sites, Free',
-    description: 'Fifteen automated quality gates for content sites: cut titles, copied paragraphs, hollow sections, dead links, stale llms.txt, unsourced figures. One command, one config, MIT.',
+    name: 'Sixteen gates',
+    title: 'Sixteen Content Gates for MDX Sites, Free',
+    description: 'Sixteen automated quality gates for content sites: cut titles, copied paragraphs, hollow sections, dead links, stale llms.txt, unsourced figures, a missing agent surface. One command, one config, MIT.',
     answer: 'The gates are sixteen automated checks that run on an MDX content site in one command and report what must not ship: characters, compile errors, frontmatter, structure, duplication at paragraph and sentence level, hollow sections, links, redirects, the agent index, unsourced figures and the agent surface (the agent card and the markdown copies an assistant reads). 1,660 files take about 13 seconds.',
     price: 'Free',
     priceNote: 'MIT licence, no account, no telemetry',
@@ -126,6 +126,53 @@ export const PRODUCTS: Product[] = [
     relatedGuides: [{ title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }, { title: 'Inbound lead reporting', href: '/guides/inbound-lead-reporting/' }],
   },
   {
+    slug: 'site-report',
+    label: 'Paid, per site',
+    name: 'Automatic site report',
+    title: 'Automatic SEO and AI Visibility Report, 9 USD',
+    description: 'The whole site measured, not one page: six area scores, every check with its finding, how much of your text disappears without JavaScript, and the files an AI agent looks for on your domain. 9 USD, one site, PDF by email.',
+    answer: 'The automatic site report reads up to twenty pages of a site with the same tooling behind the paid audit, renders three of them in a real browser to measure how much text is invisible without JavaScript, and returns a PDF with six area scores, a finding per check, and the three things to fix first. Nobody reads it for you: the numbers are measured and the wording is drafted from the measurements.',
+    price: '9 USD',
+    priceNote: 'One site, one report. No account, no access to anything of yours, no paid tool behind any number',
+    status: 'soon',
+    // Пока товар не заведён на Whop, кнопка ведёт на бесплатную проверку, а не в никуда.
+    // Как только ссылка на оплату появится в checkout.ts, кнопка сама станет «Buy for 9 USD».
+    cta: { text: 'Start with the free check', href: '/ai-visibility/' },
+    og: '/og/og-audit.png',
+    order: 4,
+    get: [
+      'A PDF report on your whole site, not a single page',
+      'Six area scores with the count of checks behind each one, and "not measured" wherever something was not tested',
+      'Every check with what it found on your pages, in plain words',
+      'How much of your text disappears when JavaScript is off, measured in a real browser: the fetchers that quote you do not run scripts',
+      'Whether the files an AI agent looks for exist on your domain at all',
+      'Where the links in your llms.txt actually lead: dead, redirecting or closed to indexing',
+      'The three things to fix first, written as actions rather than labels',
+    ],
+    how: [
+      { step: 'Pay', text: 'Card on Whop. You get an email with one link straight away.' },
+      { step: 'Say which site', text: 'Open the link, type your address. That is the whole form: no account, no access to your Search Console, nothing to install.' },
+      { step: 'Read the PDF', text: 'It arrives by email. We do not keep the address of your site once it has been sent.' },
+    ],
+    needs: [
+      { item: 'The address of your site', cost: 'Free', why: 'That is the whole requirement. Every number in the report is computed from what any stranger can read on your site for nothing.' },
+      { item: 'A public site', cost: 'Free', why: 'Pages behind a login cannot be read from outside, so they cannot be measured. What is public is what search engines and AI see too.' },
+    ],
+    notFor: [
+      'Anyone who wants a person to read the findings and explain what they mean for their business: that is the 149 USD audit',
+      'Anyone who wants the work done for them: that is Fix at 249 USD',
+      'Sites behind a login, and sites that block automated readers',
+    ],
+    faq: [
+      { question: 'How is this different from the free check?', answer: 'The free check opens one page and asks one question. This opens up to twenty pages, runs every check behind the paid audit, and measures what a real browser sees that a plain fetch does not.' },
+      { question: 'Does a person read my report?', answer: 'No. Every number is measured and the wording is drafted from those measurements. If you want a person to read each finding and write what it means for your business, that is the 149 USD audit.' },
+      { question: 'Do I need to install anything?', answer: 'No. You type your address into one field and the report arrives by email.' },
+      { question: 'Do you keep my data?', answer: 'No. The address of your site lives only until the report has been sent. Nothing about your site is stored afterwards and nothing is shared.' },
+      { question: 'Can I run this myself for nothing?', answer: 'Yes, if you use a terminal: the tool behind it is @operstack/audit on npm under an MIT licence. What you are paying for here is not having to.' },
+    ],
+    relatedGuides: [{ title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }, { title: 'Inbound lead audit', href: '/guides/inbound-lead-audit/' }],
+  },
+  {
     slug: 'site-kit',
     label: 'Paid, one licence',
     name: 'Site Kit',
@@ -137,7 +184,7 @@ export const PRODUCTS: Product[] = [
     status: 'soon',
     cta: { text: 'Join the launch list', href: '/audit/?utm=products-site-kit' },
     og: '/og/og-default.png',
-    order: 4,
+    order: 5,
     get: ['Everything in the free starter', 'A WordPress importer: your export becomes pages of the new site, and the report names which old texts are too short, undescribed or undated', 'The page generator: topic list to briefs to MDX, with the gates in the loop until each page passes', 'Niche discovery: seed terms to autocomplete and SERP shapes to a page plan with volumes where a source exists', 'Indexing runbooks: Search Console, Bing, IndexNow, the Google Indexing API on a per-site project, llms.txt', 'Quick start, EULA, licence key and email support for the first month'],
     how: [{ step: 'Buy', text: 'One payment through the checkout; the licence key arrives by email.' }, { step: 'Activate', text: 'npm run activate with the key. The generator and the discovery module unlock.' }, { step: 'Launch', text: 'Discover the niche, generate the first thirty pages, verify with the gates, deploy, submit.' }],
     needs: [
@@ -162,7 +209,7 @@ export const PRODUCTS: Product[] = [
     status: 'available',
     cta: { text: 'Order the audit', href: '#order' },
     og: '/og/og-audit.png',
-    order: 5,
+    order: 6,
     get: ['Scorecard for six areas: technical, content, AEO, GEO, off-page, conversion', 'Critical issues to fix first, with what each one costs you today', 'Technical and on-page checklist with a status and a finding per row', 'AEO and GEO: what answer engines can quote, what blocks them, how the brand is understood', 'Every finding also written as a task you paste into Cursor or Claude Code: the state now, what to change, how to know it is done', 'How much of your text is invisible without JavaScript, measured in a real browser, because the fetchers that quote you do not run scripts', 'Whether the files an AI agent reads exist at all: the agent card and a markdown copy of your pages', 'Roadmap in three phases: week one, weeks two to four, months two and three'],
     how: [{ step: 'Order', text: 'Send the site and how to reach you. We confirm scope and the tier within 24 hours.' }, { step: 'Collect and read', text: 'Public signals are collected automatically; the analyst reads the content and the pages that outrank it.' }, { step: 'Deliver', text: 'The PDF report by email, usually within one to three working days and never later than five. The two packages are quoted in the same letter.' }],
     needs: [
@@ -188,7 +235,7 @@ export const PRODUCTS: Product[] = [
     status: 'available',
     cta: { text: 'Get the list for your site', href: '#order' },
     og: '/og/og-audit.png',
-    order: 6,
+    order: 7,
     get: [
       'The checks from your audit that do not need your subject knowledge, closed. Thirty-six of the forty-four the audit can raise fall in that group; a typical site has around forty of them open or passing, and only the open ones enter your list',
       'The sixteen quality gates run over every page of your corpus, not a sample: cut titles, copied paragraphs, hollow sections, dead links, stale llms.txt, figures with no source',
@@ -235,7 +282,7 @@ export const PRODUCTS: Product[] = [
     status: 'available',
     cta: { text: 'Ask for a quote', href: '#order' },
     og: '/og/og-audit.png',
-    order: 7,
+    order: 8,
     get: [
       'Everything in Fix, on the same terms',
       'An answer-first opening on the pages that already earn impressions: twenty to ninety words, one real figure, the source beside it',

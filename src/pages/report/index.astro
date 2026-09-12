@@ -1,0 +1,100 @@
+---
+/**
+ * Одно поле: адрес вашего сайта.
+ *
+ * Сюда покупатель отчёта попадает по ссылке из письма, которое пришло сразу после оплаты. Больше
+ * ничего у него не спрашиваем: ни регистрации, ни доступов к его счётчикам, ни имени. Почта уже
+ * зашита в подписанную ссылку, поэтому и её вводить не нужно.
+ *
+ * Страница закрыта от индексации и работает без скриптов: обычная форма, обычный POST.
+ */
+import { SITE } from '../../data/site';
+import Favicon from '../../components/Favicon.astro';
+
+export const prerender = false;
+
+const token = Astro.url.searchParams.get('t') || '';
+const error = Astro.url.searchParams.get('e') || '';
+const ru = Astro.url.searchParams.get('lang') === 'ru';
+const t = ru
+  ? {
+      title: 'Адрес вашего сайта',
+      lead: 'Остался один шаг. Напишите адрес сайта, который нужно прочитать, и отчёт придёт на почту, с которой вы оплачивали.',
+      label: 'Адрес сайта',
+      placeholder: 'example.com',
+      button: 'Сделать отчёт',
+      note: 'Проверяются главная и до двадцати страниц из вашей карты сайта. Ничего устанавливать не нужно, доступы не нужны.',
+      noToken: 'Эта страница открывается по ссылке из письма об оплате. Если письма нет, напишите на info@oper-stack.com с адреса, с которого оплачивали.',
+      back: '← На сайт',
+    }
+  : {
+      title: 'Your site address',
+      lead: 'One step left. Tell us which site to read, and the report goes to the address you paid with.',
+      label: 'Site address',
+      placeholder: 'example.com',
+      button: 'Run the report',
+      note: 'We read the homepage and up to twenty pages from your sitemap. Nothing to install, no access to anything of yours.',
+      noToken: 'This page opens from the link in your payment email. If it never arrived, write to info@oper-stack.com from the address you paid with.',
+      back: '← Back to the site',
+    };
+---
+<!DOCTYPE html>
+<html lang={ru ? 'ru' : 'en'}>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>{t.title} · {SITE.name}</title>
+  <Favicon />
+  <link rel="preload" href="/fonts/dm-sans-normal.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin />
+  <link rel="stylesheet" href="/fonts/fonts.css" />
+  <style>
+    :root { --ink: #0B1017; --paper: #F5F2EC; --teal: #3DB8A9; --muted: #8B939E; --line: rgba(245,242,236,.16); }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      background: var(--ink); color: var(--paper);
+      font-family: 'DM Sans', system-ui, sans-serif; padding: 24px;
+    }
+    main { width: 100%; max-width: 30rem; }
+    h1 { font-family: 'Fraunces', Georgia, serif; font-size: clamp(26px, 5vw, 34px); line-height: 1.15; margin: 0 0 12px; }
+    p { color: var(--muted); line-height: 1.55; margin: 0 0 20px; }
+    label { display: block; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+    input[type="url"], input[type="text"] {
+      width: 100%; padding: 14px 16px; font: inherit; color: var(--paper);
+      background: rgba(245,242,236,.06); border: 1px solid var(--line); border-radius: 8px;
+    }
+    input:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
+    button {
+      margin-top: 16px; width: 100%; padding: 14px 16px; font: inherit; font-weight: 600;
+      color: #06110F; background: var(--teal); border: 0; border-radius: 8px; cursor: pointer;
+    }
+    button:hover { filter: brightness(1.08); }
+    .note { font-size: 14px; margin-top: 18px; }
+    .err { color: #E8B84A; border-left: 3px solid #E8B84A; padding-left: 12px; margin-bottom: 18px; }
+    a { color: var(--teal); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>{t.title}</h1>
+    {token ? (
+      <>
+        <p>{t.lead}</p>
+        {error && <p class="err">{error}</p>}
+        <form method="POST" action="/api/report-request/">
+          <input type="hidden" name="t" value={token} />
+          <label for="site">{t.label}</label>
+          <input id="site" name="site" type="text" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder={t.placeholder} required />
+          <button type="submit">{t.button}</button>
+        </form>
+        <p class="note">{t.note}</p>
+      </>
+    ) : (
+      <p>{t.noToken}</p>
+    )}
+    <p class="note"><a href="/">{t.back}</a></p>
+  </main>
+</body>
+</html>
