@@ -19,6 +19,7 @@ export type ReportTier = '9' | '29';
 /** Товары Whop, которые означают отчёт. Пустое значение означает «товар ещё не заведён». */
 const TIER_BY_PRODUCT: Record<string, ReportTier> = {
   prod_xGGOfxv4ZJ9bf: '9',
+  prod_8YWVnEpYSnOSe: '29',
 };
 
 /** Переопределение через окружение: WHOP_REPORT_IDS="prod_a:9,prod_b:29". */

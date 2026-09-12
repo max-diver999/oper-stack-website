@@ -5,6 +5,7 @@ import FaqSection from '../../components/FaqSection.astro';
 import { PRICING_TIERS, PRICING_FAQ, PRICING_INCLUDES } from '../../data/pricing';
 import { NETWORK_HERO } from '../../data/cases';
 import { SITE } from '../../data/site';
+import { PRODUCTS } from '../../data/products';
 
 const canonical = `${SITE.url}/pricing/`;
 
@@ -64,6 +65,27 @@ const faqSchema = {
       </div>
       <a class="btn proof-btn" href="/cases/?utm=pricing-proof">See proof → Cases</a>
     </aside>
+
+    {/* До этой правки страница цен не упоминала продукты вовсе и не вела на них ни одной ссылкой:
+        человек, пришедший узнать, сколько стоит, видел только сметы под проект. */}
+    <section class="shelf">
+      <h2>Or buy a product outright</h2>
+      <p class="shelf-lede">
+        Five of the twelve are free and open source. Four more are bought in one click, from 9 USD,
+        with nothing agreed first. Fix and Foundation are the exception: the list of work is agreed
+        in writing before any money moves, which is why they carry a quote rather than a button.
+      </p>
+      <ul class="shelf-list">
+        {PRODUCTS.filter((p) => p.status === 'available').sort((a, b) => a.order - b.order).map((p) => (
+          <li>
+            <a href={`/products/${p.slug}/`}>{p.name}</a>
+            <span class="shelf-price">{p.price}</span>
+            <span class="shelf-note">{p.label}</span>
+          </li>
+        ))}
+      </ul>
+      <p><a class="btn btn-ghost" href="/products/">All twelve products →</a></p>
+    </section>
 
     <section class="includes">
       <h2>What every plan includes</h2>
@@ -200,6 +222,24 @@ const faqSchema = {
     border: 1px solid rgba(61, 184, 169, 0.28);
     background: linear-gradient(135deg, rgba(61, 184, 169, 0.1), rgba(232, 184, 74, 0.06));
   }
+  .shelf { margin: 48px 0 8px; }
+  .shelf-lede { color: var(--muted); max-width: 62ch; margin: 8px 0 18px; }
+  .shelf-list { list-style: none; padding: 0; margin: 0 0 20px; display: grid; gap: 10px; }
+  .shelf-list li {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: baseline;
+    gap: 4px 14px;
+    padding: 12px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.02);
+  }
+  .shelf-list a { font-weight: 600; text-decoration: none; }
+  .shelf-price { font-family: var(--fm); font-size: 14px; color: var(--amber-soft); white-space: nowrap; }
+  .shelf-note { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
+  @media (max-width: 600px) { .shelf-list li { grid-template-columns: 1fr; } }
+
   .proof-eyebrow {
     font-family: var(--fm);
     font-size: 9px;

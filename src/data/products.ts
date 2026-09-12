@@ -177,10 +177,10 @@ export const PRODUCTS: Product[] = [
     answer: 'The automatic site report reads up to twenty pages of a site with the same tooling behind the paid audit, renders three of them in a real browser to measure how much text is invisible without JavaScript, and returns a PDF with six area scores, a finding per check, and the three things to fix first. Nobody reads it for you: the numbers are measured and the wording is drafted from the measurements.',
     price: '9 USD',
     priceNote: 'One site, one report. No account, no access to anything of yours, no paid tool behind any number',
-    status: 'soon',
+    status: 'available',
     // Пока товар не заведён на Whop, кнопка ведёт на бесплатную проверку, а не в никуда.
     // Как только ссылка на оплату появится в checkout.ts, кнопка сама станет «Buy for 9 USD».
-    cta: { text: 'Start with the free check', href: '/ai-visibility/' },
+    cta: { text: 'Buy for 9 USD', href: 'https://whop.com/oper-stack/automatic-site-report', external: true },
     og: '/og/og-site-report.png',
     order: 5,
     get: [
@@ -224,8 +224,8 @@ export const PRODUCTS: Product[] = [
     answer: 'The rival watch runs the automatic site report on your site and on up to three competitors, puts the six area scores and the checks that matter most in one table, and then re-reads your site once a week for four weeks, emailing what was fixed, what broke and which figures moved. The subscription expires by itself at the end of the month; there is nothing to cancel.',
     price: '29 USD',
     priceNote: 'One site and up to three rivals, plus four weekly re-checks. It ends by itself after a month: there is no subscription to cancel',
-    status: 'soon',
-    cta: { text: 'Start with the free check', href: '/ai-visibility/' },
+    status: 'available',
+    cta: { text: 'Buy for 29 USD', href: 'https://whop.com/oper-stack/you-and-three-rivals-watched-for-a-month', external: true },
     og: '/og/og-rival-watch.png',
     order: 6,
     get: [
@@ -310,8 +310,8 @@ export const PRODUCTS: Product[] = [
     answer: 'Site Kit is the full pipeline the gates came from, packaged for one person: the Astro starter, a generator that turns a topic list into gate-passing pages through Claude, a niche discovery module that finds the queries a market actually types, indexing runbooks for Google, Bing and answer engines, a quick start and a licence key. If you already have a site, the WordPress importer turns your export into pages of the new one and then tells you what is wrong with those old texts: which are too short, which have no description for the search result, which have no dates. It is a one-time purchase per site owner.',
     price: '79 USD',
     priceNote: 'One licence per owner, unlimited sites, updates for a year. The page generator runs on your own OpenAI or Anthropic key, paid to them, a few cents a page',
-    status: 'soon',
-    cta: { text: 'Join the launch list', href: '/audit/?utm=products-site-kit' },
+    status: 'available',
+    cta: { text: 'Buy for 79 USD', href: 'https://whop.com/oper-stack/operstack-site-kit', external: true },
     og: '/og/og-site-kit.png',
     order: 8,
     get: ['Everything in the free starter', 'A WordPress importer: your export becomes pages of the new site, and the report names which old texts are too short, undescribed or undated', 'The page generator: topic list to briefs to MDX, with the gates in the loop until each page passes', 'Niche discovery: seed terms to autocomplete and SERP shapes to a page plan with volumes where a source exists', 'Indexing runbooks: Search Console, Bing, IndexNow, the Google Indexing API on a per-site project, llms.txt', 'Quick start, EULA, licence key and email support for the first month'],
@@ -336,7 +336,7 @@ export const PRODUCTS: Product[] = [
     price: '149 USD',
     priceNote: 'The price of the first ten audits, then 249 USD. With read-only access to your own free Search Console and Bing Webmaster it is 199 USD and adds your real queries and positions. Usually one to three working days, five at most',
     status: 'available',
-    cta: { text: 'Order the audit', href: '#order' },
+    cta: { text: 'Buy the audit for 149 USD', href: 'https://whop.com/oper-stack/seo-aeo-and-geo-audit', external: true },
     og: '/og/og-audit.png',
     order: 9,
     get: ['Scorecard for six areas: technical, content, AEO, GEO, off-page, conversion', 'Critical issues to fix first, with what each one costs you today', 'Technical and on-page checklist with a status and a finding per row', 'AEO and GEO: what answer engines can quote, what blocks them, how the brand is understood', 'Every finding also written as a task you paste into Cursor or Claude Code: the state now, what to change, how to know it is done', 'How much of your text is invisible without JavaScript, measured in a real browser, because the fetchers that quote you do not run scripts', 'Whether the files an AI agent reads exist at all: the agent card and a markdown copy of your pages', 'Roadmap in three phases: week one, weeks two to four, months two and three'],

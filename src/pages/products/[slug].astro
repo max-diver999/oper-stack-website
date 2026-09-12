@@ -58,6 +58,13 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
       </span>
     </div>
 
+    {cta.external && cta.href.includes('whop.com') && (
+      <p class="buy-terms">
+        Payment is taken by Whop. Buying means you accept the <a href="/terms/">terms</a> and the
+        <a href="/refunds/"> refund policy</a>: what is included, when it arrives and when we give the money back.
+      </p>
+    )}
+
     {p.slug === 'gates' && (
       <p class="ph-badge">
         <a href="https://www.producthunt.com/posts/operstack-gates?utm_source=badge-featured&utm_medium=badge" target="_blank" rel="noopener">
@@ -161,6 +168,7 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
   .price-box { display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap; margin: 28px 0 8px; padding: 22px; border-radius: 14px; border: 1px solid rgba(61,184,169,0.28); background: rgba(26,138,125,0.08); }
   .price { font-family: var(--fd); font-size: 30px; line-height: 1; margin: 0 0 6px; }
   .price-note { font-size: 13px; color: var(--muted); margin: 0; }
+  .buy-terms { font-size: 13px; line-height: 1.55; color: var(--muted); margin: 0 0 8px; }
   .install pre { background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.08); border-radius: 10px; padding: 14px 16px; overflow-x: auto; margin-bottom: 10px; }
   .install code, .note code { font-family: var(--fm); font-size: 14px; color: var(--amber-soft); }
   .note { font-size: 14px; color: var(--muted); margin-top: 10px; }
