@@ -89,7 +89,7 @@ export const POST: APIRoute = async ({ request }) => {
   // Отчёт за 9 и за 29: другой товар, другая выдача. Письмо со ссылкой на форму, где покупатель
   // называет свой сайт. Проверяем это раньше кита: у кита свои идентификаторы, они не пересекаются.
   const report = readWhopReport(event, reportTierMap(env('WHOP_REPORT_IDS')));
-  if (report.tier && ['payment.succeeded', 'membership.went_valid', 'membership_went_valid'].includes(report.type)) {
+  if (report.tier && ['payment.succeeded', 'membership.activated', 'membership.went_valid', 'membership_went_valid'].includes(report.type)) {
     const buyer = report.email ?? (report.userId ? await getBuyerEmail(report.userId) : null);
     if (!buyer) {
       await notifyTelegram(`Отчёт за ${report.tier} оплачен на Whop (${report.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать вручную.`);
@@ -115,7 +115,7 @@ export const POST: APIRoute = async ({ request }) => {
   const agencyPaid = agencyIds.length
     ? readWhopPayment(event, Object.fromEntries(agencyIds.map((id) => [id, 'agency' as const])))
     : { plan: null as null | 'agency', type: '', email: null as string | null, userId: null as string | null, paymentId: '' };
-  if (agencyPaid.plan && ['payment.succeeded', 'membership.went_valid', 'membership_went_valid'].includes(agencyPaid.type)) {
+  if (agencyPaid.plan && ['payment.succeeded', 'membership.activated', 'membership.went_valid', 'membership_went_valid'].includes(agencyPaid.type)) {
     const buyer = agencyPaid.email ?? (agencyPaid.userId ? await getBuyerEmail(agencyPaid.userId) : null);
     if (!buyer) {
       await notifyTelegram(`Агентский план оплачен (${agencyPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать ключ вручную.`);
@@ -124,13 +124,12 @@ export const POST: APIRoute = async ({ request }) => {
     // 35 дней, а не 30: платёж может задержаться на сутки, и оформление не должно отваливаться
     // у того, кто заплатил вовремя.
     const { key, expires } = issueLicenceKey({ email: buyer, plan: 'agency', days: 35 }, privatePem);
-    const renewal = agencyPaid.type === 'payment.succeeded';
     try {
       await sendTransactionalMail({ to: buyer, ...buildAgencyEmail({
-        email: buyer, key, expires, renewal,
+        email: buyer, key, expires,
         supportEmail: 'support@oper-stack.com', siteUrl: SITE.url,
       }) });
-      await notifyTelegram(`🔑 Агентский план${renewal ? ' продлён' : ''}: ключ отправлен на ${buyer}, действует до ${expires}, платёж ${agencyPaid.paymentId}.`);
+      await notifyTelegram(`🔑 Агентский план: ключ отправлен на ${buyer}, действует до ${expires}, платёж ${agencyPaid.paymentId}.`);
       return json({ ok: true, handled: true, product: 'agency' });
     } catch (err) {
       console.error('agency mail failed:', err);
@@ -142,7 +141,7 @@ export const POST: APIRoute = async ({ request }) => {
   // «Боль в страницы»: тот же ключ и то же письмо, но свой архив и свои шаги запуска.
   const painIds = env('WHOP_PAIN_IDS', 'prod_TSQ7HucCUfmMi').split(',').map((s) => s.trim()).filter(Boolean);
   const painPaid = readWhopPayment(event, Object.fromEntries(painIds.map((id) => [id, 'owner' as const])));
-  if (painPaid.plan && ['payment.succeeded', 'membership.went_valid', 'membership_went_valid'].includes(painPaid.type)) {
+  if (painPaid.plan && ['payment.succeeded', 'membership.activated', 'membership.went_valid', 'membership_went_valid'].includes(painPaid.type)) {
     const buyer = painPaid.email ?? (painPaid.userId ? await getBuyerEmail(painPaid.userId) : null);
     if (!buyer) {
       await notifyTelegram(`«Боль в страницы» оплачена (${painPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать ключ вручную.`);

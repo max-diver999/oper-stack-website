@@ -152,14 +152,13 @@ check('в ключе записан агентский план', claim.plan ===
 check('почта в ключе приведена к нижнему регистру', claim.email === 'agency@example.com');
 
 const first = buildAgencyEmail({ email: 'a@b.c', key: month.key, expires: month.expires, supportEmail: 's@x', siteUrl: 'https://x' });
-check('первое письмо не называется продлением', !/renewed/i.test(first.subject));
+check('письмо не обещает продление тому, кто купил впервые', !/renewed/i.test(first.subject) && !/renewed/i.test(first.text));
 check('письмо ведёт в npm, а не в архив', first.text.includes('npm install -g @operstack/audit'));
 check('в письме есть сама команда прогона', first.text.includes('operstack-audit batch'));
 check('ключ в письме целиком', first.text.includes(month.key));
 check('в письме нет ссылки на скачивание архива', !/kit-download/.test(first.text));
 
-const again = buildAgencyEmail({ email: 'a@b.c', key: month.key, expires: month.expires, supportEmail: 's@x', siteUrl: 'https://x', renewal: true });
-check('продление названо продлением', /renewed/i.test(again.subject) && /renewed/i.test(again.text));
+check('письмо называет срок, до которого ключ жив', first.text.includes(month.expires));
 
 
 console.log(failures ? `\n${failures} check(s) failed` : '\nall checks passed');

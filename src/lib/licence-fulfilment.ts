@@ -342,7 +342,7 @@ export async function handleWhopPayment(event: any, deps: WhopFulfilmentDeps): P
  * живёт месяц, а не год: каждый успешный платёж присылает новый.
  */
 export function buildAgencyEmail(input: {
-  email: string; key: string; expires: string; supportEmail: string; siteUrl: string; renewal?: boolean;
+  email: string; key: string; expires: string; supportEmail: string; siteUrl: string;
 }) {
   const esc = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
   const steps = [
@@ -350,10 +350,11 @@ export function buildAgencyEmail(input: {
     `export OPERSTACK_LICENCE="${input.key}"`,
     'operstack-audit batch clients.txt --by "Your Agency" --logo logo.svg --color "#7b3fa0" --no-tool-line --pdf',
   ];
+  // Whop присылает payment.succeeded и на первую покупку, и на каждое продление, и отличить их
+  // по событию нельзя. Поэтому письмо написано так, чтобы быть верным в обоих случаях: обещать
+  // человеку продление там, где он только что купил впервые, хуже, чем не упоминать его вовсе.
   const lines = [
-    input.renewal
-      ? 'Your OperStack agency plan renewed. Here is the key for the next month.'
-      : 'Your OperStack agency plan is active. Here is your key.',
+    'Your OperStack agency plan is active. Here is your key for this month.',
     '',
     `Licence key: ${input.key}`,
     `Valid until: ${input.expires} (a new key arrives with every renewal)`,
@@ -369,7 +370,7 @@ export function buildAgencyEmail(input: {
   ];
   const text = lines.join('\n');
   return {
-    subject: input.renewal ? 'OperStack agency plan renewed' : 'Your OperStack agency licence key',
+    subject: 'Your OperStack agency licence key',
     text,
     html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6;color:#111">${esc(text).replace(/\n/g, '<br>')}</div>`,
   };
