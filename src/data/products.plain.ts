@@ -61,17 +61,19 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
     ],
     youDo: ['Paste one block into your Claude or Cursor settings', 'Ask the assistant about a site in plain words', 'Read what it found and change what it named'],
   },
-  'site-report': {
+    'site-report': {
     plain:
-      'You pay nine dollars, type the address of your site into one field, and a report arrives by email. It reads up to twenty of your pages the way a search engine and an AI read them, and tells you in plain words what they can and cannot see: which pages are too thin to quote, how much of your text disappears if scripts do not run, whether the files an AI assistant looks for exist on your site at all. Nobody reads the report for you: every number in it is measured, and the wording is assembled from those measurements.',
+      'You pay nine dollars, type the address of your site into one field, and two files arrive by email. The first is a list of tasks: one for every problem found on your site, each written in plain words. Take a task, hand it to whoever looks after your site or paste it into ChatGPT, Claude or Cursor, and the work gets done. Each task tells you what your site does now, what to change, and how to check the change worked. The second file is the measurement the tasks came from: what a search engine and an AI can and cannot see on up to twenty of your pages. You do not need to know any code and you do not need a terminal.',
     who: [
-      'An owner who ran the free check, saw a bad score on one page, and wants to know how bad the whole site is',
-      'A marketer who needs the real numbers before asking for a budget',
-      'Anyone weighing up the full audit and wanting to see the measurements first',
+      'An owner who knows something is wrong and wants to know exactly what to ask for',
+      'Someone who has no developer and wants an assistant to do the work from a clear brief',
+      'A marketer who wants to hand a client a list of fixes rather than a list of complaints',
+      'Anyone learning to do this for other people and wanting to see how a real fix list is written',
     ],
     youDo: ['Pay by card', 'Open the link from the email and type your site address', 'Read the PDF that arrives'],
   },
-  'rival-watch': {
+  
+'rival-watch': {
     plain:
       'You get the same report as the nine dollar one, and next to it the same measurements for up to three competitors you name, in one table. Then for the next four weeks your site is re-read once a week and you get a short email saying what got better, what broke and which numbers moved. It stops by itself after a month: there is nothing to cancel and we keep no card.',
     who: [

@@ -1,7 +1,7 @@
 # Gates report
 
 Site: (not set)  
-Run: 2026-09-12T11:59:35.680Z  
+Run: 2026-09-12T23:19:21.582Z  
 Files: 44
 
 | # | Gate | Status | Summary |
@@ -13,11 +13,11 @@ Files: 44
 | 5 | duplication | pass | 0 shared block(s) on 0 page(s), 0 near-duplicate, 0 in-page repeat(s) |
 | 6 | shared-sentences | pass | 0 sentence(s) and 0 fragment(s) on 3+ pages |
 | 7 | hollow-sections | warn | 0 hollow section(s), 1 finding(s) |
-| 8 | internal-links | pass | no broken links in 72 built pages |
+| 8 | internal-links | pass | no broken links in 73 built pages |
 | 9 | link-semantics | warn | 28 anchor(s) disagree with their target |
 | 10 | meta | pass | titles and descriptions clean |
 | 11 | readability | warn | 18 readability flag(s) |
-| 12 | images | pass | 2 image URL(s) return 200 |
+| 12 | images | fail | 1 of 3 image(s) unreachable |
 | 13 | redirects | pass | 0 redirects, no cycles or chains |
 | 14 | ai-index | pass | 70 entries match the site |
 | 15 | claims | pass | every figure is sourced or framed as an example |
@@ -237,3 +237,7 @@ Files: 44
 - `src/content/guides/sales-team-onboarding-ai.md` 14 sentences over 45 words
 - `src/content/guides/sla-speed-to-lead.md` 11 sentences over 45 words
 - `src/content/guides/website-lead-capture.md` 15 sentences over 45 words
+
+## 12. images (1)
+
+- `src/pages/prospects/index.astro` HTTP 404 https://your-site.com/logo.svg

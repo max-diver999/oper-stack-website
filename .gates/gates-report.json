@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2026-09-12T11:59:35.680Z",
+    "generatedAt": "2026-09-12T23:19:21.582Z",
     "siteUrl": "",
     "files": 44
   },
@@ -702,11 +702,11 @@
       "id": 8,
       "name": "internal-links",
       "status": "pass",
-      "summary": "no broken links in 72 built pages",
+      "summary": "no broken links in 73 built pages",
       "findings": [],
       "stats": {
         "mode": "build",
-        "pages": 72,
+        "pages": 73,
         "broken": 0
       }
     },
@@ -923,11 +923,16 @@
     {
       "id": 12,
       "name": "images",
-      "status": "pass",
-      "summary": "2 image URL(s) return 200",
-      "findings": [],
+      "status": "fail",
+      "summary": "1 of 3 image(s) unreachable",
+      "findings": [
+        {
+          "file": "src/pages/prospects/index.astro",
+          "message": "HTTP 404 https://your-site.com/logo.svg"
+        }
+      ],
       "stats": {
-        "checked": 2,
+        "checked": 3,
         "ok": 2
       }
     },
