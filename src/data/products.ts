@@ -380,7 +380,7 @@ export const PRODUCTS: Product[] = [
     label: 'Paid, per site',
     name: 'SEO, AEO and GEO audit',
     title: 'SEO, AEO and GEO Audit for a Content Site',
-    description: 'A twelve-page audit of your site: forty checks across six areas, every score computed from the checks and printed with the count behind it. 149 USD for the first ten audits, then 249. Usually one to three working days, five at most.',
+    description: 'A twelve-page audit of your site: thirty-four to forty-four checks across six areas depending on what your site has, every score computed from the checks and printed with the count behind it. 149 USD for the first ten audits, then 249. Usually one to three working days, five at most.',
     answer: 'The audit collects the public signals of your site with the same tooling behind the gates, adds an analyst\'s reading of the content, the answer-engine readiness and the AI-system visibility, and delivers a ten-page report with a scorecard, the critical issues, a technical checklist, and a roadmap in three phases. Every finding has a price to fix it.',
     price: '149 USD',
     priceNote: 'The price of the first ten audits, then 249 USD. With read-only access to your own free Search Console and Bing Webmaster it is 199 USD and adds your real queries and positions. Usually one to three working days, five at most',
