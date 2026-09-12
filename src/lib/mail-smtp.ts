@@ -30,7 +30,7 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
       from: env('LICENCE_FROM', `OperStack <${user}>`),
       to: msg.to,
       cc: cc && cc !== msg.to ? cc : undefined,
-      replyTo: 'support@oper-stack.com',
+      replyTo: 'info@oper-stack.com',
       subject: msg.subject,
       text: msg.text,
       html: msg.html,

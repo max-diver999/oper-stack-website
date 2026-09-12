@@ -69,25 +69,33 @@ export function parsePriceMap(spec: string): Record<string, Plan> {
 }
 
 /** Signed, time-limited download token: base64url(JSON) + "." + HMAC. */
-export function makeDownloadToken(claims: { email: string; exp: number }, secret: string): string {
+/**
+ * Какой продукт скачивают. Раньше продукт был один, и токен его не называл: ссылка всегда вела
+ * в репозиторий кита. Теперь продуктов два, и ссылка обязана знать, за каким из них пришли,
+ * иначе покупатель «Боли в страницы» скачал бы Site Kit.
+ */
+export type DownloadProduct = 'site-kit' | 'pain-to-seo';
+
+export function makeDownloadToken(claims: { email: string; exp: number; product?: DownloadProduct }, secret: string): string {
   const body = Buffer.from(JSON.stringify(claims)).toString('base64url');
   return `${body}.${createHmac('sha256', secret).update(body).digest('base64url')}`;
 }
 
-export function verifyDownloadToken(token: string, secret: string, nowSec: number = Math.floor(Date.now() / 1000)): { ok: boolean; email?: string; reason?: string } {
+export function verifyDownloadToken(token: string, secret: string, nowSec: number = Math.floor(Date.now() / 1000)): { ok: boolean; email?: string; product?: DownloadProduct; reason?: string } {
   const [body, mac] = String(token || '').split('.');
   if (!body || !mac) return { ok: false, reason: 'malformed token' };
   const expected = Buffer.from(createHmac('sha256', secret).update(body).digest('base64url'));
   const given = Buffer.from(mac);
   if (expected.length !== given.length || !timingSafeEqual(expected, given)) return { ok: false, reason: 'bad signature' };
-  let claims: { email?: string; exp?: number };
+  let claims: { email?: string; exp?: number; product?: DownloadProduct };
   try {
     claims = JSON.parse(Buffer.from(body, 'base64url').toString('utf8'));
   } catch {
     return { ok: false, reason: 'unreadable token' };
   }
   if (!claims.exp || claims.exp < nowSec) return { ok: false, reason: 'link expired' };
-  return { ok: true, email: claims.email };
+  // Ссылки, выданные до появления второго продукта, продукта не называют: это кит.
+  return { ok: true, email: claims.email, product: claims.product ?? 'site-kit' };
 }
 
 /**
@@ -97,9 +105,11 @@ export function verifyDownloadToken(token: string, secret: string, nowSec: numbe
  */
 export function buildLicenceEmail(input: {
   email: string; key: string; plan: Plan; expires: string; downloadUrl: string;
-  supportEmail: string; siteUrl: string; lang?: 'en' | 'ru';
+  supportEmail: string; siteUrl: string; lang?: 'en' | 'ru'; product?: DownloadProduct;
 }) {
   const ru = input.lang === 'ru';
+  // Продуктов, которые выдаются ключом, теперь два, и шаги запуска у них разные.
+  const isPain = input.product === 'pain-to-seo';
   const planLabel = ru
     ? (input.plan === 'agency' ? 'тариф «Агентство»' : 'тариф «Владелец»')
     : (input.plan === 'agency' ? 'Agency plan' : 'Owner plan');
@@ -107,36 +117,48 @@ export function buildLicenceEmail(input: {
 
   const t = ru
     ? {
-        subject: 'Ваш лицензионный ключ OperStack Site Kit',
-        thanks: 'Спасибо за покупку OperStack Site Kit.',
+        subject: isPain ? 'Ваш лицензионный ключ «Боль в страницы»' : 'Ваш лицензионный ключ OperStack Site Kit',
+        thanks: isPain ? 'Спасибо за покупку «Боли в страницы».' : 'Спасибо за покупку OperStack Site Kit.',
         keyLabel: 'Лицензионный ключ',
         keyMeta: `${planLabel}, обновления до ${input.expires}`,
-        dlLabel: 'Скачать комплект',
+        dlLabel: isPain ? 'Скачать программу' : 'Скачать комплект',
         dlMeta: 'ссылка работает 30 дней, новую можно попросить в любой момент',
         startLabel: 'С чего начать',
-        steps: [
-          'Распакуйте архив и откройте папку в терминале: npm install',
-          `npm run activate ${input.key}`,
-          'Откройте QUICKSTART.md и идите по нему со второго шага.',
-        ],
+        steps: isPain
+          ? [
+              'Распакуйте архив и откройте папку в терминале: npm install',
+              'node bin/pain.mjs <папка с выгрузкой переписок> --site вашсайт.ru --lang ru',
+              'Откройте полученный отчёт: строки сверху это страницы, которых на сайте нет.',
+            ]
+          : [
+              'Распакуйте архив и откройте папку в терминале: npm install',
+              `npm run activate ${input.key}`,
+              'Откройте QUICKSTART.md и идите по нему со второго шага.',
+            ],
         tail: `Ключ привязан к адресу ${input.email}, никому его не передавайте. Вопросы и возврат, семь дней без объяснения причин: ${input.supportEmail}.`,
-        terms: `Условия: ${input.siteUrl}/terms/ и лицензионное соглашение внутри комплекта.`,
+        terms: `Условия: ${input.siteUrl}/terms/ и лицензионное соглашение внутри архива.`,
       }
     : {
-        subject: 'Your OperStack Site Kit licence',
-        thanks: 'Thank you for buying the OperStack Site Kit.',
+        subject: isPain ? 'Your Pain to SEO licence' : 'Your OperStack Site Kit licence',
+        thanks: isPain ? 'Thank you for buying Pain to SEO.' : 'Thank you for buying the OperStack Site Kit.',
         keyLabel: 'Licence key',
         keyMeta: `${planLabel}, updates until ${input.expires}`,
-        dlLabel: 'Download the kit',
+        dlLabel: isPain ? 'Download the program' : 'Download the kit',
         dlMeta: 'the link works for 30 days; ask for a new one any time',
         startLabel: 'Get started',
-        steps: [
-          'Unzip the archive and open the folder in a terminal: npm install',
-          `npm run activate ${input.key}`,
-          'Open QUICKSTART.md and follow it from step 2.',
-        ],
+        steps: isPain
+          ? [
+              'Unzip the archive and open the folder in a terminal: npm install',
+              'node bin/pain.mjs <folder with your conversation export> --site yoursite.com',
+              'Open the report: the rows at the top are the pages your site does not have.',
+            ]
+          : [
+              'Unzip the archive and open the folder in a terminal: npm install',
+              `npm run activate ${input.key}`,
+              'Open QUICKSTART.md and follow it from step 2.',
+            ],
         tail: `The key is tied to ${input.email}; keep it private. Questions and refunds (seven days, no questions asked): ${input.supportEmail}.`,
-        terms: `Terms: ${input.siteUrl}/terms/ and the EULA inside the kit.`,
+        terms: `Terms: ${input.siteUrl}/terms/ and the EULA inside the archive.`,
       };
 
   const text = [

@@ -12,7 +12,7 @@
  */
 import type { APIRoute } from 'astro';
 import { SITE } from '../../data/site';
-import { handleWhopPayment, issueLicenceKey, makeDownloadToken, parsePriceMap, verifyWhopSignature } from '../../lib/licence-fulfilment';
+import { buildLicenceEmail, handleWhopPayment, issueLicenceKey, makeDownloadToken, parsePriceMap, readWhopPayment, verifyWhopSignature } from '../../lib/licence-fulfilment';
 import { buildReportWelcomeEmail, makeReportToken, readWhopReport, reportTierMap, TOKEN_DAYS } from '../../lib/report-fulfilment';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 
@@ -105,6 +105,31 @@ export const POST: APIRoute = async ({ request }) => {
       console.error('report welcome mail failed:', err);
       await notifyTelegram(`Отчёт за ${report.tier} оплачен (${report.paymentId}), но письмо ${buyer} не ушло: ${(err as Error).message}. Отправить ссылку вручную.`);
       return json({ ok: true, handled: false, reason: 'welcome mail failed' });
+    }
+  }
+
+  // «Боль в страницы»: тот же ключ и то же письмо, но свой архив и свои шаги запуска.
+  const painIds = env('WHOP_PAIN_IDS', 'prod_TSQ7HucCUfmMi').split(',').map((s) => s.trim()).filter(Boolean);
+  const painPaid = readWhopPayment(event, Object.fromEntries(painIds.map((id) => [id, 'owner' as const])));
+  if (painPaid.plan && ['payment.succeeded', 'membership.went_valid', 'membership_went_valid'].includes(painPaid.type)) {
+    const buyer = painPaid.email ?? (painPaid.userId ? await getBuyerEmail(painPaid.userId) : null);
+    if (!buyer) {
+      await notifyTelegram(`«Боль в страницы» оплачена (${painPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать ключ вручную.`);
+      return json({ ok: true, handled: false, reason: 'buyer email not found' });
+    }
+    const { key, expires } = issueLicenceKey({ email: buyer, plan: 'owner' }, privatePem);
+    const link = `${SITE.url}/api/kit-download/?t=${makeDownloadToken({ email: buyer.toLowerCase(), product: 'pain-to-seo', exp: Math.floor(Date.now() / 1000) + 30 * 24 * 3600 }, downloadSecret)}`;
+    try {
+      await sendTransactionalMail({ to: buyer, ...buildLicenceEmail({
+        email: buyer, key, plan: 'owner', expires, downloadUrl: link, product: 'pain-to-seo',
+        supportEmail: 'info@oper-stack.com', siteUrl: SITE.url, lang: env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en',
+      }) });
+      await notifyTelegram(`🔑 «Боль в страницы»: ключ отправлен на ${buyer}, обновления до ${expires}, платёж ${painPaid.paymentId}.`);
+      return json({ ok: true, handled: true, product: 'pain-to-seo' });
+    } catch (err) {
+      console.error('pain-to-seo mail failed:', err);
+      await notifyTelegram(`«Боль в страницы» оплачена (${painPaid.paymentId}), но письмо ${buyer} не ушло: ${(err as Error).message}. Отправить ключ вручную.`);
+      return json({ ok: true, handled: false, reason: 'licence mail failed' });
     }
   }
 

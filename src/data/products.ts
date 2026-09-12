@@ -267,9 +267,9 @@ export const PRODUCTS: Product[] = [
     answer: 'Pain to SEO reads conversation exports on the owner\'s own machine, extracts the question-shaped lines from the customer side, merges the ones that are the same question asked differently, counts how often each was asked, then reads the site and looks for the paragraph that answers each one. It returns a report in three parts: questions with no page at all, questions only mentioned in passing, and questions already covered. The conversations are never uploaded anywhere.',
     price: '69 USD',
     priceNote: 'One licence per owner, any number of sites and archives. Your conversations stay on your machine: there is no upload, no account and no telemetry',
-    status: 'soon',
-    cta: { text: 'See the free check first', href: '/ai-visibility/' },
-    og: '/og/og-default.png',
+    status: 'available',
+    cta: { text: 'Buy for 69 USD', href: 'https://whop.com/oper-stack/pain-to-seo', external: true },
+    og: '/og/og-pain-to-seo.png',
     order: 6,
     get: [
       'A report in three parts: no page for it, mentioned in passing, already covered',
