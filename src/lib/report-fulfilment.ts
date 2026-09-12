@@ -71,6 +71,10 @@ export function verifyReportToken(
 export function normaliseSiteUrl(raw: string): { ok: true; url: string } | { ok: false; reason: string } {
   const s = String(raw || '').trim();
   if (!s) return { ok: false, reason: 'Enter the address of your site.' };
+  // Чужую схему ловим до того, как припишем свою: иначе ftp://example.com превращается в
+  // https://ftp://example.com и человек читает про домен вместо того, что на самом деле не так.
+  const scheme = /^([a-z][a-z0-9+.-]*):/i.exec(s);
+  if (scheme && !/^https?$/i.test(scheme[1])) return { ok: false, reason: 'Only http and https addresses work.' };
   let u: URL;
   try { u = new URL(/^https?:\/\//i.test(s) ? s : `https://${s}`); } catch { return { ok: false, reason: 'That does not look like a web address.' }; }
   if (!/^https?:$/.test(u.protocol)) return { ok: false, reason: 'Only http and https addresses work.' };
@@ -79,7 +83,7 @@ export function normaliseSiteUrl(raw: string): { ok: true; url: string } | { ok:
   return { ok: true, url: `${u.origin}${u.pathname === '/' ? '/' : u.pathname}` };
 }
 
-export type ReportJob = { url: string; email: string; lang: 'ru' | 'en'; tier: ReportTier };
+export type ReportJob = { url: string; email: string; lang: 'ru' | 'en'; tier: ReportTier; rivals?: string[] };
 
 /**
  * Служебное письмо, которое ставит заявку в очередь.
@@ -98,9 +102,10 @@ export function buildRunSubject(job: ReportJob): string {
 export function buildRunBody(job: ReportJob, secret: string): { text: string; html: string } {
   const payload = Buffer.from(JSON.stringify(job)).toString('base64url');
   const line = `REPORT-RUN v1 ${payload} ${createHmac('sha256', secret).update(payload).digest('base64url')}`;
-  const text = [line, '', `Site: ${job.url}`, `Buyer: ${job.email}`, `Tier: ${job.tier} USD`, `Language: ${job.lang}`, '', 'Служебная заявка. Её читает очередь отчётов, отвечать не нужно.'].join('\n');
+  const rivals = job.rivals?.length ? [`Rivals: ${job.rivals.join(', ')}`] : [];
+  const text = [line, '', `Site: ${job.url}`, ...rivals, `Buyer: ${job.email}`, `Tier: ${job.tier} USD`, `Language: ${job.lang}`, '', 'Служебная заявка. Её читает очередь отчётов, отвечать не нужно.'].join('\n');
   const html = [`<pre style="font:12px ui-monospace,monospace;color:#888;white-space:pre-wrap;word-break:break-all">${line}</pre>`,
-    `<p>Site: ${job.url}<br>Buyer: ${job.email}<br>Tier: ${job.tier} USD<br>Language: ${job.lang}</p>`,
+    `<p>Site: ${job.url}<br>${job.rivals?.length ? `Rivals: ${job.rivals.join(', ')}<br>` : ''}Buyer: ${job.email}<br>Tier: ${job.tier} USD<br>Language: ${job.lang}</p>`,
     '<p style="color:#888;font-size:13px">Служебная заявка. Её читает очередь отчётов, отвечать не нужно.</p>'].join('\n');
   return { text, html };
 }
