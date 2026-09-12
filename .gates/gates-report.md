@@ -1,7 +1,7 @@
 # Gates report
 
 Site: (not set)  
-Run: 2026-09-12T02:59:53.228Z  
+Run: 2026-09-12T11:59:35.680Z  
 Files: 44
 
 | # | Gate | Status | Summary |
@@ -19,7 +19,7 @@ Files: 44
 | 11 | readability | warn | 18 readability flag(s) |
 | 12 | images | pass | 2 image URL(s) return 200 |
 | 13 | redirects | pass | 0 redirects, no cycles or chains |
-| 14 | ai-index | pass | 64 entries match the site |
+| 14 | ai-index | pass | 70 entries match the site |
 | 15 | claims | pass | every figure is sourced or framed as an example |
 | 16 | agent-surface | pass | agent card present, 44 page(s) offer markdown |
 

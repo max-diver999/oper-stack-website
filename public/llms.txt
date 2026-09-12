@@ -44,6 +44,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - [All products, free and paid, with what each one needs before you start](https://oper-stack.com/products/)
 - [Free llms.txt checker: does the map for AI still lead anywhere](https://oper-stack.com/tools/llms-txt-checker/)
 - [Free AI visibility check: can ChatGPT read and cite a site](https://oper-stack.com/ai-visibility/)
+- [What the free AI visibility check measures, and what it does not](https://oper-stack.com/products/ai-visibility/)
 - [Sixteen content gates, free and MIT, one command](https://oper-stack.com/products/gates/)
 - [Free Astro starter that already passes the gates](https://oper-stack.com/products/starter/)
 - [Free Claude Code plugin for the same checks](https://oper-stack.com/products/plugin/)
@@ -80,6 +81,14 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - [n8n vs Zapier vs Make: Which Automation Tool](https://oper-stack.com/guides/n8n-vs-zapier-vs-make/): n8n, Zapier and Make compared on the things that decide it in production: error handling, pricing shape, hosting, and who owns the instance when it breaks.
 - [Top AI Automation Agencies and How to Pick One](https://oper-stack.com/guides/top-ai-automation-agencies/): How AI automation agencies differ: four business models behind one label, the proof to demand before signing, and the questions that sort them.
 - [Top AI Consulting Companies: How to Choose](https://oper-stack.com/guides/top-ai-consulting-companies/)
+
+## About and terms
+
+- [About OperStack: who builds these tools and why](https://oper-stack.com/about/)
+- [Contact: email and Telegram, no phone](https://oper-stack.com/contact/)
+- [Refunds: what is returned, when, and how to ask](https://oper-stack.com/refunds/)
+- [Terms of service](https://oper-stack.com/terms/)
+- [Privacy policy: what is collected and what is not](https://oper-stack.com/privacy/)
 
 ## Contact
 
