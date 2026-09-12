@@ -180,7 +180,7 @@ export const PRODUCTS: Product[] = [
     status: 'available',
     // Пока товар не заведён на Whop, кнопка ведёт на бесплатную проверку, а не в никуда.
     // Как только ссылка на оплату появится в checkout.ts, кнопка сама станет «Buy for 9 USD».
-    cta: { text: 'Buy for 9 USD', href: 'https://whop.com/oper-stack/automatic-site-report-live', external: true },
+    cta: { text: 'Buy for 9 USD', href: 'https://whop.com/oper-stack/automatic-site-report', external: true },
     og: '/og/og-site-report.png',
     order: 5,
     get: [
@@ -225,7 +225,7 @@ export const PRODUCTS: Product[] = [
     price: '29 USD',
     priceNote: 'One site and up to three rivals, plus four weekly re-checks. It ends by itself after a month: there is no subscription to cancel',
     status: 'available',
-    cta: { text: 'Buy for 29 USD', href: 'https://whop.com/oper-stack/you-and-three-rivals-watched-for-a-month-57', external: true },
+    cta: { text: 'Buy for 29 USD', href: 'https://whop.com/oper-stack/you-and-three-rivals-watched-for-a-month', external: true },
     og: '/og/og-rival-watch.png',
     order: 6,
     get: [
