@@ -6,62 +6,77 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 
 ## Primary pages
 
-- https://oper-stack.com/ — interactive system map
-- https://oper-stack.com/pricing/ — audit, setup, retainer
-- https://oper-stack.com/cases/ — anonymized client outcomes (GSC, GA4)
-- https://oper-stack.com/audit/ — free Lead Gen stack audit
-- https://oper-stack.com/services/ — engagements: scope, timeline, boundaries
-- https://oper-stack.com/guides/ — lead ops guides
+- [Interactive system map](https://oper-stack.com/)
+- [Audit, setup, retainer](https://oper-stack.com/pricing/)
+- [Anonymized client outcomes (GSC, GA4)](https://oper-stack.com/cases/)
+- [Free Lead Gen stack audit](https://oper-stack.com/audit/)
+- [Engagements: scope, timeline, boundaries](https://oper-stack.com/services/)
+- [Lead ops guides](https://oper-stack.com/guides/)
 
 ## Services
 
-- https://oper-stack.com/services/ — all engagements, scope and boundaries
-- https://oper-stack.com/services/ai-automation-agency/ — AI automation agency for inbound teams
-- https://oper-stack.com/services/ai-automation-services/ — scope, price and timeline per module
-- https://oper-stack.com/services/n8n-agency/ — n8n workflow design, hosting and maintenance
-- https://oper-stack.com/services/ai-sdr/ — AI SDR task split, what stays human
-- https://oper-stack.com/services/ai-agent-development-company/ — custom AI agent development, scope and limits
-- https://oper-stack.com/services/ai-integration-services/ — AI integration into an existing CRM and forms
-- https://oper-stack.com/services/ai-readiness-assessment/ — free readiness scorecard, seven checks
-- https://oper-stack.com/services/ai-automation-consultant/ — advisory only, specification you keep
-- https://oper-stack.com/services/ai-consulting-services/ — advisory scoped to inbound, what we refuse
-- https://oper-stack.com/services/workflow-automation-services/ — process orchestration and error handling
-- https://oper-stack.com/services/ai-implementation-services/ — sequenced roadmap with exit tests
-- https://oper-stack.com/services/ai-receptionist/ — AI receptionist and voice agent for inbound calls
-- https://oper-stack.com/services/ai-customer-service-agent/ — support agent answering from your own docs
-- https://oper-stack.com/services/business-automation-agency/ — one process fixed, for small and mid-sized teams
-- https://oper-stack.com/services/zapier-consultant/ — Zapier audit, rebuild and migration assessment
-- https://oper-stack.com/services/lead-management-system/ — stages, field ownership, deduplication before assignment
-- https://oper-stack.com/services/lead-qualification-setup/ — fit and intent separated, acceptance contract
-- https://oper-stack.com/services/crm-implementation/ — pipeline as a state machine, adoption measured
-- https://oper-stack.com/services/lead-routing-software/ — rule precedence, fallbacks, unassigned count to zero
-- https://oper-stack.com/services/speed-to-lead/ — clock definition, escalation before breach
-- https://oper-stack.com/services/lead-attribution-setup/ — source at intake, revenue join finance accepts
-- https://oper-stack.com/services/marketing-automation-agency/ — nurture stop rules, handoff on evidence
+- [All engagements, scope and boundaries](https://oper-stack.com/services/)
+- [AI automation agency for inbound teams](https://oper-stack.com/services/ai-automation-agency/)
+- [Scope, price and timeline per module](https://oper-stack.com/services/ai-automation-services/)
+- [N8n workflow design, hosting and maintenance](https://oper-stack.com/services/n8n-agency/)
+- [AI SDR task split, what stays human](https://oper-stack.com/services/ai-sdr/)
+- [Custom AI agent development, scope and limits](https://oper-stack.com/services/ai-agent-development-company/)
+- [AI integration into an existing CRM and forms](https://oper-stack.com/services/ai-integration-services/)
+- [Free readiness scorecard, seven checks](https://oper-stack.com/services/ai-readiness-assessment/)
+- [Advisory only, specification you keep](https://oper-stack.com/services/ai-automation-consultant/)
+- [Advisory scoped to inbound, what we refuse](https://oper-stack.com/services/ai-consulting-services/)
+- [Process orchestration and error handling](https://oper-stack.com/services/workflow-automation-services/)
+- [Sequenced roadmap with exit tests](https://oper-stack.com/services/ai-implementation-services/)
+- [AI receptionist and voice agent for inbound calls](https://oper-stack.com/services/ai-receptionist/)
+- [Support agent answering from your own docs](https://oper-stack.com/services/ai-customer-service-agent/)
+- [One process fixed, for small and mid-sized teams](https://oper-stack.com/services/business-automation-agency/)
+- [Zapier audit, rebuild and migration assessment](https://oper-stack.com/services/zapier-consultant/)
+- [Stages, field ownership, deduplication before assignment](https://oper-stack.com/services/lead-management-system/)
+- [Fit and intent separated, acceptance contract](https://oper-stack.com/services/lead-qualification-setup/)
+- [Pipeline as a state machine, adoption measured](https://oper-stack.com/services/crm-implementation/)
+- [Rule precedence, fallbacks, unassigned count to zero](https://oper-stack.com/services/lead-routing-software/)
+- [Clock definition, escalation before breach](https://oper-stack.com/services/speed-to-lead/)
+- [Source at intake, revenue join finance accepts](https://oper-stack.com/services/lead-attribution-setup/)
+- [Nurture stop rules, handoff on evidence](https://oper-stack.com/services/marketing-automation-agency/)
+
+## Products
+
+- [All products, free and paid, with what each one needs before you start](https://oper-stack.com/products/)
+- [Free llms.txt checker: does the map for AI still lead anywhere](https://oper-stack.com/tools/llms-txt-checker/)
+- [Free AI visibility check: can ChatGPT read and cite a site](https://oper-stack.com/ai-visibility/)
+- [Sixteen content gates, free and MIT, one command](https://oper-stack.com/products/gates/)
+- [Free Astro starter that already passes the gates](https://oper-stack.com/products/starter/)
+- [Free Claude Code plugin for the same checks](https://oper-stack.com/products/plugin/)
+- [Automatic site report, 9 USD: the whole site measured, PDF by email](https://oper-stack.com/products/site-report/)
+- [You and three rivals watched for a month, 29 USD](https://oper-stack.com/products/rival-watch/)
+- [Site Kit, 79 USD: the page generator and the niche discovery module](https://oper-stack.com/products/site-kit/)
+- [SEO, AEO and GEO audit, 149 USD for the first ten](https://oper-stack.com/products/seo-audit/)
+- [Fix package, 249 USD, against a list agreed before payment](https://oper-stack.com/products/fix/)
+- [Foundation package, from 500 USD, the text work](https://oper-stack.com/products/foundation/)
 
 ## Guides
 
-- https://oper-stack.com/guides/lead-ops-stack/
-- https://oper-stack.com/guides/ai-lead-qualification/
-- https://oper-stack.com/guides/crm-automation-inbound/
-- https://oper-stack.com/guides/programmatic-seo-lead-gen/
-- https://oper-stack.com/guides/lead-routing-playbook/
-- https://oper-stack.com/guides/aeo-geo-inbound-marketing/
-- https://oper-stack.com/guides/sales-team-onboarding-ai/
-- https://oper-stack.com/guides/lead-attribution-inbound/
-- https://oper-stack.com/guides/sla-speed-to-lead/
-- https://oper-stack.com/guides/lead-hub-vs-crm/
-- https://oper-stack.com/guides/ai-sdr-vs-human-sdr/
-- https://oper-stack.com/guides/inbound-automation-roi/
-- https://oper-stack.com/guides/inbound-lead-audit/
-- https://oper-stack.com/guides/inbound-lead-reporting/
-- https://oper-stack.com/guides/lead-follow-up-system/
-- https://oper-stack.com/guides/lead-ops-vs-revops/
-- https://oper-stack.com/guides/mql-sql-lead-handoff/
-- https://oper-stack.com/guides/website-lead-capture/
-- https://oper-stack.com/guides/n8n-vs-zapier-vs-make/
-- https://oper-stack.com/guides/top-ai-automation-agencies/
-- https://oper-stack.com/guides/top-ai-consulting-companies/
+- [Stack/](https://oper-stack.com/guides/lead-ops)
+- [Qualification/](https://oper-stack.com/guides/ai-lead)
+- [Inbound/](https://oper-stack.com/guides/crm-automation)
+- [Gen/](https://oper-stack.com/guides/programmatic-seo-lead)
+- [Playbook/](https://oper-stack.com/guides/lead-routing)
+- [Marketing/](https://oper-stack.com/guides/aeo-geo-inbound)
+- [Ai/](https://oper-stack.com/guides/sales-team-onboarding)
+- [Inbound/](https://oper-stack.com/guides/lead-attribution)
+- [Lead/](https://oper-stack.com/guides/sla-speed-to)
+- [Crm/](https://oper-stack.com/guides/lead-hub-vs)
+- [Sdr/](https://oper-stack.com/guides/ai-sdr-vs-human)
+- [Roi/](https://oper-stack.com/guides/inbound-automation)
+- [Audit/](https://oper-stack.com/guides/inbound-lead)
+- [Reporting/](https://oper-stack.com/guides/inbound-lead)
+- [System/](https://oper-stack.com/guides/lead-follow-up)
+- [Revops/](https://oper-stack.com/guides/lead-ops-vs)
+- [Handoff/](https://oper-stack.com/guides/mql-sql-lead)
+- [Capture/](https://oper-stack.com/guides/website-lead)
+- [Make/](https://oper-stack.com/guides/n8n-vs-zapier-vs)
+- [Agencies/](https://oper-stack.com/guides/top-ai-automation)
+- [Companies/](https://oper-stack.com/guides/top-ai-consulting)
 
 ## Contact
 
