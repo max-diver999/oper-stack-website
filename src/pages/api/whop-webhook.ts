@@ -122,7 +122,7 @@ export const POST: APIRoute = async ({ request }) => {
     try {
       await sendTransactionalMail({ to: buyer, ...buildLicenceEmail({
         email: buyer, key, plan: 'owner', expires, downloadUrl: link, product: 'pain-to-seo',
-        supportEmail: 'info@oper-stack.com', siteUrl: SITE.url, lang: env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en',
+        supportEmail: 'support@oper-stack.com', siteUrl: SITE.url, lang: env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en',
       }) });
       await notifyTelegram(`🔑 «Боль в страницы»: ключ отправлен на ${buyer}, обновления до ${expires}, платёж ${painPaid.paymentId}.`);
       return json({ ok: true, handled: true, product: 'pain-to-seo' });
@@ -141,7 +141,7 @@ export const POST: APIRoute = async ({ request }) => {
       downloadUrl: (email) => `${SITE.url}/api/kit-download/?t=${makeDownloadToken({ email: email.toLowerCase(), exp: Math.floor(Date.now() / 1000) + 30 * 24 * 3600 }, downloadSecret)}`,
       sendMail: sendTransactionalMail,
       notify: notifyTelegram,
-      supportEmail: 'info@oper-stack.com',
+      supportEmail: 'support@oper-stack.com',
       siteUrl: SITE.url,
     });
     return json({ ok: true, ...result });

@@ -74,7 +74,7 @@ export const POST: APIRoute = async ({ request }) => {
       downloadUrl: (email) => `${SITE.url}/api/kit-download/?t=${makeDownloadToken({ email: email.toLowerCase(), exp: Math.floor(Date.now() / 1000) + 30 * 24 * 3600 }, downloadSecret)}`,
       sendMail: sendTransactionalMail,
       notify: notifyTelegram,
-      supportEmail: 'info@oper-stack.com',
+      supportEmail: 'support@oper-stack.com',
       siteUrl: SITE.url,
     });
     return json({ ok: true, ...result });

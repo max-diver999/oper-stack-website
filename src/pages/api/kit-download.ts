@@ -19,10 +19,10 @@ const text = (body: string, status = 200) =>
 export const GET: APIRoute = async ({ url }) => {
   const secret = env('KIT_DOWNLOAD_SECRET');
   const token = env('KIT_GITHUB_TOKEN');
-  if (!secret || !token) return text('Download is not configured. Write to info@oper-stack.com and we will send the archive by hand.', 503);
+  if (!secret || !token) return text('Download is not configured. Write to support@oper-stack.com and we will send the archive by hand.', 503);
 
   const check = verifyDownloadToken(url.searchParams.get('t') || '', secret);
-  if (!check.ok) return text(`This download link is not valid (${check.reason}). Write to info@oper-stack.com for a fresh one.`, 403);
+  if (!check.ok) return text(`This download link is not valid (${check.reason}). Write to support@oper-stack.com for a fresh one.`, 403);
 
   // Репозиторий выбирается по продукту из подписанной ссылки, а не по одному значению на всех.
   const REPO_BY_PRODUCT: Record<string, string> = {
@@ -33,10 +33,10 @@ export const GET: APIRoute = async ({ url }) => {
 
   const headers = { Authorization: `Bearer ${token}`, 'X-GitHub-Api-Version': '2022-11-28', 'User-Agent': 'oper-stack.com kit download' };
   const release = await fetch(`https://api.github.com/repos/${repo}/releases/latest`, { headers });
-  if (!release.ok) return text('The archive is temporarily unavailable. Write to info@oper-stack.com.', 502);
+  if (!release.ok) return text('The archive is temporarily unavailable. Write to support@oper-stack.com.', 502);
   const body = (await release.json()) as { assets?: { name: string; url: string }[] };
   const asset = (body.assets || []).find((a) => a.name.endsWith('.zip'));
-  if (!asset) return text('The archive is temporarily unavailable. Write to info@oper-stack.com.', 502);
+  if (!asset) return text('The archive is temporarily unavailable. Write to support@oper-stack.com.', 502);
 
   const file = await fetch(asset.url, { headers: { ...headers, Accept: 'application/octet-stream' }, redirect: 'manual' });
   const location = file.headers.get('location');
@@ -47,5 +47,5 @@ export const GET: APIRoute = async ({ url }) => {
       headers: { 'Content-Type': 'application/zip', 'Content-Disposition': `attachment; filename="${asset.name}"`, 'Cache-Control': 'no-store' },
     });
   }
-  return text('The archive is temporarily unavailable. Write to info@oper-stack.com.', 502);
+  return text('The archive is temporarily unavailable. Write to support@oper-stack.com.', 502);
 };
