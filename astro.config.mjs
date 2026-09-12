@@ -3,6 +3,7 @@ import sitemap from '@astrojs/sitemap';
 import vercel from '@astrojs/vercel';
 import referenceConfig from './reference-infra.config.json' with { type: 'json' };
 import { collectContentLastmod } from './scripts/reference-infra/content-lastmod.mjs';
+import rehypeTableLabels from './scripts/rehype/table-labels.mjs';
 
 const contentLastmod = await collectContentLastmod(referenceConfig, { root: process.cwd() });
 const lastmodByUrl = new Map(contentLastmod.map((item) => [item.url, item.lastmod]));
@@ -12,6 +13,11 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'always',
   adapter: vercel({ maxDuration: 30 }),
+  markdown: {
+    // Подписи колонок в ячейках: на телефоне таблица раскладывается в карточки, и без подписи
+    // ячейка теряет смысл. Делается на сборке, чтобы подпись была в готовой странице.
+    rehypePlugins: [rehypeTableLabels],
+  },
   integrations: [
     sitemap({
       filter(page) {

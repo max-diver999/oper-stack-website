@@ -238,7 +238,13 @@ const faqSchema = {
   .shelf-list a { font-weight: 600; text-decoration: none; }
   .shelf-price { font-family: var(--fm); font-size: 14px; color: var(--amber-soft); white-space: nowrap; }
   .shelf-note { grid-column: 1 / -1; font-size: 13px; color: var(--muted); }
-  @media (max-width: 600px) { .shelf-list li { grid-template-columns: 1fr; } }
+  @media (max-width: 680px) {
+    .shelf-list li { grid-template-columns: 1fr; padding: 6px 14px; }
+    /* По ссылке в полке бьют пальцем: строке текста нужна высота, а не только подчёркивание. */
+    .shelf-list a { display: inline-flex; align-items: center; min-height: 40px; }
+    .shelf-price { font-size: 15px; }
+    .shelf-note { font-size: 14px; padding-bottom: 8px; }
+  }
 
   .proof-eyebrow {
     font-family: var(--fm);
@@ -274,5 +280,11 @@ const faqSchema = {
   .guides-cta p {
     color: var(--muted);
     font-size: 15px;
+  }
+
+  /* Телефон: двенадцать пикселей на пояснении к цене читаются с трудом. */
+  @media (max-width: 680px) {
+    .price-note, .proof-note { font-size: 14px; line-height: 1.5; }
+    .proof-eyebrow { font-size: 11px; }
   }
 </style>

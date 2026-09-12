@@ -249,7 +249,11 @@ const faqSchema = {
     outline-offset: 1px;
   }
   .row { display: grid; gap: 16px; grid-template-columns: 1fr 1fr; }
-  @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+  @media (max-width: 600px) {
+    .row { grid-template-columns: 1fr; }
+    .consent input[type='checkbox'] { width: 22px; height: 22px; flex: 0 0 22px; margin-top: 1px; }
+    .consent { font-size: 14px; line-height: 1.5; }
+  }
   button:disabled { opacity: 0.6; cursor: wait; }
   .hp { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
   .msg { font-size: 14px; margin-top: 4px; }

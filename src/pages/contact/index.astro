@@ -119,4 +119,9 @@ const contactSchema = {
     font-family: var(--fm);
     font-size: 13px;
   }
+
+  /* Телефон: подпись способа связи в десять пикселей приходится разбирать. */
+  @media (max-width: 680px) {
+    .way-label { font-size: 12px; letter-spacing: 0.06em; }
+  }
 </style>

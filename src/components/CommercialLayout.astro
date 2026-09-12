@@ -231,6 +231,72 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
       letter-spacing: 0.08em;
       text-transform: uppercase;
     }
+
+    /* Телефон. Мобильных стилей у сайта не было вовсе: ссылки в шапке были высотой в шестнадцать
+       пикселей, а таблица из четырёх колонок сжималась до одного слова в строке. */
+    @media (max-width: 680px) {
+      .site-nav {
+        gap: 2px 18px;
+        padding: 6px 16px;
+        font-size: 11px;
+      }
+      /* Отступы поднимают область нажатия до сорока, а выглядит ссылка ровно как выглядела. */
+      .site-nav a {
+        display: inline-flex;
+        align-items: center;
+        min-height: 40px;
+      }
+
+      .wrap,
+      .site-foot { padding-left: 18px; padding-right: 18px; }
+      .wrap { padding-top: 28px; padding-bottom: 56px; }
+
+      .lede { font-size: 16px; }
+
+      /* Кнопку на телефоне ищут большим пальцем, а не глазами. */
+      .btn {
+        display: flex;
+        justify-content: center;
+        text-align: center;
+        width: 100%;
+        padding: 15px 18px;
+      }
+      .btn + .btn,
+      .btn-ghost { margin-top: 10px; margin-left: 0 !important; }
+
+      /* Строка таблицы становится карточкой, а каждая ячейка получает подпись своей колонки.
+         Подписи проставляет сборка. */
+      .prose table,
+      .prose tbody,
+      .prose tr,
+      .prose td { display: block; width: 100%; }
+      .prose thead { display: none; }
+      .prose table { border: 0; margin: 18px 0 26px; }
+      .prose tr {
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        margin-bottom: 12px;
+        padding: 4px 0;
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .prose td {
+        border: 0;
+        padding: 9px 14px;
+        font-size: 15px;
+        line-height: 1.5;
+      }
+      .prose td[data-label]::before {
+        content: attr(data-label);
+        display: block;
+        font-family: var(--fm);
+        font-size: 10px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--teal-soft);
+        margin-bottom: 3px;
+      }
+      .prose td:empty { display: none; }
+    }
   </style>
 </head>
 <body>

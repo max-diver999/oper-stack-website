@@ -76,7 +76,11 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
     <h2>What you need before you start</h2>
     <table class="needs">
       <thead><tr><th>What</th><th>Cost</th><th>Why</th></tr></thead>
-      <tbody>{p.needs.map((n) => <tr><td>{n.item}</td><td>{n.cost}</td><td>{n.why}</td></tr>)}</tbody>
+      <tbody>{p.needs.map((n) => <tr>
+            <td data-label="What">{n.item}</td>
+            <td data-label="Cost">{n.cost}</td>
+            <td data-label="Why">{n.why}</td>
+          </tr>)}</tbody>
     </table>
 
     <h2>What you get</h2>
@@ -196,5 +200,32 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
   .needs th { text-align: left; padding: .5rem .75rem .5rem 0; border-bottom: 2px solid currentColor; font-size: .8rem; text-transform: uppercase; letter-spacing: .05em; opacity: .7; }
   .needs td { padding: .7rem .75rem .7rem 0; border-bottom: 1px solid rgba(128,128,128,.25); vertical-align: top; }
   .needs td:nth-child(2) { white-space: nowrap; font-weight: 600; }
-  @media (max-width: 640px) { .needs, .needs tbody, .needs tr, .needs td { display: block; width: 100%; } .needs thead { display: none; } .needs tr { padding: .6rem 0; border-bottom: 1px solid rgba(128,128,128,.25); } .needs td { border: 0; padding: .15rem 0; } .needs td:nth-child(2) { white-space: normal; } }
+  /* Телефон: строка таблицы становится карточкой, ячейка получает подпись своей колонки.
+     Без подписи «Free» висит в воздухе и непонятно, к чему относится. */
+  @media (max-width: 640px) {
+    .needs, .needs tbody, .needs tr, .needs td { display: block; width: 100%; }
+    .needs thead { display: none; }
+    .needs tr {
+      padding: 6px 0;
+      margin-bottom: 12px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .needs td { border: 0; padding: 9px 14px; font-size: 15px; line-height: 1.5; }
+    .needs td::before {
+      content: attr(data-label);
+      display: block;
+      font-family: var(--fm);
+      font-size: 10px;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--teal-soft);
+      margin-bottom: 3px;
+    }
+    .needs td:nth-child(2) { white-space: normal; }
+    /* Галочка согласия в тринадцать пикселей нажимается через раз, а без неё форма не уходит. */
+    .consent input[type='checkbox'] { width: 22px; height: 22px; flex: 0 0 22px; margin-top: 1px; }
+    .consent { font-size: 14px; line-height: 1.5; }
+  }
 </style>

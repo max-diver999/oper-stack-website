@@ -393,4 +393,10 @@ const statusLabel = {
     color: rgba(245, 242, 236, 0.78);
     max-width: 62ch;
   }
+
+  /* Телефон: подписи под цифрами набраны двенадцатью пикселями, на узком экране это мелко. */
+  @media (max-width: 680px) {
+    .kpi-label, .period-note, .proof { font-size: 14px; line-height: 1.5; }
+    .kpi-label { letter-spacing: 0.04em; }
+  }
 </style>

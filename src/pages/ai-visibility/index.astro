@@ -191,7 +191,14 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   .capture form { display: grid; gap: 14px; margin-top: 12px; }
   .capture label { display: block; font-size: 12px; font-weight: 600; margin-bottom: 6px; color: rgba(245,242,236,.9); }
   .capture input:not([type=checkbox]) { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.12); background: rgba(0,0,0,.25); color: var(--paper); font: inherit; }
-  .row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; } @media (max-width: 600px) { .row { grid-template-columns: 1fr; } }
+  .row { display: grid; gap: 14px; grid-template-columns: 1fr 1fr; }
+  /* Телефон: согласие человек подтверждает юридически, значит оно должно читаться, а галочка
+     в тринадцать пикселей нажиматься с первого раза. */
+  @media (max-width: 680px) {
+    .row { grid-template-columns: 1fr; }
+    .consent { font-size: 14px; line-height: 1.5; }
+    .consent input[type='checkbox'] { width: 22px; height: 22px; flex: 0 0 22px; margin-top: 1px; }
+  }
   .consent { display: flex; gap: 10px; align-items: flex-start; font-size: 13px; color: var(--muted); } .consent input { width: auto; margin-top: 3px; }
   .hp { position: absolute; left: -9999px; opacity: 0; height: 0; overflow: hidden; }
   .msg { font-size: 14px; } .msg.err { color: #f5a962; }
