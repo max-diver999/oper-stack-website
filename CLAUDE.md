@@ -20,11 +20,12 @@ One-line prompts: **`CLAUDE-CODE-START.md`**.
 
 1. Audit 10 guides → report + roadmap → **stop for Maxim «ок»**
 2. After «ок»: new guides in batches → PR `cc/operstack-en-*`
-3. Cursor: review, merge, deploy (Maxim «выложи»)
+3. Claude Code merges, deploys and submits for indexing itself (authorised 11 Sep 2026).
+   Every deploy must be reported and verified live. Vercel auto-deploys from `main`.
 
 ## Forbidden
 
-- push main, deploy, index without Maxim + Cursor
+- push straight to main without a PR
 - MORE Group / Phuket / listing content
 - copy from moregroup.estate corpora
 

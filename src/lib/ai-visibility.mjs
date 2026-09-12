@@ -173,17 +173,17 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   if (starBlocked) access = 0; else { access -= Math.min(15, blockedSearch.length * 4); access -= Math.min(8, blockedTrain.length * 2); if (noai) access -= 5; }
   access = Math.max(0, access);
   const accessFindings = [];
-  if (starBlocked) accessFindings.push({ level: 'fail', text: 'robots.txt disallows the whole site for every crawler. Nothing can read it.' });
-  if (blockedSearch.length) accessFindings.push({ level: 'fail', text: `Blocked answer-engine fetchers: ${blockedSearch.map((v) => v.label).join(', ')}. These are the bots that cite pages live.` });
-  if (blockedTrain.length) accessFindings.push({ level: 'warn', text: `Blocked training crawlers: ${blockedTrain.map((v) => v.label).join(', ')}. Models will not learn the brand from the site.` });
-  if (noai) accessFindings.push({ level: 'warn', text: 'A page carries a noai robots meta tag.' });
+  if (starBlocked) accessFindings.push({ id: 'robots-all-blocked', level: 'fail', text: 'robots.txt disallows the whole site for every crawler. Nothing can read it.' });
+  if (blockedSearch.length) accessFindings.push({ id: 'robots-fetchers-blocked', level: 'fail', text: `Blocked answer-engine fetchers: ${blockedSearch.map((v) => v.label).join(', ')}. These are the bots that cite pages live.` });
+  if (blockedTrain.length) accessFindings.push({ id: 'robots-training-blocked', level: 'warn', text: `Blocked training crawlers: ${blockedTrain.map((v) => v.label).join(', ')}. Models will not learn the brand from the site.` });
+  if (noai) accessFindings.push({ id: 'noai-meta', level: 'warn', text: 'A page carries a noai robots meta tag.' });
   if (!accessFindings.length) accessFindings.push({ level: 'pass', text: `All ${AI_AGENTS.length} AI crawlers and fetchers are allowed${robots.signal ? ` (Content-Signal: ${robots.signal})` : ''}.` });
 
   // Area 2: agent index (15)
   let index = 0; const indexFindings = [];
-  if (!llmsRes.ok) indexFindings.push({ level: 'fail', text: 'No llms.txt. Answer engines get no map of what the site is and which pages matter.' });
-  else if (!llmsIsText) { index = 3; indexFindings.push({ level: 'fail', text: '/llms.txt answers with an HTML page instead of a text index.' }); }
-  else if (llmsLinks.length && llmsForeign.length > llmsLinks.length / 2) { index = 5; indexFindings.push({ level: 'fail', text: `llms.txt links mostly to other hosts (${[...new Set(llmsForeign.map((l) => new URL(l).host))].slice(0, 3).join(', ')}). An AI system may misidentify the business.` }); }
+  if (!llmsRes.ok) indexFindings.push({ id: 'llms-missing', level: 'fail', text: 'No llms.txt. Answer engines get no map of what the site is and which pages matter.' });
+  else if (!llmsIsText) { index = 3; indexFindings.push({ id: 'llms-not-text', level: 'fail', text: '/llms.txt answers with an HTML page instead of a text index.' }); }
+  else if (llmsLinks.length && llmsForeign.length > llmsLinks.length / 2) { index = 5; indexFindings.push({ id: 'llms-foreign', level: 'fail', text: `llms.txt links mostly to other hosts (${[...new Set(llmsForeign.map((l) => new URL(l).host))].slice(0, 3).join(', ')}). An AI system may misidentify the business.` }); }
   else { index = llmsLinks.length >= 5 ? 15 : 10; indexFindings.push({ level: 'pass', text: `llms.txt present with ${llmsLinks.length} link(s) to the site's own pages.` }); }
 
   // Area 3: entity and structure (20)
@@ -191,11 +191,11 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   const hasOrg = [...allTypes].some((t) => /Organization|LocalBusiness|Corporation|RealEstateAgent|NewsMediaOrganization|Person/.test(t));
   const hasFaq = allTypes.has('FAQPage'); const hasArticle = [...allTypes].some((t) => /Article|BlogPosting|NewsArticle/.test(t));
   let entity = 0; const entityFindings = [];
-  if (hasOrg) { entity += 8; entityFindings.push({ level: 'pass', text: 'Organization or business schema names the entity behind the site.' }); } else entityFindings.push({ level: 'fail', text: 'No Organization or business schema: AI systems have no entity to attach the site to.' });
-  if (hasFaq) { entity += 5; entityFindings.push({ level: 'pass', text: 'FAQPage schema found, the easiest format for an engine to quote.' }); } else entityFindings.push({ level: 'warn', text: 'No FAQPage schema on the sampled pages.' });
-  if (hasArticle) { entity += 3; } else if (sampled.length) entityFindings.push({ level: 'warn', text: 'No Article schema on the sampled content pages.' });
-  if (homePage.canonical) entity += 2; else entityFindings.push({ level: 'warn', text: 'The homepage has no canonical tag.' });
-  if (homePage.ogTitle) entity += 2; else entityFindings.push({ level: 'warn', text: 'No Open Graph tags on the homepage: shared links and previews render without a title or image.' });
+  if (hasOrg) { entity += 8; entityFindings.push({ level: 'pass', text: 'Organization or business schema names the entity behind the site.' }); } else entityFindings.push({ id: 'schema-org-missing', level: 'fail', text: 'No Organization or business schema: AI systems have no entity to attach the site to.' });
+  if (hasFaq) { entity += 5; entityFindings.push({ level: 'pass', text: 'FAQPage schema found, the easiest format for an engine to quote.' }); } else entityFindings.push({ id: 'schema-faq-missing', level: 'warn', text: 'No FAQPage schema on the sampled pages.' });
+  if (hasArticle) { entity += 3; } else if (sampled.length) entityFindings.push({ id: 'schema-article-missing', level: 'warn', text: 'No Article schema on the sampled content pages.' });
+  if (homePage.canonical) entity += 2; else entityFindings.push({ id: 'canonical-missing', level: 'warn', text: 'The homepage has no canonical tag.' });
+  if (homePage.ogTitle) entity += 2; else entityFindings.push({ id: 'og-missing', level: 'warn', text: 'No Open Graph tags on the homepage: shared links and previews render without a title or image.' });
 
   // Area 4: answer-first content (25)
   const contentPages = sampled.length ? sampled : [homePage];
@@ -205,22 +205,22 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   const withTables = contentPages.filter((p) => p.tables > 0).length;
   let content = 0; const contentFindings = [];
   content += Math.round(10 * (1 - thin / contentPages.length));
-  if (thin) contentFindings.push({ level: thin === contentPages.length ? 'fail' : 'warn', text: `${thin} of ${contentPages.length} sampled page(s) hold under 300 words. Engines rarely cite thin pages.` }); else contentFindings.push({ level: 'pass', text: `Sampled pages carry ${Math.round(contentPages.reduce((a, p) => a + p.words, 0) / contentPages.length)} words on average.` });
+  if (thin) contentFindings.push({ id: 'thin-pages', level: thin === contentPages.length ? 'fail' : 'warn', text: `${thin} of ${contentPages.length} sampled page(s) hold under 300 words. Engines rarely cite thin pages.` }); else contentFindings.push({ level: 'pass', text: `Sampled pages carry ${Math.round(contentPages.reduce((a, p) => a + p.words, 0) / contentPages.length)} words on average.` });
   content += Math.round(8 * (answerFirst / contentPages.length));
-  if (answerFirst < contentPages.length) contentFindings.push({ level: answerFirst ? 'warn' : 'fail', text: `${answerFirst} of ${contentPages.length} sampled page(s) open with an answer-first paragraph (20 to 90 words with a figure right after the H1). That paragraph is what gets quoted.` }); else contentFindings.push({ level: 'pass', text: 'Every sampled page opens with an answer-first paragraph carrying a figure.' });
+  if (answerFirst < contentPages.length) contentFindings.push({ id: 'answer-first-missing', level: answerFirst ? 'warn' : 'fail', text: `${answerFirst} of ${contentPages.length} sampled page(s) open with an answer-first paragraph (20 to 90 words with a figure right after the H1). That paragraph is what gets quoted.` }); else contentFindings.push({ level: 'pass', text: 'Every sampled page opens with an answer-first paragraph carrying a figure.' });
   content += Math.round(4 * (structured / contentPages.length)) + Math.round(3 * (withTables / contentPages.length));
-  if (structured < contentPages.length) contentFindings.push({ level: 'warn', text: `${contentPages.length - structured} sampled page(s) have fewer than three H2 sections.` });
-  if (!withTables) contentFindings.push({ level: 'warn', text: 'No tables on the sampled pages. Tables are the second most quoted format after the first paragraph.' });
+  if (structured < contentPages.length) contentFindings.push({ id: 'few-h2', level: 'warn', text: `${contentPages.length - structured} sampled page(s) have fewer than three H2 sections.` });
+  if (!withTables) contentFindings.push({ id: 'no-tables', level: 'warn', text: 'No tables on the sampled pages. Tables are the second most quoted format after the first paragraph.' });
 
   // Area 5: freshness and sources (15)
   const dated = contentPages.filter((p) => p.datePublished || p.dateModified).length;
   const sourced = contentPages.filter((p) => p.sourcePhrases > 0).length;
   let trust = 0; const trustFindings = [];
   trust += Math.round(7 * (dated / contentPages.length));
-  if (dated < contentPages.length) trustFindings.push({ level: dated ? 'warn' : 'fail', text: `${contentPages.length - dated} sampled page(s) expose no publication or modified date. Engines prefer sources they can date.` }); else trustFindings.push({ level: 'pass', text: 'Sampled pages expose publication dates.' });
+  if (dated < contentPages.length) trustFindings.push({ id: 'dates-missing', level: dated ? 'warn' : 'fail', text: `${contentPages.length - dated} sampled page(s) expose no publication or modified date. Engines prefer sources they can date.` }); else trustFindings.push({ level: 'pass', text: 'Sampled pages expose publication dates.' });
   trust += Math.round(5 * (sourced / contentPages.length));
-  if (sourced < contentPages.length) trustFindings.push({ level: 'warn', text: `${contentPages.length - sourced} sampled page(s) name no source for their figures ("according to", "data from").` }); else trustFindings.push({ level: 'pass', text: 'Sampled pages name sources for their figures.' });
-  if (sitemap.found) { trust += sitemap.lastmod ? 3 : 1; if (!sitemap.lastmod) trustFindings.push({ level: 'warn', text: 'The sitemap carries no lastmod dates.' }); } else trustFindings.push({ level: 'fail', text: 'No XML sitemap found at the usual paths or in robots.txt.' });
+  if (sourced < contentPages.length) trustFindings.push({ id: 'sources-missing', level: 'warn', text: `${contentPages.length - sourced} sampled page(s) name no source for their figures ("according to", "data from").` }); else trustFindings.push({ level: 'pass', text: 'Sampled pages name sources for their figures.' });
+  if (sitemap.found) { trust += sitemap.lastmod ? 3 : 1; if (!sitemap.lastmod) trustFindings.push({ id: 'sitemap-no-lastmod', level: 'warn', text: 'The sitemap carries no lastmod dates.' }); } else trustFindings.push({ level: 'fail', text: 'No XML sitemap found at the usual paths or in robots.txt.' });
 
   const areas = [
     { id: 'access', label: 'Can AI crawlers read it', score: access, max: 25, findings: accessFindings },
@@ -231,7 +231,7 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   ];
   const total = areas.reduce((a, x) => a + x.score, 0);
   const grade = total >= 80 ? 'A' : total >= 65 ? 'B' : total >= 45 ? 'C' : total >= 25 ? 'D' : 'E';
-  const fixes = areas.flatMap((a) => a.findings.filter((f) => f.level === 'fail').map((f) => ({ area: a.label, text: f.text }))).concat(areas.flatMap((a) => a.findings.filter((f) => f.level === 'warn').map((f) => ({ area: a.label, text: f.text })))).slice(0, 3);
+  const fixes = areas.flatMap((a) => a.findings.filter((f) => f.level === 'fail').map((f) => ({ id: f.id, area: a.label, text: f.text }))).concat(areas.flatMap((a) => a.findings.filter((f) => f.level === 'warn').map((f) => ({ id: f.id, area: a.label, text: f.text })))).slice(0, 3);
   return {
     ok: true, url: home.url, host, checkedAt: new Date().toISOString(), ms: Date.now() - started,
     score: total, grade, areas, fixes,

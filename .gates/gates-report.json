@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2026-09-12T23:19:21.582Z",
+    "generatedAt": "2026-09-12T23:49:14.838Z",
     "siteUrl": "",
     "files": 44
   },
@@ -702,11 +702,11 @@
       "id": 8,
       "name": "internal-links",
       "status": "pass",
-      "summary": "no broken links in 73 built pages",
+      "summary": "no broken links in 74 built pages",
       "findings": [],
       "stats": {
         "mode": "build",
-        "pages": 73,
+        "pages": 74,
         "broken": 0
       }
     },

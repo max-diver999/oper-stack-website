@@ -32,17 +32,17 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     <section id="vis-result" class="result" hidden aria-live="polite"></section>
 
     <section id="vis-capture" class="capture" hidden>
-      <h2>Get the method behind the score</h2>
-      <p>The sixteen gates PDF: each gate, the failure it was written for, and the fix. Eight pages, free, by email.</p>
+      <h2>Get the first fix, written out, free</h2>
+      <p>We will email you the single task that moves your score most: what your site does now, what to change, and how to check it worked. Hand it to whoever looks after your site, or paste it into ChatGPT, Claude or Cursor. No code, nothing to install.</p>
       <form id="pdf-form" novalidate>
         <input type="hidden" name="source" id="pdf-source" value="ai-visibility" />
         <div class="row">
           <div><label for="pdf-name">Name</label><input id="pdf-name" name="name" autocomplete="name" /></div>
           <div><label for="pdf-email">Email *</label><input id="pdf-email" name="email" type="email" required autocomplete="email" /></div>
         </div>
-        <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive the PDF and, at most once a month, a note when a gate changes.</label></div>
+        <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive the task and, at most once a month, a note when a check changes.</label></div>
         <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
-        <button type="submit" class="btn" id="pdf-btn">Send me the PDF →</button>
+        <button type="submit" class="btn" id="pdf-btn">Email me the first fix →</button>
         <p class="msg" id="pdf-msg" hidden></p>
       </form>
     </section>
@@ -140,13 +140,21 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     pdfForm.addEventListener('submit', async (e) => {
       e.preventDefault(); pdfMsg.hidden = true; pdfBtn.disabled = true;
       const fd = new FormData(pdfForm);
-      const payload = { name: fd.get('name'), email: fd.get('email'), message: last ? `AI visibility ${last.score}/100 (grade ${last.grade}) for ${last.url}` : 'AI visibility PDF request', source: pdfSource.value, website: fd.get('website'), page: location.pathname, formLoadedAt: loadedAt, formElapsedMs: Date.now() - loadedAt };
+      const payload = { name: fd.get('name'), email: fd.get('email'), message: last ? `AI visibility ${last.score}/100 (grade ${last.grade}) for ${last.url}` : 'AI visibility task request', source: pdfSource.value, website: fd.get('website'), page: location.pathname, formLoadedAt: loadedAt, formElapsedMs: Date.now() - loadedAt };
       try {
-        const res = await fetch('/api/lead/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
-        const data = await res.json().catch(() => ({}));
-        if (!res.ok) throw new Error(data.error || 'Request failed');
-        track('lead_form_submit', { form_name: 'ai_visibility_pdf', source: pdfSource.value });
-        location.href = '/thanks/gates-pdf/';
+        // Сначала письмо с задачей: человек пришёл за ней. Лид записываем следом и не роняем
+        // ответ, если CRM недоступна: задача уже ушла, и это главное.
+        const taskRes = await fetch('/api/visibility-task/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: fd.get('email'), url: last ? last.url : '', website: fd.get('website') }) });
+        const taskData = await taskRes.json().catch(() => ({}));
+        if (!taskRes.ok) throw new Error(taskData.error || 'Request failed');
+        fetch('/api/lead/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => {});
+        track('lead_form_submit', { form_name: 'ai_visibility_task', source: pdfSource.value });
+        if (taskData.sent === false) {
+          pdfMsg.textContent = taskData.message || 'Nothing is failing on this site, so there is no task to send.';
+          pdfMsg.className = 'msg'; pdfMsg.hidden = false; pdfBtn.disabled = false;
+          return;
+        }
+        location.href = '/thanks/first-fix/';
       } catch (err: any) { pdfMsg.textContent = err.message || 'Something went wrong. Email info@oper-stack.com'; pdfMsg.className = 'msg err'; pdfMsg.hidden = false; pdfBtn.disabled = false; }
     });
   </script>

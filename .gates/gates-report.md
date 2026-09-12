@@ -1,7 +1,7 @@
 # Gates report
 
 Site: (not set)  
-Run: 2026-09-12T23:19:21.582Z  
+Run: 2026-09-12T23:49:14.838Z  
 Files: 44
 
 | # | Gate | Status | Summary |
@@ -13,7 +13,7 @@ Files: 44
 | 5 | duplication | pass | 0 shared block(s) on 0 page(s), 0 near-duplicate, 0 in-page repeat(s) |
 | 6 | shared-sentences | pass | 0 sentence(s) and 0 fragment(s) on 3+ pages |
 | 7 | hollow-sections | warn | 0 hollow section(s), 1 finding(s) |
-| 8 | internal-links | pass | no broken links in 73 built pages |
+| 8 | internal-links | pass | no broken links in 74 built pages |
 | 9 | link-semantics | warn | 28 anchor(s) disagree with their target |
 | 10 | meta | pass | titles and descriptions clean |
 | 11 | readability | warn | 18 readability flag(s) |
