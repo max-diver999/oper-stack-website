@@ -181,7 +181,7 @@ export const PRODUCTS: Product[] = [
     // Пока товар не заведён на Whop, кнопка ведёт на бесплатную проверку, а не в никуда.
     // Как только ссылка на оплату появится в checkout.ts, кнопка сама станет «Buy for 9 USD».
     cta: { text: 'Start with the free check', href: '/ai-visibility/' },
-    og: '/og/og-audit.png',
+    og: '/og/og-site-report.png',
     order: 5,
     get: [
       'A PDF report on your whole site, not a single page',
@@ -226,7 +226,7 @@ export const PRODUCTS: Product[] = [
     priceNote: 'One site and up to three rivals, plus four weekly re-checks. It ends by itself after a month: there is no subscription to cancel',
     status: 'soon',
     cta: { text: 'Start with the free check', href: '/ai-visibility/' },
-    og: '/og/og-audit.png',
+    og: '/og/og-rival-watch.png',
     order: 6,
     get: [
       'Everything in the 9 USD report, on your own site',
@@ -312,7 +312,7 @@ export const PRODUCTS: Product[] = [
     priceNote: 'One licence per owner, unlimited sites, updates for a year. The page generator runs on your own OpenAI or Anthropic key, paid to them, a few cents a page',
     status: 'soon',
     cta: { text: 'Join the launch list', href: '/audit/?utm=products-site-kit' },
-    og: '/og/og-default.png',
+    og: '/og/og-site-kit.png',
     order: 8,
     get: ['Everything in the free starter', 'A WordPress importer: your export becomes pages of the new site, and the report names which old texts are too short, undescribed or undated', 'The page generator: topic list to briefs to MDX, with the gates in the loop until each page passes', 'Niche discovery: seed terms to autocomplete and SERP shapes to a page plan with volumes where a source exists', 'Indexing runbooks: Search Console, Bing, IndexNow, the Google Indexing API on a per-site project, llms.txt', 'Quick start, EULA, licence key and email support for the first month'],
     how: [{ step: 'Buy', text: 'One payment through the checkout; the licence key arrives by email.' }, { step: 'Activate', text: 'npm run activate with the key. The generator and the discovery module unlock.' }, { step: 'Launch', text: 'Discover the niche, generate the first thirty pages, verify with the gates, deploy, submit.' }],
