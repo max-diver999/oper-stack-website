@@ -50,6 +50,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - [Free MCP server: Claude and Cursor measure a site themselves](https://oper-stack.com/products/mcp/)
 - [Automatic site report, 9 USD: the whole site measured, PDF by email](https://oper-stack.com/products/site-report/)
 - [You and three rivals watched for a month, 29 USD](https://oper-stack.com/products/rival-watch/)
+- [Pain to SEO, 69 USD: the pages your customers already asked for](https://oper-stack.com/products/pain-to-seo/)
 - [Site Kit, 79 USD: the page generator and the niche discovery module](https://oper-stack.com/products/site-kit/)
 - [SEO, AEO and GEO audit, 149 USD for the first ten](https://oper-stack.com/products/seo-audit/)
 - [Fix package, 249 USD, against a list agreed before payment](https://oper-stack.com/products/fix/)

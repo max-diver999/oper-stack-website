@@ -81,6 +81,16 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
     ],
     youDo: ['Pay by card', 'Open the link from the email and name your site and up to three competitors', 'Read the comparison, then read one short email a week for four weeks'],
   },
+  'pain-to-seo': {
+    plain:
+      'Your customers have already told you what your site should say. It is written down in your chat history, your support tickets and your notes after calls, and nobody has read it because there is far too much of it. This reads that pile and tells you which of the questions people actually ask your site says nothing about, and how often each one came up. The conversations stay on your own computer: nothing is uploaded anywhere.',
+    who: [
+      'An owner who has been asked the same question on the phone fifty times and never thought to put it on the site',
+      'A marketer who needs a list of topics that is not guesswork',
+      'Anyone paying for content and wanting the order decided by customers rather than by a content plan',
+    ],
+    youDo: ['Export your chats, tickets or call notes into a folder', 'Run one command pointing at that folder and at your site', 'Write the pages at the top of the list'],
+  },
   'site-kit': {
     plain:
       'Everything one person needs to launch a content website that brings clients from Google and AI assistants, without hiring a developer or a writer. The kit finds what your market actually searches for, writes the first pages from the facts you give it, checks every page with the gates, and walks you through putting the site online and getting it into Google. You follow numbered steps; the instructions explain every word.',
