@@ -1,0 +1,110 @@
+---
+/**
+ * Одно поле: список сайтов, вставленный как есть.
+ *
+ * Сюда покупатель курса попадает по ссылке из своего письма. Больше ничего не спрашиваем: почта
+ * зашита в подписанную ссылку. Ничего не устанавливается, командная строка не открывается, никакой
+ * программы на компьютере не появляется. Человек вставляет то, что у него в блокноте или в таблице,
+ * и получает результат письмом.
+ *
+ * Страница закрыта от индексации и работает без скриптов: обычная форма, обычный POST.
+ */
+import { SITE } from '../../data/site';
+import Favicon from '../../components/Favicon.astro';
+import { verifyReportToken } from '../../lib/report-fulfilment';
+import { MAX_SITES } from '../../lib/prospect-request';
+
+export const prerender = false;
+
+const token = Astro.url.searchParams.get('t') || '';
+const secret = String(import.meta.env.KIT_DOWNLOAD_SECRET ?? process.env.KIT_DOWNLOAD_SECRET ?? '').trim();
+const check = token && secret ? verifyReportToken(token, secret) : { ok: false as const };
+const claims = check.ok ? check.claims : undefined;
+const ru = claims ? claims.lang === 'ru' : Astro.url.searchParams.get('lang') === 'ru';
+
+const t = ru
+  ? {
+      title: 'Ваш список сайтов',
+      lead: `Вставьте адреса сайтов, по одному в строке. Можно прямо из блокнота или из таблицы, как есть: лишнее мы отбросим сами. До ${MAX_SITES} штук за раз.`,
+      label: 'Список сайтов',
+      hint: 'Можно просто адреса, можно адрес и через запятую название клиента. Строки, начинающиеся с решётки, пропускаются.',
+      button: 'Проверить список',
+      after: 'Таблица придёт письмом на ту же почту, обычно за пятнадцать-тридцать минут. Каждый сайт читается по-настоящему, поэтому не мгновенно.',
+      bad: 'Ссылка не подошла',
+      badText: 'Ссылки живут тридцать дней. Напишите на support@oper-stack.com, пришлём новую.',
+    }
+  : {
+      title: 'Your list of sites',
+      lead: `Paste the addresses, one per line. Straight from a notepad or a spreadsheet is fine: anything that is not an address gets dropped. Up to ${MAX_SITES} at a time.`,
+      label: 'Sites',
+      hint: 'Addresses alone are fine, or an address and the client name after a comma. Lines starting with a hash are skipped.',
+      button: 'Check the list',
+      after: 'The table arrives by email at the same address, usually in fifteen to thirty minutes. Every site is read properly, which is why it is not instant.',
+      bad: 'This link is not valid',
+      badText: 'Links last thirty days. Write to support@oper-stack.com and we will send a fresh one.',
+    };
+
+const placeholder = ru
+  ? 'northline-dental.com, Стоматология Нортлайн\nharborview-clinic.com\nriverside-dental.com'
+  : 'northline-dental.com, Northline Dental\nharborview-clinic.com\nriverside-dental.com';
+---
+
+<html lang={ru ? 'ru' : 'en'}>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>{t.title} · {SITE.name}</title>
+  <Favicon />
+</head>
+<body>
+  <main>
+    {claims ? (
+      <>
+        <h1>{t.title}</h1>
+        <p class="lead">{t.lead}</p>
+        <form method="POST" action="/api/prospect-request/">
+          <input type="hidden" name="t" value={token} />
+          <input type="hidden" name="lang" value={ru ? 'ru' : 'en'} />
+          <label for="sites">{t.label}</label>
+          <textarea id="sites" name="sites" rows="12" required placeholder={placeholder}></textarea>
+          <p class="hint">{t.hint}</p>
+          <button type="submit">{t.button}</button>
+        </form>
+        <p class="after">{t.after}</p>
+      </>
+    ) : (
+      <>
+        <h1>{t.bad}</h1>
+        <p class="lead">{t.badText}</p>
+      </>
+    )}
+  </main>
+</body>
+</html>
+
+<style is:global>
+  :root { --ink: #0f1419; --paper: #e6edf3; --muted: #8b939e; --teal: #1a8a7d; --teal-soft: #3db8a9; }
+  body {
+    margin: 0; padding: 32px 24px 64px; background: var(--ink); color: var(--paper);
+    font: 16px/1.65 -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+  main { max-width: 620px; margin: 0 auto; }
+  h1 { font-size: 28px; margin: 0 0 12px; }
+  .lead { color: var(--paper); margin: 0 0 24px; }
+  label { display: block; font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  textarea {
+    width: 100%; box-sizing: border-box; padding: 14px 16px; font: 15px/1.6 ui-monospace, 'SF Mono', Menlo, monospace;
+    color: var(--paper); background: rgba(0, 0, 0, .3); border: 1px solid rgba(255, 255, 255, .14);
+    border-radius: 10px; resize: vertical;
+  }
+  textarea::placeholder { color: #5c6b6f; }
+  textarea:focus-visible { outline: 2px solid var(--teal-soft); outline-offset: 2px; }
+  .hint, .after { color: var(--muted); font-size: 14px; }
+  button {
+    margin-top: 18px; padding: 13px 26px; font: 600 16px/1 inherit; color: #fff; cursor: pointer;
+    background: var(--teal); border: 0; border-radius: 10px;
+  }
+  button:hover { background: var(--teal-soft); }
+  .after { margin-top: 28px; border-top: 1px solid rgba(255, 255, 255, .1); padding-top: 18px; }
+</style>
