@@ -61,6 +61,16 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
     ],
     youDo: ['Pay by card', 'Open the link from the email and type your site address', 'Read the PDF that arrives'],
   },
+  'rival-watch': {
+    plain:
+      'You get the same report as the nine dollar one, and next to it the same measurements for up to three competitors you name, in one table. Then for the next four weeks your site is re-read once a week and you get a short email saying what got better, what broke and which numbers moved. It stops by itself after a month: there is nothing to cancel and we keep no card.',
+    who: [
+      'An owner who suspects a specific competitor is being quoted instead of them and wants to see where the gap actually is',
+      'A marketer who has just had work done on the site and wants proof, week by week, that it held',
+      'Anyone who does not want to log into another dashboard and would rather get a short email',
+    ],
+    youDo: ['Pay by card', 'Open the link from the email and name your site and up to three competitors', 'Read the comparison, then read one short email a week for four weeks'],
+  },
   'site-kit': {
     plain:
       'Everything one person needs to launch a content website that brings clients from Google and AI assistants, without hiring a developer or a writer. The kit finds what your market actually searches for, writes the first pages from the facts you give it, checks every page with the gates, and walks you through putting the site online and getting it into Google. You follow numbered steps; the instructions explain every word.',
