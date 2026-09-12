@@ -107,11 +107,11 @@ export const POST: APIRoute = async ({ request }) => {
     ru ? 'Заявка принята' : 'Request accepted',
     ru
       ? `<h1>Принято: ${escape(url.url)}</h1>
-<p>Отчёт придёт на ${escape(email)}. Обычно в течение часа, чаще за несколько минут.</p>
+<p>Два файла придут на ${escape(email)}: список задач и замер, из которого они выросли. Обычно в течение часа, чаще за несколько минут.</p>
 <p>Ничего делать не нужно, письмо придёт само. Если через час его нет, посмотрите в спаме и напишите на <a href="mailto:info@oper-stack.com">info@oper-stack.com</a>.</p>
 <p class="muted">Мы не храним адрес вашего сайта после того, как отчёт отправлен.</p>`
       : `<h1>Got it: ${escape(url.url)}</h1>
-<p>The report goes to ${escape(email)}. Usually within the hour, often within minutes.</p>
+<p>Two files go to ${escape(email)}: the task list and the measurement behind it. Usually within the hour, often within minutes.</p>
 <p>Nothing else to do; the email arrives on its own. If an hour passes and it has not, check your spam folder and write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a>.</p>
 <p class="muted">We do not keep the address of your site once the report has been sent.</p>`,
   );

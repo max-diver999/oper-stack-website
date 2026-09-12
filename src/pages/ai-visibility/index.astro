@@ -111,7 +111,8 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         </div>
         ${fixes}
         <div class="areas">${areas}</div>
-        ${pages}${crawlers}`;
+        ${pages}${crawlers}
+        <p class="next">This check reads one page. The <a href="/products/site-report/">site fix list</a> reads up to twenty and turns every failure into a task written in plain words: what your site does now, what to change, how to check it worked. Hand a task to your developer or paste it into ChatGPT, Claude or Cursor. 9 USD, no code, nothing to install.</p>`;
       out.hidden = false;
       capture.hidden = false;
       pdfSource.value = `ai-visibility:${r.host}:${r.score}`;
@@ -160,6 +161,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   .vis-form input { flex: 1 1 280px; min-height: 48px; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(61,184,169,.35); background: rgba(0,0,0,.3); color: var(--paper); font: inherit; font-size: 16px; }
   .vis-form input:focus { outline: 2px solid rgba(61,184,169,.45); outline-offset: 1px; }
   .note { font-size: 13px; color: var(--muted); }
+  .next { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1); font-size: .95rem; line-height: 1.6; }
   .result { margin-top: 28px; padding: 24px; border-radius: 16px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.02); }
   .score-row { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
   .ring { width: 132px; height: 132px; flex-shrink: 0; transform: rotate(-90deg); }
