@@ -51,6 +51,16 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
     ],
     youDo: ['Add the OperStack marketplace to Claude Code with one command', 'Install the plugin', 'Write pages as usual; the checks run by themselves'],
   },
+  mcp: {
+    plain:
+      'If you use Claude or Cursor, this teaches them to look at a website for you. You ask in ordinary words, "why does ChatGPT recommend my competitor and not me", and the assistant goes and reads the site, scores it across six areas and tells you what is actually missing. It is free, there is no account, and nothing you check is stored.',
+    who: [
+      'Anyone who already works with Claude or Cursor every day and would rather ask a question than open another tool',
+      'A marketer who wants the assistant to check a claim before repeating it',
+      'A developer who wants the sixteen gates without leaving the editor',
+    ],
+    youDo: ['Paste one block into your Claude or Cursor settings', 'Ask the assistant about a site in plain words', 'Read what it found and change what it named'],
+  },
   'site-report': {
     plain:
       'You pay nine dollars, type the address of your site into one field, and a report arrives by email. It reads up to twenty of your pages the way a search engine and an AI read them, and tells you in plain words what they can and cannot see: which pages are too thin to quote, how much of your text disappears if scripts do not run, whether the files an AI assistant looks for exist on your site at all. Nobody reads the report for you: every number in it is measured, and the wording is assembled from those measurements.',

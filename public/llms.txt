@@ -47,6 +47,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - [Sixteen content gates, free and MIT, one command](https://oper-stack.com/products/gates/)
 - [Free Astro starter that already passes the gates](https://oper-stack.com/products/starter/)
 - [Free Claude Code plugin for the same checks](https://oper-stack.com/products/plugin/)
+- [Free MCP server: Claude and Cursor measure a site themselves](https://oper-stack.com/products/mcp/)
 - [Automatic site report, 9 USD: the whole site measured, PDF by email](https://oper-stack.com/products/site-report/)
 - [You and three rivals watched for a month, 29 USD](https://oper-stack.com/products/rival-watch/)
 - [Site Kit, 79 USD: the page generator and the niche discovery module](https://oper-stack.com/products/site-kit/)
