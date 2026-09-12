@@ -22,6 +22,20 @@ const TIER_BY_PRODUCT: Record<string, ReportTier> = {
   prod_8YWVnEpYSnOSe: '29',
 };
 
+/**
+ * Запасной путь по названию товара.
+ *
+ * Зачем. Поддержка Whop пересоздаёт товары, когда чинит что-то на своей стороне: у нового товара
+ * новый идентификатор, а публичный адрес тот же. Если полагаться только на список идентификаторов,
+ * покупатель заплатит, вебхук не узнает товар и не пришлёт ничего. Название переживает пересоздание,
+ * поэтому оно второй ключ, а не единственный: сначала идентификатор, и только если он незнаком,
+ * смотрим, как товар называется.
+ */
+const TIER_BY_NAME: [RegExp, ReportTier][] = [
+  [/three\s+rivals/i, '29'],
+  [/automatic\s+site\s+report/i, '9'],
+];
+
 /** Переопределение через окружение: WHOP_REPORT_IDS="prod_a:9,prod_b:29". */
 export function reportTierMap(spec = ''): Record<string, ReportTier> {
   const extra: Record<string, ReportTier> = {};
@@ -169,12 +183,16 @@ export function readWhopReport(event: any, tiers: Record<string, ReportTier>): {
   const candidates = [d.product_id, d.plan_id, d.access_pass_id, d.product?.id, d.plan?.id, d.access_pass?.id, d.membership?.product_id, d.membership?.plan_id]
     .filter((x): x is string => typeof x === 'string' && x.length > 0);
   const matchedId = candidates.find((id) => tiers[id]) ?? null;
+  // Название товара в событии: пробуем все места, где Whop его кладёт.
+  const name = first(d.product_name, d.product?.title, d.product?.name, d.plan?.name, d.access_pass?.title,
+    d.access_pass?.name, d.membership?.product?.title, d.membership?.product?.name) ?? '';
+  const byName = matchedId ? null : (TIER_BY_NAME.find(([re]) => re.test(name))?.[1] ?? null);
   return {
     type: String(event?.type ?? event?.event ?? ''),
     paymentId: String(d.id ?? event?.id ?? ''),
     email: email ? email.trim().toLowerCase() : null,
     userId,
-    tier: matchedId ? tiers[matchedId] : null,
-    matchedId,
+    tier: matchedId ? tiers[matchedId] : byName,
+    matchedId: matchedId ?? (byName ? `по названию: ${name}` : null),
   };
 }
