@@ -58,16 +58,19 @@ export const POST: APIRoute = async ({ request }) => {
 
   let token = '';
   let site = '';
+  let rivalsRaw: string[] = [];
   try {
     const type = request.headers.get('content-type') || '';
     if (type.includes('application/json')) {
-      const body = (await request.json()) as { t?: string; site?: string };
+      const body = (await request.json()) as { t?: string; site?: string; rivals?: string[] };
       token = String(body.t || '');
       site = String(body.site || '');
+      rivalsRaw = Array.isArray(body.rivals) ? body.rivals.map(String) : [];
     } else {
       const form = await request.formData();
       token = String(form.get('t') || '');
       site = String(form.get('site') || '');
+      rivalsRaw = [form.get('rival1'), form.get('rival2'), form.get('rival3')].map((x) => String(x || ''));
     }
   } catch {
     return page('Bad request', '<h1>The form did not arrive</h1><p>Go back and send it again.</p>', 400);
@@ -87,7 +90,12 @@ export const POST: APIRoute = async ({ request }) => {
 
   // Заявка в очередь. Подпись лежит первой строкой тела: письмо нельзя подделать снаружи,
   // а тема при этом остаётся читаемой для человека, который откроет ящик.
-  const job = { url: url.url, email, lang, tier };
+  // Конкуренты только у ступени за 29, и только те, что прошли ту же проверку адреса.
+  // Кривой адрес конкурента не должен ронять заявку: покупатель платил за свой сайт.
+  const rivals = tier === '29'
+    ? rivalsRaw.map((r) => normaliseSiteUrl(r)).filter((r): r is { ok: true; url: string } => r.ok).map((r) => r.url).slice(0, 3)
+    : [];
+  const job = { url: url.url, email, lang, tier, rivals };
   try {
     await sendTransactionalMail({ to: QUEUE_TO, subject: buildRunSubject(job), ...buildRunBody(job, secret) });
   } catch {

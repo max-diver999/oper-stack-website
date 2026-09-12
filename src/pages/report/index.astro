@@ -10,12 +10,18 @@
  */
 import { SITE } from '../../data/site';
 import Favicon from '../../components/Favicon.astro';
+import { verifyReportToken } from '../../lib/report-fulfilment';
 
 export const prerender = false;
 
 const token = Astro.url.searchParams.get('t') || '';
 const error = Astro.url.searchParams.get('e') || '';
-const ru = Astro.url.searchParams.get('lang') === 'ru';
+/** Язык и ступень берём из самой ссылки: покупателю не нужно ничего выбирать руками. */
+const secret = String(import.meta.env.KIT_DOWNLOAD_SECRET ?? process.env.KIT_DOWNLOAD_SECRET ?? '').trim();
+const check = token && secret ? verifyReportToken(token, secret) : { ok: false as const };
+const claims = check.ok ? check.claims : undefined;
+const ru = claims ? claims.lang === 'ru' : Astro.url.searchParams.get('lang') === 'ru';
+const withRivals = claims?.tier === '29';
 const t = ru
   ? {
       title: 'Адрес вашего сайта',
@@ -24,6 +30,8 @@ const t = ru
       placeholder: 'example.com',
       button: 'Сделать отчёт',
       note: 'Проверяются главная и до двадцати страниц из вашей карты сайта. Ничего устанавливать не нужно, доступы не нужны.',
+      rivalsLabel: 'Конкуренты, до трёх',
+      rivalsNote: 'Кого с вами сравнить. Можно оставить пустым: тогда будет только ваш сайт.',
       noToken: 'Эта страница открывается по ссылке из письма об оплате. Если письма нет, напишите на info@oper-stack.com с адреса, с которого оплачивали.',
       back: '← На сайт',
     }
@@ -34,6 +42,8 @@ const t = ru
       placeholder: 'example.com',
       button: 'Run the report',
       note: 'We read the homepage and up to twenty pages from your sitemap. Nothing to install, no access to anything of yours.',
+      rivalsLabel: 'Rivals, up to three',
+      rivalsNote: 'Who to put beside you. Leave empty and the report covers your site alone.',
       noToken: 'This page opens from the link in your payment email. If it never arrived, write to info@oper-stack.com from the address you paid with.',
       back: '← Back to the site',
     };
@@ -87,6 +97,15 @@ const t = ru
           <input type="hidden" name="t" value={token} />
           <label for="site">{t.label}</label>
           <input id="site" name="site" type="text" inputmode="url" autocomplete="url" autocapitalize="off" spellcheck="false" placeholder={t.placeholder} required />
+          {withRivals && (
+            <>
+              <label for="rival1" style="margin-top:1.2rem">{t.rivalsLabel}</label>
+              <input id="rival1" name="rival1" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="rival-one.com" />
+              <input name="rival2" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="rival-two.com" style="margin-top:.6rem" />
+              <input name="rival3" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="rival-three.com" style="margin-top:.6rem" />
+              <p class="note" style="margin-top:.6rem">{t.rivalsNote}</p>
+            </>
+          )}
           <button type="submit">{t.button}</button>
         </form>
         <p class="note">{t.note}</p>

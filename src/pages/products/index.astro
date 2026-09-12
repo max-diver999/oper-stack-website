@@ -16,12 +16,12 @@ const itemList = {
 };
 const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: PRODUCTS_FAQ.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
 ---
-<CommercialLayout title="Tools for Content Sites That Rank and Get Cited · OperStack" description="Fifteen free content gates, an Astro starter, a Claude Code plugin, a Site Kit and an SEO, AEO and GEO audit. Built from a pipeline that publishes to eleven sites." canonical={canonical} jsonLd={[itemList, faqSchema]}>
+<CommercialLayout title="Tools for Content Sites That Rank and Get Cited · OperStack" description="Sixteen free content gates, an Astro starter, a Claude Code plugin, an automatic site report from 9 USD and an SEO, AEO and GEO audit. Built from a pipeline that publishes to eleven sites." canonical={canonical} jsonLd={[itemList, faqSchema]}>
   <div class="wrap wide">
     <h1>Tools for content sites that have to rank, be cited and convert</h1>
     <p class="lede">Every product on this page came out of one pipeline that publishes to eleven content sites. The free ones stay free. The paid ones have a price on the page, not in a call.</p>
     <p class="lede plain-lede">Not a developer? Start with the <a href="/products/ai-visibility/">free AI visibility check</a> (ten seconds, nothing to install), then read the <a href="/products/seo-audit/">audit</a> if your site already exists or the <a href="/products/site-kit/">Site Kit</a> if you are building one. Developers usually start with the <a href="/products/gates/">gates</a> and the <a href="/products/starter/">starter</a>.</p>
-    <CitabilityBlock text="OperStack publishes eight products for content sites: fifteen free quality gates, a free Astro starter, a free Claude Code plugin, a free AI visibility check, a paid Site Kit at 79 USD, an audit at 149 USD for the first ten, a Fix package at 249 USD and a Foundation package from 500 USD." />
+    <CitabilityBlock text="OperStack publishes ten products for content sites: sixteen free quality gates, a free Astro starter, a free Claude Code plugin, a free AI visibility check, an automatic site report at 9 USD, a rival comparison with a month of watching at 29 USD, a Site Kit at 79 USD, an audit at 149 USD for the first ten, a Fix package at 249 USD and a Foundation package from 500 USD." />
     <div class="grid">
       {products.map((p) => (
         <a class="card" href={`/products/${p.slug}/`}>
