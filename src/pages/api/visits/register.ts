@@ -21,14 +21,36 @@ export const prerender = false;
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-function json(body: unknown, status = 200): Response {
+/** The Russian site sells the same counter and calls this endpoint from its own origin. */
+const ALLOWED_ORIGINS = new Set(['https://oper-stack.ru', 'https://www.oper-stack.ru', 'https://oper-stack.com']);
+
+function corsFor(request: Request): Record<string, string> {
+  const origin = request.headers.get('origin') || '';
+  return ALLOWED_ORIGINS.has(origin)
+    ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' }
+    : {};
+}
+
+function json(body: unknown, status = 200, cors: Record<string, string> = {}): Response {
   return new Response(JSON.stringify(body), {
     status,
-    headers: { 'Content-Type': 'application/json' },
+    headers: { 'Content-Type': 'application/json', ...cors },
   });
 }
 
+export const OPTIONS: APIRoute = async ({ request }) =>
+  new Response(null, {
+    status: 204,
+    headers: {
+      ...corsFor(request),
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+
 export const POST: APIRoute = async ({ request }) => {
+  const cors = corsFor(request);
   if (!visitsDbConfigured()) {
     return json({ error: 'The counter is not switched on yet. Write to ' + SITE.email + '.' }, 503);
   }
@@ -37,22 +59,24 @@ export const POST: APIRoute = async ({ request }) => {
   let email = '';
   let platform = '';
   let honeypot = '';
+  let lang = 'en';
   try {
     const body = await request.json();
     domainInput = String(body?.domain || '');
     email = String(body?.email || '').trim();
     platform = String(body?.platform || '').trim().slice(0, 40);
     honeypot = String(body?.website || '').trim();
+    lang = body?.lang === 'ru' ? 'ru' : 'en';
   } catch {
-    return json({ error: 'Send a site address and an email.' }, 400);
+    return json({ error: 'Send a site address and an email.' }, 400, cors);
   }
 
   // A field no person can see. Anything in it came from a machine.
-  if (honeypot) return json({ error: 'Thanks.' }, 400);
+  if (honeypot) return json({ error: 'Thanks.' }, 400, cors);
 
   const domain = normaliseDomain(domainInput);
-  if (!domain) return json({ error: 'Give a public web address, like yoursite.com.' }, 400);
-  if (!EMAIL_RE.test(email)) return json({ error: 'Give an email we can send the link to.' }, 400);
+  if (!domain) return json({ error: 'Give a public web address, like yoursite.com.' }, 400, cors);
+  if (!EMAIL_RE.test(email)) return json({ error: 'Give an email we can send the link to.' }, 400, cors);
 
   const sql = visitsDb();
 
@@ -69,7 +93,7 @@ export const POST: APIRoute = async ({ request }) => {
       JSON.stringify({
         error: 'That is a lot of sites at once. Write to ' + SITE.email + ' and we will set it up by hand.',
       }),
-      { status: 429, headers: { 'Content-Type': 'application/json' } },
+      { status: 429, headers: { 'Content-Type': 'application/json', ...cors } },
     );
   }
 
@@ -95,11 +119,11 @@ export const POST: APIRoute = async ({ request }) => {
     key = newSiteKey();
     token = newViewToken();
     await sql`
-      insert into sites (id, domain, email, platform, view_token)
-      values (${key}, ${domain}, ${email}, ${platform || null}, ${token})`;
+      insert into sites (id, domain, email, platform, view_token, lang)
+      values (${key}, ${domain}, ${email}, ${platform || null}, ${token}, ${lang})`;
   }
 
-  const dashboard = `${SITE.url}/visits/numbers/?t=${token}`;
+  const dashboard = `${SITE.url}/visits/numbers/?t=${token}${lang === 'ru' ? '&lang=ru' : ''}`;
   const snippet = `<script defer src="${SITE.url}/v.js" data-key="${key}"></script>`;
 
   // The link is the only way back to their numbers, so it goes to them by email as well as on
@@ -133,5 +157,5 @@ export const POST: APIRoute = async ({ request }) => {
     /* the owner still has both on screen, which is the copy that matters */
   }
 
-  return json({ key, snippet, dashboard, domain });
+  return json({ key, snippet, dashboard, domain }, 200, cors);
 };

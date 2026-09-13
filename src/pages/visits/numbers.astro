@@ -10,62 +10,129 @@ import CommercialLayout from '../../components/CommercialLayout.astro';
 import { SITE } from '../../data/site';
 
 export const prerender = false;
+
+/** The Russian site sells the same counter, and a Russian owner should not land on English. */
+const ru = Astro.url.searchParams.get('lang') === 'ru';
+
+const T = ru
+  ? {
+      title: 'Ваши визиты из ИИ · OperStack',
+      description: 'Сколько людей прислал вам каждый ИИ-ассистент.',
+      label: 'Ваши числа',
+      h1: 'Кто присылал вам посетителей',
+      loading: 'Читаем ваш счётчик…',
+      emptyH: 'Пока ничего не насчитано',
+      emptyP: 'У этого две совершенно разные причины, и гадать вам не нужно. Мы посмотрим ваш сайт и скажем, какая именно.',
+      checkBtn: 'Проверить, стоит ли строчка на сайте',
+      emptySmall: 'Ваши собственные заходы на сайт не считаются: вы пришли не от ассистента.',
+      failH: 'Эта ссылка ничего не открывает',
+      failP: 'Либо в ней опечатка, либо она не наша. Ссылку мы присылали письмом, когда вы заводили счётчик. Если не находите её, напишите нам с того же адреса, и мы пришлём заново.',
+      keepH: 'Сохраните эту ссылку',
+      keepP: 'Это единственный путь к вашим числам, и любой, у кого она есть, их увидит. Пароля нет, потому что здесь нечего защищать паролем: ни один посетитель не опознан, адреса не хранятся, страницы не записываются. Только имя ассистента, день и количество.',
+      nextP: 'Когда число известно, бесплатная проверка видимости скажет, может ли вас вообще процитировать ответная система, а список исправлений за 9 долларов превратит каждый пробел в задачу, которую можно отдать кому угодно.',
+      nextCheck: 'бесплатная проверка видимости',
+      nextFix: 'список исправлений за 9 долларов',
+    }
+  : {
+      title: 'Your AI visits · OperStack',
+      description: 'How many people each AI assistant sent to your site.',
+      label: 'Your numbers',
+      h1: 'Who sent you visitors',
+      loading: 'Reading your counter…',
+      emptyH: 'Nothing counted yet',
+      emptyP: 'That has two very different causes, and you should not have to guess which. We can look at your site and tell you.',
+      checkBtn: 'Check the line is on my site',
+      emptySmall: 'Nothing is counted from you browsing your own site, because you did not arrive from an assistant.',
+      failH: 'This link does not open anything',
+      failP: 'Either it was mistyped, or it is not one of ours. The link was emailed to you when you set the counter up. If you cannot find it, write to us from the same address and we will send it again.',
+      keepH: 'Keep this link',
+      keepP: 'It is the only way to your numbers, and anyone who has it can see them. There is no password because there is nothing here worth a password: no visitor is identified, no address is stored, and no page is recorded. Only which assistant, which day, and how many.',
+      nextP: 'Once you know the number, the free visibility check says whether an answer engine can quote you in the first place, and the 9 USD fix list turns every gap into a task you can hand to anyone.',
+      nextCheck: 'free visibility check',
+      nextFix: '9 USD fix list',
+    };
+
+/** Everything the browser renders after the numbers arrive. */
+const JS_STRINGS = ru
+  ? {
+      missing: 'В этом адресе нет ссылки.',
+      whoSent: 'Кто присылал посетителей на ',
+      countingSince: 'Считаем с ',
+      visitsOne: 'визит', visitsFew: 'визита', visitsMany: 'визитов',
+      visitsLine: '{n} {w} от ИИ-ассистентов за последние {d} дней.',
+      thAssistant: 'Ассистент', thVisits: 'Визитов', thShare: 'Доля',
+      lastVisit: 'Последний визит: ',
+      looking: 'Смотрим ваш сайт…',
+      cantLook: 'Сейчас посмотреть не получилось. Попробуйте через минуту.',
+      installedOk: 'Строчка на {d} стоит и работает. Вы просто ждёте: визит засчитывается, когда человек читает ответ ассистента и переходит к вам. На небольшом сайте это дни, а не минуты.',
+      installedNo: 'Строчки на {d} нет. Поэтому ничего и не считается. Вставьте её в шапку сайта на всех страницах и опубликуйте. Строчка есть в письме, которое мы вам прислали.',
+      wrongKeyTail: ' Замените её на строчку из вашего письма, ту, что заканчивается вашим ключом.',
+      wrongKeyHead: 'Строчка стоит, но с чужим ключом, поэтому визиты считаются не вам.',
+      rWalled: 'Ваш сайт не пускает автоматических читателей, поэтому снаружи мы посмотреть не можем. Эту проверку придётся сделать самому.',
+      rStatus: 'Сайт ответил ошибкой, поэтому посмотреть не удалось.',
+      rTimeout: 'Сайт отвечал слишком долго.',
+      rNoanswer: 'Сайт не ответил.',
+      rUnknown: 'Посмотреть ваш сайт отсюда не вышло, эту проверку придётся сделать самому.',
+    }
+  : {
+      missing: 'This address is missing its link.',
+      whoSent: 'Who sent visitors to ',
+      countingSince: 'Counting since ',
+      visitsOne: 'visit', visitsFew: 'visits', visitsMany: 'visits',
+      visitsLine: '{n} {w} from AI assistants in the last {d} days.',
+      thAssistant: 'Assistant', thVisits: 'Visits', thShare: 'Share',
+      lastVisit: 'Most recent visit: ',
+      looking: 'Looking at your site…',
+      cantLook: 'We could not look just now. Try again in a minute.',
+      installedOk: 'The line is on {d} and working. You are simply waiting: a visit is counted when somebody reads an answer from an assistant and clicks through to you. On a small site that is days, not minutes.',
+      installedNo: 'The line is not on {d}. That is why nothing is counted. Paste it into the head of your site, on every page, and publish. The line is in the email we sent you.',
+      wrongKeyTail: ' Replace it with the line from your email, the one ending in your own key.',
+      wrongKeyHead: 'The line is there, but it carries a different key, so the visits are being counted somewhere else.',
+      rWalled: 'Your site turns away automated readers, so we cannot look from outside. This one you will have to check yourself.',
+      rStatus: 'The site answered with an error, so we could not look.',
+      rTimeout: 'The site took too long to answer.',
+      rNoanswer: 'The site did not answer.',
+      rUnknown: 'We could not look at your site from here, so this one you will have to check yourself.',
+    };
 ---
 
 <CommercialLayout
-  title="Your AI visits · OperStack"
-  description="How many people each AI assistant sent to your site."
+  title={T.title}
+  description={T.description}
   canonical={`${SITE.url}/visits/numbers/`}
   noindex={true}
 >
   <div class="wrap">
-    <p class="label">Your numbers</p>
-    <h1 id="head">Who sent you visitors</h1>
-    <p class="lede" id="sub">Reading your counter…</p>
+    <p class="label">{T.label}</p>
+    <h1 id="head">{T.h1}</h1>
+    <p class="lede" id="sub">{T.loading}</p>
 
     <section id="out" hidden></section>
 
     <section id="empty" hidden>
-      <h2>Nothing counted yet</h2>
-      <p>
-        That has two very different causes, and you should not have to guess which. We can look at
-        your site and tell you.
-      </p>
-      <p><button type="button" class="btn" id="check">Check the line is on my site</button></p>
+      <h2>{T.emptyH}</h2>
+      <p>{T.emptyP}</p>
+      <p><button type="button" class="btn" id="check">{T.checkBtn}</button></p>
       <p class="verdict" id="verdict" hidden></p>
-      <p class="small">
-        Nothing is counted from you browsing your own site, because you did not arrive from an
-        assistant.
-      </p>
+      <p class="small">{T.emptySmall}</p>
     </section>
 
     <section id="fail" hidden>
-      <h2>This link does not open anything</h2>
-      <p>
-        Either it was mistyped, or it is not one of ours. The link was emailed to you when you set
-        the counter up. If you cannot find it, write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-        from the same address and we will send it again.
-      </p>
+      <h2>{T.failH}</h2>
+      <p>{T.failP} <a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
     </section>
 
     <section class="keep">
-      <h2>Keep this link</h2>
-      <p>
-        It is the only way to your numbers, and anyone who has it can see them. There is no password
-        because there is nothing here worth a password: no visitor is identified, no address is
-        stored, and no page is recorded. Only which assistant, which day, and how many.
-      </p>
-      <p class="next">
-        Once you know the number, the <a href="/ai-visibility/">free visibility check</a> says
-        whether an answer engine can quote you in the first place, and the
-        <a href="/products/site-report/">9 USD fix list</a> turns every gap into a task you can hand
-        to anyone.
-      </p>
+      <h2>{T.keepH}</h2>
+      <p>{T.keepP}</p>
+      <p class="next" set:html={T.nextP
+        .replace(T.nextCheck, `<a href="/ai-visibility/">${T.nextCheck}</a>`)
+        .replace(T.nextFix, `<a href="/products/site-report/">${T.nextFix}</a>`)} />
     </section>
   </div>
 </CommercialLayout>
 
-<script is:inline>
+<script is:inline define:vars={{ S: JS_STRINGS }}>
   (function () {
     var token = new URLSearchParams(location.search).get('t') || '';
     var sub = document.getElementById('sub');
@@ -81,7 +148,14 @@ export const prerender = false;
 
     function show(el) { el.hidden = false; }
 
-    if (!token) { sub.textContent = 'This address is missing its link.'; show(fail); return; }
+    function plural(n) {
+      var m10 = n % 10, m100 = n % 100;
+      if (m10 === 1 && m100 !== 11) return S.visitsOne;
+      if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return S.visitsFew;
+      return S.visitsMany;
+    }
+
+    if (!token) { sub.textContent = S.missing; show(fail); return; }
 
     function wireCheck() {
       var btn = document.getElementById('check');
@@ -90,25 +164,26 @@ export const prerender = false;
         btn.disabled = true;
         verdict.hidden = false;
         verdict.className = 'verdict';
-        verdict.textContent = 'Looking at your site\u2026';
+        verdict.textContent = S.looking;
         try {
           var r = await fetch('/api/visits/installed/?t=' + encodeURIComponent(token));
           var d = await r.json();
-          if (!r.ok) { verdict.textContent = d.error || 'We could not look just now.'; btn.disabled = false; return; }
+          if (!r.ok) { verdict.textContent = d.error || S.cantLook; btn.disabled = false; return; }
           if (d.installed === true) {
             verdict.className = 'verdict ok';
-            verdict.textContent = 'The line is on ' + d.domain + ' and working. You are simply waiting: a visit is counted when somebody reads an answer from an assistant and clicks through to you. On a small site that is days, not minutes.';
+            verdict.textContent = S.installedOk.replace('{d}', d.domain);
           } else if (d.installed === false && d.wrongKey) {
             verdict.className = 'verdict bad';
-            verdict.textContent = d.reason + ' Replace it with the line from your email, the one ending in your own key.';
+            verdict.textContent = S.wrongKeyHead + S.wrongKeyTail;
           } else if (d.installed === false) {
             verdict.className = 'verdict bad';
-            verdict.textContent = 'The line is not on ' + d.domain + '. That is why nothing is counted. Paste it into the head of your site, on every page, and publish. The line is in the email we sent you.';
+            verdict.textContent = S.installedNo.replace('{d}', d.domain);
           } else {
-            verdict.textContent = d.reason || 'We could not look at your site from here, so this one you will have to check yourself.';
+            var byCode = { walled: S.rWalled, status: S.rStatus, timeout: S.rTimeout, noanswer: S.rNoanswer };
+            verdict.textContent = byCode[d.code] || S.rUnknown;
           }
         } catch (err) {
-          verdict.textContent = 'We could not look just now. Try again in a minute.';
+          verdict.textContent = S.cantLook;
         }
         btn.disabled = false;
       });
@@ -119,18 +194,17 @@ export const prerender = false;
       .then(function (res) {
         if (!res.ok) { sub.textContent = ''; show(fail); return; }
         var d = res.d;
-        document.getElementById('head').textContent = 'Who sent visitors to ' + d.domain;
+        document.getElementById('head').textContent = S.whoSent + d.domain;
 
         if (!d.total) {
-          sub.textContent = 'Counting since ' + new Date(d.installedAt).toLocaleDateString();
+          sub.textContent = S.countingSince + new Date(d.installedAt).toLocaleDateString();
           show(empty);
           wireCheck();
           return;
         }
 
-        sub.textContent =
-          d.total + ' ' + (d.total === 1 ? 'visit' : 'visits') +
-          ' from AI assistants in the last ' + d.days + ' days.';
+        sub.textContent = S.visitsLine
+          .replace('{n}', d.total).replace('{w}', plural(d.total)).replace('{d}', d.days);
 
         var rows = d.byAssistant.map(function (a) {
           var share = Math.round((a.hits / d.total) * 100);
@@ -139,12 +213,12 @@ export const prerender = false;
         }).join('');
 
         var last = d.lastVisitAt
-          ? '<p class="small">Most recent visit: ' + esc(new Date(d.lastVisitAt).toLocaleString()) + '.</p>'
+          ? '<p class="small">' + S.lastVisit + esc(new Date(d.lastVisitAt).toLocaleString()) + '.</p>'
           : '';
 
         out.innerHTML =
-          '<div class="tablewrap"><table><thead><tr><th>Assistant</th><th class="n">Visits</th>' +
-          '<th class="n">Share</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + last;
+          '<div class="tablewrap"><table><thead><tr><th>' + S.thAssistant + '</th><th class="n">' + S.thVisits + '</th>' +
+          '<th class="n">' + S.thShare + '</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + last;
         show(out);
       })
       .catch(function () { sub.textContent = ''; show(fail); });

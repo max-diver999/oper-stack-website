@@ -17,6 +17,7 @@ export type WeeklyRow = {
   view_token: string;
   created_at: string;
   last_report_at: string | null;
+  lang: string;
 };
 
 export type WeeklyNumbers = {
@@ -30,7 +31,7 @@ export type WeeklyNumbers = {
 export async function dueForReport(limit = 200): Promise<WeeklyRow[]> {
   const sql = visitsDb();
   return (await sql`
-    select id, domain, email, view_token, created_at, last_report_at
+    select id, domain, email, view_token, created_at, last_report_at, lang
     from sites
     where weekly = true
       and email is not null
@@ -67,13 +68,22 @@ export async function numbersFor(siteId: string): Promise<WeeklyNumbers> {
 }
 
 /** How the week compares with the one before it, in words rather than a percentage. */
-export function movement(thisWeek: number, lastWeek: number): string {
-  if (lastWeek === 0 && thisWeek > 0) return 'the first week with any';
+export function movement(thisWeek: number, lastWeek: number, ru = false): string {
+  if (lastWeek === 0 && thisWeek > 0) return ru ? 'первая неделя, когда кто-то пришёл' : 'the first week with any';
   if (lastWeek === 0) return '';
   const diff = thisWeek - lastWeek;
-  if (diff === 0) return 'the same as the week before';
-  const word = diff > 0 ? 'more' : 'fewer';
-  return `${Math.abs(diff)} ${word} than the week before`;
+  if (diff === 0) return ru ? 'столько же, сколько неделей раньше' : 'the same as the week before';
+  if (ru) return `на ${Math.abs(diff)} ${diff > 0 ? 'больше' : 'меньше'}, чем неделей раньше`;
+  return `${Math.abs(diff)} ${diff > 0 ? 'more' : 'fewer'} than the week before`;
+}
+
+/** Russian needs three forms of the word, and getting it wrong reads as machine output. */
+function visitsWord(n: number): string {
+  const m10 = n % 10;
+  const m100 = n % 100;
+  if (m10 === 1 && m100 !== 11) return 'визит';
+  if (m10 >= 2 && m10 <= 4 && (m100 < 10 || m100 >= 20)) return 'визита';
+  return 'визитов';
 }
 
 /**
@@ -88,9 +98,29 @@ export function composeWeekly(
   const dashboard = `${siteUrl}/visits/numbers/?t=${row.view_token}`;
   const stop = `${siteUrl}/visits/stop/?t=${row.view_token}`;
 
+  const ru = row.lang === 'ru';
+
   if (n.everCounted === 0) {
     // Only once: after the first silent week. A second identical nudge is nagging.
     if (row.last_report_at) return null;
+    if (ru) {
+      return {
+        subject: `На ${row.domain} пока ничего не насчитано`,
+        text: [
+          `Неделя прошла, а визитов от ИИ-ассистентов на ${row.domain} не насчиталось ни одного.`,
+          '',
+          'Для небольшого сайта это нормально, и ровно так же выглядит не вставленная строчка.',
+          'Откройте свой сайт, посмотрите исходный код страницы и поищите в нём v.js. Если его там',
+          'нет, строчка не сохранилась, и вставить её заново это минута.',
+          '',
+          `Ваши числа: ${dashboard}&lang=ru`,
+          `Отписаться: ${stop}&lang=ru`,
+        ].join('\n'),
+        html: `<p>Неделя прошла, а визитов от ИИ-ассистентов на <b>${esc(row.domain)}</b> не насчиталось ни одного.</p>
+<p>Для небольшого сайта это нормально, и ровно так же выглядит не вставленная строчка. Откройте свой сайт, посмотрите исходный код страницы и поищите в нём <code>v.js</code>. Если его там нет, строчка не сохранилась, и вставить её заново это минута.</p>
+<p><a href="${dashboard}&lang=ru">Ваши числа</a> · <a href="${stop}&lang=ru">отписаться</a></p>`,
+      };
+    }
     const subject = `Nothing counted yet on ${row.domain}`;
     const lines = [
       `A week in and no visits from AI assistants have been counted on ${row.domain}.`,
@@ -112,6 +142,29 @@ export function composeWeekly(
   }
 
   if (n.thisWeek === 0) return null; // a quiet week on a working counter needs no email
+
+  if (ru) {
+    const moveRu = movement(n.thisWeek, n.lastWeek, true);
+    const visitsRu = `${n.thisWeek} ${visitsWord(n.thisWeek)}`;
+    const listRu = n.byAssistant.map((a) => `  ${a.assistant}: ${a.hits}`).join('\n');
+    const rowsRu = n.byAssistant
+      .map((a) => `<tr><td style="padding:4px 12px 4px 0">${esc(a.assistant)}</td><td align="right">${a.hits}</td></tr>`)
+      .join('');
+    return {
+      subject: `${visitsRu} из ИИ на ${row.domain}`,
+      text: [
+        `За последние семь дней на ${row.domain} пришло ${visitsRu} от ИИ-ассистентов${moveRu ? ', ' + moveRu : ''}.`,
+        '',
+        listRu,
+        '',
+        `Ваши числа: ${dashboard}&lang=ru`,
+        `Отписаться: ${stop}&lang=ru`,
+      ].join('\n'),
+      html: `<p>За последние семь дней на <b>${esc(row.domain)}</b> пришло <b>${visitsRu}</b> от ИИ-ассистентов${moveRu ? ', ' + esc(moveRu) : ''}.</p>
+<table style="border-collapse:collapse;font:14px system-ui,sans-serif">${rowsRu}</table>
+<p><a href="${dashboard}&lang=ru">Ваши числа</a> · <a href="${stop}&lang=ru">отписаться</a></p>`,
+    };
+  }
 
   const move = movement(n.thisWeek, n.lastWeek);
   const visits = `${n.thisWeek} ${n.thisWeek === 1 ? 'visit' : 'visits'}`;

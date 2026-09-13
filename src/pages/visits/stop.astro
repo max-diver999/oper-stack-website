@@ -7,33 +7,62 @@ import CommercialLayout from '../../components/CommercialLayout.astro';
 import { SITE } from '../../data/site';
 
 export const prerender = false;
+
+const ru = Astro.url.searchParams.get('lang') === 'ru';
+const T = ru
+  ? {
+      title: 'Отписаться от еженедельного письма · OperStack',
+      description: 'Выключить еженедельное письмо о визитах, которые присылают вам ИИ-ассистенты.',
+      label: 'Еженедельное письмо',
+      h1: 'Выключить еженедельное письмо?',
+      lede: 'Одно письмо в неделю, и только в те недели, когда кто-то действительно пришёл от ассистента. Счётчик продолжит считать в любом случае, и ваша личная ссылка продолжит работать.',
+      btn: 'Выключить письмо',
+      small: 'Передумали? Откройте эту же ссылку снова, и письмо включится обратно. По всему остальному пишите на',
+      noLink: 'В этом адресе нет ссылки. Возьмите её внизу письма.',
+      wait: 'Секунду…',
+      fail: 'Не получилось. Напишите на info@oper-stack.com, и мы сделаем это руками.',
+      onAgain: 'Включено обратно. Одно письмо в неделю про {d}, и только когда есть что сказать.',
+      offNow: 'Выключено. Писем про {d} больше не будет. Счётчик продолжает считать.',
+      btnOff: 'Выключить письмо',
+      btnOn: 'Включить обратно',
+    }
+  : {
+      title: 'Stop the weekly email · OperStack',
+      description: 'Turn off the weekly note about the visits AI assistants send your site.',
+      label: 'Weekly email',
+      h1: 'Stop the weekly note?',
+      lede: 'One email a week, only in the weeks when somebody actually arrived from an assistant. Your counter keeps counting either way, and your private link keeps working.',
+      btn: 'Stop the weekly email',
+      small: 'Changed your mind later? Open this same link again and it turns back on. Anything else, write to',
+      noLink: 'This address is missing its link. Use the one at the bottom of the email.',
+      wait: 'One moment…',
+      fail: 'That did not go through. Write to info@oper-stack.com and we will do it by hand.',
+      onAgain: 'Back on. One email a week about {d}, only when there is something to say.',
+      offNow: 'Stopped. No more weekly emails about {d}. The counter keeps counting.',
+      btnOff: 'Stop the weekly email',
+      btnOn: 'Turn it back on',
+    };
 ---
 
 <CommercialLayout
-  title="Stop the weekly email · OperStack"
-  description="Turn off the weekly note about the visits AI assistants send your site."
+  title={T.title}
+  description={T.description}
   canonical={`${SITE.url}/visits/stop/`}
   noindex={true}
 >
   <div class="wrap">
-    <p class="label">Weekly email</p>
-    <h1>Stop the weekly note?</h1>
-    <p class="lede" id="sub">
-      One email a week, only in the weeks when somebody actually arrived from an assistant. Your
-      counter keeps counting either way, and your private link keeps working.
-    </p>
+    <p class="label">{T.label}</p>
+    <h1>{T.h1}</h1>
+    <p class="lede" id="sub">{T.lede}</p>
 
-    <p><button type="button" class="btn" id="go">Stop the weekly email</button></p>
+    <p><button type="button" class="btn" id="go">{T.btn}</button></p>
     <p class="msg" id="msg" hidden></p>
 
-    <p class="small">
-      Changed your mind later? Open this same link again and it turns back on. Anything else, write
-      to <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
-    </p>
+    <p class="small">{T.small} <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.</p>
   </div>
 </CommercialLayout>
 
-<script is:inline>
+<script is:inline define:vars={{ T }}>
   (function () {
     var token = new URLSearchParams(location.search).get('t') || '';
     var go = document.getElementById('go');
@@ -43,14 +72,14 @@ export const prerender = false;
     if (!token) {
       go.disabled = true;
       msg.hidden = false;
-      msg.textContent = 'This address is missing its link. Use the one at the bottom of the email.';
+      msg.textContent = T.noLink;
       return;
     }
 
     go.addEventListener('click', async function () {
       go.disabled = true;
       msg.hidden = false;
-      msg.textContent = 'One moment…';
+      msg.textContent = T.wait;
       try {
         var r = await fetch('/api/visits/stop/', {
           method: 'POST',
@@ -58,15 +87,13 @@ export const prerender = false;
           body: JSON.stringify({ t: token, resume: resume }),
         });
         var d = await r.json();
-        if (!r.ok) { msg.textContent = d.error || 'That did not go through.'; go.disabled = false; return; }
+        if (!r.ok) { msg.textContent = d.error || T.fail; go.disabled = false; return; }
         resume = !d.weekly ? true : false;
-        msg.textContent = d.weekly
-          ? 'Back on. One email a week about ' + d.domain + ', only when there is something to say.'
-          : 'Stopped. No more weekly emails about ' + d.domain + '. The counter keeps counting.';
-        go.textContent = d.weekly ? 'Stop the weekly email' : 'Turn it back on';
+        msg.textContent = (d.weekly ? T.onAgain : T.offNow).replace('{d}', d.domain);
+        go.textContent = d.weekly ? T.btnOff : T.btnOn;
         go.disabled = false;
       } catch (err) {
-        msg.textContent = 'That did not go through. Write to info@oper-stack.com and we will do it by hand.';
+        msg.textContent = T.fail;
         go.disabled = false;
       }
     });
