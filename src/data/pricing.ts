@@ -62,7 +62,7 @@ export const PRICING_FAQ = [
   {
     question: 'What is OperStack?',
     answer:
-      'Two things sold from one place. Products you buy off the shelf for a content site that has to rank and be quoted by AI assistants: thirteen of them, five free and eight paid from 9 USD. And setup work for businesses that live on inbound leads: routing, CRM wiring, AI qualification and reporting, connected by one Lead Hub and quoted per project.',
+      'Two things sold from one place. Products you buy off the shelf for a content site that has to rank and be quoted by AI assistants: thirteen of them, six free and nine paid from 9 USD. And setup work for businesses that live on inbound leads: routing, CRM wiring, AI qualification and reporting, connected by one Lead Hub and quoted per project.',
   },
   {
     question: 'Do I have to buy the setup work to use the products?',

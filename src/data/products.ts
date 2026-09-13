@@ -30,6 +30,49 @@ export type Product = {
 
 export const PRODUCTS: Product[] = [
   {
+    slug: 'visits',
+    label: 'Free tool',
+    name: 'AI visit counter',
+    title: 'AI Visit Counter: How Many People Does ChatGPT Send You?',
+    description: 'A free counter that shows how many people ChatGPT, Perplexity, Claude, Copilot and Gemini actually sent to your site. One line of code, or a WordPress plugin, and nothing about your visitors leaves the site.',
+    answer: 'The OperStack AI visit counter records visits that arrive from an AI assistant and reports how many each one sent. On WordPress it is a free plugin that keeps every number in the site\u2019s own database. On every other platform it is one line of code in the head, and the numbers appear on a private link. It stores the name of the assistant, the day and a count, with no visitor identifier, no address and no page. Visits from ordinary search are deliberately not counted: an inflated number would not match the owner\u2019s analytics.',
+    price: 'Free',
+    priceNote: 'One line of code or a WordPress plugin. No account on our side, nothing to pay, no list to leave',
+    status: 'available',
+    cta: { text: 'Count my AI visits', href: '/visits/' },
+    og: '/og/og-default.png',
+    order: 2,
+    get: [
+      'How many visits each assistant sent you, by day and by name',
+      'A weekly email with the number, only in the weeks when somebody actually arrived',
+      'A check that tells you whether the line is really on your site, so an empty table is never a mystery',
+      'On WordPress: a plugin that also opens robots.txt to answer engines, publishes llms.txt and an agent card, and adds business schema',
+      'Everywhere else: one line of code and a private link to the numbers',
+      'Nothing about your visitors: no identifier, no address, no page, nothing to disclose to anybody',
+    ],
+    how: [
+      { step: 'Say what your site runs on', text: 'Type your address and we tell you, or pick your platform from the list.' },
+      { step: 'Paste one line, or install the plugin', text: 'The instructions are written for your platform, in the words of somebody who has never opened an HTML file.' },
+      { step: 'Watch', text: 'Open your private link whenever you like. Once a week we write to you if anybody arrived.' },
+    ],
+    notFor: [
+      'Sites where you cannot add anything to the page, and nobody who can will do it for you',
+      'Anybody wanting to know who the individual visitors were: that is not stored and never will be',
+      'Measuring whether an assistant mentions you at all, which is the free AI visibility check instead',
+    ],
+    needs: [
+      { item: 'Somewhere to paste one line', cost: 'Free', why: 'Any platform with a place for code in the head, which is nearly all of them. WordPress needs nothing pasted at all.' },
+      { item: 'An email address', cost: 'Free', why: 'The private link to your numbers is sent there, and it is the only way back to them.' },
+    ],
+    faq: [
+      { question: 'Why does my analytics not show this?', answer: 'It usually does, buried. A visit from an assistant arrives as a referral from chatgpt.com or perplexity.ai, one row among hundreds that nobody opens, and many land in direct traffic because the assistant strips the referrer. Nothing is broken: the number is simply on no screen you look at.' },
+      { question: 'Does it slow the site down?', answer: 'No. Three lines run in the visitor\u2019s browser and send one request only when that visitor came from an assistant. For everybody else nothing happens. It also keeps working behind a page cache, where counting during the page build would miss most of the traffic.' },
+      { question: 'Is ordinary search counted too?', answer: 'No, deliberately. Referrals from Yandex and DuckDuckGo search are not assistant answers, and counting them would inflate your number against the analytics you would compare it with. Alice and the DuckDuckGo assistant have their own addresses and only those count.' },
+      { question: 'What if it says nothing was counted?', answer: 'Press the button that checks your site. We look at your page and tell you whether the line is there, including the case where it is there but carrying somebody else\u2019s key. If it is there, you are simply waiting.' },
+    ],
+    relatedGuides: [{ title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }],
+  },
+  {
     slug: 'ai-visibility',
     label: 'Free tool',
     name: 'AI visibility check',
@@ -72,7 +115,7 @@ export const PRODUCTS: Product[] = [
       { item: 'A content site whose text lives in files', cost: 'Free', why: 'The gates read Markdown or MDX files. If your text lives inside WordPress or Tilda, they have nothing to read.' },
     ],
     notFor: ['Rankings, traffic or citations: it measures the corpus, not the results', 'Rewriting prose: the only automatic fix is characters', 'Sites without a content folder of Markdown or MDX'],
-    faq: [{ question: 'Does it work outside Astro?', answer: 'Any folder of MDX or Markdown files with frontmatter. Gate 08 needs a static build for the exact link check and otherwise checks source links.' }, { question: 'Why are the thresholds what they are?', answer: 'They are the values one pipeline settled on across the thirteen brands on the cases page. Every one lives in gates.config.json; change them for your corpus and tell us which were wrong.' }, { question: 'Is the demo data real?', answer: 'No. The fixture market, Isla Verde, is fictional. Every number was invented for the tests.' }, { question: 'What does it cost?', answer: 'Nothing. It is MIT. Eight of the thirteen products are paid, from a 9 USD fix list to work quoted per site; the gates stay free.' }],
+    faq: [{ question: 'Does it work outside Astro?', answer: 'Any folder of MDX or Markdown files with frontmatter. Gate 08 needs a static build for the exact link check and otherwise checks source links.' }, { question: 'Why are the thresholds what they are?', answer: 'They are the values one pipeline settled on across the thirteen brands on the cases page. Every one lives in gates.config.json; change them for your corpus and tell us which were wrong.' }, { question: 'Is the demo data real?', answer: 'No. The fixture market, Isla Verde, is fictional. Every number was invented for the tests.' }, { question: 'What does it cost?', answer: 'Nothing. It is MIT. Eight of the fifteen products are paid, from a 9 USD fix list to work quoted per site; the gates stay free.' }],
     relatedGuides: [{ title: 'Programmatic SEO for lead generation', href: '/guides/programmatic-seo-lead-gen/' }, { title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }],
   },
   {
@@ -553,6 +596,6 @@ export const PRODUCTS: Product[] = [
 
 export const PRODUCTS_FAQ = [
   { question: 'Which product first?', answer: 'The free AI visibility check: ten seconds, nothing to install, and it tells you whether there is a problem at all. If your pages live in Markdown files, run the free gates next, because they read every page rather than a sample. Everything paid on this page answers a question one of those two has already raised.' },
-  { question: 'Are the free tools really free?', answer: 'Yes. Five of the thirteen products are free, four of them MIT licensed with the source public: the gates, the Astro starter, the Claude Code plugin, the MCP server and the AI visibility check. They came out of the pipeline behind the brands on the cases page and they stay free. The other eight are paid, from 9 USD.' },
+  { question: 'Are the free tools really free?', answer: 'Yes. Six of the fifteen products are free, four of them MIT licensed with the source public: the gates, the Astro starter, the Claude Code plugin, the MCP server and the AI visibility check. They came out of the pipeline behind the brands on the cases page and they stay free. The other eight are paid, from 9 USD.' },
   { question: 'Do the tools send data anywhere?', answer: 'No. The gates, the starter, the MCP server and Pain to SEO run on your own machine, and Pain to SEO never uploads your conversations. The checks that read a site fetch its public pages the way a browser or a search engine would, and the paid reports keep your address only until the email has been sent.' },
 ];
