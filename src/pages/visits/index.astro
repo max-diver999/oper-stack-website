@@ -1,0 +1,364 @@
+---
+/**
+ * The question no site owner can answer: how many people did ChatGPT actually send me?
+ * This page hands them the way to find out, in the words of their own platform.
+ */
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import { SITE } from '../../data/site';
+
+const canonical = `${SITE.url}/visits/`;
+
+const FAQ = [
+  {
+    question: 'Why does my analytics not show this already?',
+    answer:
+      'It usually does, buried. A visit from ChatGPT arrives as a referral from chatgpt.com, one row among hundreds that nobody opens, and many of these visits land in "direct" because the assistant strips the referrer. Nothing is wrong with your analytics: the number is simply not on any screen you look at.',
+  },
+  {
+    question: 'What exactly is counted?',
+    answer:
+      'A visit from a person who clicked through to you from an assistant: ChatGPT, Perplexity, Claude, Copilot, Gemini, NotebookLM, Grok, You.com, Qwen, Doubao, Alice, Le Chat and their other addresses. One visit is counted once even if the person reads five pages. Somebody browsing with JavaScript switched off is not counted, which is a handful of people in a hundred.',
+  },
+  {
+    question: 'What is stored, and where?',
+    answer:
+      'On WordPress, everything stays in your own site’s database: the name of the assistant, the day, and a number. No visitor identifier, no cookie, no address, and nothing leaves your site. The plugin is open source, so this is checkable rather than a promise.',
+  },
+  {
+    question: 'Does it slow my site down?',
+    answer:
+      'No. Three lines of script run in the visitor’s browser, and they send one request only when the visitor came from an assistant. For everybody else nothing happens at all. It also keeps working behind a page cache or a CDN, where counting during the page build would miss most of the traffic.',
+  },
+  {
+    question: 'What if the number turns out to be zero?',
+    answer:
+      'Then you have learned something worth knowing, and the free AI visibility check on this site tells you why in ten seconds. Zero is an answer, and it is the one most sites get in their first weeks.',
+  },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })),
+};
+
+const pageSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebPage',
+  url: canonical,
+  name: 'How many visits do AI assistants send you',
+  description: 'Count the visits ChatGPT, Perplexity, Claude, Copilot and Gemini send to your site, on your own site, free.',
+  isPartOf: { '@type': 'WebSite', name: SITE.name, url: SITE.url },
+};
+---
+
+<CommercialLayout
+  title="How Many Visits Does ChatGPT Send You? Count Them Free · OperStack"
+  description="Almost no site owner can say how many people ChatGPT, Perplexity or Claude sent them last month. Count them on your own site, free, with nothing leaving it."
+  canonical={canonical}
+  jsonLd={[pageSchema, faqSchema]}
+>
+  <div class="wrap">
+    <p class="label">Free</p>
+    <h1>How many people did ChatGPT send you last month?</h1>
+    <p class="lede">
+      Almost nobody can answer that about their own site. The visits are real, they just do not appear
+      on any screen you look at. This counts them, on your site, and shows you one small table.
+    </p>
+
+    <CitabilityBlock
+      text="Visits from AI assistants arrive as referrals from chatgpt.com, perplexity.ai or claude.ai, and most site owners never see them because they sit as single rows in analytics or fall into direct traffic. OperStack counts them on the site itself and reports how many each assistant sent."
+    />
+
+    <section class="proof">
+      <h2>What this looks like on a real site</h2>
+      <p>
+        Ninety days on one of our own content sites, measured in Google Analytics to 12 September 2026:
+      </p>
+      <div class="cards">
+        <div class="card"><span class="n">90</span><span class="k">ChatGPT</span></div>
+        <div class="card"><span class="n">26</span><span class="k">Perplexity</span></div>
+        <div class="card"><span class="n">19</span><span class="k">Copilot</span></div>
+        <div class="card"><span class="n">7</span><span class="k">Claude</span></div>
+        <div class="card"><span class="n">10</span><span class="k">Gemini and six others</span></div>
+      </div>
+      <p class="small">
+        159 visits and 3 enquiries from ten different assistants, against 826 visits and 13 enquiries
+        from Google over the same window. Small, and growing. The point is not the size: it is that
+        the number existed for months before anybody looked at it.
+      </p>
+    </section>
+
+    <h2 id="start">Start with what your site runs on</h2>
+    <p>Pick the one you use, or let us look at your address and tell you.</p>
+
+    <form id="detect" class="detect" novalidate>
+      <label for="site" class="sr">Your site address</label>
+      <input id="site" name="site" type="text" inputmode="url" placeholder="yoursite.com" autocomplete="url" />
+      <button type="submit" class="btn" id="detect-btn">Tell me what my site runs on →</button>
+    </form>
+    <p class="note" id="detect-note">We read one public page, the way a browser does, and store nothing.</p>
+
+    <div class="picker" role="group" aria-label="Choose your platform">
+      <button type="button" data-p="WordPress">WordPress</button>
+      <button type="button" data-p="Shopify">Shopify</button>
+      <button type="button" data-p="Tilda">Tilda</button>
+      <button type="button" data-p="Wix">Wix</button>
+      <button type="button" data-p="Squarespace">Squarespace</button>
+      <button type="button" data-p="Webflow">Webflow</button>
+      <button type="button" data-p="Bitrix">Bitrix</button>
+      <button type="button" data-p="other">Something else</button>
+    </div>
+
+    <section id="steps" class="steps" hidden aria-live="polite"></section>
+
+    <section class="help">
+      <h2>If you would rather not touch the site yourself</h2>
+      <p>Three ways, safest first.</p>
+      <ol>
+        <li>
+          <b>Send it to whoever looks after your site.</b> Give them the address of this page. Everything
+          they need is on it, and it takes them a couple of minutes.
+        </li>
+        <li>
+          <b>Ask an assistant to do it while you watch.</b> Open your site’s admin in your browser, start
+          Claude in that same browser, and ask it to install the plugin or paste the line. It clicks in
+          your window, you see every step, and you have handed nobody a password.
+        </li>
+        <li>
+          <b>On WordPress, give an assistant an application password.</b> That is a separate one-time
+          password you create in your own profile in four clicks and delete with one. It does not open
+          your email, it cannot be used to log in as you, and you can revoke it the moment the work is done.
+        </li>
+      </ol>
+      <p class="warn">
+        What we will never tell you to do: hand your real admin password to an assistant, to us, or to
+        anyone else. It is the key to your whole business. WordPress has application passwords for
+        exactly this reason, and on every other platform the assistant can work in a browser you are
+        already signed into.
+      </p>
+    </section>
+
+    <FaqSection items={FAQ} />
+
+    <section class="next">
+      <h2>Once you have the number</h2>
+      <p>
+        If it is low or zero, the reason is usually on the site rather than in the assistants. The
+        <a href="/ai-visibility/">free visibility check</a> scores what an answer engine needs before it
+        quotes a page, and takes ten seconds. From there the
+        <a href="/products/site-report/">9 USD fix list</a> writes every problem out as a task you can
+        hand to anyone.
+      </p>
+    </section>
+  </div>
+</CommercialLayout>
+
+<script is:inline>
+  (function () {
+    var steps = document.getElementById('steps');
+    var picker = document.querySelector('.picker');
+    var form = document.getElementById('detect');
+    var note = document.getElementById('detect-note');
+    var btn = document.getElementById('detect-btn');
+
+    var WHERE = {
+      Tilda: 'Site settings, the More tab, the field called HTML code for the head. Paste it there, then press Publish all pages.',
+      Wix: 'Settings, Custom code, Add code to all pages, and place it in the Head.',
+      Squarespace: 'Settings, Advanced, Code injection, the Header field.',
+      Webflow: 'Project settings, Custom code, the Head code field, then Publish.',
+      Bitrix: 'the site template, inside the head section. Whoever maintains the site does this in a minute.',
+      GoDaddy: 'Settings, Site-wide code, the Head field.',
+      Duda: 'Site settings, Head HTML.',
+      Weebly: 'Settings, SEO, Header code.',
+      HubSpot: 'Settings, Website, Pages, the site header HTML field.',
+      Framer: 'Site settings, General, Custom code, Start of head tag.',
+      'Next.js': 'your own layout file, in the head.',
+      Astro: 'your base layout, in the head.',
+      Nuxt: 'the head script list in nuxt.config.'
+    };
+
+    function esc(s) { return String(s).replace(/[<>&"]/g, function (c) { return ({ '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' })[c]; }); }
+
+    function wordpress() {
+      return '' +
+        '<h3>WordPress: install the plugin, nothing to paste</h3>' +
+        '<p>The counter is a free plugin. It keeps every number inside your own site’s database and sends nothing anywhere.</p>' +
+        '<ol>' +
+        '<li>Open your site’s admin: your address followed by <code>/wp-admin</code>.</li>' +
+        '<li>In the left menu choose <b>Plugins</b>, then <b>Add New</b>, then <b>Upload Plugin</b>.</li>' +
+        '<li>Choose the file you download here, press <b>Install Now</b>, then <b>Activate</b>.</li>' +
+        '<li>Open <b>Settings</b>, then <b>AI Visibility</b>. The table is empty on day one and fills as people arrive.</li>' +
+        '</ol>' +
+        '<p><a class="btn" href="/downloads/operstack-ai-visibility.zip" download>Download the plugin (12 KB)</a></p>' +
+        '<p class="small">It is under review at wordpress.org right now. Once it is listed you will be able to find it in the plugin search inside your admin and skip the download entirely. The code is the same either way.</p>';
+    }
+
+    function shopify() {
+      return '' +
+        '<h3>Shopify</h3>' +
+        '<p>The Shopify version is being built and is not ready yet. Tell us your store address and we will write to you the day it is, once, with no list to unsubscribe from afterwards.</p>' +
+        waitlist('shopify');
+    }
+
+    function snippet(platform) {
+      var where = WHERE[platform];
+      return '' +
+        '<h3>' + esc(platform) + '</h3>' +
+        '<p>For your platform the counter is one line of code that goes into the site’s head. <b>It is not ready yet</b>, and we would rather say so than hand you something that quietly counts nothing.</p>' +
+        (where ? '<p>When it is ready, this is where it will go on ' + esc(platform) + ': ' + esc(where) + '</p>' : '') +
+        '<p>Leave your address and we will write to you once, the day it works.</p>' +
+        waitlist(platform.toLowerCase());
+    }
+
+    function waitlist(source) {
+      return '' +
+        '<form class="wait" data-source="' + esc(source) + '" novalidate>' +
+        '<label class="sr" for="w-email-' + esc(source) + '">Email</label>' +
+        '<input id="w-email-' + esc(source) + '" name="email" type="email" placeholder="you@yourcompany.com" required />' +
+        '<input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />' +
+        '<button class="btn" type="submit">Tell me when it is ready</button>' +
+        '<p class="msg" hidden></p>' +
+        '</form>';
+    }
+
+    function show(platform) {
+      var html;
+      if (platform === 'WordPress') html = wordpress();
+      else if (platform === 'Shopify') html = shopify();
+      else if (platform === 'other' || !platform) {
+        html = '<h3>Something else</h3><p>Tell us the address and we will work out what it runs on and write the instructions for it. One email, the day it works.</p>' + waitlist('other');
+      } else html = snippet(platform);
+
+      steps.innerHTML = html;
+      steps.hidden = false;
+      steps.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      wireWaitlists();
+    }
+
+    function wireWaitlists() {
+      steps.querySelectorAll('form.wait').forEach(function (f) {
+        if (f.dataset.wired) return;
+        f.dataset.wired = '1';
+        f.addEventListener('submit', async function (e) {
+          e.preventDefault();
+          var msg = f.querySelector('.msg');
+          var email = f.querySelector('input[name=email]').value.trim();
+          var site = (document.getElementById('site') || {}).value || '';
+          if (!email || email.indexOf('@') < 1) { msg.hidden = false; msg.textContent = 'Please put in an address we can reach you at.'; return; }
+          msg.hidden = false;
+          msg.textContent = 'Sending…';
+          try {
+            var r = await fetch('/api/lead/', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: email,
+                source: 'visits-waitlist:' + f.dataset.source,
+                message: 'Waiting for the AI visit counter on ' + f.dataset.source + (site ? '. Site: ' + site : ''),
+                website: f.querySelector('input[name=website]').value,
+                consent: true
+              })
+            });
+            msg.textContent = r.ok
+              ? 'Noted. One email when it works, and nothing else.'
+              : 'That did not go through. Write to ' + 'info@oper-stack.com' + ' and we will add you by hand.';
+          } catch (err) {
+            msg.textContent = 'That did not go through. Write to info@oper-stack.com and we will add you by hand.';
+          }
+        });
+      });
+    }
+
+    picker.addEventListener('click', function (e) {
+      var b = e.target.closest('button[data-p]');
+      if (!b) return;
+      picker.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+      show(b.dataset.p);
+    });
+
+    form.addEventListener('submit', async function (e) {
+      e.preventDefault();
+      var url = document.getElementById('site').value.trim();
+      if (!url) { note.textContent = 'Put in your site address first, like yoursite.com.'; return; }
+      btn.disabled = true;
+      note.textContent = 'Looking at your site…';
+      try {
+        var r = await fetch('/api/platform/', {
+          method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: url })
+        });
+        var d = await r.json();
+        if (d.walled) {
+          note.textContent = 'Your site turns away automated readers, so we cannot tell from outside what it runs on. Pick it below yourself.';
+        } else if (d.platform) {
+          note.textContent = 'It runs on ' + d.platform + '.';
+          var b = picker.querySelector('button[data-p="' + d.platform + '"]');
+          picker.querySelectorAll('button').forEach(function (x) { x.classList.toggle('on', x === b); });
+          show(d.platform);
+        } else {
+          note.textContent = d.error ? d.error : 'We could not tell what it runs on. Pick it below, or choose Something else.';
+        }
+      } catch (err) {
+        note.textContent = 'Something went wrong on our side. Pick your platform below.';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  })();
+</script>
+
+<style>
+  .wrap { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+  .label { font-family: var(--fm); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal-soft); }
+  h1 { font-family: var(--fd); font-size: clamp(28px, 5vw, 40px); letter-spacing: -.02em; margin: 8px 0 0; }
+  .lede { font-size: 18px; color: rgba(245,242,236,.86); max-width: 62ch; margin: 14px 0 0; }
+  h2 { font-family: var(--fd); font-size: 23px; margin: 44px 0 10px; }
+  h3 { font-family: var(--fd); font-size: 19px; margin: 0 0 10px; }
+  p { max-width: 68ch; }
+  .small { font-size: 14px; color: var(--muted); }
+  .cards { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0; }
+  .card { flex: 1 1 120px; border: 1px solid rgba(255,255,255,.09); border-radius: 12px; padding: 12px 14px; background: rgba(255,255,255,.02); }
+  .card .n { display: block; font-family: var(--fd); font-size: 26px; color: var(--amber-soft); font-variant-numeric: tabular-nums; }
+  .card .k { display: block; font-size: 12.5px; color: var(--muted); margin-top: 2px; }
+  .detect { display: flex; flex-wrap: wrap; gap: 10px; margin: 14px 0 6px; }
+  .detect input { flex: 1 1 260px; min-width: 0; padding: 12px 14px; border-radius: 10px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.25); color: var(--paper); font-size: 16px; }
+  .note { font-size: 13.5px; color: var(--muted); margin: 0 0 18px; }
+  .picker { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 24px; }
+  .picker button { padding: 9px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.14); background: rgba(255,255,255,.02); color: var(--paper); font-family: var(--fd); font-size: 14px; cursor: pointer; min-height: 40px; }
+  .picker button:hover { border-color: var(--teal); }
+  .picker button.on { border-color: var(--teal); background: rgba(61,184,169,.12); }
+  .steps { border: 1px solid rgba(255,255,255,.09); border-radius: 14px; padding: 20px 22px; background: rgba(255,255,255,.02); margin: 0 0 28px; }
+  .help ol { padding-left: 20px; max-width: 68ch; }
+  .help li { margin: 10px 0; }
+  .warn { border-left: 3px solid var(--amber-soft); padding-left: 14px; font-size: 15px; color: rgba(245,242,236,.86); }
+  .next a { color: var(--teal-soft); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  @media (max-width: 640px) { .small, .note { font-size: 14px; } }
+</style>
+
+<!-- Всё внутри #steps вставляется скриптом, поэтому областные стили Astro до него не доходят:
+     без этого блока поле ввода получает 13 пикселей (айфон зумит страницу), кнопка теряет вид,
+     а ловушка для спама становится видимой и живой человек её заполняет. -->
+<style is:global>
+  #steps h3 { font-family: var(--fd); font-size: 19px; margin: 0 0 10px; }
+  #steps p { max-width: 68ch; }
+  #steps .small { font-size: 14px; color: var(--muted); }
+  #steps ol { margin: 10px 0 14px; padding-left: 20px; }
+  #steps li { margin: 7px 0; }
+  #steps code { font-family: var(--fm); font-size: 13.5px; background: rgba(0,0,0,.3); padding: 1px 6px; border-radius: 4px; }
+  /* Метка «Email» существует только для читалок экрана: без этого правила она видна глазами. */
+  #steps .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  #steps form.wait { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: flex-start; }
+  #steps form.wait input[name="email"] {
+    flex: 1 1 240px; min-width: 0; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, .14); background: rgba(0, 0, 0, .25);
+    color: var(--paper); font-size: 16px; min-height: 46px;
+  }
+  #steps form.wait .msg { flex: 1 1 100%; font-size: 14.5px; color: var(--teal-soft); margin: 4px 0 0; }
+  #steps form.wait input.hp {
+    position: absolute !important; left: -9999px !important;
+    width: 1px !important; height: 1px !important; opacity: 0 !important;
+  }
+</style>

@@ -72,7 +72,8 @@ export const POST: APIRoute = async ({ request }) => {
 
     // Lead magnets (the AI visibility check, the gates PDF) capture an email, not a phone.
     const emailText = String(body.email || '').trim();
-    const emailOnlySource = /^(ai-visibility|gates-pdf)/.test(sourceText);
+    // Формы, где телефон не спрашивают вовсе: просить его в ответе на «сообщите, когда заработает» значит терять людей.
+    const emailOnlySource = /^(ai-visibility|gates-pdf|visits-waitlist)/.test(sourceText);
     const emailLooksValid = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(emailText);
     if (!isHealthcheck && phoneDigits.length < 8 && !(emailOnlySource && emailLooksValid)) {
       return new Response(JSON.stringify({ error: emailOnlySource ? 'Valid email required' : 'Valid phone required' }), { status: 400 });
