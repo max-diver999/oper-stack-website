@@ -28,20 +28,11 @@ export const prerender = false;
     <section id="empty" hidden>
       <h2>Nothing counted yet</h2>
       <p>
-        That is normal on day one, and it is also what a missing snippet looks like. Two things to
-        check, in this order.
+        That has two very different causes, and you should not have to guess which. We can look at
+        your site and tell you.
       </p>
-      <ol>
-        <li>
-          Open your site, view the page source, and search it for <code>v.js</code>. If it is not
-          there, the line did not save. Paste it again and press publish.
-        </li>
-        <li>
-          If the line is there, you are simply waiting. A visit is counted when a person reads an
-          answer from an assistant and clicks through to you. On a small site that is days, not
-          minutes.
-        </li>
-      </ol>
+      <p><button type="button" class="btn" id="check">Check the line is on my site</button></p>
+      <p class="verdict" id="verdict" hidden></p>
       <p class="small">
         Nothing is counted from you browsing your own site, because you did not arrive from an
         assistant.
@@ -92,6 +83,37 @@ export const prerender = false;
 
     if (!token) { sub.textContent = 'This address is missing its link.'; show(fail); return; }
 
+    function wireCheck() {
+      var btn = document.getElementById('check');
+      var verdict = document.getElementById('verdict');
+      btn.addEventListener('click', async function () {
+        btn.disabled = true;
+        verdict.hidden = false;
+        verdict.className = 'verdict';
+        verdict.textContent = 'Looking at your site\u2026';
+        try {
+          var r = await fetch('/api/visits/installed/?t=' + encodeURIComponent(token));
+          var d = await r.json();
+          if (!r.ok) { verdict.textContent = d.error || 'We could not look just now.'; btn.disabled = false; return; }
+          if (d.installed === true) {
+            verdict.className = 'verdict ok';
+            verdict.textContent = 'The line is on ' + d.domain + ' and working. You are simply waiting: a visit is counted when somebody reads an answer from an assistant and clicks through to you. On a small site that is days, not minutes.';
+          } else if (d.installed === false && d.wrongKey) {
+            verdict.className = 'verdict bad';
+            verdict.textContent = d.reason + ' Replace it with the line from your email, the one ending in your own key.';
+          } else if (d.installed === false) {
+            verdict.className = 'verdict bad';
+            verdict.textContent = 'The line is not on ' + d.domain + '. That is why nothing is counted. Paste it into the head of your site, on every page, and publish. The line is in the email we sent you.';
+          } else {
+            verdict.textContent = d.reason || 'We could not look at your site from here, so this one you will have to check yourself.';
+          }
+        } catch (err) {
+          verdict.textContent = 'We could not look just now. Try again in a minute.';
+        }
+        btn.disabled = false;
+      });
+    }
+
     fetch('/api/visits/report/?t=' + encodeURIComponent(token) + '&days=90')
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (res) {
@@ -102,6 +124,7 @@ export const prerender = false;
         if (!d.total) {
           sub.textContent = 'Counting since ' + new Date(d.installedAt).toLocaleDateString();
           show(empty);
+          wireCheck();
           return;
         }
 
@@ -142,6 +165,9 @@ export const prerender = false;
   .keep { border-top: 1px solid rgba(255,255,255,.1); margin-top: 44px; padding-top: 20px; }
   .next { margin-top: 16px; }
   .next a, .keep a { color: var(--teal-soft); }
+  .verdict { font-size: 15.5px; line-height: 1.55; max-width: 68ch; border-left: 3px solid rgba(255,255,255,.2); padding-left: 14px; }
+  .verdict.ok { border-left-color: var(--teal); }
+  .verdict.bad { border-left-color: var(--amber-soft); }
 </style>
 
 <!-- The table is built in the browser, and Astro scopes styles to markup it rendered itself. -->

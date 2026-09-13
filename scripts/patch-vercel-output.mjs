@@ -51,6 +51,14 @@ async function main() {
 
   const pre = [
     { src: '^/(.*)$', has: [{ type: 'host', value: WWW_HOST }], headers: { Location: `${APEX}/$1` }, status: 308 },
+    // Plain redirects from vercel.json (no `has` condition) are dropped by the adapter too.
+    ...(vercel.redirects || [])
+      .filter((r) => !r.has && r.source && r.destination)
+      .map((r) => ({
+        src: toSrc(r.source),
+        headers: { Location: r.destination },
+        status: r.statusCode || 308,
+      })),
     ...(vercel.headers || []).map((h) => ({ src: toSrc(h.source), headers: Object.fromEntries(h.headers.map((x) => [x.key, x.value])), continue: true })),
     // Link and Vary on every response; `continue` lets the later routes still run.
     { src: '^/(.*)$', headers: { Link: LINK_HEADER, Vary: 'Accept' }, continue: true },
@@ -77,7 +85,11 @@ async function main() {
   if (fsIdx === -1) { console.error('[patch-vercel] filesystem handler not found'); process.exit(1); }
   config.routes.splice(fsIdx, 0, ...pre);
 
+  // Scheduled jobs live in vercel.json but the adapter does not carry them into the build output,
+  // so the weekly report would simply never run.
+  if (Array.isArray(vercel.crons) && vercel.crons.length) config.crons = vercel.crons;
+
   await fs.writeFile(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
-  console.log(`[patch-vercel] injected www redirect and ${pre.length - 1} pre-filesystem rule(s) into ${path.relative(ROOT, CONFIG_PATH)} (collections: ${collections.join(', ') || 'none'})`);
+  console.log(`[patch-vercel] injected www redirect, ${(vercel.crons || []).length} cron(s) and ${pre.length - 1} pre-filesystem rule(s) into ${path.relative(ROOT, CONFIG_PATH)} (collections: ${collections.join(', ') || 'none'})`);
 }
 main();
