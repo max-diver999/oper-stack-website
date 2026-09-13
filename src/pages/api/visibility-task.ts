@@ -17,6 +17,7 @@ import type { APIRoute } from 'astro';
 import { checkVisibility, normaliseInput } from '../../lib/ai-visibility.mjs';
 import { topTask, renderTask } from '../../lib/ai-visibility-tasks.mjs';
 import { buildRunBody, buildRunSubject } from '../../lib/report-fulfilment';
+import { makeUnsubToken } from './unsubscribe';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 import { logLead, originOf } from '../../lib/sheets-log';
 import { SITE } from '../../data/site';
@@ -82,7 +83,7 @@ function limited(ip: string): boolean {
  *
  * Порядок: сначала весь список, потом первая задача целиком как образец, потом ступень за 9.
  */
-function buildEmail(task: ReturnType<typeof topTask>, result: any) {
+function buildEmail(task: ReturnType<typeof topTask>, result: any, unsubUrl: string) {
   const host = String(result?.host ?? '');
   const score = Number(result?.score ?? 0);
   type Finding = { level: string; text: string };
@@ -113,6 +114,7 @@ function buildEmail(task: ReturnType<typeof topTask>, result: any) {
     `This check reads one page. The site fix list reads up to twenty and turns every problem above into a task written the same way: ${SITE.url}/products/site-report/`,
     '',
     'OperStack · info@oper-stack.com',
+    `Not interested in the follow-ups? One click and we stop: ${unsubUrl}`,
   ].join('\n');
 
   const html = [
@@ -126,7 +128,8 @@ function buildEmail(task: ReturnType<typeof topTask>, result: any) {
     `<p style="margin:0;color:#666;font-size:13px">${esc(task?.rule || '')}</p>`,
     '</div>',
     `<p>This check reads one page. The <a href="${SITE.url}/products/site-report/">site fix list</a> reads up to twenty and turns every problem above into a task written the same way, for 9 USD.</p>`,
-    '<p style="color:#888;font-size:13px">OperStack · info@oper-stack.com</p>',
+    '<p style="color:#888;font-size:13px">OperStack · info@oper-stack.com<br>'
+      + `Not interested in the follow-ups? <a href="${unsubUrl}" style="color:#888">One click and we stop.</a></p>`,
   ].join('\n');
   return { subject, text, html };
 }
@@ -155,7 +158,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   try {
-    await sendTransactionalMail({ to: email, ...buildEmail(task, result) });
+    const unsubUrl = `${SITE.url}/api/unsubscribe/?t=${makeUnsubToken(email, env('KIT_DOWNLOAD_SECRET'))}`;
+    await sendTransactionalMail({ to: email, ...buildEmail(task, result, unsubUrl) });
   } catch {
     return json({ ok: false, error: 'We could not send the email just now. Write to info@oper-stack.com and we will send it by hand.' }, 502);
   }
