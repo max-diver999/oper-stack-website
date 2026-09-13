@@ -44,6 +44,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - [All products, free and paid, with what each one needs before you start](https://oper-stack.com/products/)
 - [Free llms.txt checker: does the map for AI still lead anywhere](https://oper-stack.com/tools/llms-txt-checker/)
 - [Free AI visibility check: can ChatGPT read and cite a site](https://oper-stack.com/ai-visibility/)
+- [Free counter for the visits ChatGPT, Perplexity and Claude send a site](https://oper-stack.com/visits/)
 - [What the free AI visibility check measures, and what it does not](https://oper-stack.com/products/ai-visibility/)
 - [Sixteen content gates, free and MIT, one command](https://oper-stack.com/products/gates/)
 - [Free Astro starter that already passes the gates](https://oper-stack.com/products/starter/)
