@@ -6,6 +6,11 @@
  * https://oper-stack.com/api/mcp into Claude, Cursor, VS Code, Windsurf, Zed or ChatGPT and it
  * works, with nothing installed and no account.
  *
+ * The published address carries a trailing slash, and that is not cosmetic: the site redirects
+ * /api/mcp to /api/mcp/ at the platform level, before any rule of ours can rewrite it. The
+ * redirect is a 308 and preserves the POST body, so a client that follows redirects is fine either
+ * way, but the address we hand out is the one that needs no redirect at all.
+ *
  * Speaks JSON-RPC 2.0 over POST, which is the streamable HTTP transport's plain-response mode.
  * Kept deliberately small: initialize, tools/list, tools/call, ping. No session state, so there is
  * nothing to lose between calls and nothing to leak between callers.
