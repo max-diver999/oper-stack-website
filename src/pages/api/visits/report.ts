@@ -7,6 +7,7 @@
  */
 import type { APIRoute } from 'astro';
 import { visitsDb, visitsDbConfigured } from '../../../lib/visits-db';
+import { recentScores, scoreForToday } from '../../../lib/visits-score';
 
 /** REQUIRED: without this GET is served from the build instead of running */
 export const prerender = false;
@@ -48,6 +49,19 @@ export const GET: APIRoute = async ({ url }) => {
 
   const total = byAssistant.reduce((sum, row) => sum + row.hits, 0);
 
+  // The other half of the picture. Measuring costs about ten seconds, so it happens once a day and
+  // a refresh reads the stored point rather than paying for it again.
+  let score = null;
+  let scoreBefore = null;
+  try {
+    const points = await recentScores(id, 2);
+    const today = points.find((p) => p.day === new Date().toISOString().slice(0, 10));
+    score = today ?? (await scoreForToday(id, site[0].domain)) ?? points[0] ?? null;
+    scoreBefore = points.find((p) => p.day !== score?.day) ?? null;
+  } catch {
+    // A failed measurement must not take the visit numbers down with it.
+  }
+
   return json({
     domain: site[0].domain,
     installedAt: site[0].created_at,
@@ -56,5 +70,7 @@ export const GET: APIRoute = async ({ url }) => {
     total,
     byAssistant,
     byDay,
+    score,
+    scoreBefore,
   });
 };

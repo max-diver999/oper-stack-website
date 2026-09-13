@@ -58,6 +58,17 @@ const JS_STRINGS = ru
       missing: 'В этом адресе нет ссылки.',
       whoSent: 'Кто присылал посетителей на ',
       countingSince: 'Считаем с ',
+      twoHalves: 'Два числа про один и тот же сайт',
+      halfVisits: 'Сколько людей пришло',
+      halfScore: 'Могут ли вас процитировать',
+      scoreOf: 'из 100',
+      inDays: 'за {d} дн.',
+      scoreNone: 'Оценку пока не сняли.',
+      moveUp: 'выросла на ', moveDown: 'упала на ', moveSame: 'не изменилась',
+      sinceDay: ' с ',
+      areasH: 'Из чего складывается оценка',
+      whyBoth: 'Счётчик говорит, сколько людей пришло. Оценка говорит, могут ли вас вообще процитировать. Сайт, который нельзя процитировать, визитов и не получит, а визиты без понимания причины нельзя повторить.',
+      fixLink: 'Что чинить первым',
       visitsOne: 'визит', visitsFew: 'визита', visitsMany: 'визитов',
       visitsLine: '{n} {w} от ИИ-ассистентов за последние {d} дней.',
       thAssistant: 'Ассистент', thVisits: 'Визитов', thShare: 'Доля',
@@ -78,6 +89,17 @@ const JS_STRINGS = ru
       missing: 'This address is missing its link.',
       whoSent: 'Who sent visitors to ',
       countingSince: 'Counting since ',
+      twoHalves: 'Two numbers about the same site',
+      halfVisits: 'How many people arrived',
+      halfScore: 'Whether you can be quoted',
+      scoreOf: 'of 100',
+      inDays: 'in {d} days',
+      scoreNone: 'No score taken yet.',
+      moveUp: 'up ', moveDown: 'down ', moveSame: 'unchanged',
+      sinceDay: ' since ',
+      areasH: 'What the score is made of',
+      whyBoth: 'The counter says how many people arrived. The score says whether anybody can quote you at all. A site nobody can quote will never have visits to count, and visits with no idea why cannot be repeated.',
+      fixLink: 'What to fix first',
       visitsOne: 'visit', visitsFew: 'visits', visitsMany: 'visits',
       visitsLine: '{n} {w} from AI assistants in the last {d} days.',
       thAssistant: 'Assistant', thVisits: 'Visits', thShare: 'Share',
@@ -110,6 +132,7 @@ const JS_STRINGS = ru
     <h1 id="head">{T.h1}</h1>
     <p class="lede" id="sub">{T.loading}</p>
 
+    <section id="both" hidden></section>
     <section id="out" hidden></section>
 
     <section id="empty" hidden>
@@ -160,6 +183,45 @@ const JS_STRINGS = ru
 
     if (!token) { sub.textContent = S.missing; show(fail); return; }
 
+    /** Both halves in one place, each with how it moved. */
+    function renderBoth(d) {
+      var both = document.getElementById('both');
+      var sc = d.score;
+      var before = d.scoreBefore;
+
+      var move = '';
+      if (sc && before) {
+        var diff = sc.score - before.score;
+        move = diff === 0 ? S.moveSame
+          : (diff > 0 ? S.moveUp : S.moveDown) + Math.abs(diff) + S.sinceDay + new Date(before.day).toLocaleDateString();
+      }
+
+      var areas = sc && sc.areas && sc.areas.length
+        ? '<div class="areas"><p class="areas-h">' + S.areasH + '</p><ul>' +
+          sc.areas.map(function (a) {
+            var pct = Math.round((a.score / a.max) * 100);
+            return '<li><span class="a-name">' + esc(a.label) + '</span>' +
+              '<span class="a-bar"><i style="width:' + pct + '%"></i></span>' +
+              '<span class="a-num">' + a.score + '/' + a.max + '</span></li>';
+          }).join('') + '</ul></div>'
+        : '';
+
+      both.innerHTML =
+        '<h2>' + S.twoHalves + '</h2>' +
+        '<div class="halves">' +
+          '<div class="half"><span class="h-k">' + S.halfVisits + '</span>' +
+            '<span class="h-n">' + d.total + '</span>' +
+            '<span class="h-s">' + (d.days ? S.inDays.replace('{d}', d.days) : '') + '</span>' +
+          '</div>' +
+          '<div class="half"><span class="h-k">' + S.halfScore + '</span>' +
+            '<span class="h-n">' + (sc ? sc.score : '—') + '</span>' +
+            '<span class="h-s">' + (sc ? S.scoreOf + (move ? ' · ' + esc(move) : '') : S.scoreNone) + '</span>' +
+          '</div>' +
+        '</div>' + areas +
+        '<p class="why">' + S.whyBoth + ' <a href="/ai-visibility/">' + S.fixLink + '</a></p>';
+      both.hidden = false;
+    }
+
     function wireCheck() {
       var btn = document.getElementById('check');
       var verdict = document.getElementById('verdict');
@@ -198,6 +260,8 @@ const JS_STRINGS = ru
         if (!res.ok) { sub.textContent = ''; show(fail); return; }
         var d = res.d;
         document.getElementById('head').textContent = S.whoSent + d.domain;
+
+        renderBoth(d);
 
         if (!d.total) {
           sub.textContent = S.countingSince + new Date(d.installedAt).toLocaleDateString();
@@ -245,10 +309,27 @@ const JS_STRINGS = ru
   .verdict { font-size: 15.5px; line-height: 1.55; max-width: 68ch; border-left: 3px solid rgba(255,255,255,.2); padding-left: 14px; }
   .verdict.ok { border-left-color: var(--teal); }
   .verdict.bad { border-left-color: var(--amber-soft); }
+
 </style>
 
 <!-- The table is built in the browser, and Astro scopes styles to markup it rendered itself. -->
 <style is:global>
+  #both h2 { margin-top: 0; }
+  #both .halves { display: flex; flex-wrap: wrap; gap: 12px; margin: 0 0 18px; }
+  #both .half { flex: 1 1 200px; border: 1px solid rgba(255,255,255,.09); border-radius: 12px; padding: 14px 16px; background: rgba(255,255,255,.02); }
+  #both .h-k { display: block; font-family: var(--fm); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  #both .h-n { display: block; font-family: var(--fd); font-size: 34px; line-height: 1.1; margin: 6px 0 2px; color: var(--amber-soft); font-variant-numeric: tabular-nums; }
+  #both .h-s { display: block; font-size: 13px; color: var(--muted); }
+  #both .areas-h { font-family: var(--fm); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 8px; }
+  #both .areas ul { list-style: none; padding: 0; margin: 0; }
+  #both .areas li { display: flex; align-items: center; gap: 10px; margin: 6px 0; font-size: 14px; }
+  #both .a-name { flex: 1 1 auto; min-width: 0; }
+  #both .a-bar { flex: 0 0 90px; height: 6px; border-radius: 99px; background: rgba(255,255,255,.08); overflow: hidden; }
+  #both .a-bar i { display: block; height: 100%; background: var(--teal); }
+  #both .a-num { flex: 0 0 46px; text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+  #both .why { font-size: 14.5px; color: var(--muted); max-width: 68ch; margin-top: 16px; }
+  #both .why a { color: var(--teal-soft); }
+
   #out .tablewrap { overflow-x: auto; border: 1px solid rgba(255, 255, 255, .09); border-radius: 12px; }
   #out table { width: 100%; border-collapse: collapse; font-size: 15.5px; }
   #out th, #out td { padding: 11px 14px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, .06); }

@@ -9,6 +9,7 @@ import { SITE } from '../../../data/site';
 import { sendTransactionalMail } from '../../../lib/mail-smtp';
 import { visitsDb, visitsDbConfigured } from '../../../lib/visits-db';
 import { dueForReport, numbersFor, composeWeekly } from '../../../lib/visits-weekly';
+import { recentScores, recordScore } from '../../../lib/visits-score';
 
 /** REQUIRED: without this the route is served from the build instead of running */
 export const prerender = false;
@@ -41,9 +42,29 @@ export const GET: APIRoute = async ({ request, url }) => {
   const skipped: string[] = [];
   const failed: string[] = [];
 
+  // Measuring costs about ten seconds a site, so the run takes a budget rather than a count:
+  // whoever fits gets a fresh score, the rest keep last week's and get one next time.
+  const measureUntil = Date.now() + 60_000;
+
   for (const row of due) {
     const numbers = await numbersFor(row.id);
-    const mail = composeWeekly(row, numbers, SITE.url);
+
+    let score = null;
+    let scoreBefore = null;
+    try {
+      const points = await recentScores(row.id, 2);
+      if (!dry && Date.now() < measureUntil) {
+        score = (await recordScore(row.id, row.domain)) ?? points[0] ?? null;
+        scoreBefore = points[0] && points[0].day !== score?.day ? points[0] : points[1] ?? null;
+      } else {
+        score = points[0] ?? null;
+        scoreBefore = points[1] ?? null;
+      }
+    } catch {
+      // The visit numbers must go out even when the measurement does not.
+    }
+
+    const mail = composeWeekly(row, numbers, SITE.url, score, scoreBefore);
     if (!mail) {
       skipped.push(row.domain);
       // Still stamp it, or a site with a quiet week is reconsidered every single run.
