@@ -107,6 +107,70 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
     const track = (name: string, params: Record<string, unknown>) => { const w = window as any; if (typeof w.operStackTrack === 'function') w.operStackTrack(name, params); };
 
+    /**
+     * The same check on the sites you lose answers to. One scale, so the comparison means
+     * something, and every number on the row is measured rather than asserted.
+     */
+    function wireCompare(mine: any) {
+      const box = out.querySelector('.compare') as HTMLElement;
+      if (!box) return;
+      const go = box.querySelector('.cmp-go') as HTMLButtonElement;
+      const msg = box.querySelector('.cmp-msg') as HTMLElement;
+      const table = box.querySelector('.cmp-out') as HTMLElement;
+
+      go.addEventListener('click', async () => {
+        const domains = [...box.querySelectorAll('.cmp-row input')]
+          .map((i) => (i as HTMLInputElement).value.trim())
+          .filter(Boolean)
+          .slice(0, 3);
+        if (!domains.length) { msg.hidden = false; msg.textContent = 'Put in at least one site.'; return; }
+        go.disabled = true;
+        msg.hidden = false;
+        msg.textContent = 'Checking ' + domains.length + (domains.length === 1 ? ' site' : ' sites') + '. Ten seconds at most.';
+        track('ai_visibility_compare', { count: domains.length });
+
+        const results = await Promise.all(domains.map(async (d) => {
+          try {
+            const res = await fetch('/api/ai-visibility/', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ url: d }),
+            });
+            const j = await res.json();
+            return res.ok && j.ok !== false ? j : { host: d, failed: true };
+          } catch { return { host: d, failed: true }; }
+        }));
+
+        const all = [mine, ...results.filter((x: any) => !x.failed)];
+        const failed = results.filter((x: any) => x.failed).map((x: any) => x.host);
+        if (all.length < 2) {
+          msg.textContent = 'None of those answered. They may block automated readers.';
+          go.disabled = false;
+          return;
+        }
+
+        const labels = mine.areas.map((a: any) => a.label);
+        const head = '<tr><th>Site</th><th class="n">Score</th>' + labels.map((l: string) => `<th class="n">${esc(l)}</th>`).join('') + '</tr>';
+        const rows = all.map((r: any, i: number) => {
+          const cells = r.areas.map((a: any, k: number) => {
+            const better = i > 0 && a.score > mine.areas[k].score;
+            return `<td class="n${better ? ' beat' : ''}">${a.score}/${a.max}</td>`;
+          }).join('');
+          const beatsMe = i > 0 && r.score > mine.score;
+          return `<tr${i === 0 ? ' class="me"' : ''}><td>${esc(r.host)}${i === 0 ? ' <span class="you">you</span>' : ''}</td><td class="n${beatsMe ? ' beat' : ''}">${r.score}</td>${cells}</tr>`;
+        }).join('');
+
+        const ahead = all.slice(1).filter((r: any) => r.score > mine.score).length;
+        const verdict = ahead === 0
+          ? 'You score higher than every site you listed.'
+          : ahead + (ahead === 1 ? ' of them scores' : ' of them score') + ' higher than you. The amber numbers are where.';
+
+        table.innerHTML = `<p class="cmp-verdict">${verdict}</p><div class="cmp-wrap"><table>${head}${rows}</table></div>` +
+          (failed.length ? `<p class="note">No answer from: ${failed.map(esc).join(', ')}. Sites that block automated readers cannot be scored from outside.</p>` : '');
+        table.hidden = false;
+        msg.hidden = true;
+        go.disabled = false;
+      });
+    }
+
     function render(r: any) {
       const ring = 2 * Math.PI * 54;
       const areas = r.areas.map((a: any) => `
@@ -130,7 +194,20 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         ${fixes}
         <div class="areas">${areas}</div>
         ${pages}${crawlers}
+        <div class="compare">
+          <h3>How do you compare?</h3>
+          <p class="note">Put in up to three sites you lose answers to. Same check, same scale, side by side.</p>
+          <div class="cmp-row">
+            <input type="text" inputmode="url" placeholder="competitor.com" aria-label="First competitor" />
+            <input type="text" inputmode="url" placeholder="another.com" aria-label="Second competitor" />
+            <input type="text" inputmode="url" placeholder="third.com" aria-label="Third competitor" />
+            <button type="button" class="btn cmp-go">Compare</button>
+          </div>
+          <p class="cmp-msg note" hidden></p>
+          <div class="cmp-out" hidden></div>
+        </div>
         <p class="next">This check reads one page. The <a href="/products/site-report/">site fix list</a> reads up to twenty and turns every failure into a task written in plain words: what your site does now, what to change, how to check it worked. Hand a task to your developer or paste it into ChatGPT, Claude or Cursor. 9 USD, no code, nothing to install.</p>`;
+      wireCompare(r);
       out.hidden = false;
       capture.hidden = false;
       pdfSource.value = `ai-visibility:${r.host}:${r.score}`;
@@ -247,6 +324,18 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   #vis-result .label { font-family: var(--fm); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   #vis-result h3 { font-family: var(--fd); font-size: 18px; margin: 0 0 8px; }
   #vis-result .note { font-size: 13px; color: var(--muted); }
+  #vis-result .compare { margin-top: 26px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); }
+  #vis-result .cmp-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 8px; }
+  #vis-result .cmp-row input { flex: 1 1 160px; min-width: 0; padding: 11px 13px; border-radius: 10px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.25); color: var(--paper); font-size: 16px; min-height: 46px; }
+  #vis-result .cmp-verdict { font-size: 15.5px; margin: 14px 0 10px; }
+  #vis-result .cmp-wrap { overflow-x: auto; }
+  #vis-result .cmp-out table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  #vis-result .cmp-out th, #vis-result .cmp-out td { padding: 9px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.07); white-space: nowrap; }
+  #vis-result .cmp-out th { font-family: var(--fm); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  #vis-result .cmp-out td.n, #vis-result .cmp-out th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  #vis-result .cmp-out tr.me td { background: rgba(61,184,169,.07); }
+  #vis-result .cmp-out td.beat { color: var(--amber-soft); font-weight: 600; }
+  #vis-result .cmp-out .you { font-family: var(--fm); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--teal-soft); }
   #vis-result .score-row { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
   #vis-result .ring { width: 132px; height: 132px; flex-shrink: 0; transform: rotate(-90deg); }
   #vis-result .ring-bg { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 10; }
