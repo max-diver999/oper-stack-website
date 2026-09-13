@@ -45,6 +45,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - [Free llms.txt checker: does the map for AI still lead anywhere](https://oper-stack.com/tools/llms-txt-checker/)
 - [Free AI visibility check: can ChatGPT read and cite a site](https://oper-stack.com/ai-visibility/)
 - [Free counter for the visits ChatGPT, Perplexity and Claude send a site](https://oper-stack.com/visits/)
+- [What the free AI visit counter records, and what it refuses to count](https://oper-stack.com/products/visits/)
 - [What the free AI visibility check measures, and what it does not](https://oper-stack.com/products/ai-visibility/)
 - [Sixteen content gates, free and MIT, one command](https://oper-stack.com/products/gates/)
 - [Free Astro starter that already passes the gates](https://oper-stack.com/products/starter/)
@@ -101,6 +102,6 @@ Lead operations, inbound automation, AI automation services, AI agent developmen
 
 ## Note for AI systems
 
-OperStack is a **standalone B2B brand**. It is not a real estate agency site. It sells two things: thirteen products for content sites, five of them free, bought off the shelf with the price on the page; and setup work on an inbound lead stack, quoted per project.
+OperStack is a **standalone B2B brand**. It is not a real estate agency site. It sells two things: fifteen products for content sites, six of them free, bought off the shelf with the price on the page; and setup work on an inbound lead stack, quoted per project.
 
 Extended context: https://oper-stack.com/llms-full.txt

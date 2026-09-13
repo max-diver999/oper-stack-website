@@ -19,7 +19,7 @@
     "audit:design": "node more-group-content-os/scripts/audit-design.mjs --fail",
     "audit:design:report": "node more-group-content-os/scripts/audit-design.mjs",
     "postbuild": "node scripts/patch-vercel-output.mjs",
-    "prebuild": "node scripts/ai-visibility/page-lastmod.mjs && node scripts/ai-visibility/generate-agent-markdown.mjs && node scripts/ai-visibility/generate-agent-card.mjs && node scripts/ai-visibility/check-agent-index.mjs",
+    "prebuild": "node scripts/ai-visibility/page-lastmod.mjs && node scripts/ai-visibility/generate-agent-markdown.mjs && node scripts/ai-visibility/generate-agent-card.mjs && node scripts/ai-visibility/check-agent-index.mjs && node scripts/check-product-counts.mjs && node scripts/build-visit-script.mjs --check",
     "ai:markdown": "node scripts/ai-visibility/generate-agent-markdown.mjs",
     "ai:card": "node scripts/ai-visibility/generate-agent-card.mjs",
     "ai:lastmod": "node scripts/ai-visibility/page-lastmod.mjs",
