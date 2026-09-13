@@ -85,20 +85,13 @@ async function main() {
   if (fsIdx === -1) { console.error('[patch-vercel] filesystem handler not found'); process.exit(1); }
   config.routes.splice(fsIdx, 0, ...pre);
 
-  // The adapter DOES carry scheduled jobs across, unlike redirects and headers. Setting them again
-  // produced two identical entries and Vercel rejected the whole deployment, so this merges and
-  // de-duplicates on path plus schedule rather than assuming either side did or did not run.
-  if (Array.isArray(vercel.crons) && vercel.crons.length) {
-    const seen = new Set();
-    config.crons = [...(config.crons || []), ...vercel.crons].filter((c) => {
-      const id = `${c.path}|${c.schedule}`;
-      if (seen.has(id)) return false;
-      seen.add(id);
-      return true;
-    });
-  }
+  // Scheduled jobs are deliberately NOT copied here. Vercel reads them straight from vercel.json
+  // even on a Build Output API deployment, unlike redirects and headers, which it does drop and
+  // which is why the rest of this script exists. Writing them into the build output as well made
+  // the platform see the same job twice and reject the whole deployment with duplicated_cron_job.
+  // Measured on 13 Sep 2026: config.json carries no crons at all before this script runs.
 
   await fs.writeFile(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
-  console.log(`[patch-vercel] injected www redirect, ${(vercel.crons || []).length} cron(s) and ${pre.length - 1} pre-filesystem rule(s) into ${path.relative(ROOT, CONFIG_PATH)} (collections: ${collections.join(', ') || 'none'})`);
+  console.log(`[patch-vercel] injected www redirect and ${pre.length - 1} pre-filesystem rule(s) into ${path.relative(ROOT, CONFIG_PATH)} (collections: ${collections.join(', ') || 'none'})`);
 }
 main();
