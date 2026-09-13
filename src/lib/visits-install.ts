@@ -13,6 +13,8 @@ export type InstallState = {
   installed: boolean | null;
   /** Set when the line is there but carrying somebody else's key. */
   wrongKey?: boolean;
+  /** A stable code, so the page can say this in the reader's own language. */
+  code?: 'walled' | 'status' | 'timeout' | 'noanswer' | 'wrongkey';
   reason?: string;
 };
 
@@ -29,10 +31,10 @@ export async function snippetInstalled(domain: string, key: string): Promise<Ins
 
     // A challenge page is not the owner's page and proves nothing either way.
     if (res.status === 403 || /cf-mitigated|just a moment|cf_chl/i.test(html)) {
-      return { installed: null, reason: 'The site turns away automated readers, so we cannot look from outside.' };
+      return { installed: null, code: 'walled', reason: 'The site turns away automated readers, so we cannot look from outside.' };
     }
     if (!res.ok) {
-      return { installed: null, reason: `The site answered ${res.status}.` };
+      return { installed: null, code: 'status', reason: `The site answered ${res.status}.` };
     }
 
     if (html.includes(key)) return { installed: true };
@@ -40,13 +42,18 @@ export async function snippetInstalled(domain: string, key: string): Promise<Ins
       return {
         installed: false,
         wrongKey: true,
+        code: 'wrongkey',
         reason: 'The line is there, but it carries a different key, so the visits are being counted somewhere else.',
       };
     }
     return { installed: false };
   } catch (err) {
     const timeout = err instanceof Error && err.name === 'AbortError';
-    return { installed: null, reason: timeout ? 'The site took too long to answer.' : 'The site did not answer.' };
+    return {
+      installed: null,
+      code: timeout ? 'timeout' : 'noanswer',
+      reason: timeout ? 'The site took too long to answer.' : 'The site did not answer.',
+    };
   } finally {
     clearTimeout(timer);
   }

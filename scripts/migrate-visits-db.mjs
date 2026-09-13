@@ -84,6 +84,12 @@ const STATEMENTS = [
     'alter table sites add column if not exists weekly boolean not null default true',
   ],
   [
+    // The Russian site sells the same counter to Russian owners, and a weekly email in the wrong
+    // language is worse than no email. One column decides the page and the email.
+    'sites language',
+    "alter table sites add column if not exists lang text not null default 'en'",
+  ],
+  [
     'view token is unique',
     'create unique index if not exists sites_view_token_idx on sites (view_token) where view_token is not null',
   ],
