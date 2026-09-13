@@ -40,7 +40,7 @@ export const PRODUCTS: Product[] = [
     priceNote: 'One line of code or a WordPress plugin. No account on our side, nothing to pay, no list to leave',
     status: 'available',
     cta: { text: 'Count my AI visits', href: '/visits/' },
-    og: '/og/og-default.png',
+    og: '/og/og-visits.png',
     order: 2,
     get: [
       'How many visits each assistant sent you, by day and by name',
@@ -180,7 +180,7 @@ export const PRODUCTS: Product[] = [
     status: 'available',
     cta: { text: 'Copy the command', href: '#install' },
     command: 'npx -y @operstack/mcp',
-    og: '/og/og-default.png',
+    og: '/og/og-mcp.png',
     order: 4,
     get: [
       'Four tools your assistant can call by itself, in plain conversation',
@@ -272,7 +272,7 @@ export const PRODUCTS: Product[] = [
     priceNote: 'Fourteen lessons, a hundred minutes, eight files to download, and the hosted tool that does the measuring. One payment',
     status: 'available',
     cta: { text: 'Buy for 25 USD', href: 'https://whop.com/oper-stack/invisible-to-chatgpt', external: true },
-    og: '/og/og-default.png',
+    og: '/og/og-course.png',
     order: 6,
     get: [
       'Fourteen lessons, a hundred minutes, each one ending with a single action, and half of that time is the work happening on screen at the speed you will do it',
