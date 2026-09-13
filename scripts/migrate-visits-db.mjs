@@ -104,6 +104,20 @@ const STATEMENTS = [
      )`,
   ],
   ['visits lookup index', 'create index if not exists visits_site_day_idx on visits (site_id, day desc)'],
+  [
+    // The counter answers "how many came". The check answers "can anyone quote me at all". An
+    // owner needs both in one place, and needs to watch both move, so the score gets a history
+    // rather than being recomputed and forgotten on every page load.
+    'scores table',
+    `create table if not exists scores (
+       site_id text not null references sites (id) on delete cascade,
+       day     date not null,
+       score   integer not null,
+       areas   jsonb,
+       primary key (site_id, day)
+     )`,
+  ],
+  ['scores lookup index', 'create index if not exists scores_site_day_idx on scores (site_id, day desc)'],
 ];
 
 async function tableExists(name) {
@@ -113,7 +127,7 @@ async function tableExists(name) {
 
 async function main() {
   if (checkOnly) {
-    for (const name of ['sites', 'visits']) {
+    for (const name of ['sites', 'visits', 'scores']) {
       console.log(`${name}: ${(await tableExists(name)) ? 'есть' : 'НЕТ'}`);
     }
     const counts = (await tableExists('sites'))

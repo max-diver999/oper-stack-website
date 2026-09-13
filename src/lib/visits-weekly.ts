@@ -94,11 +94,26 @@ export function composeWeekly(
   row: WeeklyRow,
   n: WeeklyNumbers,
   siteUrl: string,
+  /** The other half: can anybody quote this site at all, and did that move. */
+  score?: { score: number; day: string } | null,
+  scoreBefore?: { score: number; day: string } | null,
 ): { subject: string; text: string; html: string } | null {
   const dashboard = `${siteUrl}/visits/numbers/?t=${row.view_token}`;
   const stop = `${siteUrl}/visits/stop/?t=${row.view_token}`;
 
   const ru = row.lang === 'ru';
+
+  /** One line about the score, or nothing when we have never taken one. */
+  const scoreLine = (() => {
+    if (!score) return '';
+    const diff = scoreBefore ? score.score - scoreBefore.score : 0;
+    if (ru) {
+      const move = !scoreBefore ? '' : diff === 0 ? ', без изменений' : `, ${diff > 0 ? 'выросла на ' : 'упала на '}${Math.abs(diff)}`;
+      return `Оценка «могут ли вас процитировать»: ${score.score} из 100${move}.`;
+    }
+    const move = !scoreBefore ? '' : diff === 0 ? ', unchanged' : `, ${diff > 0 ? 'up ' : 'down '}${Math.abs(diff)}`;
+    return `Whether you can be quoted at all: ${score.score} of 100${move}.`;
+  })();
 
   if (n.everCounted === 0) {
     // Only once: after the first silent week. A second identical nudge is nagging.
@@ -154,6 +169,7 @@ export function composeWeekly(
       subject: `${visitsRu} из ИИ на ${row.domain}`,
       text: [
         `За последние семь дней на ${row.domain} пришло ${visitsRu} от ИИ-ассистентов${moveRu ? ', ' + moveRu : ''}.`,
+        ...(scoreLine ? ['', scoreLine] : []),
         '',
         listRu,
         '',
@@ -161,6 +177,7 @@ export function composeWeekly(
         `Отписаться: ${stop}&lang=ru`,
       ].join('\n'),
       html: `<p>За последние семь дней на <b>${esc(row.domain)}</b> пришло <b>${visitsRu}</b> от ИИ-ассистентов${moveRu ? ', ' + esc(moveRu) : ''}.</p>
+${scoreLine ? `<p>${esc(scoreLine)}</p>` : ''}
 <table style="border-collapse:collapse;font:14px system-ui,sans-serif">${rowsRu}</table>
 <p><a href="${dashboard}&lang=ru">Ваши числа</a> · <a href="${stop}&lang=ru">отписаться</a></p>`,
     };
@@ -178,6 +195,7 @@ export function composeWeekly(
     subject,
     text: [
       `${visits} arrived at ${row.domain} from AI assistants in the last seven days${move ? ', ' + move : ''}.`,
+      ...(scoreLine ? ['', scoreLine] : []),
       '',
       list,
       '',
@@ -185,6 +203,7 @@ export function composeWeekly(
       `Stop these emails: ${stop}`,
     ].join('\n'),
     html: `<p><b>${visits}</b> arrived at <b>${esc(row.domain)}</b> from AI assistants in the last seven days${move ? ', ' + esc(move) : ''}.</p>
+${scoreLine ? `<p>${esc(scoreLine)}</p>` : ''}
 <table style="border-collapse:collapse;font:14px system-ui,sans-serif">${rows}</table>
 <p><a href="${dashboard}">Your numbers</a> · <a href="${stop}">stop these emails</a></p>`,
   };
