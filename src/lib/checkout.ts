@@ -30,6 +30,9 @@
 const LINK_BY_SLUG: Record<string, string> = {
   'site-kit': String(import.meta.env.PUBLIC_WHOP_CHECKOUT_SITE_KIT || 'https://whop.com/oper-stack/operstack-site-kit').trim(),
   'seo-audit': String(import.meta.env.PUBLIC_WHOP_CHECKOUT_AUDIT || 'https://whop.com/oper-stack/seo-aeo-and-geo-audit').trim(),
+  // Курс продаётся с 13 сентября 2026: четырнадцать уроков и восемь файлов лежат в самом Whop,
+  // в приложении Courses, поэтому выдавать после оплаты нечего и ломаться в выдаче нечему.
+  course: String(import.meta.env.PUBLIC_WHOP_CHECKOUT_COURSE || 'https://whop.com/oper-stack/invisible-to-chatgpt').trim(),
 };
 
 /** Принимаем только адрес самого Whop: опечатка в переменной не должна увести покупателя никуда. */
