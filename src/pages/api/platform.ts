@@ -25,7 +25,7 @@ const SIGNS: Array<[string, RegExp]> = [
   ['Framer', /framerusercontent\.com|framer\.website/i],
   ['WordPress', /wp-content\/|wp-includes\/|content="WordPress/i],
   ['Next.js', /\/_next\/static\//i],
-  ['Astro', /astro-island|data-astro-cid/i],
+  ['Astro', /astro-island|data-astro-cid|\/_astro\//i],
   ['Nuxt', /\/_nuxt\//i],
 ];
 
