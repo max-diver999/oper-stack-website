@@ -69,21 +69,38 @@ async function notifyTelegram(text: string): Promise<void> {
   }
 }
 
-/** Почта покупателя по его id, если событие её не принесло. Пробуем обе версии API Whop. */
+/**
+ * Почта покупателя по его id, если событие её не принесло.
+ *
+ * Адреса выбраны не наугад, а проверены ключом 13 сентября 2026. Два, которые стояли здесь
+ * раньше, этому ключу запрещены: /api/v5/app/users/ отвечает «нужен App API key, а у вас
+ * Bot API key», /api/v2/users/ отвечает «нет прав на этот маршрут». Оба молча возвращали
+ * null, и покупатель не получал ничего.
+ *
+ * Разрешены и работают: /api/v5/company/users/<id> и список участников с фильтром по
+ * пользователю. Первый отвечает по одному человеку, второй возвращает запись участника,
+ * в которой почта лежит либо сверху, либо внутри user. Пробуем по очереди.
+ */
 async function getBuyerEmail(userId: string): Promise<string | null> {
   const key = env('WHOP_API_KEY');
   if (!key) return null;
+  const pick = (o: unknown): string | null => {
+    const d = o as Record<string, any> | null;
+    const found = d?.email ?? d?.user?.email ?? d?.data?.email ?? d?.data?.user?.email
+      ?? (Array.isArray(d?.data) ? (d!.data[0]?.email ?? d!.data[0]?.user?.email) : undefined);
+    return typeof found === 'string' && found.includes('@') ? found : null;
+  };
   const urls = [
-    `https://api.whop.com/api/v5/app/users/${encodeURIComponent(userId)}`,
-    `https://api.whop.com/api/v2/users/${encodeURIComponent(userId)}`,
+    `https://api.whop.com/api/v5/company/users/${encodeURIComponent(userId)}`,
+    `https://api.whop.com/api/v2/members?user_id=${encodeURIComponent(userId)}`,
+    `https://api.whop.com/api/v2/memberships?user_id=${encodeURIComponent(userId)}`,
   ];
   for (const url of urls) {
     try {
       const res = await fetch(url, { headers: { Authorization: `Bearer ${key}` }, signal: AbortSignal.timeout(8_000) });
       if (!res.ok) continue;
-      const body = (await res.json()) as { email?: string; data?: { email?: string } };
-      const email = body.email ?? body.data?.email;
-      if (email) return String(email);
+      const email = pick(await res.json());
+      if (email) return email.trim().toLowerCase();
     } catch { /* пробуем следующий адрес */ }
   }
   return null;
