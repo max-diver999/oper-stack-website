@@ -73,6 +73,17 @@ const STATEMENTS = [
     'alter table sites add column if not exists last_email_at timestamptz',
   ],
   [
+    // Without this the weekly report has no memory and a retry sends the same email twice.
+    'sites last report',
+    'alter table sites add column if not exists last_report_at timestamptz',
+  ],
+  [
+    // An owner who stops wanting the weekly note must be able to stop it, and one link in the
+    // email has to be enough. Nothing else about the site changes.
+    'sites weekly flag',
+    'alter table sites add column if not exists weekly boolean not null default true',
+  ],
+  [
     'view token is unique',
     'create unique index if not exists sites_view_token_idx on sites (view_token) where view_token is not null',
   ],

@@ -1,0 +1,84 @@
+---
+/**
+ * Stops the weekly note. One button, and the same link turns it back on, because somebody who
+ * stops by accident should not have to write to us to undo it.
+ */
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { SITE } from '../../data/site';
+
+export const prerender = false;
+---
+
+<CommercialLayout
+  title="Stop the weekly email · OperStack"
+  description="Turn off the weekly note about the visits AI assistants send your site."
+  canonical={`${SITE.url}/visits/stop/`}
+  noindex={true}
+>
+  <div class="wrap">
+    <p class="label">Weekly email</p>
+    <h1>Stop the weekly note?</h1>
+    <p class="lede" id="sub">
+      One email a week, only in the weeks when somebody actually arrived from an assistant. Your
+      counter keeps counting either way, and your private link keeps working.
+    </p>
+
+    <p><button type="button" class="btn" id="go">Stop the weekly email</button></p>
+    <p class="msg" id="msg" hidden></p>
+
+    <p class="small">
+      Changed your mind later? Open this same link again and it turns back on. Anything else, write
+      to <a href={`mailto:${SITE.email}`}>{SITE.email}</a>.
+    </p>
+  </div>
+</CommercialLayout>
+
+<script is:inline>
+  (function () {
+    var token = new URLSearchParams(location.search).get('t') || '';
+    var go = document.getElementById('go');
+    var msg = document.getElementById('msg');
+    var resume = false;
+
+    if (!token) {
+      go.disabled = true;
+      msg.hidden = false;
+      msg.textContent = 'This address is missing its link. Use the one at the bottom of the email.';
+      return;
+    }
+
+    go.addEventListener('click', async function () {
+      go.disabled = true;
+      msg.hidden = false;
+      msg.textContent = 'One moment…';
+      try {
+        var r = await fetch('/api/visits/stop/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ t: token, resume: resume }),
+        });
+        var d = await r.json();
+        if (!r.ok) { msg.textContent = d.error || 'That did not go through.'; go.disabled = false; return; }
+        resume = !d.weekly ? true : false;
+        msg.textContent = d.weekly
+          ? 'Back on. One email a week about ' + d.domain + ', only when there is something to say.'
+          : 'Stopped. No more weekly emails about ' + d.domain + '. The counter keeps counting.';
+        go.textContent = d.weekly ? 'Stop the weekly email' : 'Turn it back on';
+        go.disabled = false;
+      } catch (err) {
+        msg.textContent = 'That did not go through. Write to info@oper-stack.com and we will do it by hand.';
+        go.disabled = false;
+      }
+    });
+  })();
+</script>
+
+<style>
+  .wrap { max-width: 700px; margin: 0 auto; padding: 40px 20px 80px; }
+  .label { font-family: var(--fm); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal-soft); }
+  h1 { font-family: var(--fd); font-size: clamp(26px, 5vw, 34px); letter-spacing: -.02em; margin: 8px 0 0; }
+  .lede { font-size: 17px; color: rgba(245,242,236,.86); max-width: 62ch; margin: 14px 0 22px; }
+  .msg { font-size: 15px; color: var(--teal-soft); max-width: 62ch; }
+  .small { font-size: 14px; color: var(--muted); margin-top: 28px; max-width: 62ch; }
+  .small a { color: var(--teal-soft); }
+</style>

@@ -298,6 +298,9 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
       .prose td:empty { display: none; }
     }
   </style>
+  <!-- We run our own counter on our own site. It is the same line every customer gets, and the
+       numbers on /visits/ are ours, measured, not illustrative. -->
+  <script defer src="/v.js" data-key="osv_operstackowncom"></script>
 </head>
 <body>
   <nav class="site-nav" aria-label="Site">
