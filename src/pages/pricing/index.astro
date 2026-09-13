@@ -25,18 +25,20 @@ const faqSchema = {
 
 <CommercialLayout
   title={`Pricing · ${SITE.name}`}
-  description="OperStack pricing: free Lead Gen audit, custom setup, and retainer for inbound lead operations."
+  description="OperStack pricing: thirteen products with the price on the page, from free to 500 USD, plus quoted setup and retainer work for inbound lead operations."
   canonical={canonical}
   jsonLd={faqSchema}
 >
   <div class="wrap wide">
     <h1>Pick your entry point</h1>
     <p class="lede">
-      Start with a free written assessment, launch a focused stack, or keep growth on retainer. Every plan runs through one Lead Hub.
+      Two ways in. Buy a product outright, with the price on the page and nothing agreed first: five are free and eight
+      are paid, from 9 USD. Or have the stack built for you, which starts with a free written assessment and is quoted
+      per project.
     </p>
 
     <CitabilityBlock
-      text="OperStack pricing starts with a free written assessment of the inbound stack, then fixed-price setup and retainer quotes for teams that run on lead gen."
+      text="OperStack prices two things separately. Thirteen products are sold off the shelf with the price on the page: five free, then 9, 29, 39 a month, 69, 79, 149, 249 and from 500 USD. Setup and retainer work on an inbound lead stack is quoted per project, and starts with a free written assessment."
     />
 
     <div class="tiers">
@@ -69,11 +71,12 @@ const faqSchema = {
     {/* До этой правки страница цен не упоминала продукты вовсе и не вела на них ни одной ссылкой:
         человек, пришедший узнать, сколько стоит, видел только сметы под проект. */}
     <section class="shelf">
-      <h2>Or buy a product outright</h2>
+      <h2>Buy a product outright</h2>
       <p class="shelf-lede">
-        Five of the twelve are free and open source. Four more are bought in one click, from 9 USD,
-        with nothing agreed first. Fix and Foundation are the exception: the list of work is agreed
-        in writing before any money moves, which is why they carry a quote rather than a button.
+        Five of the thirteen are free, four of those with the source public. Six more are bought in one
+        click, from 9 USD, with nothing agreed first. Fix and Foundation are the exception: the list of
+        work is agreed in writing before any money moves, which is why they carry a quote rather than a
+        button.
       </p>
       <ul class="shelf-list">
         {PRODUCTS.filter((p) => p.status === 'available').sort((a, b) => a.order - b.order).map((p) => (
@@ -84,11 +87,11 @@ const faqSchema = {
           </li>
         ))}
       </ul>
-      <p><a class="btn btn-ghost" href="/products/">All twelve products →</a></p>
+      <p><a class="btn btn-ghost" href="/products/">All thirteen products →</a></p>
     </section>
 
     <section class="includes">
-      <h2>What every plan includes</h2>
+      <h2>What every quoted project includes</h2>
       <ul>
         {PRICING_INCLUDES.map((item) => (
           <li>{item}</li>

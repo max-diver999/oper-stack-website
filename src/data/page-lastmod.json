@@ -18,6 +18,7 @@
   "/services/*": "2026-09-10",
   "/terms/": "2026-09-12",
   "/thanks/": "2026-09-05",
+  "/thanks/first-fix/": "2026-09-12",
   "/thanks/gates-pdf/": "2026-09-11",
   "/tools/llms-txt-checker/": "2026-09-12"
 }

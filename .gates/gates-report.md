@@ -1,7 +1,7 @@
 # Gates report
 
 Site: (not set)  
-Run: 2026-09-12T23:49:14.838Z  
+Run: 2026-09-13T00:10:18.426Z  
 Files: 44
 
 | # | Gate | Status | Summary |
@@ -17,7 +17,7 @@ Files: 44
 | 9 | link-semantics | warn | 28 anchor(s) disagree with their target |
 | 10 | meta | pass | titles and descriptions clean |
 | 11 | readability | warn | 18 readability flag(s) |
-| 12 | images | fail | 1 of 3 image(s) unreachable |
+| 12 | images | pass | 2 image URL(s) return 200 |
 | 13 | redirects | pass | 0 redirects, no cycles or chains |
 | 14 | ai-index | pass | 70 entries match the site |
 | 15 | claims | pass | every figure is sourced or framed as an example |
@@ -237,7 +237,3 @@ Files: 44
 - `src/content/guides/sales-team-onboarding-ai.md` 14 sentences over 45 words
 - `src/content/guides/sla-speed-to-lead.md` 11 sentences over 45 words
 - `src/content/guides/website-lead-capture.md` 15 sentences over 45 words
-
-## 12. images (1)
-
-- `src/pages/prospects/index.astro` HTTP 404 https://your-site.com/logo.svg

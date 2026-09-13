@@ -14,9 +14,9 @@ const FAQ = [
       'Maksim Shchegolev, who owns and operates the portfolio of content sites the tools were built for. There is no agency behind this and no team of account managers: the person who writes the code is the person who answers your email.',
   },
   {
-    question: 'Why are four of the six products free?',
+    question: 'Why are five of the thirteen products free?',
     answer:
-      'Because they were built to solve our own problem first and cost nothing to give away. The gates, the starter, the plugin and the AI visibility check are MIT licensed and stay free. The two paid products, Site Kit and the audit, are the parts that take our time.',
+      'Because they were built to solve our own problem first and cost nothing to give away. The gates, the starter, the Claude Code plugin, the MCP server and the AI visibility check stay free, four of them MIT licensed with the source public. The eight paid ones are the parts that take time: our machines run for you, or we do.',
   },
   {
     question: 'Do I need a paid subscription to anything to use your tools?',
@@ -58,7 +58,7 @@ const aboutSchema = {
 
 <CommercialLayout
   title="About OperStack: who builds these tools and why"
-  description="OperStack is built by one operator running a portfolio of content sites. The tools came out of that work: four are free and open source, two are paid. Every score we publish is computed from free public data."
+  description="OperStack is built by one operator running a portfolio of content sites. The tools came out of that work: five are free, eight are paid. Every score we publish is computed from free public data."
   canonical={canonical}
   jsonLd={[aboutSchema, faqSchema]}
 >
@@ -79,7 +79,7 @@ const aboutSchema = {
     </p>
 
     <CitabilityBlock
-      text="OperStack is built and run by Maksim Shchegolev, a solo operator of 13 content brands in more than 10 countries. Four of its six products are free and MIT licensed; the paid ones are Site Kit at 79 USD, a site audit at 149 USD for the first ten, and two fix packages. No OperStack score depends on a paid data source."
+      text="OperStack is built and run by Maksim Shchegolev, a solo operator of 13 content brands in more than 10 countries. Five of its thirteen products are free, four of those MIT licensed; the paid eight run from a 9 USD site fix list through Site Kit at 79 USD and a site audit at 149 USD for the first ten, to two packages where the work is agreed before payment. No OperStack score depends on a paid data source."
     />
 
     <h2>Where the tools came from</h2>
@@ -134,7 +134,7 @@ const aboutSchema = {
 
     <FaqSection items={FAQ} />
 
-    <p class="back"><a href="/products/">See the six products →</a></p>
+    <p class="back"><a href="/products/">See the thirteen products →</a></p>
   </div>
 </CommercialLayout>
 
