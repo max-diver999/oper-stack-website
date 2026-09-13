@@ -16,6 +16,7 @@
 import type { APIRoute } from 'astro';
 import { checkVisibility, normaliseInput } from '../../lib/ai-visibility.mjs';
 import { topTask, renderTask } from '../../lib/ai-visibility-tasks.mjs';
+import { buildRunBody, buildRunSubject } from '../../lib/report-fulfilment';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 import { logLead, originOf } from '../../lib/sheets-log';
 import { SITE } from '../../data/site';
@@ -29,6 +30,37 @@ const json = (body: unknown, status = 200) =>
   });
 
 const EMAIL = /^[^@\s]+@[^@\s.]+\.[^@\s]{2,}$/;
+
+const env = (key: string, fallback = ''): string =>
+  String((import.meta.env as Record<string, unknown>)[key] ?? process.env[key] ?? fallback).trim();
+
+/** Куда падает заявка. Тот же ящик, что читает очередь отчётов. */
+const QUEUE_TO = 'info@oper-stack.com';
+
+/**
+ * Ставим бесплатный отчёт в ту же очередь, что делает платные.
+ *
+ * Простым языком: список находок человек получает письмом сразу, а PDF собирается по-настоящему,
+ * с открытием пяти страниц в браузере, и приходит следом в течение двадцати минут.
+ *
+ * Заявка это служебное письмо с подписанной темой, ровно как у платных ступеней. Подпись нужна,
+ * чтобы никто не смог заказать бесплатный прогон на чужой адрес: очередь проверяет её и чужие
+ * заявки не берёт.
+ *
+ * Не получилось поставить в очередь, значит человек всё равно уже получил список письмом:
+ * ошибку глотаем и ответ не портим.
+ */
+async function queueFreeReport(url: string, email: string): Promise<boolean> {
+  const secret = env('KIT_DOWNLOAD_SECRET');
+  if (!secret) return false;
+  const job = { url, email, lang: 'en' as const, tier: 'free' as const };
+  try {
+    await sendTransactionalMail({ to: QUEUE_TO, subject: buildRunSubject(job), ...buildRunBody(job, secret) });
+    return true;
+  } catch {
+    return false;
+  }
+}
 const esc = (s: string) => String(s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
 
 /** Не больше шести писем с одного адреса за десять минут. */
@@ -128,6 +160,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     return json({ ok: false, error: 'We could not send the email just now. Write to info@oper-stack.com and we will send it by hand.' }, 502);
   }
 
+  // PDF ставим в очередь до записи в таблицу, чтобы в строке было видно, что именно ушло.
+  const queued = await queueFreeReport(result.url ?? url, email);
+
   // Строка в таблицу пишется только после того, как письмо ушло: записываем состоявшийся
   // обмен, а не намерение. Если таблица недоступна, человек всё равно получил свою задачу.
   const { source, campaign, page } = originOf(
@@ -144,11 +179,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     source,
     campaign,
     page,
-    sent: 'задача письмом',
+    sent: queued ? 'список письмом + PDF в очереди' : 'список письмом',
     tier: 'бесплатно',
   });
 
-  return json({ ok: true, sent: true, taskId: task.id });
+  return json({ ok: true, sent: true, taskId: task.id, queued });
 };
 
 export const GET: APIRoute = async ({ url }) => {

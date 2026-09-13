@@ -14,7 +14,11 @@
  */
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
-export type ReportTier = '9' | '29';
+/**
+ * Ступени отчёта. 'free' не продаётся и не имеет товара на Whop: это то, что человек получает
+ * за почту после бесплатной проверки. Пять страниц, только замер, без списка задач.
+ */
+export type ReportTier = 'free' | '9' | '29';
 
 /** Товары Whop, которые означают отчёт. Пустое значение означает «товар ещё не заведён». */
 const TIER_BY_PRODUCT: Record<string, ReportTier> = {
@@ -48,6 +52,7 @@ export function reportTierMap(spec = ''): Record<string, ReportTier> {
 
 /** Сколько страниц и сколько конкурентов даёт каждая ступень. Одно место на весь продукт. */
 export const TIER_SPEC: Record<ReportTier, { pages: number; competitors: number; weeks: number }> = {
+  free: { pages: 5, competitors: 0, weeks: 0 },
   '9': { pages: 20, competitors: 0, weeks: 0 },
   '29': { pages: 20, competitors: 3, weeks: 4 },
 };
@@ -115,7 +120,7 @@ export type ReportJob = { url: string; email: string; lang: 'ru' | 'en'; tier: R
 export function buildRunSubject(job: ReportJob): string {
   let host = job.url;
   try { host = new URL(job.url).host; } catch { /* оставляем как есть */ }
-  return `Report request: ${host} (${job.tier} USD)`;
+  return `Report request: ${host} (${job.tier === 'free' ? 'free' : `${job.tier} USD`})`;
 }
 
 /** Первая строка тела: REPORT-RUN v1 <payload> <подпись>. Её и читает очередь. */
@@ -123,9 +128,9 @@ export function buildRunBody(job: ReportJob, secret: string): { text: string; ht
   const payload = Buffer.from(JSON.stringify(job)).toString('base64url');
   const line = `REPORT-RUN v1 ${payload} ${createHmac('sha256', secret).update(payload).digest('base64url')}`;
   const rivals = job.rivals?.length ? [`Rivals: ${job.rivals.join(', ')}`] : [];
-  const text = [line, '', `Site: ${job.url}`, ...rivals, `Buyer: ${job.email}`, `Tier: ${job.tier} USD`, `Language: ${job.lang}`, '', 'Служебная заявка. Её читает очередь отчётов, отвечать не нужно.'].join('\n');
+  const text = [line, '', `Site: ${job.url}`, ...rivals, `Buyer: ${job.email}`, `Tier: ${job.tier === 'free' ? 'free' : `${job.tier} USD`}`, `Language: ${job.lang}`, '', 'Служебная заявка. Её читает очередь отчётов, отвечать не нужно.'].join('\n');
   const html = [`<pre style="font:12px ui-monospace,monospace;color:#888;white-space:pre-wrap;word-break:break-all">${line}</pre>`,
-    `<p>Site: ${job.url}<br>${job.rivals?.length ? `Rivals: ${job.rivals.join(', ')}<br>` : ''}Buyer: ${job.email}<br>Tier: ${job.tier} USD<br>Language: ${job.lang}</p>`,
+    `<p>Site: ${job.url}<br>${job.rivals?.length ? `Rivals: ${job.rivals.join(', ')}<br>` : ''}Buyer: ${job.email}<br>Tier: ${job.tier === 'free' ? 'free' : `${job.tier} USD`}<br>Language: ${job.lang}</p>`,
     '<p style="color:#888;font-size:13px">Служебная заявка. Её читает очередь отчётов, отвечать не нужно.</p>'].join('\n');
   return { text, html };
 }
