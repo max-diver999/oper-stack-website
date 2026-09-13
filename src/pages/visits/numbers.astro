@@ -101,6 +101,9 @@ const JS_STRINGS = ru
   description={T.description}
   canonical={`${SITE.url}/visits/numbers/`}
   noindex={true}
+  bare={ru
+    ? { home: 'https://oper-stack.ru/vizity/', label: '← Счётчик визитов из ИИ', footer: 'OperStack · счётчик визитов из ИИ' }
+    : { home: '/visits/', label: '← AI visit counter', footer: 'OperStack · the AI visit counter' }}
 >
   <div class="wrap">
     <p class="label">{T.label}</p>

@@ -189,11 +189,28 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   // Area 3: entity and structure (20)
   const allTypes = new Set(pages.flatMap((p) => p.schemaTypes));
   const hasOrg = [...allTypes].some((t) => /Organization|Corporation|NGO|EducationalOrganization|GovernmentOrganization|MedicalOrganization|NewsMediaOrganization|Person|LocalBusiness|RealEstateAgent|Dentist|Physician|Hospital|Pharmacy|VeterinaryCare|LegalService|Attorney|Notary|AccountingService|InsuranceAgency|FinancialService|BankOrCreditUnion|AutomotiveBusiness|AutoRepair|AutoDealer|HomeAndConstructionBusiness|Plumber|Electrician|RoofingContractor|HVACBusiness|HousePainter|Locksmith|MovingCompany|GeneralContractor|Restaurant|FoodEstablishment|CafeOrCoffeeShop|Bakery|BarOrPub|LodgingBusiness|Hotel|TravelAgency|HealthAndBeautyBusiness|BeautySalon|HairSalon|DaySpa|NailSalon|TattooParlor|SportsActivityLocation|HealthClub|Gym|ProfessionalService|Store|ClothingStore|GroceryStore|HardwareStore|FurnitureStore|JewelryStore|PetStore|ChildCare|EmploymentAgency|SelfStorage|Library|Museum|EntertainmentBusiness|MedicalClinic|DentalClinic|Optician|PhysicalTherapy|NutritionService|EmergencyService|ITService|WebDesignService|MarketingAgency|AdvertisingAgency/.test(t));
-  const hasFaq = allTypes.has('FAQPage'); const hasArticle = [...allTypes].some((t) => /Article|BlogPosting|NewsArticle/.test(t));
+  const hasFaq = allTypes.has('FAQPage');
+  const hasArticle = [...allTypes].some((t) => /Article|BlogPosting|NewsArticle/.test(t));
+  /*
+   * A page does not have to be an article to be quotable. Asking every site for Article schema
+   * marks a correctly typed service, shop, course or job page as missing something, which is the
+   * same mistake the check once made by refusing "Dentist" as a business type. What an answer
+   * engine needs is a page-level type it can name, so any of these earns the same points.
+   */
+  const PAGE_TYPES = /^(Service|Product|Course|Event|HowTo|Recipe|SoftwareApplication|WebApplication|MobileApplication|JobPosting|Book|Review|QAPage|MedicalWebPage|CollectionPage|ItemPage|AboutPage|ProfilePage)$/;
+  const pageType = [...allTypes].find((t) => PAGE_TYPES.test(t)) || null;
   let entity = 0; const entityFindings = [];
   if (hasOrg) { entity += 8; entityFindings.push({ level: 'pass', text: 'Organization or business schema names the entity behind the site.' }); } else entityFindings.push({ id: 'schema-org-missing', level: 'fail', text: 'No Organization or business schema: AI systems have no entity to attach the site to.' });
   if (hasFaq) { entity += 5; entityFindings.push({ level: 'pass', text: 'FAQPage schema found, the easiest format for an engine to quote.' }); } else entityFindings.push({ id: 'schema-faq-missing', level: 'warn', text: 'No FAQPage schema on the sampled pages.' });
-  if (hasArticle) { entity += 3; } else if (sampled.length) entityFindings.push({ id: 'schema-article-missing', level: 'warn', text: 'No Article schema on the sampled content pages.' });
+  if (hasArticle) {
+    entity += 3;
+    entityFindings.push({ level: 'pass', text: 'Article schema on the sampled pages: an engine can name and date what it is quoting.' });
+  } else if (pageType) {
+    entity += 3;
+    entityFindings.push({ level: 'pass', text: `${pageType} schema on the sampled pages: an engine can name what it is quoting.` });
+  } else if (sampled.length) {
+    entityFindings.push({ id: 'schema-article-missing', level: 'warn', text: 'The sampled pages carry no page-level type (Article, Service, Product, Course and the like), so an engine cannot say what kind of thing it is quoting.' });
+  }
   if (homePage.canonical) entity += 2; else entityFindings.push({ id: 'canonical-missing', level: 'warn', text: 'The homepage has no canonical tag.' });
   if (homePage.ogTitle) entity += 2; else entityFindings.push({ id: 'og-missing', level: 'warn', text: 'No Open Graph tags on the homepage: shared links and previews render without a title or image.' });
 
@@ -214,12 +231,27 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
 
   // Area 5: freshness and sources (15)
   const dated = contentPages.filter((p) => p.datePublished || p.dateModified).length;
-  const sourced = contentPages.filter((p) => p.sourcePhrases > 0).length;
+  /*
+   * Only a page that states figures can fail to attribute them. Docking a page for naming no
+   * source for numbers it does not contain is not a measurement, it is a complaint, and the
+   * finding said something untrue about the page.
+   */
+  const withFigures = contentPages.filter((p) => p.numbers > 0);
+  const sourced = withFigures.filter((p) => p.sourcePhrases > 0).length;
   let trust = 0; const trustFindings = [];
   trust += Math.round(7 * (dated / contentPages.length));
   if (dated < contentPages.length) trustFindings.push({ id: 'dates-missing', level: dated ? 'warn' : 'fail', text: `${contentPages.length - dated} sampled page(s) expose no publication or modified date. Engines prefer sources they can date.` }); else trustFindings.push({ level: 'pass', text: 'Sampled pages expose publication dates.' });
-  trust += Math.round(5 * (sourced / contentPages.length));
-  if (sourced < contentPages.length) trustFindings.push({ id: 'sources-missing', level: 'warn', text: `${contentPages.length - sourced} sampled page(s) name no source for their figures ("according to", "data from").` }); else trustFindings.push({ level: 'pass', text: 'Sampled pages name sources for their figures.' });
+  if (!withFigures.length) {
+    trust += 5;
+    trustFindings.push({ level: 'pass', text: 'The sampled pages state no figures, so there is nothing that needs a source named.' });
+  } else {
+    trust += Math.round(5 * (sourced / withFigures.length));
+    if (sourced < withFigures.length) {
+      trustFindings.push({ id: 'sources-missing', level: 'warn', text: `${withFigures.length - sourced} of ${withFigures.length} sampled page(s) state figures without naming where they came from ("according to", "data from").` });
+    } else {
+      trustFindings.push({ level: 'pass', text: 'Every sampled page that states figures names where they came from.' });
+    }
+  }
   if (sitemap.found) { trust += sitemap.lastmod ? 3 : 1; if (!sitemap.lastmod) trustFindings.push({ id: 'sitemap-no-lastmod', level: 'warn', text: 'The sitemap carries no lastmod dates.' }); } else trustFindings.push({ level: 'fail', text: 'No XML sitemap found at the usual paths or in robots.txt.' });
 
   const areas = [
