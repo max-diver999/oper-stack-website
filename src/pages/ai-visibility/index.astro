@@ -32,17 +32,14 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     <section id="vis-result" class="result" hidden aria-live="polite"></section>
 
     <section id="vis-capture" class="capture" hidden>
-      <h2>Get the first fix, written out, free</h2>
-      <p>We will email you the single task that moves your score most: what your site does now, what to change, and how to check it worked. Hand it to whoever looks after your site, or paste it into ChatGPT, Claude or Cursor. No code, nothing to install.</p>
+      <h2 id="capture-head">See the rest, free</h2>
+      <p id="capture-sub">The whole list of what this check found on your site, and the one fix that moves your score most, written out in full: what your site does now, what to change, and how to check it worked. Hand it to whoever looks after your site, or paste it into ChatGPT, Claude or Cursor.</p>
       <form id="pdf-form" novalidate>
         <input type="hidden" name="source" id="pdf-source" value="ai-visibility" />
-        <div class="row">
-          <div><label for="pdf-name">Name</label><input id="pdf-name" name="name" autocomplete="name" /></div>
-          <div><label for="pdf-email">Email *</label><input id="pdf-email" name="email" type="email" required autocomplete="email" /></div>
-        </div>
-        <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive the task and, at most once a month, a note when a check changes.</label></div>
+        <div><label for="pdf-email">Email</label><input id="pdf-email" name="email" type="email" required autocomplete="email" placeholder="you@company.com" /></div>
+        <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive the report and, at most once a month, a note when a check changes. One click unsubscribes.</label></div>
         <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
-        <button type="submit" class="btn" id="pdf-btn">Email me the first fix →</button>
+        <button type="submit" class="btn" id="pdf-btn">Email me the full list →</button>
         <p class="msg" id="pdf-msg" hidden></p>
       </form>
     </section>
@@ -173,12 +170,29 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
 
     function render(r: any) {
       const ring = 2 * Math.PI * 54;
-      const areas = r.areas.map((a: any) => `
+      // Балл, области и всё, что пройдено, видно сразу: это и есть приманка, цифра про его сайт.
+      // Из проблем показываем первые три, остальные считаем и отдаём за почту. Иначе человеку
+      // незачем её оставлять, а без почты вся дальнейшая воронка не существует.
+      const SHOWN = 3;
+      let left = SHOWN;
+      let hidden = 0;
+      const areas = r.areas.map((a: any) => {
+        const shown: string[] = [];
+        for (const f of a.findings) {
+          if (f.level === 'pass') { shown.push(`<li class="f-pass"><span class="chip">OK</span>${esc(f.text)}</li>`); continue; }
+          if (left > 0) { left -= 1; shown.push(`<li class="f-${f.level}"><span class="chip">${f.level === 'warn' ? 'Partial' : 'Problem'}</span>${esc(f.text)}</li>`); }
+          else hidden += 1;
+        }
+        return `
         <div class="area">
           <div class="area-head"><span>${esc(a.label)}</span><strong>${a.score}/${a.max}</strong></div>
           <div class="bar"><i style="width:${Math.round((a.score / a.max) * 100)}%"></i></div>
-          <ul>${a.findings.map((f: any) => `<li class="f-${f.level}"><span class="chip">${f.level === 'pass' ? 'OK' : f.level === 'warn' ? 'Partial' : 'Problem'}</span>${esc(f.text)}</li>`).join('')}</ul>
-        </div>`).join('');
+          <ul>${shown.join('')}</ul>
+        </div>`;
+      }).join('');
+      const locked = hidden
+        ? `<p class="locked"><strong>${hidden} more problem${hidden === 1 ? '' : 's'} found on ${esc(r.host)}.</strong> The full list goes to your email, free, with the first fix written out in full.</p>`
+        : '';
       const fixes = r.fixes.length ? `<div class="fixes"><h3>Fix these first</h3><ol>${r.fixes.map((f: any) => `<li><strong>${esc(f.area)}.</strong> ${esc(f.text)}</li>`).join('')}</ol></div>` : '';
       const pages = r.sample.length ? `<details class="more"><summary>Pages sampled (${r.sample.length})</summary><table><tr><th>Page</th><th>Words</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr>${r.sample.map((p: any) => `<tr><td><a href="${esc(p.url)}" rel="nofollow noopener" target="_blank">${esc(new URL(p.url).pathname)}</a></td><td>${p.words}</td><td>${p.answerFirst ? 'yes' : 'no'}</td><td>${p.dated ? 'yes' : 'no'}</td><td>${esc(p.schema.join(', ') || 'none')}</td></tr>`).join('')}</table></details>` : '';
       const crawlers = `<details class="more"><summary>Crawlers checked (${r.crawlers.length})</summary><table><tr><th>Crawler</th><th>Kind</th><th>robots.txt</th></tr>${r.crawlers.map((c: any) => `<tr><td>${esc(c.label)}</td><td>${c.kind === 'search' ? 'search and citation' : 'training'}</td><td class="${c.verdict === 'blocked' ? 'bad' : 'ok'}">${c.verdict}</td></tr>`).join('')}</table></details>`;
@@ -193,6 +207,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         </div>
         ${fixes}
         <div class="areas">${areas}</div>
+        ${locked}
         ${pages}${crawlers}
         <div class="compare">
           <h3>How do you compare?</h3>
@@ -210,6 +225,12 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       wireCompare(r);
       out.hidden = false;
       capture.hidden = false;
+      const head = document.getElementById('capture-head') as HTMLElement;
+      const sub = document.getElementById('capture-sub') as HTMLElement;
+      if (hidden) {
+        head.textContent = `See the other ${hidden} problem${hidden === 1 ? '' : 's'}, free`;
+        sub.textContent = `Every problem this check found on ${r.host}, and the one fix that moves your score most, written out in full: what your site does now, what to change, and how to check it worked.`;
+      }
       pdfSource.value = `ai-visibility:${r.host}:${r.score}`;
       out.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -237,11 +258,11 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     pdfForm.addEventListener('submit', async (e) => {
       e.preventDefault(); pdfMsg.hidden = true; pdfBtn.disabled = true;
       const fd = new FormData(pdfForm);
-      const payload = { name: fd.get('name'), email: fd.get('email'), message: last ? `AI visibility ${last.score}/100 (grade ${last.grade}) for ${last.url}` : 'AI visibility task request', source: pdfSource.value, website: fd.get('website'), page: location.pathname, formLoadedAt: loadedAt, formElapsedMs: Date.now() - loadedAt };
+      const payload = { name: '', email: fd.get('email'), message: last ? `AI visibility ${last.score}/100 (grade ${last.grade}) for ${last.url}` : 'AI visibility task request', source: pdfSource.value, website: fd.get('website'), page: location.pathname, formLoadedAt: loadedAt, formElapsedMs: Date.now() - loadedAt };
       try {
         // Сначала письмо с задачей: человек пришёл за ней. Лид записываем следом и не роняем
         // ответ, если CRM недоступна: задача уже ушла, и это главное.
-        const taskRes = await fetch('/api/visibility-task/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: fd.get('email'), name: fd.get('name'), url: last ? last.url : '', website: fd.get('website'), ...origin() }) });
+        const taskRes = await fetch('/api/visibility-task/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: fd.get('email'), url: last ? last.url : '', website: fd.get('website'), ...origin() }) });
         const taskData = await taskRes.json().catch(() => ({}));
         if (!taskRes.ok) throw new Error(taskData.error || 'Request failed');
         fetch('/api/lead/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => {});
@@ -293,6 +314,10 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   .more td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.06); color: rgba(245,242,236,.85); }
   .more td.bad { color: #e07a5f; } .more td.ok { color: var(--teal-soft); }
   .err { color: #f5a962; margin: 0; }
+  /* Сообщение о том, сколько проблем осталось за почтой. Стоит сразу под областями,
+     чтобы человек увидел его ровно там, где список обрывается. */
+  #vis-result .locked { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; border: 1px dashed rgba(61,184,169,.45); background: rgba(26,138,125,.07); font-size: 15px; line-height: 1.5; }
+  #vis-result .locked strong { color: var(--paper); }
   .capture { margin-top: 28px; padding: 24px; border-radius: 16px; border: 1px solid rgba(61,184,169,.28); background: rgba(26,138,125,.08); }
   .capture h2 { margin-top: 0; }
   .capture form { display: grid; gap: 14px; margin-top: 12px; }

@@ -41,26 +41,59 @@ function limited(ip: string): boolean {
   return h.n > 6;
 }
 
-function buildEmail(task: ReturnType<typeof topTask>, host: string, score: number) {
-  const plain = renderTask(task, host);
-  const subject = `Your site scored ${score} of 100. Here is what to fix first`;
+/**
+ * Письмо в обмен на почту.
+ *
+ * На странице человек видит балл, всё, что пройдено, и первые три проблемы. Остальные проблемы
+ * спрятаны, и письмо это ровно то, что он за них получает. Поэтому здесь идёт ПОЛНЫЙ список
+ * найденного, а не одна задача: иначе обещание на странице было бы враньём.
+ *
+ * Порядок: сначала весь список, потом первая задача целиком как образец, потом ступень за 9.
+ */
+function buildEmail(task: ReturnType<typeof topTask>, result: any) {
+  const host = String(result?.host ?? '');
+  const score = Number(result?.score ?? 0);
+  type Finding = { level: string; text: string };
+  const problems: { area: string; level: string; text: string }[] = [];
+  for (const area of (result?.areas ?? []) as { label: string; findings: Finding[] }[]) {
+    for (const f of area.findings ?? []) {
+      if (f.level !== 'pass') problems.push({ area: area.label, level: f.level, text: f.text });
+    }
+  }
+  const n = problems.length;
+  const subject = n
+    ? `${host}: ${score} of 100, and the ${n} problem${n === 1 ? '' : 's'} behind it`
+    : `${host} scored ${score} of 100, and nothing is failing`;
+
+  const listText = problems.map((p, i) => `${i + 1}. [${p.level === 'warn' ? 'partial' : 'problem'}] ${p.area}: ${p.text}`).join('\n');
+  const listHtml = problems.map((p) => `<li style="margin:7px 0"><span style="display:inline-block;min-width:62px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:${p.level === 'warn' ? '#9a7b1f' : '#a33'}">${p.level === 'warn' ? 'Partial' : 'Problem'}</span> <strong>${esc(p.area)}.</strong> ${esc(p.text)}</li>`).join('');
+
   const text = [
-    plain,
+    `${host} scored ${score} of 100 on the AI visibility check.`,
     '',
-    `The rest of the tasks for ${host}, one for every problem found, are in the site fix list: ${SITE.url}/products/site-report/`,
+    n ? `Everything the check found, ${n} item${n === 1 ? '' : 's'}:` : 'Nothing is failing on this site.',
+    listText,
+    '',
+    'The one that moves your score most, written out in full:',
+    '',
+    renderTask(task, host),
+    '',
+    `This check reads one page. The site fix list reads up to twenty and turns every problem above into a task written the same way: ${SITE.url}/products/site-report/`,
     '',
     'OperStack · info@oper-stack.com',
   ].join('\n');
+
   const html = [
     `<p>Your site <strong>${esc(host)}</strong> scored <strong>${score} of 100</strong> on the AI visibility check.</p>`,
-    '<p>Here is the single task that moves that score most. Copy it whole and hand it to whoever looks after your site, or paste it into ChatGPT, Claude or Cursor. Keep the "Now" and "How to check" lines: without them nobody knows where to start or when it is done.</p>',
+    n ? `<p>Everything the check found on it, ${n} item${n === 1 ? '' : 's'}:</p><ul style="padding-left:18px;margin:14px 0">${listHtml}</ul>` : '<p>Nothing is failing on this site. That is a good result.</p>',
+    '<p>Here is the one that moves your score most, written out in full. Copy it whole and hand it to whoever looks after your site, or paste it into ChatGPT, Claude or Cursor. Keep the "Now" and "How to check" lines: without them nobody knows where to start or when it is done.</p>',
     '<div style="border-left:3px solid #888;padding:12px 16px;margin:18px 0;background:#fafafa">',
     `<p style="margin:0 0 10px"><strong>Now:</strong> ${esc(task?.now || '')}</p>`,
     `<p style="margin:0 0 10px"><strong>What to do:</strong> ${esc(task?.task || '')}</p>`,
     `<p style="margin:0 0 10px"><strong>How to check:</strong> ${esc(task?.verify || '')}</p>`,
     `<p style="margin:0;color:#666;font-size:13px">${esc(task?.rule || '')}</p>`,
     '</div>',
-    `<p>The rest of the tasks for ${esc(host)}, one for every problem found, are in the <a href="${SITE.url}/products/site-report/">site fix list</a>.</p>`,
+    `<p>This check reads one page. The <a href="${SITE.url}/products/site-report/">site fix list</a> reads up to twenty and turns every problem above into a task written the same way, for 9 USD.</p>`,
     '<p style="color:#888;font-size:13px">OperStack · info@oper-stack.com</p>',
   ].join('\n');
   return { subject, text, html };
@@ -90,7 +123,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   try {
-    await sendTransactionalMail({ to: email, ...buildEmail(task, result.host, result.score) });
+    await sendTransactionalMail({ to: email, ...buildEmail(task, result) });
   } catch {
     return json({ ok: false, error: 'We could not send the email just now. Write to info@oper-stack.com and we will send it by hand.' }, 502);
   }
