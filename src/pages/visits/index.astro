@@ -344,6 +344,8 @@ const pageSchema = {
 <style is:global>
   #steps h3 { font-family: var(--fd); font-size: 19px; margin: 0 0 10px; }
   #steps p { max-width: 68ch; }
+  /* Сайт обнуляет отступы у абзацев, и три подряд идущих слипаются в сплошной текст. */
+  #steps p + p { margin-top: 12px; }
   #steps .small { font-size: 14px; color: var(--muted); }
   #steps ol { margin: 10px 0 14px; padding-left: 20px; }
   #steps li { margin: 7px 0; }
