@@ -85,9 +85,18 @@ async function main() {
   if (fsIdx === -1) { console.error('[patch-vercel] filesystem handler not found'); process.exit(1); }
   config.routes.splice(fsIdx, 0, ...pre);
 
-  // Scheduled jobs live in vercel.json but the adapter does not carry them into the build output,
-  // so the weekly report would simply never run.
-  if (Array.isArray(vercel.crons) && vercel.crons.length) config.crons = vercel.crons;
+  // The adapter DOES carry scheduled jobs across, unlike redirects and headers. Setting them again
+  // produced two identical entries and Vercel rejected the whole deployment, so this merges and
+  // de-duplicates on path plus schedule rather than assuming either side did or did not run.
+  if (Array.isArray(vercel.crons) && vercel.crons.length) {
+    const seen = new Set();
+    config.crons = [...(config.crons || []), ...vercel.crons].filter((c) => {
+      const id = `${c.path}|${c.schedule}`;
+      if (seen.has(id)) return false;
+      seen.add(id);
+      return true;
+    });
+  }
 
   await fs.writeFile(CONFIG_PATH, JSON.stringify(config, null, 2), 'utf8');
   console.log(`[patch-vercel] injected www redirect, ${(vercel.crons || []).length} cron(s) and ${pre.length - 1} pre-filesystem rule(s) into ${path.relative(ROOT, CONFIG_PATH)} (collections: ${collections.join(', ') || 'none'})`);
