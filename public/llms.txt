@@ -46,6 +46,7 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - [Free AI visibility check: can ChatGPT read and cite a site](https://oper-stack.com/ai-visibility/)
 - [Free counter for the visits ChatGPT, Perplexity and Claude send a site](https://oper-stack.com/visits/)
 - [What the free AI visit counter records, and what it refuses to count](https://oper-stack.com/products/visits/)
+- [Remote MCP server: OperStack tools inside Claude, ChatGPT, Cursor, Copilot](https://oper-stack.com/mcp/)
 - [What the free AI visibility check measures, and what it does not](https://oper-stack.com/products/ai-visibility/)
 - [Sixteen content gates, free and MIT, one command](https://oper-stack.com/products/gates/)
 - [Free Astro starter that already passes the gates](https://oper-stack.com/products/starter/)

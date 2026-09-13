@@ -1,0 +1,250 @@
+---
+/**
+ * One address, every assistant. The tools that measure a site, connected to whatever the buyer
+ * already uses, with nothing installed and no account.
+ */
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import { SITE } from '../../data/site';
+import { TOOL_LIST } from '../../lib/mcp-tools';
+
+const canonical = `${SITE.url}/mcp/`;
+const URL_HTTP = `${SITE.url}/api/mcp/`;
+
+/** Every client that takes a remote MCP server, in the words its own settings use. */
+const CLIENTS = [
+  {
+    id: 'claude-code',
+    name: 'Claude Code',
+    how: 'One command in the project you are working on.',
+    lang: 'bash',
+    code: `claude mcp add --transport http operstack ${URL_HTTP}`,
+  },
+  {
+    id: 'claude',
+    name: 'Claude (desktop and web)',
+    how: 'Settings, then Connectors, then Add custom connector. Paste the address, no key needed.',
+    lang: 'text',
+    code: URL_HTTP,
+  },
+  {
+    id: 'chatgpt',
+    name: 'ChatGPT',
+    how: 'Settings, then Connectors, then create a connector from a URL. Paste the address and leave authentication as none.',
+    lang: 'text',
+    code: URL_HTTP,
+  },
+  {
+    id: 'cursor',
+    name: 'Cursor',
+    how: 'Put this in .cursor/mcp.json in the project, or in ~/.cursor/mcp.json for every project.',
+    lang: 'json',
+    code: `{
+  "mcpServers": {
+    "operstack": { "url": "${URL_HTTP}" }
+  }
+}`,
+  },
+  {
+    id: 'vscode',
+    name: 'VS Code and GitHub Copilot',
+    how: 'Put this in .vscode/mcp.json. Note the key here is servers, not mcpServers.',
+    lang: 'json',
+    code: `{
+  "servers": {
+    "operstack": { "type": "http", "url": "${URL_HTTP}" }
+  }
+}`,
+  },
+  {
+    id: 'windsurf',
+    name: 'Windsurf',
+    how: 'Put this in ~/.codeium/windsurf/mcp_config.json. Windsurf calls the field serverUrl, not url.',
+    lang: 'json',
+    code: `{
+  "mcpServers": {
+    "operstack": { "serverUrl": "${URL_HTTP}" }
+  }
+}`,
+  },
+  {
+    id: 'zed',
+    name: 'Zed',
+    how: 'Settings, then the context servers section of settings.json.',
+    lang: 'json',
+    code: `{
+  "context_servers": {
+    "operstack": { "source": "custom", "url": "${URL_HTTP}" }
+  }
+}`,
+  },
+  {
+    id: 'other',
+    name: 'Anything else',
+    how: 'Any client that accepts a remote MCP server over streamable HTTP. Paste the address, choose no authentication.',
+    lang: 'text',
+    code: URL_HTTP,
+  },
+];
+
+const FAQ = [
+  {
+    question: 'Do I need an account or a key?',
+    answer:
+      'No. Four of the five tools read public signals only and need nothing at all. The fifth reads your own visit counter and is unlocked by the private token from your own counter link, which you paste when you ask. There is no key to manage and nothing to pay.',
+  },
+  {
+    question: 'What does it send anywhere?',
+    answer:
+      'The address you ask about, and nothing else. We do not see your code, your repository or your files: this is a remote server, so it only ever receives the arguments of the tool you called. The local package is the option to use if you want the measurement to run entirely on your own machine.',
+  },
+  {
+    question: 'How is this different from the local MCP server?',
+    answer:
+      'The same measurements, reached two ways. The local package runs on your machine, can read a folder of Markdown, and has to be installed. This one is an address: it works in clients that only accept a URL, needs no install, and cannot touch your disk. Most people want this one.',
+  },
+  {
+    question: 'Do the numbers match the ones on the site?',
+    answer:
+      'Yes, and deliberately. The tools call the same measurement code as the free check on this site and the paid reports, so a score an assistant reports and a score a page shows can never disagree.',
+  },
+  {
+    question: 'Is it really free?',
+    answer:
+      'Yes. It is the same free check that has always been on this site, reachable from wherever you already work. We would rather you measure with our tools than somebody else’s.',
+  },
+];
+
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })),
+};
+
+const appSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'OperStack MCP server',
+  url: canonical,
+  applicationCategory: 'DeveloperApplication',
+  operatingSystem: 'Any',
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+  provider: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+};
+---
+
+<CommercialLayout
+  title="MCP Server: Measure a Site From Claude, ChatGPT, Cursor or Copilot · OperStack"
+  description="One address connects the OperStack measurements to whatever assistant you already use: Claude, ChatGPT, Cursor, VS Code, Windsurf, Zed. Free, no account, nothing installed."
+  canonical={canonical}
+  jsonLd={[appSchema, faqSchema]}
+>
+  <div class="wrap">
+    <p class="label">Free, no account</p>
+    <h1>Measure a site from wherever you already work</h1>
+    <p class="lede">
+      One address connects five OperStack tools to any assistant that speaks MCP. Ask it whether a
+      site can be quoted by an answer engine, compare it with rivals, or read your own visit
+      counter, without leaving the window you are in.
+    </p>
+
+    <div class="addr">
+      <p class="addr-label">The address</p>
+      <pre id="addr">{URL_HTTP}</pre>
+      <button type="button" class="btn" id="copy">Copy the address</button>
+    </div>
+
+    <CitabilityBlock
+      text={`The OperStack MCP server is a free remote server at ${URL_HTTP}. It gives any MCP client five tools: score a site out of 100 for AI visibility, compare up to four sites on the same scale, check whether a site llms.txt still leads anywhere, read the site owner's own AI visit counter, and check whether the counter is really installed. No account, no key, nothing installed.`}
+    />
+
+    <h2>Connect it</h2>
+    <p>Pick the one you use. Every one of these is the whole setup, not the first step of it.</p>
+
+    <div class="clients">
+      {CLIENTS.map((c) => (
+        <section class="client">
+          <h3>{c.name}</h3>
+          <p class="how">{c.how}</p>
+          <pre class="snip" data-lang={c.lang}>{c.code}</pre>
+        </section>
+      ))}
+    </div>
+
+    <h2>What it can do</h2>
+    <ul class="tools">
+      {TOOL_LIST.map((t) => (
+        <li>
+          <b>{t.title}.</b> {t.description}
+        </li>
+      ))}
+    </ul>
+
+    <section class="local">
+      <h2>If you would rather it ran on your own machine</h2>
+      <p>
+        There is a local version as an npm package. It does everything this one does, plus one thing
+        this one cannot: run the sixteen content gates over a folder of Markdown on your disk. It
+        has to be installed, and it works in clients that accept a command rather than a URL.
+      </p>
+      <p><a href="/products/mcp/">The local MCP server →</a></p>
+    </section>
+
+    <FaqSection items={FAQ} />
+
+    <section class="next">
+      <h2>Once you have a score</h2>
+      <p>
+        The <a href="/visits/">free visit counter</a> answers the other half of the question: not
+        whether an assistant can quote you, but how many people it actually sent. The
+        <a href="/products/site-report/">9 USD fix list</a> turns every gap into a task you can hand
+        to anyone, including the assistant you just connected this to.
+      </p>
+    </section>
+  </div>
+</CommercialLayout>
+
+<script is:inline>
+  (function () {
+    var btn = document.getElementById('copy');
+    if (!btn) return;
+    btn.addEventListener('click', function () {
+      var text = document.getElementById('addr').textContent.trim();
+      navigator.clipboard.writeText(text).then(
+        function () { btn.textContent = 'Copied'; },
+        function () { btn.textContent = 'Select it and copy by hand'; },
+      );
+    });
+    document.querySelectorAll('.snip').forEach(function (pre) {
+      pre.addEventListener('click', function () {
+        navigator.clipboard.writeText(pre.textContent.trim()).catch(function () {});
+        pre.classList.add('copied');
+        setTimeout(function () { pre.classList.remove('copied'); }, 1200);
+      });
+    });
+  })();
+</script>
+
+<style>
+  .wrap { max-width: 860px; margin: 0 auto; padding: 40px 20px 80px; }
+  .label { font-family: var(--fm); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal-soft); }
+  h1 { font-family: var(--fd); font-size: clamp(27px, 5vw, 38px); letter-spacing: -.02em; margin: 8px 0 0; }
+  .lede { font-size: 18px; color: rgba(245,242,236,.86); max-width: 62ch; margin: 14px 0 24px; }
+  h2 { font-family: var(--fd); font-size: 23px; margin: 44px 0 10px; }
+  h3 { font-family: var(--fd); font-size: 17px; margin: 0 0 6px; }
+  p { max-width: 68ch; }
+  .addr { border: 1px solid rgba(61,184,169,.3); border-radius: 14px; padding: 18px 20px; background: rgba(61,184,169,.06); margin: 0 0 26px; }
+  .addr-label { font-family: var(--fm); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--teal-soft); margin: 0 0 8px; }
+  .addr pre { font-family: var(--fm); font-size: 15px; margin: 0 0 14px; overflow-x: auto; }
+  .clients { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 14px; margin: 16px 0 0; }
+  .client { border: 1px solid rgba(255,255,255,.09); border-radius: 12px; padding: 16px 18px; background: rgba(255,255,255,.02); }
+  .how { font-size: 14px; color: var(--muted); margin: 0 0 10px; }
+  .snip { font-family: var(--fm); font-size: 12.5px; line-height: 1.5; background: rgba(0,0,0,.35); border: 1px solid rgba(255,255,255,.08); border-radius: 9px; padding: 11px 13px; overflow-x: auto; white-space: pre; margin: 0; cursor: pointer; }
+  .snip:hover { border-color: rgba(61,184,169,.4); }
+  .snip.copied { border-color: var(--teal); }
+  .tools { max-width: 68ch; padding-left: 20px; }
+  .tools li { margin: 10px 0; font-size: 15.5px; }
+  .local a, .next a { color: var(--teal-soft); }
+  @media (max-width: 640px) { .clients { grid-template-columns: 1fr; } }
+</style>
