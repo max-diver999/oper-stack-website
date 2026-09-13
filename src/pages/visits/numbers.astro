@@ -1,0 +1,157 @@
+---
+/**
+ * The answer to the question the whole funnel asks: how many people did each assistant send you.
+ *
+ * The private link is the only credential, so this page is never indexed and never cached. It reads
+ * its own token from the address bar and asks the report endpoint; nothing is rendered on the
+ * server, so the token never sits in a build artefact.
+ */
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { SITE } from '../../data/site';
+
+export const prerender = false;
+---
+
+<CommercialLayout
+  title="Your AI visits · OperStack"
+  description="How many people each AI assistant sent to your site."
+  canonical={`${SITE.url}/visits/numbers/`}
+  noindex={true}
+>
+  <div class="wrap">
+    <p class="label">Your numbers</p>
+    <h1 id="head">Who sent you visitors</h1>
+    <p class="lede" id="sub">Reading your counter…</p>
+
+    <section id="out" hidden></section>
+
+    <section id="empty" hidden>
+      <h2>Nothing counted yet</h2>
+      <p>
+        That is normal on day one, and it is also what a missing snippet looks like. Two things to
+        check, in this order.
+      </p>
+      <ol>
+        <li>
+          Open your site, view the page source, and search it for <code>v.js</code>. If it is not
+          there, the line did not save. Paste it again and press publish.
+        </li>
+        <li>
+          If the line is there, you are simply waiting. A visit is counted when a person reads an
+          answer from an assistant and clicks through to you. On a small site that is days, not
+          minutes.
+        </li>
+      </ol>
+      <p class="small">
+        Nothing is counted from you browsing your own site, because you did not arrive from an
+        assistant.
+      </p>
+    </section>
+
+    <section id="fail" hidden>
+      <h2>This link does not open anything</h2>
+      <p>
+        Either it was mistyped, or it is not one of ours. The link was emailed to you when you set
+        the counter up. If you cannot find it, write to <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
+        from the same address and we will send it again.
+      </p>
+    </section>
+
+    <section class="keep">
+      <h2>Keep this link</h2>
+      <p>
+        It is the only way to your numbers, and anyone who has it can see them. There is no password
+        because there is nothing here worth a password: no visitor is identified, no address is
+        stored, and no page is recorded. Only which assistant, which day, and how many.
+      </p>
+      <p class="next">
+        Once you know the number, the <a href="/ai-visibility/">free visibility check</a> says
+        whether an answer engine can quote you in the first place, and the
+        <a href="/products/site-report/">9 USD fix list</a> turns every gap into a task you can hand
+        to anyone.
+      </p>
+    </section>
+  </div>
+</CommercialLayout>
+
+<script is:inline>
+  (function () {
+    var token = new URLSearchParams(location.search).get('t') || '';
+    var sub = document.getElementById('sub');
+    var out = document.getElementById('out');
+    var empty = document.getElementById('empty');
+    var fail = document.getElementById('fail');
+
+    function esc(s) {
+      return String(s).replace(/[<>&"]/g, function (c) {
+        return { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }[c];
+      });
+    }
+
+    function show(el) { el.hidden = false; }
+
+    if (!token) { sub.textContent = 'This address is missing its link.'; show(fail); return; }
+
+    fetch('/api/visits/report/?t=' + encodeURIComponent(token) + '&days=90')
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (res) {
+        if (!res.ok) { sub.textContent = ''; show(fail); return; }
+        var d = res.d;
+        document.getElementById('head').textContent = 'Who sent visitors to ' + d.domain;
+
+        if (!d.total) {
+          sub.textContent = 'Counting since ' + new Date(d.installedAt).toLocaleDateString();
+          show(empty);
+          return;
+        }
+
+        sub.textContent =
+          d.total + ' ' + (d.total === 1 ? 'visit' : 'visits') +
+          ' from AI assistants in the last ' + d.days + ' days.';
+
+        var rows = d.byAssistant.map(function (a) {
+          var share = Math.round((a.hits / d.total) * 100);
+          return '<tr><td>' + esc(a.assistant) + '</td><td class="n">' + a.hits +
+            '</td><td class="n muted">' + share + '%</td></tr>';
+        }).join('');
+
+        var last = d.lastVisitAt
+          ? '<p class="small">Most recent visit: ' + esc(new Date(d.lastVisitAt).toLocaleString()) + '.</p>'
+          : '';
+
+        out.innerHTML =
+          '<div class="tablewrap"><table><thead><tr><th>Assistant</th><th class="n">Visits</th>' +
+          '<th class="n">Share</th></tr></thead><tbody>' + rows + '</tbody></table></div>' + last;
+        show(out);
+      })
+      .catch(function () { sub.textContent = ''; show(fail); });
+  })();
+</script>
+
+<style>
+  .wrap { max-width: 820px; margin: 0 auto; padding: 40px 20px 80px; }
+  .label { font-family: var(--fm); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal-soft); }
+  h1 { font-family: var(--fd); font-size: clamp(26px, 5vw, 36px); letter-spacing: -.02em; margin: 8px 0 0; }
+  .lede { font-size: 18px; color: rgba(245,242,236,.86); max-width: 62ch; margin: 14px 0 24px; }
+  h2 { font-family: var(--fd); font-size: 22px; margin: 36px 0 10px; }
+  p { max-width: 68ch; }
+  ol { padding-left: 20px; max-width: 68ch; }
+  li { margin: 9px 0; }
+  .small { font-size: 14px; color: var(--muted); }
+  code { font-family: var(--fm); font-size: 13.5px; background: rgba(0,0,0,.3); padding: 1px 6px; border-radius: 4px; }
+  .keep { border-top: 1px solid rgba(255,255,255,.1); margin-top: 44px; padding-top: 20px; }
+  .next { margin-top: 16px; }
+  .next a, .keep a { color: var(--teal-soft); }
+</style>
+
+<!-- The table is built in the browser, and Astro scopes styles to markup it rendered itself. -->
+<style is:global>
+  #out .tablewrap { overflow-x: auto; border: 1px solid rgba(255, 255, 255, .09); border-radius: 12px; }
+  #out table { width: 100%; border-collapse: collapse; font-size: 15.5px; }
+  #out th, #out td { padding: 11px 14px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, .06); }
+  #out tbody tr:last-child td { border-bottom: 0; }
+  #out th { font-family: var(--fm); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  #out td.n, #out th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  #out td.muted { color: var(--muted); }
+  #out .small { font-size: 14px; color: var(--muted); margin-top: 12px; }
+</style>

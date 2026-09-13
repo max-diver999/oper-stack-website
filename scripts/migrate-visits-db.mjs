@@ -61,6 +61,16 @@ const STATEMENTS = [
   ],
   ['sites domain index', 'create index if not exists sites_domain_idx on sites (domain)'],
   [
+    // The site key is public: it sits in the snippet on every page. The view token is the secret
+    // that shows the numbers, so it lives in its own column and never reaches page source.
+    'sites view token',
+    'alter table sites add column if not exists view_token text',
+  ],
+  [
+    'view token is unique',
+    'create unique index if not exists sites_view_token_idx on sites (view_token) where view_token is not null',
+  ],
+  [
     'visits table',
     `create table if not exists visits (
        site_id   text not null references sites (id) on delete cascade,

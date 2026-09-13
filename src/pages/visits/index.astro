@@ -165,6 +165,7 @@ const pageSchema = {
     var btn = document.getElementById('detect-btn');
 
     var WHERE = {
+      Shopify: 'Online Store, Themes, the three dots next to your theme, Edit code, the file theme.liquid. Paste it just above the line that says </head>, then Save.',
       Tilda: 'Site settings, the More tab, the field called HTML code for the head. Paste it there, then press Publish all pages.',
       Wix: 'Settings, Custom code, Add code to all pages, and place it in the Head.',
       Squarespace: 'Settings, Advanced, Code injection, the Header field.',
@@ -196,77 +197,100 @@ const pageSchema = {
         '<p class="small">It is under review at wordpress.org right now. Once it is listed you will be able to find it in the plugin search inside your admin and skip the download entirely. The code is the same either way.</p>';
     }
 
-    function shopify() {
-      return '' +
-        '<h3>Shopify</h3>' +
-        '<p>The Shopify version is being built and is not ready yet. Tell us your store address and we will write to you the day it is, once, with no list to unsubscribe from afterwards.</p>' +
-        waitlist('shopify');
-    }
-
+    /**
+     * Everything that is not WordPress gets the same thing: one line, their own key, and the
+     * private link to their numbers. The waitlist this replaced was a promise; this is the product.
+     */
     function snippet(platform) {
       var where = WHERE[platform];
       return '' +
         '<h3>' + esc(platform) + '</h3>' +
-        '<p>For your platform the counter is one line of code that goes into the site’s head. <b>It is not ready yet</b>, and we would rather say so than hand you something that quietly counts nothing.</p>' +
-        (where ? '<p>When it is ready, this is where it will go on ' + esc(platform) + ': ' + esc(where) + '</p>' : '') +
-        '<p>Leave your address and we will write to you once, the day it works.</p>' +
-        waitlist(platform.toLowerCase());
+        '<p>On ' + esc(platform) + ' the counter is one line of code. Tell us your address and we will write that line for you, with your own key in it.</p>' +
+        (where ? '<p><b>Where it goes on ' + esc(platform) + ':</b> ' + esc(where) + '</p>' : '<p>It goes in the site\u2019s head, on every page.</p>') +
+        signup(platform);
     }
 
-    function waitlist(source) {
+    function signup(platform) {
+      var id = esc(platform.toLowerCase().replace(/[^a-z0-9]+/g, '-'));
       return '' +
-        '<form class="wait" data-source="' + esc(source) + '" novalidate>' +
-        '<label class="sr" for="w-email-' + esc(source) + '">Email</label>' +
-        '<input id="w-email-' + esc(source) + '" name="email" type="email" placeholder="you@yourcompany.com" required />' +
+        '<form class="wait" data-platform="' + esc(platform) + '" novalidate>' +
+        '<label class="sr" for="w-site-' + id + '">Your site address</label>' +
+        '<input id="w-site-' + id + '" name="domain" type="text" inputmode="url" placeholder="yoursite.com" autocomplete="url" required />' +
+        '<label class="sr" for="w-email-' + id + '">Email</label>' +
+        '<input id="w-email-' + id + '" name="email" type="email" placeholder="you@yourcompany.com" autocomplete="email" required />' +
         '<input class="hp" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" />' +
-        '<button class="btn" type="submit">Tell me when it is ready</button>' +
+        '<button class="btn" type="submit">Give me my line \u2192</button>' +
         '<p class="msg" hidden></p>' +
-        '</form>';
+        '</form>' +
+        '<div class="result" hidden></div>';
     }
 
     function show(platform) {
       var html;
       if (platform === 'WordPress') html = wordpress();
-      else if (platform === 'Shopify') html = shopify();
       else if (platform === 'other' || !platform) {
-        html = '<h3>Something else</h3><p>Tell us the address and we will work out what it runs on and write the instructions for it. One email, the day it works.</p>' + waitlist('other');
+        html = '<h3>Something else</h3>' +
+          '<p>The line works on any site where you can add code to the head, whatever built it. Tell us your address and we will write it for you.</p>' +
+          signup('other');
       } else html = snippet(platform);
 
       steps.innerHTML = html;
       steps.hidden = false;
       steps.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      wireWaitlists();
+      wireSignups();
     }
 
-    function wireWaitlists() {
+    function wireSignups() {
       steps.querySelectorAll('form.wait').forEach(function (f) {
         if (f.dataset.wired) return;
         f.dataset.wired = '1';
         f.addEventListener('submit', async function (e) {
           e.preventDefault();
           var msg = f.querySelector('.msg');
+          var box = f.parentNode.querySelector('.result');
+          var domain = f.querySelector('input[name=domain]').value.trim() ||
+            ((document.getElementById('site') || {}).value || '').trim();
           var email = f.querySelector('input[name=email]').value.trim();
-          var site = (document.getElementById('site') || {}).value || '';
-          if (!email || email.indexOf('@') < 1) { msg.hidden = false; msg.textContent = 'Please put in an address we can reach you at.'; return; }
           msg.hidden = false;
-          msg.textContent = 'Sending…';
+          if (!domain) { msg.textContent = 'Put in your site address first, like yoursite.com.'; return; }
+          if (!email || email.indexOf('@') < 1) { msg.textContent = 'Put in an address we can send the link to.'; return; }
+          msg.textContent = 'Writing your line\u2026';
           try {
-            var r = await fetch('/api/lead/', {
+            var r = await fetch('/api/visits/register/', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
+                domain: domain,
                 email: email,
-                source: 'visits-waitlist:' + f.dataset.source,
-                message: 'Waiting for the AI visit counter on ' + f.dataset.source + (site ? '. Site: ' + site : ''),
-                website: f.querySelector('input[name=website]').value,
-                consent: true
+                platform: f.dataset.platform,
+                website: f.querySelector('input[name=website]').value
               })
             });
-            msg.textContent = r.ok
-              ? 'Noted. One email when it works, and nothing else.'
-              : 'That did not go through. Write to ' + 'info@oper-stack.com' + ' and we will add you by hand.';
+            var d = await r.json();
+            if (!r.ok) { msg.textContent = d.error || 'That did not go through. Write to info@oper-stack.com.'; return; }
+            msg.hidden = true;
+            f.hidden = true;
+            box.innerHTML =
+              '<h4>Your line, for ' + esc(d.domain) + '</h4>' +
+              '<p>Paste it into your site\u2019s head, on every page, then publish.</p>' +
+              '<pre id="snip">' + esc(d.snippet) + '</pre>' +
+              '<p><button type="button" class="btn copy">Copy the line</button></p>' +
+              '<h4>Your private link</h4>' +
+              '<p>This is where your numbers appear. We have emailed it to you as well. Keep it: it is the only way back, and anyone who has it can see the numbers too.</p>' +
+              '<p><a href="' + esc(d.dashboard) + '">' + esc(d.dashboard) + '</a></p>' +
+              '<p class="small">The table is empty until somebody arrives from an assistant. Your own visits are not counted, because you did not come from one.</p>';
+            box.hidden = false;
+            box.querySelector('.copy').addEventListener('click', function () {
+              var t = box.querySelector('#snip').textContent;
+              navigator.clipboard.writeText(t).then(function () {
+                box.querySelector('.copy').textContent = 'Copied';
+              }, function () {
+                box.querySelector('.copy').textContent = 'Select it and copy by hand';
+              });
+            });
           } catch (err) {
-            msg.textContent = 'That did not go through. Write to info@oper-stack.com and we will add you by hand.';
+            msg.hidden = false;
+            msg.textContent = 'That did not go through. Write to info@oper-stack.com and we will set it up by hand.';
           }
         });
       });
@@ -353,12 +377,29 @@ const pageSchema = {
   /* Метка «Email» существует только для читалок экрана: без этого правила она видна глазами. */
   #steps .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   #steps form.wait { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; align-items: flex-start; }
+  /* display:flex beats the browser's own rule for [hidden], so the form stayed on screen after it
+     had done its job and a second submit would have issued a second key. */
+  #steps form.wait[hidden] { display: none; }
   #steps form.wait input[name="email"] {
     flex: 1 1 240px; min-width: 0; padding: 12px 14px; border-radius: 10px;
     border: 1px solid rgba(255, 255, 255, .14); background: rgba(0, 0, 0, .25);
     color: var(--paper); font-size: 16px; min-height: 46px;
   }
   #steps form.wait .msg { flex: 1 1 100%; font-size: 14.5px; color: var(--teal-soft); margin: 4px 0 0; }
+  #steps form.wait input[name="domain"] {
+    flex: 1 1 200px; min-width: 0; padding: 12px 14px; border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, .14); background: rgba(0, 0, 0, .25);
+    color: var(--paper); font-size: 16px; min-height: 46px;
+  }
+  #steps h4 { font-family: var(--fd); font-size: 16px; margin: 20px 0 8px; }
+  #steps .result { margin-top: 4px; }
+  #steps .result > h4:first-child { margin-top: 8px; }
+  #steps pre {
+    font-family: var(--fm); font-size: 13px; line-height: 1.5; background: rgba(0, 0, 0, .35);
+    border: 1px solid rgba(255, 255, 255, .09); border-radius: 10px; padding: 12px 14px;
+    overflow-x: auto; white-space: pre; margin: 10px 0;
+  }
+  #steps .result a { color: var(--teal-soft); word-break: break-all; }
   #steps form.wait input.hp {
     position: absolute !important; left: -9999px !important;
     width: 1px !important; height: 1px !important; opacity: 0 !important;
