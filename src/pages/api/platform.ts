@@ -66,7 +66,27 @@ function normalise(input: string): string | null {
   }
 }
 
+/** The Russian site asks the same question from its own origin. Only ours are answered. */
+const ALLOWED_ORIGINS = new Set(['https://oper-stack.ru', 'https://www.oper-stack.ru', 'https://oper-stack.com']);
+
+function corsFor(request: Request): Record<string, string> {
+  const origin = request.headers.get('origin') || '';
+  return ALLOWED_ORIGINS.has(origin) ? { 'Access-Control-Allow-Origin': origin, Vary: 'Origin' } : {};
+}
+
+export const OPTIONS: APIRoute = async ({ request }) =>
+  new Response(null, {
+    status: 204,
+    headers: {
+      ...corsFor(request),
+      'Access-Control-Allow-Methods': 'POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type',
+      'Access-Control-Max-Age': '86400',
+    },
+  });
+
 export const POST: APIRoute = async ({ request }) => {
+  const cors = corsFor(request);
   let url: string | null = null;
   try {
     const body = await request.json();
@@ -77,7 +97,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!url) {
     return new Response(JSON.stringify({ error: 'Give a public web address, like example.com.' }), {
       status: 400,
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', ...cors },
     });
   }
 
@@ -96,7 +116,7 @@ export const POST: APIRoute = async ({ request }) => {
     if (walled) {
       return new Response(
         JSON.stringify({ url, platform: null, walled: true, where: null }),
-        { status: 200, headers: { 'Content-Type': 'application/json' } },
+        { status: 200, headers: { 'Content-Type': 'application/json', ...cors } },
       );
     }
 
@@ -109,13 +129,13 @@ export const POST: APIRoute = async ({ request }) => {
     }
     return new Response(
       JSON.stringify({ url, platform, where: platform ? WHERE[platform] ?? null : null, walled: false }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } },
+      { status: 200, headers: { 'Content-Type': 'application/json', ...cors } },
     );
   } catch (err) {
     const timeout = err instanceof Error && err.name === 'AbortError';
     return new Response(
       JSON.stringify({ url, platform: null, error: timeout ? 'The site took too long to answer.' : 'The site did not answer.' }),
-      { status: 200, headers: { 'Content-Type': 'application/json' } },
+      { status: 200, headers: { 'Content-Type': 'application/json', ...cors } },
     );
   } finally {
     clearTimeout(timer);
