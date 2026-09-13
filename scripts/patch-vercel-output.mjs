@@ -73,9 +73,6 @@ async function main() {
       },
       continue: true,
     },
-    // The site enforces trailing slashes, but an MCP client is handed a URL and posts to exactly
-    // that. A redirect would work for most clients and quietly fail for the rest, so serve it.
-    { src: '^/api/mcp$', dest: '/api/mcp/' },
     // Markdown content negotiation. Only fires on an explicit Accept: text/markdown.
     { src: '^/$', has: [{ type: 'header', key: 'accept', value: '.*text/markdown.*' }], dest: '/index.md' },
     ...collections.map((col) => ({
