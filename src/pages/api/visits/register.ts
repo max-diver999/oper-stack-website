@@ -56,19 +56,41 @@ export const POST: APIRoute = async ({ request }) => {
 
   const sql = visitsDb();
 
+  // This endpoint sends an email to whatever address it is given, so without a ceiling it is a
+  // machine for posting mail to strangers from our domain, which is how a sending domain gets
+  // burned. Two ceilings: one address cannot keep asking, and the whole endpoint has an hourly cap.
+  const recent = await sql`
+    select
+      (select count(*) from sites where lower(email) = ${email.toLowerCase()}
+         and created_at > now() - interval '1 hour')::int as mine,
+      (select count(*) from sites where created_at > now() - interval '1 hour')::int as everyone`;
+  if (recent[0].mine >= 5 || recent[0].everyone >= 120) {
+    return new Response(
+      JSON.stringify({
+        error: 'That is a lot of sites at once. Write to ' + SITE.email + ' and we will set it up by hand.',
+      }),
+      { status: 429, headers: { 'Content-Type': 'application/json' } },
+    );
+  }
+
   // Registering the same site twice is harmless: a key only counts pages that carry it, and the
   // numbers stay with whoever holds the view token. But sending back the key they already have
   // saves the honest owner from installing two snippets.
   const existing = await sql`
-    select id, view_token from sites
+    select id, view_token, last_email_at from sites
     where domain = ${domain} and lower(email) = ${email.toLowerCase()} and view_token is not null
     order by created_at desc limit 1`;
 
   let key: string;
   let token: string;
+  let mayEmail = true;
   if (existing.length) {
     key = existing[0].id;
     token = existing[0].view_token;
+    // Asking again is how an owner recovers a lost link, so it has to work. Asking again every
+    // second is how somebody else's inbox gets filled, so it only works occasionally.
+    const last = existing[0].last_email_at ? new Date(existing[0].last_email_at).getTime() : 0;
+    mayEmail = Date.now() - last > 10 * 60 * 1000;
   } else {
     key = newSiteKey();
     token = newViewToken();
@@ -83,6 +105,7 @@ export const POST: APIRoute = async ({ request }) => {
   // The link is the only way back to their numbers, so it goes to them by email as well as on
   // screen. A mail failure must not lose them the key they just got.
   try {
+    if (!mayEmail) throw new Error('emailed recently');
     await sendTransactionalMail({
       to: email,
       subject: 'Your AI visit counter for ' + domain,
@@ -105,8 +128,9 @@ export const POST: APIRoute = async ({ request }) => {
 <p>Keep the link. It is the only way to see your numbers, and anyone who has it can see them too.</p>
 <p>Nothing about your visitors is stored: only which assistant, which day, and how many.</p>`,
     });
+    await sql`update sites set last_email_at = now() where id = ${key}`;
   } catch {
-    /* the owner still has both on screen */
+    /* the owner still has both on screen, which is the copy that matters */
   }
 
   return json({ key, snippet, dashboard, domain });

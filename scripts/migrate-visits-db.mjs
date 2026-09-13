@@ -67,6 +67,12 @@ const STATEMENTS = [
     'alter table sites add column if not exists view_token text',
   ],
   [
+    // Without this, asking again for a key you already have re-sends the email every time, which
+    // turns the endpoint into a way to post mail to one address for as long as somebody likes.
+    'sites last email',
+    'alter table sites add column if not exists last_email_at timestamptz',
+  ],
+  [
     'view token is unique',
     'create unique index if not exists sites_view_token_idx on sites (view_token) where view_token is not null',
   ],
