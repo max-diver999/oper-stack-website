@@ -23,7 +23,7 @@ const productSchema = { '@context': 'https://schema.org', '@type': p.slug === 's
 const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: p.faq.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
 const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order - b.order);
 ---
-<CommercialLayout title={`${p.title} · ${SITE.name}`} description={p.description} canonical={canonical} jsonLd={[productSchema, faqSchema]}>
+<CommercialLayout title={`${p.title} · ${SITE.name}`} description={p.description} canonical={canonical} ogImage={p.og} jsonLd={[productSchema, faqSchema]}>
   <div class="wrap">
     <p class="crumb"><a href="/products/">Products</a> / {p.name}</p>
     <p class="label">{p.label}</p>
