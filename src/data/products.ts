@@ -391,7 +391,7 @@ export const PRODUCTS: Product[] = [
     priceNote: 'Unlimited client sites and reports. Cancel any time; the key runs to the end of the month you paid for',
     status: 'available',
     cta: { text: 'Start for 39 USD a month', href: 'https://whop.com/oper-stack/agency-plan-reports-under-your-own-brand', external: true },
-    og: '/og/og-default.png',
+    og: '/og/og-agency.png',
     order: 10,
     get: [
       'A licence key that unlocks your own branding in the report generator',
