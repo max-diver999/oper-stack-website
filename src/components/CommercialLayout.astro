@@ -16,9 +16,12 @@ interface Props {
   article?: { published: string; modified: string };
   /** Страницы с чужим адресом в запросе: результат проверки не место в индексе. */
   noindex?: boolean;
+  /** Личные страницы, куда приходят по ссылке из письма. Маркетинговое меню там лишнее, а на
+   *  русской странице оно ещё и английское. Одна ссылка домой вместо восьми. */
+  bare?: { home: string; label: string; footer?: string };
 }
 
-const { title, description, canonical, jsonLd = [], ogImage = '/og/og-default.png', article, noindex = false } = Astro.props;
+const { title, description, canonical, jsonLd = [], ogImage = '/og/og-default.png', article, noindex = false, bare } = Astro.props;
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE.url}${ogImage}`;
 
 const organizationSchema = {
@@ -303,6 +306,11 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
   <script defer src="/v.js" data-key="osv_operstackowncom"></script>
 </head>
 <body>
+  {bare ? (
+  <nav class="site-nav" aria-label="Site">
+    <a href={bare.home}>{bare.label}</a>
+  </nav>
+  ) : (
   <nav class="site-nav" aria-label="Site">
     <a href="/">Map</a>
     <a href="/services/" class:list={{ active: Astro.url.pathname.startsWith('/services') }}>Services</a>
@@ -313,11 +321,12 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
     <a href="/about/" class:list={{ active: Astro.url.pathname.startsWith('/about') }}>About</a>
     <a href="/audit/">Audit</a>
   </nav>
+  )}
   <slot />
   <footer class="site-foot">
-    <p>{SITE.name} · {SITE.tagline}</p>
+    <p>{bare?.footer ?? `${SITE.name} · ${SITE.tagline}`}</p>
     <p style="margin-top:8px"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
-    <p class="foot-links"><a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>
+    {!bare && <p class="foot-links"><a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>}
   </footer>
 </body>
 </html>
