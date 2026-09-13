@@ -83,7 +83,7 @@ export const PRODUCTS: Product[] = [
     priceNote: 'No account. Public signals only. Ten seconds.',
     status: 'available',
     cta: { text: 'Check a site', href: '/ai-visibility/' },
-    og: '/og/og-default.png',
+    og: '/og/og-ai-visibility.png',
     order: 0,
     get: ['A score out of 100 and a grade, with five area scores', 'The three fixes that move the score most, in plain words', 'Each question asked several times rather than once, and the share of answers that named you: one AI answer is a coin toss', 'Per-crawler verdicts for fourteen AI crawlers and fetchers from robots.txt', 'A table of the sampled pages: words, answer-first paragraph, dates, schema', 'The sixteen gates PDF by email if you want the method behind every check'],
     how: [{ step: 'Enter a site', text: 'Any public address. The checker reads the homepage, robots.txt, llms.txt, the sitemap and up to three pages.' }, { step: 'Read the score', text: 'Five areas, weighted by what answer engines need first: access, a map, an entity, something to quote, dates.' }, { step: 'Fix the top three', text: 'Most sites move twenty points with robots.txt, llms.txt and an answer-first paragraph on the pages that matter.' }],
