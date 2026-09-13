@@ -27,7 +27,8 @@ export default defineConfig({
         // Сравниваем путь целиком, а не вхождением. Вхождение '/site-report/' выбрасывало из карты
         // сайта страницу товара /products/site-report/, то есть ровно ту, которую надо продавать, а
         // форму /report/, закрытую от индексации, оставляло внутри.
-        const excludedExact = ['/report/'];
+        // /visits/numbers/ открывается только по личной ссылке и стоит под noindex.
+        const excludedExact = ['/report/', '/visits/numbers/'];
         const excludedPrefix = ['/thanks/'];
         const path = new URL(page).pathname;
         return !excludedExact.includes(path) && !excludedPrefix.some((p) => path.startsWith(p));
