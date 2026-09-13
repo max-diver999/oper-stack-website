@@ -8,7 +8,7 @@ const canonical = `${SITE.url}/ai-visibility/`;
 const FAQ = [
   { question: 'What does the check look at?', answer: 'Five things an answer engine needs before it can cite a site: whether its crawlers are allowed in robots.txt, whether there is an llms.txt map, whether schema names the entity, whether the sampled pages open with a quotable answer and carry tables, and whether pages expose dates and name sources. It reads the homepage, robots.txt, llms.txt, the sitemap and up to three pages.' },
   { question: 'Does it measure traffic from ChatGPT or Perplexity?', answer: 'No. Traffic lives in your analytics. This check measures whether the site is readable and quotable in the first place, which is the part you control. The OperStack plugin for Claude Code has an ai-visibility command that reads the GA4 side.' },
-  { question: 'Is anything stored?', answer: 'The score is cached for ten minutes so a repeated check is instant. Nothing else is kept unless you ask for the PDF and leave an email.' },
+  { question: 'Is anything stored?', answer: 'We keep a line for each check: the address checked, the score, and which link brought you here. We do not keep your IP address, and we do not sell or share any of it. Your email is kept only if you leave it for the report, and every email we send has one-click unsubscribe.' },
   { question: 'Why did my site score low on content when the pages are long?', answer: 'Length is not the signal. The check looks for an answer-first paragraph of 20 to 90 words with a figure right after the H1, at least three H2 sections and a table. Long pages that bury the answer score low because engines quote the opening, not the middle.' },
   { question: 'What is the difference between this and the audit?', answer: 'This is the free, automatic, ten-second version of the first two pages of the audit. The audit adds an analyst, Search Console data, competitor pages, and a ten-page report with a price on every fix.' },
 ];
@@ -27,7 +27,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       <input id="vis-url" name="url" type="text" inputmode="url" placeholder="example.com" autocomplete="url" required />
       <button type="submit" class="btn" id="vis-btn">Check the site →</button>
     </form>
-    <p class="note" id="vis-note">Public signals only. Nothing is stored except the score, for ten minutes.</p>
+    <p class="note" id="vis-note">Public signals only. We log the address checked and the score, never your IP.</p>
 
     <section id="vis-result" class="result" hidden aria-live="polite"></section>
 
@@ -86,6 +86,24 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     const loadedAt = Date.now();
     let last: any = null;
 
+    // Человек приходит по ссылке с меткой площадки, но проверку может запустить через
+    // несколько кликов. Запоминаем метку на время визита, иначе в таблице у всех будет
+    // "прямой заход" и мы не узнаем, какая соцсеть на самом деле приводит людей.
+    function origin(): { from: string; campaign: string } {
+      const KEY = 'os-origin';
+      try {
+        const q = new URLSearchParams(location.search);
+        const from = q.get('utm_source') || q.get('ref') || '';
+        const campaign = q.get('utm_campaign') || '';
+        if (from) { const v = { from, campaign }; sessionStorage.setItem(KEY, JSON.stringify(v)); return v; }
+        const saved = sessionStorage.getItem(KEY);
+        if (saved) return JSON.parse(saved);
+      } catch {
+        // Приватное окно или запрет на хранилище: тогда источник определит сервер по Referer.
+      }
+      return { from: '', campaign: '' };
+    }
+
     const esc = (s: unknown) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c] as string));
     const track = (name: string, params: Record<string, unknown>) => { const w = window as any; if (typeof w.operStackTrack === 'function') w.operStackTrack(name, params); };
 
@@ -125,15 +143,17 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       if (!url) { input.focus(); return; }
       btn.disabled = true; btn.textContent = 'Checking…'; note.textContent = 'Reading robots.txt, llms.txt, the sitemap and a few pages. Ten seconds at most.';
       try {
-        const res = await fetch(`/api/ai-visibility/?url=${encodeURIComponent(url)}`);
+        const o = origin();
+        const tail = o.from ? `&from=${encodeURIComponent(o.from)}&campaign=${encodeURIComponent(o.campaign)}` : '';
+        const res = await fetch(`/api/ai-visibility/?url=${encodeURIComponent(url)}${tail}`);
         const data = await res.json();
         if (!data.ok) throw new Error(data.error || 'The check failed');
         last = data; render(data);
         track('ai_visibility_check', { host: data.host, score: data.score, grade: data.grade });
-        note.textContent = 'Public signals only. Nothing is stored except the score, for ten minutes.';
+        note.textContent = 'Public signals only. We log the address checked and the score, never your IP.';
       } catch (err: any) {
         out.innerHTML = `<p class="err">${esc(err.message || 'The check failed')}</p>`; out.hidden = false;
-        note.textContent = 'Public signals only. Nothing is stored except the score, for ten minutes.';
+        note.textContent = 'Public signals only. We log the address checked and the score, never your IP.';
       } finally { btn.disabled = false; btn.textContent = 'Check the site →'; }
     });
 
@@ -144,7 +164,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       try {
         // Сначала письмо с задачей: человек пришёл за ней. Лид записываем следом и не роняем
         // ответ, если CRM недоступна: задача уже ушла, и это главное.
-        const taskRes = await fetch('/api/visibility-task/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: fd.get('email'), url: last ? last.url : '', website: fd.get('website') }) });
+        const taskRes = await fetch('/api/visibility-task/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ email: fd.get('email'), name: fd.get('name'), url: last ? last.url : '', website: fd.get('website'), ...origin() }) });
         const taskData = await taskRes.json().catch(() => ({}));
         if (!taskRes.ok) throw new Error(taskData.error || 'Request failed');
         fetch('/api/lead/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) }).catch(() => {});

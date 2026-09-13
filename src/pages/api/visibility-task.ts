@@ -17,6 +17,7 @@ import type { APIRoute } from 'astro';
 import { checkVisibility, normaliseInput } from '../../lib/ai-visibility.mjs';
 import { topTask, renderTask } from '../../lib/ai-visibility-tasks.mjs';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
+import { logLead, originOf } from '../../lib/sheets-log';
 import { SITE } from '../../data/site';
 
 export const prerender = false;
@@ -93,6 +94,26 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   } catch {
     return json({ ok: false, error: 'We could not send the email just now. Write to info@oper-stack.com and we will send it by hand.' }, 502);
   }
+
+  // Строка в таблицу пишется только после того, как письмо ушло: записываем состоявшийся
+  // обмен, а не намерение. Если таблица недоступна, человек всё равно получил свою задачу.
+  const { source, campaign, page } = originOf(
+    { source: body.from, campaign: body.campaign },
+    request.headers.get('referer'),
+  );
+  await logLead({
+    lang: 'en',
+    host: result.host,
+    score: result.score,
+    grade: result.grade,
+    email,
+    name: String(body.name ?? '').trim().slice(0, 80),
+    source,
+    campaign,
+    page,
+    sent: 'задача письмом',
+    tier: 'бесплатно',
+  });
 
   return json({ ok: true, sent: true, taskId: task.id });
 };

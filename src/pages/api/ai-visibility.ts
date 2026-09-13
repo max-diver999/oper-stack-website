@@ -4,6 +4,7 @@
  */
 import type { APIRoute } from 'astro';
 import { checkVisibility, normaliseInput } from '../../lib/ai-visibility.mjs';
+import { logCheck, originOf } from '../../lib/sheets-log';
 
 export const prerender = false;
 
@@ -22,7 +23,18 @@ function limited(ip: string): boolean {
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex' } });
 
-async function handle(rawUrl: string, ip: string): Promise<Response> {
+/**
+ * Каждый прогон уходит строкой в таблицу: какой сайт проверяли, какой балл, с какой площадки
+ * человек пришёл. Почты здесь нет и быть не может, её на этом шаге ещё не спрашивали.
+ * Ждём таблицу вместе с ответом, но не дольше трёх секунд, и любую её ошибку проглатываем.
+ */
+async function record(result: any, request: Request, from: { source?: string; campaign?: string }): Promise<void> {
+  if (!result?.ok) return;
+  const { source, campaign, page } = originOf(from, request.headers.get('referer'));
+  await logCheck({ lang: 'en', host: result.host, score: result.score, grade: result.grade, source, campaign, page });
+}
+
+async function handle(rawUrl: string, ip: string, request: Request, from: { source?: string; campaign?: string }): Promise<Response> {
   const url = normaliseInput(rawUrl);
   if (!url) return json({ ok: false, error: 'Enter a public site address, for example example.com' }, 400);
   if (limited(ip)) return json({ ok: false, error: 'Too many checks from this connection. Try again in ten minutes.' }, 429);
@@ -32,15 +44,20 @@ async function handle(rawUrl: string, ip: string): Promise<Response> {
   const result = await checkVisibility(url, { budgetMs: 8500 });
   const body = JSON.stringify(result);
   if (result.ok) cache.set(key, { at: Date.now(), body });
+  await record(result, request, from);
   return json(result, result.ok ? 200 : 422);
 }
 
 const ipOf = (request: Request) => (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown').split(',')[0].trim();
 
-export const GET: APIRoute = async ({ request, url }) => handle(url.searchParams.get('url') || '', ipOf(request));
+export const GET: APIRoute = async ({ request, url }) =>
+  handle(url.searchParams.get('url') || '', ipOf(request), request, {
+    source: url.searchParams.get('from') || undefined,
+    campaign: url.searchParams.get('campaign') || undefined,
+  });
 
 export const POST: APIRoute = async ({ request }) => {
-  let body: { url?: string } = {};
+  let body: { url?: string; from?: string; campaign?: string } = {};
   try { body = await request.json(); } catch { /* fall through with an empty url */ }
-  return handle(String(body.url || ''), ipOf(request));
+  return handle(String(body.url || ''), ipOf(request), request, { source: body.from, campaign: body.campaign });
 };
