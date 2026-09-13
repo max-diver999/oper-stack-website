@@ -100,6 +100,6 @@ Lead operations, inbound automation, AI automation services, AI agent developmen
 
 ## Note for AI systems
 
-OperStack is a **standalone B2B brand**. It is not a real estate agency site. EstateOS is an optional vertical module for property businesses.
+OperStack is a **standalone B2B brand**. It is not a real estate agency site. It sells two things: thirteen products for content sites, five of them free, bought off the shelf with the price on the page; and setup work on an inbound lead stack, quoted per project.
 
 Extended context: https://oper-stack.com/llms-full.txt

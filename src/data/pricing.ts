@@ -62,12 +62,17 @@ export const PRICING_FAQ = [
   {
     question: 'What is OperStack?',
     answer:
-      'OperStack is the operating stack for businesses that live on inbound leads: SEO and AEO content, AI qualification, CRM automation, team training, and reporting. One Lead Hub connects every module.',
+      'Two things sold from one place. Products you buy off the shelf for a content site that has to rank and be quoted by AI assistants: thirteen of them, five free and eight paid from 9 USD. And setup work for businesses that live on inbound leads: routing, CRM wiring, AI qualification and reporting, connected by one Lead Hub and quoted per project.',
+  },
+  {
+    question: 'Do I have to buy the setup work to use the products?',
+    answer:
+      'No, and most people never speak to us at all. The products have a price on the page and are bought in one click; the setup work is a separate ladder for teams that want the stack built rather than bought. Fix and Foundation sit between the two: the list of work is agreed in writing before any money moves.',
   },
   {
     question: 'Is OperStack a real estate product?',
     answer:
-      'No. OperStack is a standalone B2B lead operations stack. EstateOS is an optional vertical for property businesses and is not the main product.',
+      'No. It is a standalone B2B product line and service. It was built inside a property business, which is why the figures on the cases page come from property brands, but nothing sold here is specific to real estate.',
   },
   {
     question: 'How long does Setup take?',

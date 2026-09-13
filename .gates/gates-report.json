@@ -1,6 +1,6 @@
 {
   "meta": {
-    "generatedAt": "2026-09-12T23:49:14.838Z",
+    "generatedAt": "2026-09-13T00:10:18.426Z",
     "siteUrl": "",
     "files": 44
   },
@@ -923,16 +923,11 @@
     {
       "id": 12,
       "name": "images",
-      "status": "fail",
-      "summary": "1 of 3 image(s) unreachable",
-      "findings": [
-        {
-          "file": "src/pages/prospects/index.astro",
-          "message": "HTTP 404 https://your-site.com/logo.svg"
-        }
-      ],
+      "status": "pass",
+      "summary": "2 image URL(s) return 200",
+      "findings": [],
       "stats": {
-        "checked": 3,
+        "checked": 2,
         "ok": 2
       }
     },
