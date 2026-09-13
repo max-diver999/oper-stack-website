@@ -67,6 +67,13 @@ const JS_STRINGS = ru
       moveUp: 'выросла на ', moveDown: 'упала на ', moveSame: 'не изменилась',
       sinceDay: ' с ',
       areasH: 'Из чего складывается оценка',
+      areaNames: {
+        'Can AI crawlers read it': 'Пускает ли сайт читателей ИИ',
+        'Is there a map for agents (llms.txt)': 'Есть ли карта для агентов (llms.txt)',
+        'Is the entity clear (schema)': 'Понятно ли из разметки, чей это сайт',
+        'Is there something to quote': 'Есть ли что цитировать',
+        'Can it be dated and trusted': 'Можно ли датировать и доверять',
+      },
       whyBoth: 'Счётчик говорит, сколько людей пришло. Оценка говорит, могут ли вас вообще процитировать. Сайт, который нельзя процитировать, визитов и не получит, а визиты без понимания причины нельзя повторить.',
       fixLink: 'Что чинить первым',
       visitsOne: 'визит', visitsFew: 'визита', visitsMany: 'визитов',
@@ -98,6 +105,7 @@ const JS_STRINGS = ru
       moveUp: 'up ', moveDown: 'down ', moveSame: 'unchanged',
       sinceDay: ' since ',
       areasH: 'What the score is made of',
+      areaNames: {},
       whyBoth: 'The counter says how many people arrived. The score says whether anybody can quote you at all. A site nobody can quote will never have visits to count, and visits with no idea why cannot be repeated.',
       fixLink: 'What to fix first',
       visitsOne: 'visit', visitsFew: 'visits', visitsMany: 'visits',
@@ -200,7 +208,8 @@ const JS_STRINGS = ru
         ? '<div class="areas"><p class="areas-h">' + S.areasH + '</p><ul>' +
           sc.areas.map(function (a) {
             var pct = Math.round((a.score / a.max) * 100);
-            return '<li><span class="a-name">' + esc(a.label) + '</span>' +
+            var name = (S.areaNames && S.areaNames[a.label]) || a.label;
+            return '<li><span class="a-name">' + esc(name) + '</span>' +
               '<span class="a-bar"><i style="width:' + pct + '%"></i></span>' +
               '<span class="a-num">' + a.score + '/' + a.max + '</span></li>';
           }).join('') + '</ul></div>'
