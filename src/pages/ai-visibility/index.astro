@@ -228,7 +228,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       const head = document.getElementById('capture-head') as HTMLElement;
       const sub = document.getElementById('capture-sub') as HTMLElement;
       if (hidden) {
-        head.textContent = `See the other ${hidden} problem${hidden === 1 ? '' : 's'}, free`;
+        head.textContent = hidden === 1 ? 'See the last problem, free' : `See the other ${hidden} problems, free`;
         sub.textContent = `Every problem this check found on ${r.host}, and the one fix that moves your score most, written out in full: what your site does now, what to change, and how to check it worked.`;
       }
       pdfSource.value = `ai-visibility:${r.host}:${r.score}`;
