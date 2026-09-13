@@ -152,3 +152,48 @@ export async function logLead(r: CheckRow & { email: string; name: string; sent:
     // То же самое: письмо человеку уже ушло, и это важнее строки в таблице.
   }
 }
+
+/**
+ * Отметить, что человек отписался.
+ *
+ * Ищем его строки в листе «С почтой» и ставим «да» в колонку N. Строк может быть несколько:
+ * один и тот же человек мог проверить пять сайтов. Отписка касается всех.
+ *
+ * Возвращаем true, только если отметка действительно проставлена. Иначе страница отписки
+ * честно скажет человеку написать нам письмом, а не соврёт, что всё готово.
+ */
+export async function markUnsubscribed(email: string): Promise<boolean> {
+  if (!sheetsConfigured()) return false;
+  const wanted = email.trim().toLowerCase();
+  try {
+    const token = await accessToken();
+    if (!token) return false;
+    const id = env('FREE_CHECKS_SHEET_ID');
+    const head = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+    const range = encodeURIComponent(`${SHEET_LEADS}!A2:N`);
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${range}`, {
+      headers: head,
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) return false;
+    const rows = ((await res.json()) as { values?: string[][] }).values ?? [];
+    // Колонка F это почта, шестая по счёту. Первая строка данных это вторая строка листа.
+    const hits = rows
+      .map((row, i) => ({ row: i + 2, email: String(row[5] ?? '').trim().toLowerCase() }))
+      .filter((r) => r.email === wanted);
+    if (!hits.length) return false;
+    const body = {
+      valueInputOption: 'RAW',
+      data: hits.map((h) => ({ range: `${SHEET_LEADS}!N${h.row}`, values: [['да']] })),
+    };
+    const put = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values:batchUpdate`, {
+      method: 'POST',
+      headers: head,
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    return put.ok;
+  } catch {
+    return false;
+  }
+}
