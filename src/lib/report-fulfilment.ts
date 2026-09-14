@@ -13,6 +13,7 @@
  * секретом, что и ссылка на скачивание кита (KIT_DOWNLOAD_SECRET), и живёт тридцать дней.
  */
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { button, emailShell, note, p as par } from './email-shell';
 
 /**
  * Ступени отчёта. 'free' не продаётся и не имеет товара на Whop: это то, что человек получает
@@ -168,14 +169,18 @@ const COPY = {
 export function buildReportWelcomeEmail(opts: { tier: ReportTier; lang: 'ru' | 'en'; link: string }): { subject: string; text: string; html: string } {
   const t = COPY[opts.lang];
   const text = [t.hello, '', t.action, opts.link, '', t.what(opts.tier), '', t.validity, '', t.sign].join('\n');
-  const html = [
-    `<p>${t.hello}</p>`,
-    `<p>${t.action}</p>`,
-    `<p><a href="${opts.link}" style="display:inline-block;padding:12px 20px;background:#1A8A7D;color:#fff;border-radius:6px;text-decoration:none">${opts.lang === 'ru' ? 'Ввести адрес сайта' : 'Enter your site address'}</a></p>`,
-    `<p>${t.what(opts.tier)}</p>`,
-    `<p style="color:#666;font-size:14px">${t.validity}</p>`,
-    `<p style="color:#666;font-size:14px">${t.sign}</p>`,
-  ].join('\n');
+  const ru = opts.lang === 'ru';
+  const html = emailShell({
+    preheader: ru ? 'Остался один шаг: скажите, какой сайт читать' : 'One step left: tell us which site to read',
+    heading: ru ? 'Отчёт: остался один шаг' : 'Your report: one step left',
+    blocks: [
+      par(t.hello),
+      par(t.action),
+      button(opts.link, ru ? 'Ввести адрес сайта →' : 'Tell us your site address →'),
+      par(t.what(opts.tier)),
+      note(t.validity),
+    ],
+  });
   return { subject: t.subject(opts.tier), text, html };
 }
 
