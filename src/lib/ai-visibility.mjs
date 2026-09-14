@@ -200,13 +200,28 @@ export function agentVerdict(robots, agent) {
 }
 
 /*
- * Source phrases and figure units in English and Russian. A Russian page that writes «по данным
- * Росстата, 12 500 ₽» names a source and states a figure just as an English one does, and the
- * check must see both, or every Russian site loses the same five points for no reason. \b is
- * ASCII-only in JavaScript, so the Cyrillic words are fenced with letter lookarounds instead.
+ * Что считается утверждением, требующим источника, и что считается названным источником.
+ *
+ * Здесь дважды ошибались, и оба раза в сторону несправедливого штрафа. Сначала регулярки знали
+ * только английский, и русская страница теряла пять баллов за то, что написана по-русски.
+ * Потом выяснилось хуже: собственная цена («от 800 ₽»), длительность своей же встречи
+ * («30 до 45 минут») и подписанный словом «иллюстративный» пример весов считались утверждениями
+ * о мире, а настоящая ссылка на исследование Harvard Business Review источником не считалась,
+ * потому что рядом не стояло оборота «по данным». Стоматолог, который пишет «приём 45 минут,
+ * от 3 000 ₽», получал ровно тот же штраф.
+ *
+ * Поэтому теперь: цена и длительность это факты о себе, они источника не требуют; источником
+ * считается не только оборот, но и внешняя ссылка рядом с цифрой; а число, честно подписанное
+ * как пример, утверждением не является. \b в JavaScript работает только по латинице, поэтому
+ * кириллица огорожена просмотрами вперёд и назад.
  */
 const SOURCE_RE = /(?<!\p{L})(according to|source:|sources:|data from|reported by|published by|registry|statistics office|central bank|по данным|источник:|источники:|согласно|по информации|по сведениям|росстат|центробанк|банк россии|росреестр|минфин|минэкономразвития)(?!\p{L})/giu;
-const FIGURE_RE = /\d[\d,.]*\s*(%|percent|процент\w*|[A-Z]{3}\b|km|км|m²|м²|sqm|кв\.?\s?м|min|мин|тыс|млн|млрд|₽|руб)/gu;
+/** Число, которое что-то утверждает о мире: доля, объём, расстояние, площадь. */
+const CLAIM_FIGURE_RE = /\d[\d,.\s]*\s*(%|percent|процент\w*|km\b|км(?!\p{L})|m²|м²|sqm|кв\.?\s?м|тыс(?!\p{L})|млн(?!\p{L})|млрд(?!\p{L})|thousand|million|billion)/giu;
+/** Число, честно подписанное как пример, не является утверждением. */
+const ILLUSTRATIVE_RE = /(иллюстратив\w*|для примера|условн\w+|примерн\w+|illustrative|for example|hypothetical)/giu;
+/** Ссылка наружу рядом с цифрой это и есть названный источник. */
+const OUTBOUND_LINK_RE = /<a[^>]+href=["']https?:\/\//i;
 
 function analysePage(html, url) {
   const head = html.slice(0, 200_000);
@@ -237,9 +252,25 @@ function analysePage(html, url) {
   const firstPara = strip((afterH1.match(/<p[^>]*>([\s\S]*?)<\/p>/i) || ['', ''])[1]);
   const firstParaWords = (firstPara.match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || []).length;
   const answerFirst = firstParaWords >= 20 && firstParaWords <= 90 && /\d/.test(firstPara);
-  const sourcePhrases = (text.match(SOURCE_RE) || []).length;
-  const numbers = (text.match(FIGURE_RE) || []).length;
-  return { url, title, description, robotsMeta, canonical, ogTitle, schemaTypes: [...types], datePublished, dateModified, words, h1, h2Count, tables, firstPara: firstPara.slice(0, 220), answerFirst, sourcePhrases, numbers, noai: /noai|noimageai/.test(robotsMeta) };
+  /*
+   * Цифру и её источник ищем в одном блоке, а не по всей странице: иначе одно «по данным» внизу
+   * прикрывает десять неподписанных чисел сверху. Таблица берётся целиком, потому что подпись
+   * («Иллюстративный вес») стоит в шапке, а число в ячейке.
+   */
+  const tableBlocks = [...bodyHtml.matchAll(/<table[\s\S]*?<\/table>/gi)].map((m) => m[0]);
+  const outsideTables = bodyHtml.replace(/<table[\s\S]*?<\/table>/gi, ' ');
+  const textBlocks = [...outsideTables.matchAll(/<(p|li|h2|h3|figcaption|blockquote)[^>]*>([\s\S]*?)<\/\1>/gi)].map((m) => m[0]);
+  let claimFigures = 0;
+  let unsourcedFigures = 0;
+  for (const block of [...tableBlocks, ...textBlocks]) {
+    const blockText = strip(block);
+    const found = (blockText.match(CLAIM_FIGURE_RE) || []).length;
+    if (!found) continue;
+    claimFigures += found;
+    const named = Boolean(blockText.match(SOURCE_RE)) || Boolean(blockText.match(ILLUSTRATIVE_RE)) || OUTBOUND_LINK_RE.test(block);
+    if (!named) unsourcedFigures += found;
+  }
+  return { url, title, description, robotsMeta, canonical, ogTitle, schemaTypes: [...types], datePublished, dateModified, words, h1, h2Count, tables, firstPara: firstPara.slice(0, 220), answerFirst, claimFigures, unsourcedFigures, noai: /noai|noimageai/.test(robotsMeta) };
 }
 
 async function readSitemap(origin, robotsText, timeoutFn = () => 3000) {
@@ -384,10 +415,11 @@ export async function checkVisibility(input, { budgetMs = 8500, lang = 'en', sam
   /*
    * Only a page that states figures can fail to attribute them. Docking a page for naming no
    * source for numbers it does not contain is not a measurement, it is a complaint, and the
-   * finding said something untrue about the page.
+   * finding said something untrue about the page. A price and the length of your own meeting
+   * are facts about you, not claims about the world, and they never counted here.
    */
-  const withFigures = contentPages.filter((p) => p.numbers > 0);
-  const sourced = withFigures.filter((p) => p.sourcePhrases > 0).length;
+  const withFigures = contentPages.filter((p) => p.claimFigures > 0);
+  const sourced = withFigures.filter((p) => p.unsourcedFigures === 0).length;
   let trust = 0; const trustFindings = [];
   trust += Math.round(7 * (dated / contentPages.length));
   if (dated < contentPages.length) trustFindings.push({ id: 'dates-missing', level: dated ? 'warn' : 'fail', text: T.datesMissing(contentPages.length - dated, contentPages.length) }); else trustFindings.push({ level: 'pass', text: T.datesOk });

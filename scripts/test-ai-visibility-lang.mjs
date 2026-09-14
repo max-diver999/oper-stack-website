@@ -77,7 +77,7 @@ const описанные = ru.crawlers.filter((c) => /search|browsing|training|g
 ok(описанные.length === 0, `у роботов не осталось английских пояснений${описанные.length ? `: ${описанные.map((c) => c.label).join(' | ')}` : ''}`);
 ok(ru.crawlers.some((c) => /Поиск ChatGPT/.test(c.label)) && en.crawlers.some((c) => /ChatGPT search/.test(c.label)), 'пояснения к роботам переведены');
 const trust = ru.areas.find((a) => a.id === 'trust');
-ok(trust.findings.some((f) => f.level === 'pass' && /называет/.test(f.text)), 'русские источники («по данным») засчитаны');
+ok(trust.findings.some((f) => f.level === 'pass'), 'область дат и источников не штрафует богатый сайт');
 ok(ru.areas.find((a) => a.id === 'content').score === 25, 'русская страница с ответом, H2 и таблицей берёт все 25 баллов за контент');
 ok(ru.areas.every((a) => a.findings.every((f) => !/undefined|NaN|\[object/.test(f.text))), 'ни одной незаполненной подстановки в тексте');
 
@@ -91,6 +91,34 @@ const pustoTexts = [...pusto.areas.map((a) => a.label), ...pusto.areas.flatMap((
 ok(pustoTexts.every((t) => CYR.test(t)), 'все находки пустого сайта по-русски');
 ok(pustoTexts.some((t) => /Единственная проверенная страница короче 300 слов/.test(t)), 'одна страница названа единственной, а не «1 из 1 проверенных страница»');
 ok(pusto.areas.find((a) => a.id === 'access').findings.some((f) => /Закрыты поисковые роботы/.test(f.text)), 'закрытые роботы названы по-русски');
+
+console.log('\n── цифры и источники');
+/*
+ * Ровно те случаи, на которых инструмент штрафовал несправедливо (найдено 14.09.2026 на своих же
+ * страницах): цена и длительность встречи это факты о себе; пример, подписанный словом
+ * «иллюстративный», не утверждение; ссылка на исследование это названный источник, даже если
+ * рядом нет оборота «по данным». И наоборот: голый процент без ссылки и без оборота штрафуется.
+ */
+const figurePage = (inner) => ({ type: 'text/html; charset=utf-8', body: `<!doctype html><html><head><title>Цифры</title><link rel="canonical" href="https://cifry.ru/"><meta property="og:title" content="Цифры"><script type="application/ld+json">{"@context":"https://schema.org","@type":"Organization","datePublished":"2026-09-01"}</script></head><body><main><h1>Цифры</h1><p>${'Вступление на двадцать слов, чтобы страница не считалась пустой и абзац-ответ находился там, где нужно, вместе с числом 7 внутри. '.repeat(1)}</p>${inner}<h2>Раз</h2><h2>Два</h2><h2>Три</h2><p>${'Текст для объёма. '.repeat(120)}</p></main></body></html>` });
+
+const cases2 = [
+  ['цена и длительность источника не требуют', '<p>Разбор бесплатный, занимает 45 минут. Внедрение от 3 000 ₽ в месяц.</p>', true],
+  ['процент без источника штрафуется', '<p>Конверсия выросла на 40% за квартал.</p>', false],
+  ['процент с оборотом «по данным» засчитан', '<p>По данным Росстата, спрос вырос на 40% за год.</p>', true],
+  ['процент со ссылкой наружу засчитан', '<p>Аудит Harvard Business Review 2011 года показал падение на 40% (<a href="https://hbr.org/2011/03/x">исследование HBR</a>).</p>', true],
+  ['подписанный пример не считается утверждением', '<table><tr><th>Пункт</th><th>Иллюстративный вес</th></tr><tr><td>Квалификация</td><td>25%</td></tr></table>', true],
+];
+for (const [name, inner, expectOk] of cases2) {
+  serve({
+    'https://cifry.ru': figurePage(inner),
+    'https://cifry.ru/robots.txt': { type: 'text/plain', body: 'User-agent: *\nAllow: /\n' },
+  });
+  const r = await checkVisibility('cifry.ru', { lang: 'ru', budgetMs: 6000 });
+  const t = r.areas.find((a) => a.id === 'trust');
+  // При одной странице текст находки другой («не называет»), при нескольких «не называя».
+  const наказан = t.findings.some((f) => /не называ(ет|я)/.test(f.text));
+  ok(наказан !== expectOk, `${name}${наказан === expectOk ? ` (получено: ${наказан ? 'штраф' : 'без штрафа'})` : ''}`);
+}
 
 console.log('\n── сайт за проверкой браузера');
 serveWall();
