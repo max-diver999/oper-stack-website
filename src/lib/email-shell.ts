@@ -70,9 +70,9 @@ export const scoreBlock = (host: string, score: number | string) =>
  * превращается в обычный синий текст.
  */
 export const button = (href: string, label: string, kind: 'main' | 'quiet' = 'main') =>
-  `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 20px">
+  `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 20px;max-width:100%">
     <tr><td align="center" bgcolor="${kind === 'main' ? C.teal : C.paper}" style="border-radius:8px${kind === 'quiet' ? `;border:2px solid ${C.teal}` : ''}">
-      <a href="${href}" style="display:inline-block;padding:15px 30px;font-family:${FONT};font-size:16px;line-height:1;font-weight:700;color:${kind === 'main' ? '#FFFFFF' : C.teal};text-decoration:none;border-radius:8px">${esc(label)}</a>
+      <a href="${href}" style="display:block;padding:15px 24px;font-family:${FONT};font-size:16px;line-height:1.3;font-weight:700;color:${kind === 'main' ? '#FFFFFF' : C.teal};text-decoration:none;border-radius:8px">${esc(label)}</a>
     </td></tr>
   </table>`;
 
@@ -101,7 +101,8 @@ export const taskBlock = (task: { now?: string; task?: string; verify?: string; 
 export type Shell = {
   /** Серая строка рядом с темой в списке писем. Без неё почта покажет первое предложение. */
   preheader: string;
-  heading: string;
+  /** Строкой или несколькими строками. Несколько нужны, чтобы домен не рвался посередине. */
+  heading: string | string[];
   blocks: string[];
   unsubUrl?: string;
 };
@@ -117,23 +118,50 @@ export function emailShell({ preheader, heading, blocks, unsubUrl }: Shell): str
 <body style="margin:0;padding:0;background:${C.outer};-webkit-font-smoothing:antialiased">
 <div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:${C.outer}">${esc(preheader)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.outer}" style="background:${C.outer}">
-  <tr><td align="center" style="padding:28px 12px 40px">
-    <table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:600px;max-width:100%">
-      <tr><td style="padding:0 0 18px">
-        <img src="${LOGO}" width="220" height="45" alt="OperStack" style="display:block;border:0;width:220px;height:auto">
+  <tr><td align="center" style="padding:24px 12px 36px">
+    <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="max-width:600px;margin:0 auto">
+      <tr><td style="padding:0 0 16px">
+        <img src="${LOGO}" width="200" alt="OperStack" style="display:block;border:0;width:200px;max-width:60%;height:auto">
       </td></tr>
-      <tr><td bgcolor="${C.paper}" style="padding:34px 34px 26px;border-radius:14px">
-        <h1 style="margin:0 0 20px;font-family:${FONT};font-size:26px;line-height:1.2;font-weight:700;color:${C.text}">${esc(heading)}</h1>
+      <tr><td bgcolor="${C.paper}" style="padding:26px 22px 20px;border-radius:14px">
+        <h1 style="margin:0 0 18px;font-family:${FONT};font-size:24px;line-height:1.25;font-weight:700;color:${C.text}">${(Array.isArray(heading) ? heading : [heading]).map(esc).join('<br>')}</h1>
         ${blocks.join('\n        ')}
       </td></tr>
-      <tr><td style="padding:20px 6px 0;font-family:${FONT};font-size:13px;line-height:1.6;color:${C.dim}">
+      <tr><td style="padding:18px 4px 0;font-family:${FONT};font-size:13px;line-height:1.6;color:${C.dim}">
         <a href="${SITE}" style="color:${C.dim};text-decoration:none">oper-stack.com</a>
         &nbsp;·&nbsp;
         <a href="mailto:info@oper-stack.com" style="color:${C.dim};text-decoration:none">info@oper-stack.com</a>
         ${unsubUrl ? `<br><a href="${unsubUrl}" style="color:${C.dim};text-decoration:underline">Not interested? One click and we stop.</a>` : ''}
       </td></tr>
     </table>
+    <!--[if mso]></td></tr></table><![endif]-->
   </td></tr>
 </table>
 </body></html>`;
 }
+
+/**
+ * Баллы по областям таблицей, с цветом. Человек видит результат, не открывая вложение.
+ * Зелёное это хорошо, жёлтое средне, красное плохо: цвет считается, а не проставляется руками.
+ */
+export const scoreTable = (rows: [string, number | null][]) =>
+  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px">
+    ${rows.map(([label, v]) => {
+      const colour = v === null ? C.dim : v >= 9 ? C.teal : v >= 7 ? C.amber : '#B4462F';
+      const shown = v === null ? 'not measured' : `${v} / 10`;
+      return `<tr>
+        <td style="padding:9px 10px;border-bottom:1px solid ${C.line};font-family:${FONT};font-size:15px;line-height:1.35;color:${C.text}">${esc(label)}</td>
+        <td align="right" style="padding:9px 10px;border-bottom:1px solid ${C.line};font-family:${FONT};font-size:15px;font-weight:700;white-space:nowrap;color:${colour}">${shown}</td>
+      </tr>`;
+    }).join('')}
+  </table>`;
+
+/** Ключ лицензии в рамке: крупно и моноширинно, чтобы выделялся одним касанием на телефоне. */
+export const keyBlock = (title: string, value: string) =>
+  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px">
+    <tr><td align="center" bgcolor="${C.tint}" style="padding:20px 16px;border-radius:10px">
+      <div style="font-family:${FONT};font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:${C.dim}">${esc(title)}</div>
+      <div style="font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:18px;line-height:1.5;color:${C.text};word-break:break-all;padding-top:6px">${esc(value)}</div>
+    </td></tr>
+  </table>`;

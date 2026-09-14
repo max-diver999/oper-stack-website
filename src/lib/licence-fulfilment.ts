@@ -6,6 +6,7 @@
  * Key format (must match site-kit/scripts/activate.mjs and site-kit-tools/make-license.mjs):
  *   OSK1.<base64url JSON {email, plan, issued, expires}>.<base64url Ed25519 signature of that JSON>
  */
+import { button, emailShell, keyBlock, note, p as par } from './email-shell';
 import { createHmac, createPrivateKey, sign, timingSafeEqual } from 'node:crypto';
 
 export type Plan = 'owner' | 'agency';
@@ -181,14 +182,27 @@ export function buildLicenceEmail(input: {
     t.terms,
   ].join('\n');
 
-  const html = `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.55;color:#111">
-<p>${t.thanks}</p>
-<p><strong>${t.keyLabel}</strong> (${esc(t.keyMeta)}):<br><code style="font-size:13px;word-break:break-all">${esc(input.key)}</code></p>
-<p><strong>${t.dlLabel}</strong> (${esc(t.dlMeta)}):<br><a href="${esc(input.downloadUrl)}">${esc(input.downloadUrl)}</a></p>
-<p><strong>${t.startLabel}</strong></p>
-<ol>${t.steps.map((s) => `<li>${esc(s)}</li>`).join('')}</ol>
-<p>${esc(t.tail)}<br>${esc(t.terms)}</p>
-</div>`;
+  const html = emailShell({
+    preheader: `${t.keyLabel}: ${input.key}`,
+    heading: t.subject,
+    blocks: [
+      par(esc(t.thanks)),
+      keyBlock(t.keyLabel, input.key),
+      par(esc(t.keyMeta)),
+      button(input.downloadUrl, `${t.dlLabel} →`),
+      note(esc(t.dlMeta)),
+      // Шаги запуска: команды моноширинно, иначе их не отличить от обычного текста
+      // и человек копирует вместе с точкой в конце предложения.
+      `<p style="margin:22px 0 10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;color:#14181C">${esc(t.startLabel)}</p>`,
+      `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px">${t.steps.map((step, i) => `
+        <tr>
+          <td valign="top" style="padding:0 10px 10px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;line-height:1.6;color:#1A8A7D">${i + 1}</td>
+          <td valign="top" style="padding:0 0 10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:1.5;color:#14181C;word-break:break-word">${esc(step)}</td>
+        </tr>`).join('')}
+      </table>`,
+      note(`${esc(t.tail)}<br>${esc(t.terms)}`),
+    ],
+  });
 
   return { subject: t.subject, text, html };
 }
@@ -372,6 +386,25 @@ export function buildAgencyEmail(input: {
   return {
     subject: 'Your OperStack agency licence key',
     text,
-    html: `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.6;color:#111">${esc(text).replace(/\n/g, '<br>')}</div>`,
+    html: emailShell({
+      preheader: `Licence key: ${input.key}`,
+      heading: 'Your agency plan is active',
+      blocks: [
+        par('Here is your key for this month.'),
+        keyBlock('Licence key', input.key),
+        note(`Valid until ${esc(input.expires)}. A new key arrives with every renewal.`),
+        `<p style="margin:22px 0 10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;font-weight:700;color:#14181C">Three commands to your first branded report</p>`,
+        `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px">${steps.map((step, i) => `
+          <tr>
+            <td valign="top" style="padding:0 10px 10px 0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;line-height:1.6;color:#1A8A7D">${i + 1}</td>
+            <td valign="top" style="padding:0 0 10px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13.5px;line-height:1.55;color:#14181C;word-break:break-all">${esc(step)}</td>
+          </tr>`).join('')}
+        </table>`,
+        par('<strong>clients.txt</strong> holds one site per line, either <em>example.com</em> or <em>example.com, Client Name</em>.'),
+        par('Reports land in <strong>reports/</strong> as HTML and PDF, carrying your logo, your colour and your name.'),
+        button(`${input.siteUrl}/products/agency/`, 'Docs and examples →', 'quiet'),
+        note(`Questions: ${esc(input.supportEmail)}`),
+      ],
+    }),
   };
 }
