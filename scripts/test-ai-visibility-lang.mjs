@@ -92,6 +92,26 @@ ok(pustoTexts.every((t) => CYR.test(t)), 'все находки пустого �
 ok(pustoTexts.some((t) => /Единственная проверенная страница короче 300 слов/.test(t)), 'одна страница названа единственной, а не «1 из 1 проверенных страница»');
 ok(pusto.areas.find((a) => a.id === 'access').findings.some((f) => /Закрыты поисковые роботы/.test(f.text)), 'закрытые роботы названы по-русски');
 
+console.log('\n── число в первом абзаце: цифрой или словом');
+/*
+ * Дом стиля многих сайтов требует писать числа словами, и «шестнадцать гейтов» это такая же
+ * цифра, как «16». 13 из 16 наших витрин продуктов теряли балл ровно на этом. «Один» и «one»
+ * не считаются: слишком часто это оборот речи, а не число.
+ */
+const leadPage = (lead) => ({ type: 'text/html; charset=utf-8', body: `<!doctype html><html><head><title>Лид</title></head><body><main><h1>Заголовок</h1><p>${lead}</p><h2>Раз</h2><h2>Два</h2><h2>Три</h2><p>${'Текст для объёма. '.repeat(120)}</p></main></body></html>` });
+const leadCases = [
+  ['цифра засчитана', 'Инструмент читает сайт и ставит балл из 100 по пяти областям, а потом называет три правки, которые двигают его сильнее всего, простыми словами.', true],
+  ['число словом по-русски засчитано', 'Инструмент читает сайт и ставит балл по пяти областям, а потом называет шестнадцать проверок, которые двигают его сильнее всего, простыми словами и без регистрации.', true],
+  ['число словом по-английски засчитано', 'The package ships sixteen gates and one config file, runs in your terminal, prints a table, and returns an exit code your build can act on without any account.', true],
+  ['абзац без числа не засчитан', 'Инструмент читает сайт целиком и рассказывает простыми словами, что мешает ответным системам его цитировать, а потом предлагает исправления в понятном порядке.', false],
+  ['«один» числом не считается', 'One of the better ways to keep a content site honest is to run the checks before publishing rather than after, which is what this package exists to make easy.', false],
+];
+for (const [name, lead, expect] of leadCases) {
+  serve({ 'https://lid.ru': leadPage(lead), 'https://lid.ru/robots.txt': { type: 'text/plain', body: 'User-agent: *\nAllow: /\n' } });
+  const r = await checkVisibility('lid.ru', { lang: 'ru', budgetMs: 6000 });
+  ok(r.sample[0].answerFirst === expect, `${name}${r.sample[0].answerFirst === expect ? '' : ` (получено: ${r.sample[0].answerFirst})`}`);
+}
+
 console.log('\n── цифры и источники');
 /*
  * Ровно те случаи, на которых инструмент штрафовал несправедливо (найдено 14.09.2026 на своих же

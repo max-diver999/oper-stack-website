@@ -218,6 +218,23 @@ export function agentVerdict(robots, agent) {
 const SOURCE_RE = /(?<!\p{L})(according to|source:|sources:|data from|reported by|published by|registry|statistics office|central bank|по данным|источник:|источники:|согласно|по информации|по сведениям|росстат|центробанк|банк россии|росреестр|минфин|минэкономразвития)(?!\p{L})/giu;
 /** Число, которое что-то утверждает о мире: доля, объём, расстояние, площадь. */
 const CLAIM_FIGURE_RE = /\d[\d,.\s]*\s*(%|percent|процент\w*|km\b|км(?!\p{L})|m²|м²|sqm|кв\.?\s?м|тыс(?!\p{L})|млн(?!\p{L})|млрд(?!\p{L})|thousand|million|billion)/giu;
+/*
+ * Число в первом абзаце. «Шестнадцать гейтов» это такая же цифра, как «16»: дом стиля многих
+ * сайтов (и нашего) требует писать числа словами, и проверка, которая видит только 16, штрафует
+ * за грамотность. 13 из 16 наших витрин продуктов попались ровно на этом.
+ * «Один» и «one» не в счёт: в обоих языках это слишком часто не число, а оборот речи.
+ */
+const SPELLED_NUMBER_RE = new RegExp(
+  '(?<![A-Za-z])(two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|thousand|million|billion)(?![A-Za-z])'
+  + '|(?<!\\p{L})(два|две|двух|двум|двумя|три|трёх|трех|трём|трем|тремя|четыре|четырёх|четырех|пять|пяти|шесть|шести|семь|семи|восемь|восьми|девять|девяти|десять|десяти'
+  + '|одиннадцат\\p{L}*|двенадцат\\p{L}*|тринадцат\\p{L}*|четырнадцат\\p{L}*|пятнадцат\\p{L}*|шестнадцат\\p{L}*|семнадцат\\p{L}*|восемнадцат\\p{L}*|девятнадцат\\p{L}*'
+  + '|двадцат\\p{L}*|тридцат\\p{L}*|сорок|сорока|пятьдесят|пятидесяти|шестьдесят|шестидесяти|семьдесят|восемьдесят|девяносто|сто|ста|двест\\p{L}*|трист\\p{L}*|четырест\\p{L}*|пятьсот'
+  + '|тысяч\\p{L}*|миллион\\p{L}*|миллиард\\p{L}*)(?!\\p{L})',
+  'iu',
+);
+/** Абзац-ответ несёт число: цифрой или словом. */
+const hasFigure = (text) => /\d/.test(text) || SPELLED_NUMBER_RE.test(text);
+
 /** Число, честно подписанное как пример, не является утверждением. */
 const ILLUSTRATIVE_RE = /(иллюстратив\w*|для примера|условн\w+|примерн\w+|illustrative|for example|hypothetical)/giu;
 /** Ссылка наружу рядом с цифрой это и есть названный источник. */
@@ -251,7 +268,7 @@ function analysePage(html, url) {
   const afterH1 = bodyHtml.split(/<\/h1>/i)[1] || '';
   const firstPara = strip((afterH1.match(/<p[^>]*>([\s\S]*?)<\/p>/i) || ['', ''])[1]);
   const firstParaWords = (firstPara.match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || []).length;
-  const answerFirst = firstParaWords >= 20 && firstParaWords <= 90 && /\d/.test(firstPara);
+  const answerFirst = firstParaWords >= 20 && firstParaWords <= 90 && hasFigure(firstPara);
   /*
    * Цифру и её источник ищем в одном блоке, а не по всей странице: иначе одно «по данным» внизу
    * прикрывает десять неподписанных чисел сверху. Таблица берётся целиком, потому что подпись

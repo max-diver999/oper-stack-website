@@ -1,0 +1,1045 @@
+---
+export const prerender = true;
+
+const reportDate = '14 September 2026';
+const reportVersion = 'v1.2';
+const launchDate = '21 August 2026';
+const dataThrough = '11 September 2026';
+
+const gsc28d = { clicks: 0, impressions: 10, ctr: 0, position: 3.5 };
+const sitemapUrls = 76;
+
+const monthlyGsc = [
+  {
+    "month": "Aug 2026",
+    "label": "Aug",
+    "clicks": 0,
+    "impressions": 0,
+    "position": 0,
+    "note": "21 Aug pilot launch · GSC sc-domain · no rows until Sep"
+  },
+  {
+    "month": "Sep 2026",
+    "label": "Sep",
+    "clicks": 0,
+    "impressions": 10,
+    "position": 3.5,
+    "note": "Through 11 Sep · first 10 impressions · avg pos 3.5 · MCP 14 Sep"
+  }
+];
+
+const monthlyGa4 = [
+  {
+    "month": "Aug",
+    "sessions": 0
+  },
+  {
+    "month": "Sep",
+    "sessions": 43
+  }
+];
+
+const contentBreakdown = [
+  {
+    "type": "Guides",
+    "count": 22,
+    "words": 96298,
+    "color": "#1A8A7D"
+  },
+  {
+    "type": "Services",
+    "count": 22,
+    "words": 7215,
+    "color": "#3DB8A9"
+  },
+  {
+    "type": "Core pages",
+    "count": 6,
+    "words": 8400,
+    "color": "#C9922A"
+  }
+];
+
+const dailyRaw = [
+  {
+    "d": "08-21",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-22",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-23",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-24",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-25",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-26",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-27",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-28",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-29",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-30",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "08-31",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "09-01",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "09-02",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "09-03",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "09-04",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "09-05",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "09-06",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "09-07",
+    "c": 0,
+    "i": 4
+  },
+  {
+    "d": "09-08",
+    "c": 0,
+    "i": 2
+  },
+  {
+    "d": "09-09",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "09-10",
+    "c": 0,
+    "i": 1
+  },
+  {
+    "d": "09-11",
+    "c": 0,
+    "i": 3
+  },
+  {
+    "d": "09-12",
+    "c": 0,
+    "i": 0
+  },
+  {
+    "d": "09-13",
+    "c": 0,
+    "i": 0
+  }
+];
+
+const maxMonthlyImp = Math.max(1, ...monthlyGsc.map((m) => m.impressions));
+function momPill(i) {
+  if (i === 0) return { cls: 'pill-blue', text: 'Launch' };
+  const curr = monthlyGsc[i].clicks;
+  const prev = monthlyGsc[i - 1].clicks;
+  if (prev === 0 && curr === 0) return { cls: 'pill-gray', text: '—' };
+  if (prev === 0) return { cls: 'pill-blue', text: 'new' };
+  const pct = Math.round(((curr - prev) / prev) * 100);
+  if (pct > 0) return { cls: 'pill-green', text: `+${pct}%` };
+  if (pct < 0) return { cls: 'pill-amber', text: `${pct}%` };
+  return { cls: 'pill-gray', text: '0%' };
+}
+function barPx(impressions) {
+  return Math.max(20, Math.round((impressions / maxMonthlyImp) * 120));
+}
+const totalGa4 = monthlyGa4.reduce((s, m) => s + m.sessions, 0);
+const clicksDelta = 0;
+const maxImp = maxMonthlyImp;
+
+const chartPayload = JSON.stringify({"monthlyGsc":[{"label":"Aug","clicks":0,"impressions":0},{"label":"Sep","clicks":0,"impressions":10}],"monthlyGa4":[{"month":"Aug","sessions":0},{"month":"Sep","sessions":43}],"contentBreakdown":[{"type":"Guides","count":22,"color":"#1A8A7D"},{"type":"Services","count":22,"color":"#3DB8A9"},{"type":"Core pages","count":6,"color":"#C9922A"}],"dailyRaw":[{"d":"08-21","c":0,"i":0},{"d":"08-22","c":0,"i":0},{"d":"08-23","c":0,"i":0},{"d":"08-24","c":0,"i":0},{"d":"08-25","c":0,"i":0},{"d":"08-26","c":0,"i":0},{"d":"08-27","c":0,"i":0},{"d":"08-28","c":0,"i":0},{"d":"08-29","c":0,"i":0},{"d":"08-30","c":0,"i":0},{"d":"08-31","c":0,"i":0},{"d":"09-01","c":0,"i":0},{"d":"09-02","c":0,"i":0},{"d":"09-03","c":0,"i":0},{"d":"09-04","c":0,"i":0},{"d":"09-05","c":0,"i":0},{"d":"09-06","c":0,"i":0},{"d":"09-07","c":0,"i":4},{"d":"09-08","c":0,"i":2},{"d":"09-09","c":0,"i":0},{"d":"09-10","c":0,"i":1},{"d":"09-11","c":0,"i":3},{"d":"09-12","c":0,"i":0},{"d":"09-13","c":0,"i":0}]});
+
+const totalClicks = monthlyGsc.reduce((s, m) => s + m.clicks, 0);
+const totalImp = monthlyGsc.reduce((s, m) => s + m.impressions, 0);
+const totalWords = contentBreakdown.reduce((s, c) => s + c.words, 0);
+const totalFiles = contentBreakdown.reduce((s, c) => s + c.count, 0);
+---
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>oper-stack.com — Site Report</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f5f3ef; color: #2c2c2c; min-height: 100vh; }
+
+    .header { background: #1c1917; color: white; padding: 32px 40px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    .header-brand { display: flex; align-items: center; gap: 12px; }
+    .header-logo { width: 36px; height: 36px; background: #3DB8A9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; color: white; }
+    .header h1 { font-size: 22px; font-weight: 700; }
+    .header-sub { font-size: 13px; color: #a8a29e; margin-top: 2px; }
+    .header-meta { text-align: right; }
+    .header-meta .label { font-size: 12px; color: #a8a29e; }
+    .header-meta .value { font-size: 14px; font-weight: 600; margin-top: 2px; }
+    .live-badge { display: inline-flex; align-items: center; gap: 6px; background: #292524; border-radius: 20px; padding: 4px 12px; font-size: 12px; margin-top: 8px; }
+    .live-dot { width: 6px; height: 6px; background: #4ade80; border-radius: 50%; animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+    .container { max-width: 1280px; margin: 0 auto; padding: 32px 24px; }
+
+    .section-title { font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #78716c; margin-bottom: 16px; margin-top: 40px; }
+    .section-title:first-child { margin-top: 0; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px; }
+    .stat-card { background: white; border-radius: 10px; padding: 14px 10px; border: 1px solid #e7e5e4; min-width: 0; }
+    .stat-card .num { font-size: 26px; font-weight: 800; color: #1c1917; line-height: 1.05; letter-spacing: -0.02em; }
+    .stat-card .num.teal { color: #1A8A7D; }
+    .stat-card .num.amber { color: #1A8A7D; }
+    .stat-card .label { font-size: 11px; color: #78716c; margin-top: 5px; line-height: 1.25; }
+    .stat-card .sublabel { font-size: 9px; color: #aaa; margin-top: 3px; line-height: 1.35; }
+    @media (max-width: 1100px) { .stats-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+
+    .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-card { background: white; border-radius: 12px; padding: 20px; border: 1px solid #e7e5e4; }
+    .info-card h3 { font-size: 14px; font-weight: 700; color: #1c1917; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 1px solid #f0ece4; }
+    .info-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 6px 0; border-bottom: 1px solid #f7f4ef; gap: 16px; }
+    .info-row:last-child { border-bottom: none; }
+    .info-row .key { font-size: 13px; color: #78716c; flex-shrink: 0; }
+    .info-row .val { font-size: 13px; font-weight: 600; color: #2c2c2c; text-align: right; }
+    .info-row .val a { color: #1A8A7D; text-decoration: none; }
+    .info-row .val a:hover { text-decoration: underline; }
+
+    .content-card { background: white; border-radius: 12px; border: 1px solid #e7e5e4; overflow: hidden; }
+    .table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .content-table { width: 100%; border-collapse: collapse; }
+    .content-table th { font-size: 11px; text-transform: uppercase; letter-spacing: 0.06em; color: #78716c; font-weight: 700; padding: 12px 20px; text-align: left; background: #faf8f4; border-bottom: 1px solid #e7e5e4; }
+    .content-table td { padding: 12px 20px; font-size: 13px; border-bottom: 1px solid #f5f3ef; vertical-align: top; }
+    .content-table tr:last-child td { border-bottom: none; }
+    .content-table tr:hover td { background: #faf8f4; }
+    .content-table .count { font-weight: 800; color: #1A8A7D; font-size: 18px; }
+    .content-table .words { color: #78716c; font-size: 12px; }
+    .tag { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+    .tag.green { background: #dcfce7; color: #166534; }
+    .tag.blue { background: #dbeafe; color: #1e40af; }
+    .tag.amber { background: #fef3c7; color: #92400e; }
+    .tag.gray { background: #f3f4f6; color: #374151; }
+
+    .changelog { display: flex; flex-direction: column; gap: 0; }
+    .changelog-item { background: white; border-radius: 0; border: 1px solid #e7e5e4; border-bottom: none; padding: 16px 20px; display: flex; gap: 16px; align-items: flex-start; }
+    .changelog-item:first-child { border-radius: 12px 12px 0 0; }
+    .changelog-item:last-child { border-radius: 0 0 12px 12px; border-bottom: 1px solid #e7e5e4; }
+    .changelog-date { font-size: 11px; color: #9ca3af; min-width: 80px; padding-top: 2px; }
+    .changelog-content { flex: 1; }
+    .changelog-title { font-size: 13px; font-weight: 600; color: #1c1917; }
+    .changelog-desc { font-size: 12px; color: #78716c; margin-top: 3px; }
+    .changelog-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+
+    .next-steps { display: flex; flex-direction: column; gap: 10px; }
+    .next-item { background: white; border-radius: 10px; border: 1px solid #e7e5e4; padding: 14px 18px; display: flex; align-items: flex-start; gap: 12px; }
+    .next-item .priority { font-size: 11px; font-weight: 700; min-width: 50px; padding-top: 1px; }
+    .priority.high { color: #dc2626; }
+    .priority.medium { color: #d97706; }
+    .priority.low { color: #025069; }
+    .next-item .text { font-size: 13px; color: #2c2c2c; }
+    .next-item .subtext { font-size: 12px; color: #9ca3af; margin-top: 2px; }
+
+    .links-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+    .link-card { background: white; border-radius: 10px; border: 1px solid #e7e5e4; padding: 16px; text-decoration: none; color: #2c2c2c; transition: border-color 0.2s; display: block; }
+    .link-card:hover { border-color: #1A8A7D; }
+    .link-card .link-label { font-size: 11px; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.06em; }
+    .link-card .link-url { font-size: 13px; font-weight: 600; color: #1A8A7D; margin-top: 4px; word-break: break-all; }
+
+    .footer { text-align: center; padding: 32px 24px; color: #9ca3af; font-size: 12px; }
+    .footer strong { color: #78716c; }
+
+    /* ── SEO PULSE DASHBOARD ── */
+    .pulse-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 20px; }
+    .pulse-header h2 { font-size: 16px; font-weight: 800; color: #1c1917; }
+    .pulse-updated { font-size: 11px; color: #9ca3af; background: #f5f3ef; border-radius: 20px; padding: 4px 12px; display: flex; align-items: center; gap: 6px; }
+    .pulse-updated-dot { width: 6px; height: 6px; border-radius: 50%; background: #4ade80; animation: pulse 2s infinite; }
+
+    .pulse-kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 20px; }
+    @media (max-width: 700px) { .pulse-kpi-row { grid-template-columns: repeat(2, 1fr); } }
+    .pulse-kpi { background: white; border-radius: 12px; border: 1px solid #e7e5e4; padding: 18px 20px; position: relative; overflow: hidden; }
+    .pulse-kpi::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px; }
+    .pulse-kpi.kpi-green::before { background: linear-gradient(90deg, #4ade80, #1A8A7D); }
+    .pulse-kpi.kpi-blue::before { background: linear-gradient(90deg, #60a5fa, #2563eb); }
+    .pulse-kpi.kpi-amber::before { background: linear-gradient(90deg, #fbbf24, #d97706); }
+    .pulse-kpi.kpi-orange::before { background: linear-gradient(90deg, #fb923c, #c2410c); }
+    .pulse-kpi .kpi-val { font-size: 36px; font-weight: 900; color: #1c1917; line-height: 1; margin-top: 4px; }
+    .pulse-kpi .kpi-label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #78716c; }
+    .pulse-kpi .kpi-sub { font-size: 11px; color: #aaa; margin-top: 4px; }
+    .pulse-kpi .kpi-trend { position: absolute; top: 18px; right: 18px; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 20px; }
+    .trend-up { background: #dcfce7; color: #166534; }
+    .trend-new { background: #dbeafe; color: #1e40af; }
+
+    .pulse-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    @media (max-width: 700px) { .pulse-grid { grid-template-columns: 1fr; } }
+
+    .pulse-card { background: white; border-radius: 12px; border: 1px solid #e7e5e4; padding: 18px 20px; }
+    .pulse-card-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.07em; color: #78716c; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
+    .pulse-card-title span { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+    .span-green { background: #4ade80; }
+    .span-blue { background: #60a5fa; }
+
+    .pulse-query-row { display: flex; align-items: center; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f5f3ef; }
+    .pulse-query-row:last-child { border-bottom: none; }
+    .pulse-query-rank { font-size: 11px; font-weight: 700; color: #aaa; min-width: 20px; }
+    .pulse-query-text { flex: 1; min-width: 0; font-size: 12px; color: #2c2c2c; white-space: normal; overflow-wrap: anywhere; word-break: break-word; }
+    .pulse-query-pos { font-size: 11px; font-weight: 700; color: #1A8A7D; background: #fffbeb; border-radius: 6px; padding: 2px 7px; }
+    .pulse-query-imp { font-size: 11px; color: #aaa; min-width: 50px; text-align: right; }
+
+    .pulse-page-row { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid #f5f3ef; }
+    .pulse-page-row:last-child { border-bottom: none; }
+    .pulse-page-url { flex: 1; min-width: 0; font-size: 11px; color: #1A8A7D; overflow-wrap: anywhere; word-break: break-word; }
+    .pulse-page-meta { display: flex; gap: 6px; flex-shrink: 0; }
+    .pulse-badge { font-size: 10px; font-weight: 700; padding: 2px 7px; border-radius: 20px; }
+    .badge-clicks { background: #dcfce7; color: #166534; }
+    .badge-impr { background: #dbeafe; color: #1e40af; }
+    .badge-pos { background: #fef3c7; color: #92400e; }
+
+    .pulse-chart { margin-top: 4px; }
+    .chart-bars { display: flex; align-items: flex-end; gap: 4px; height: 60px; }
+    .chart-bar-wrap { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .chart-bar { width: 100%; border-radius: 3px 3px 0 0; min-height: 2px; transition: height 0.3s; }
+    .chart-bar.bar-impr { background: #bfdbfe; }
+    .chart-bar.bar-click { background: #4ade80; }
+    .chart-label { font-size: 9px; color: #aaa; }
+
+    .pulse-insight { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px 16px; margin-top: 16px; display: flex; gap: 12px; align-items: flex-start; }
+    .pulse-insight-icon { font-size: 18px; flex-shrink: 0; }
+    .pulse-insight-text { font-size: 12px; color: #78350f; line-height: 1.5; }
+    .pulse-insight-text strong { font-weight: 700; }
+
+    .pulse-footer-note { font-size: 11px; color: #aaa; margin-top: 16px; text-align: center; }
+    .pulse-footer-note a { color: #1A8A7D; text-decoration: none; }
+    .pulse-table-scroll { width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .pulse-table-scroll table { min-width: 720px; }
+
+    @media (max-width: 640px) {
+      body { overflow-x: hidden; }
+      .header { padding: 22px 16px; display: block; }
+      .header-brand { align-items: flex-start; }
+      .header h1 { font-size: 19px; line-height: 1.2; word-break: break-word; }
+      .header-meta { text-align: left; margin-top: 18px; }
+      .live-badge { display: flex; align-items: flex-start; width: 100%; border-radius: 14px; padding: 8px 10px; line-height: 1.45; white-space: normal; }
+      .container { width: 100%; padding: 20px 12px; overflow: hidden; }
+      .section-title { margin-top: 30px !important; font-size: 12px; line-height: 1.35; }
+      .stats-grid, .info-grid, .pulse-grid, .pulse-kpi-row, .links-grid { grid-template-columns: 1fr !important; gap: 10px; }
+      .pulse-card > div[style*="grid-template-columns:repeat(4,1fr)"],
+      .pulse-card > div[style*="grid-template-columns:1fr 1fr"],
+      div[style*="grid-template-columns:1fr 1fr"] { grid-template-columns: 1fr !important; }
+      .stat-card, .info-card, .pulse-card, .pulse-kpi, .link-card { padding: 14px; border-radius: 12px; max-width: 100%; }
+      .stat-card .num, .pulse-kpi .kpi-val { font-size: 30px; }
+      .pulse-kpi .kpi-trend { position: static; display: inline-block; margin-bottom: 8px; }
+      .info-row { display: block; }
+      .info-row .key, .info-row .val { display: block; text-align: left; }
+      .info-row .val { margin-top: 4px; word-break: break-word; }
+      .pulse-query-row, .pulse-page-row { align-items: flex-start; flex-wrap: wrap; gap: 6px; }
+      .pulse-query-text, .pulse-page-url { min-width: 0; white-space: normal; overflow: visible; text-overflow: clip; word-break: break-word; }
+      .pulse-page-meta { flex-wrap: wrap; width: 100%; }
+      .pulse-query-imp { min-width: auto; text-align: left; }
+      .pulse-insight { padding: 12px; gap: 10px; }
+      .pulse-insight-text { font-size: 12px; word-break: break-word; }
+      .pulse-table-scroll { margin: 0 -2px; }
+      .content-card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+      .content-table { min-width: 720px; }
+      .changelog-item { display: block; padding: 14px; }
+      .changelog-date { min-width: 0; margin-bottom: 6px; }
+      .footer { padding: 24px 14px; line-height: 1.5; }
+    }
+
+    /* ── GROWTH DASHBOARD v19 ── */
+    :root {
+      --ink: #1c1917;
+      --ink-soft: #2c4a44;
+      --accent: #3DB8A9;
+      --accent-dark: #1A8A7D;
+      --paper-2: #faf8f4;
+      --card: #ffffff;
+      --border: #e7e5e4;
+      --muted: #78716c;
+      --up: #15803d;
+      --down: #dc2626;
+      --shadow: 0 4px 24px rgba(26, 46, 42, 0.06);
+      --radius: 14px;
+    }
+
+    .kpi-strip {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 8px;
+      margin-bottom: 32px;
+    }
+    @media (max-width: 1100px) { .kpi-strip { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 560px) { .kpi-strip { grid-template-columns: 1fr; } }
+    .kpi-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 18px 16px;
+      box-shadow: var(--shadow);
+    }
+    .kpi-label {
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+    }
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1c1917;
+      margin: 6px 0 4px;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+    .kpi-delta {
+      font-size: 11px;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+    .kpi-delta.up { background: #dcfce7; color: var(--up); }
+    .kpi-delta.down { background: #fee2e2; color: var(--down); }
+    .kpi-delta.neutral { background: #f3f4f6; color: var(--muted); }
+    .kpi-sub { font-size: 10px; color: #aaa; margin-top: 6px; line-height: 1.35; }
+
+    /* ── Sections ── */
+    .section { margin-bottom: 48px; }
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .section-head h2 {
+      font-family: Georgia, 'Times New Roman', serif;
+      font-size: 24px;
+      font-weight: 700;
+      color: #1c1917;
+    }
+    .section-head p { font-size: 13px; color: var(--muted); max-width: 480px; }
+    .badge-src {
+      font-size: 11px;
+      font-weight: 600;
+      color: #1A8A7D;
+      background: #fffbeb;
+      border: 1px solid #fde68a;
+      border-radius: 999px;
+      padding: 4px 12px;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+    .card-title {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--muted);
+      margin-bottom: 16px;
+    }
+    .chart-wrap { position: relative; height: 280px; }
+    .chart-wrap-sm { height: 220px; }
+
+    /* ── Monthly table ── */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    .data-table th {
+      text-align: left;
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      color: var(--muted);
+      padding: 10px 14px;
+      border-bottom: 2px solid var(--border);
+      font-weight: 700;
+    }
+    .data-table td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f5f3ef;
+      vertical-align: middle;
+    }
+    .data-table tr:last-child td { border-bottom: none; }
+    .data-table tr:hover td { background: var(--paper-2); }
+    .data-table .num { font-weight: 800; font-size: 15px; color: #1A8A7D; }
+    .bar-cell { display: flex; align-items: center; gap: 10px; }
+    .mini-bar {
+      height: 6px;
+      border-radius: 3px;
+      background: linear-gradient(90deg, #3DB8A9, #1A8A7D);
+      min-width: 4px;
+    }
+
+    /* ── Query / page rows ── */
+    .rank-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 9px 0;
+      border-bottom: 1px solid #f5f3ef;
+      font-size: 12px;
+    }
+    .rank-row:last-child { border-bottom: none; }
+    .rank-num { font-weight: 800; color: #ccc; min-width: 22px; font-size: 11px; }
+    .rank-text { flex: 1; min-width: 0; word-break: break-word; color: #1c1917; }
+    .rank-url { flex: 1; min-width: 0; word-break: break-all; color: #1A8A7D; font-size: 11px; }
+    .pill {
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      white-space: nowrap;
+    }
+    .pill-green { background: #dcfce7; color: #166534; }
+    .pill-blue { background: #dbeafe; color: #1e40af; }
+    .pill-amber { background: #fef3c7; color: #92400e; }
+
+    /* ── Insight ── */
+    .insight {
+      background: linear-gradient(135deg, #fffbeb, #ecfdf5);
+      border: 1px solid #fde68a;
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-size: 13px;
+      color: #44403c;
+      line-height: 1.55;
+      margin-top: 20px;
+    }
+    .insight strong { color: #1c1917; }
+
+    /* ── Timeline ── */
+    .timeline { position: relative; padding-left: 28px; }
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 7px;
+      top: 8px;
+      bottom: 8px;
+      width: 2px;
+      background: linear-gradient(180deg, #3DB8A9, var(--border));
+    }
+    .tl-item { position: relative; padding-bottom: 24px; }
+    .tl-item:last-child { padding-bottom: 0; }
+    .tl-dot {
+      position: absolute;
+      left: -28px;
+      top: 4px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      background: #3DB8A9;
+      border: 3px solid var(--paper);
+      box-shadow: 0 0 0 2px #3DB8A9;
+    }
+    .tl-date { font-size: 11px; color: var(--muted); font-weight: 600; }
+    .tl-title { font-size: 14px; font-weight: 700; color: #1c1917; margin: 2px 0 4px; }
+    .tl-desc { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .tl-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+      background: #fffbeb;
+      color: #1A8A7D;
+      margin-top: 6px;
+    }
+
+
+  </style>
+  <script is:inline src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-brand">
+    <div class="header-logo">OS</div>
+    <div>
+      <div class="header-sub">Website Performance Report</div>
+      <h1>oper-stack.com</h1>
+    </div>
+  </div>
+  <div class="header-meta">
+    <div class="label">Last updated</div>
+    <div class="value">{reportDate} · {reportVersion} (live)</div>
+    <div class="label" style="margin-top:6px;font-size:11px;">Data: GSC through {dataThrough} · GA4 through 13 Sep 2026</div>
+    <div class="live-badge"><span class="live-dot"></span> Site is live</div>
+</div>
+</div>
+
+<div class="container">
+
+  <div class="section-title">At a glance</div>
+  <div class="stats-grid">
+    <div class="stat-card">
+      <div class="num teal">{sitemapUrls}</div>
+      <div class="label">URLs in sitemap</div>
+      <div class="sublabel">22 guides · 22 services · 6 core pages</div>
+    </div>
+    <div class="stat-card">
+      <div class="num amber">{monthlyGa4[1].sessions}</div>
+      <div class="label">GA4 sessions (Sep)</div>
+      <div class="sublabel">43 sessions Sep 7–13 · traffic ramp after analytics live</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">{Math.round(totalWords / 1000)}K</div>
+      <div class="label">SEO words</div>
+      <div class="sublabel">{totalFiles} pages · ~{Math.round(totalWords / totalFiles).toLocaleString('en-US')} avg · B2B corpus</div>
+    </div>
+    <div class="stat-card">
+      <div class="num teal">{gsc28d.impressions}</div>
+      <div class="label">GSC impressions (Sep)</div>
+      <div class="sublabel">10 imp through 11 Sep · 0 clicks · first query rows appearing</div>
+    </div>
+    <div class="stat-card">
+      <div class="num">3</div>
+      <div class="label">Content clusters</div>
+      <div class="sublabel">guides · services · audit / cases / pricing</div>
+    </div>
+    <div class="stat-card">
+      <div class="num amber">Success</div>
+      <div class="label">Bing sitemap</div>
+      <div class="sublabel">sitemap-index.xml · IndexNow key on site</div>
+    </div>
+    <div class="stat-card">
+      <div class="num teal">{totalGa4}</div>
+      <div class="label">GA4 sessions total</div>
+      <div class="sublabel">Aug 0 · Sep 43 · G-X4NJ5MB5BD · property 553035819</div>
+    </div>
+  </div>
+
+
+  <!-- ═══ GROWTH DASHBOARD v19 — charts + MoM (CTR hidden) ═══ -->
+  <div class="section-title" style="margin-top:32px;">Growth dashboard — since launch</div>
+
+  <div class="kpi-strip">
+    <div class="kpi-card">
+      <div class="kpi-label">GSC Clicks</div>
+      <div class="kpi-value">{totalClicks}</div>
+      <span class="kpi-delta neutral">baseline</span>
+      <div class="kpi-sub">Since 21 Aug launch · sc-domain oper-stack.com</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Impressions</div>
+      <div class="kpi-value">{gsc28d.impressions}</div>
+      <span class="kpi-delta neutral">+10 Sep</span>
+      <div class="kpi-sub">First impressions Sep 7–11 · clicks still 0</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">GA4 Sessions</div>
+      <div class="kpi-value">{totalGa4}</div>
+      <span class="kpi-delta neutral">new counter</span>
+      <div class="kpi-sub">GA4 live 8 Sep · G-X4NJ5MB5BD · property 553035819</div>
+    </div>
+    <div class="kpi-card">
+      <div class="kpi-label">Content corpus</div>
+      <div class="kpi-value">{Math.round(totalWords / 1000)}K</div>
+      <span class="kpi-delta neutral">{totalFiles} URLs</span>
+      <div class="kpi-sub">22 guides · 22 services · {sitemapUrls} sitemap URLs</div>
+    </div>
+  </div>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Monthly growth since launch</h2>
+        <p>Google Search Console web search · 21 August 2026 → 5 September 2026 · pilot launch month.</p>
+      </div>
+      <span class="badge-src">GSC API · Updated {reportDate}</span>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Clicks &amp; impressions by month</div>
+        <div class="chart-wrap"><canvas id="chartMonthly"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">GA4 sessions by month</div>
+        <div class="chart-wrap"><canvas id="chartGa4"></canvas></div>
+        <div class="insight" style="margin-top:16px;">
+          <strong>Traffic mix:</strong> {totalGa4} GA4 sessions in Sep · GSC {gsc28d.impressions} impressions / {gsc28d.clicks} clicks through 11 Sep. Peak day 10 Sep (14 sessions).
+        </div>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:20px;">
+      <div class="card-title">Month-over-month detail</div>
+      <div style="overflow-x:auto;">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Month</th>
+              <th>Clicks</th>
+              <th>Impressions</th>
+              <th>Avg position</th>
+              <th>MoM clicks</th>
+              <th>Notes</th>
+            </tr>
+          </thead>
+          <tbody>
+            {monthlyGsc.map((m, i) => {
+              const pill = momPill(i);
+              return (
+                <tr>
+                  <td><strong>{m.month}</strong></td>
+                  <td class="num">{m.clicks}</td>
+                  <td>
+                    <div class="bar-cell">
+                      <span>{m.impressions.toLocaleString('en-US')}</span>
+                      <div class="mini-bar" style={`width:${barPx(m.impressions)}px`}></div>
+                    </div>
+                  </td>
+                  <td>{m.position.toFixed(1)}</td>
+                  <td><span class={`pill ${pill.cls}`}>{pill.text}</span></td>
+                  <td style="color:#78716c;font-size:12px;">{m.note}</td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
+      <div class="insight">
+        <strong>Sep progress:</strong> {totalImp} GSC impressions and {totalClicks} clicks since launch. First impression rows Sep 7 · {sitemapUrls} URLs in sitemap · corpus ~{Math.round(totalWords/1000)}K words.
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>SEO momentum — daily trend</h2>
+        <p>Key days since launch · GSC impressions (area) vs clicks (line).</p>
+      </div>
+    </div>
+    <div class="card">
+      <div class="chart-wrap" style="height:320px;"><canvas id="chartDaily"></canvas></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-head">
+      <div>
+        <h2>Content engine</h2>
+        <p>{totalFiles.toLocaleString('en-US')} MDX pages · {(totalWords / 1_000_000).toFixed(2)} million words · programmatic + editorial SEO.</p>
+      </div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Corpus by collection</div>
+        <div class="chart-wrap-sm"><canvas id="chartContent"></canvas></div>
+      </div>
+      <div class="card">
+        <div class="card-title">Breakdown</div>
+        <table class="data-table">
+          <thead>
+            <tr><th>Collection</th><th>Pages</th><th>Words</th><th>Avg depth</th></tr>
+          </thead>
+          <tbody>
+            {contentBreakdown.map(c => (
+              <tr>
+                <td><strong>{c.type}</strong></td>
+                <td class="num">{c.count}</td>
+                <td>{c.words.toLocaleString('en-US')}</td>
+                <td>{Math.round(c.words / c.count).toLocaleString('en-US')}</td>
+              </tr>
+            ))}
+            <tr style="background:#fffbeb;">
+              <td><strong>TOTAL</strong></td>
+              <td class="num">{totalFiles}</td>
+              <td><strong>{totalWords.toLocaleString('en-US')}</strong></td>
+              <td>{Math.round(totalWords / totalFiles).toLocaleString('en-US')}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+
+    <!-- SEO PULSE — Google Search Console, GA4 -->
+  <div class="section-title" style="margin-top:40px;">SEO Pulse — Google Search Console</div>
+
+  <div style="background:white;border-radius:16px;border:1px solid #e7e5e4;padding:24px 28px;">
+    <div class="pulse-header">
+      <div>
+        <h2>Search Performance</h2>
+        <p style="font-size:12px;color:#9ca3af;margin-top:2px;">oper-stack.com · 21 Aug – 11 Sep 2026 · sc-domain · MCP 14 Sep</p>
+      </div>
+      <div class="pulse-updated"><span class="pulse-updated-dot"></span>Updated 14 September 2026</div>
+    </div>
+
+    <div class="pulse-kpi-row">
+      <div class="pulse-kpi kpi-green">
+        <div class="kpi-trend trend-new">baseline</div>
+        <div class="kpi-label">Total Clicks</div>
+        <div class="kpi-val">0</div>
+        <div class="kpi-sub">First clicks pending · 10 impressions logged Sep 7–11</div>
+      </div>
+      <div class="pulse-kpi kpi-blue">
+        <div class="kpi-trend trend-new">+10</div>
+        <div class="kpi-label">Impressions</div>
+        <div class="kpi-val">10</div>
+        <div class="kpi-sub">GSC daily rows live · avg position 3.5</div>
+      </div>
+      <div class="pulse-kpi kpi-amber">
+        <div class="kpi-trend" style="background:#f3f4f6;color:#374151;">—</div>
+        <div class="kpi-label">Avg. Position</div>
+        <div class="kpi-val">—</div>
+        <div class="kpi-sub">Awaiting first query rows in GSC</div>
+      </div>
+      <div class="pulse-kpi kpi-orange">
+        <div class="kpi-label">GA4 Sessions</div>
+        <div class="kpi-val">43</div>
+        <div class="kpi-sub">Sep 7–13 · peak 14 sessions (10 Sep) · G-X4NJ5MB5BD</div>
+      </div>
+    </div>
+
+    <div class="pulse-insight" style="margin-top:16px;">
+      <div class="pulse-insight-icon">📡</div>
+      <div class="pulse-insight-text">
+        <strong>Early traction:</strong> GSC 10 impressions (Sep 7–11), GA4 43 sessions in Sep. Analytics stack live since 8 Sep. Indexing + content growth to 76 sitemap URLs.
+      </div>
+    </div>
+
+    <div class="pulse-card" style="margin-top:16px;">
+      <div class="pulse-card-title"><span class="span-green"></span>Top queries — no data yet</div>
+      <p style="font-size:13px;color:#78716c;">GSC MCP <code>dimensions=query</code> returned 0 rows for 28d. Re-run report after first impressions appear.</p>
+    </div>
+  </div>
+
+  <div class="section-title" style="margin-top:32px;">Bing Pulse</div>
+  <div style="background:white;border-radius:16px;border:1px solid #e7e5e4;padding:24px 28px;">
+    <div class="pulse-header">
+      <div><h2>Bing Webmaster</h2><p style="font-size:12px;color:#9ca3af;margin-top:2px;">oper-stack.com · MCP refresh 8 Sep 2026</p></div>
+    </div>
+    <div class="pulse-kpi-row">
+      <div class="pulse-kpi kpi-green">
+        <div class="kpi-label">Sitemap status</div>
+        <div class="kpi-val" style="font-size:22px;">Success</div>
+        <div class="kpi-sub">sitemap-index.xml · verified site</div>
+      </div>
+      <div class="pulse-kpi kpi-blue">
+        <div class="kpi-label">Bing clicks (90d)</div>
+        <div class="kpi-val">0</div>
+        <div class="kpi-sub">Early crawl window</div>
+      </div>
+    </div>
+  </div>
+
+
+  <div class="section-title">Change history</div>
+  <div class="changelog">
+    <div class="changelog-item">
+      <div class="changelog-date">14 Sep 2026 (v1.2)</div>
+      <div class="changelog-content">
+        <div class="changelog-title">Report refresh — first GSC impressions + GA4 ramp</div>
+        <div class="changelog-desc">GSC 10 imp / 0 clk through 11 Sep · GA4 43 sessions Sep · 76 sitemap URLs · 44 MDX · ~112K words.</div>
+        <div class="changelog-tags"><span class="tag green">v1.2</span><span class="tag blue">MCP</span></div>
+      </div>
+    </div>
+    <div class="changelog-item">
+      <div class="changelog-date">8 Sep 2026 (v1.0)</div>
+      <div class="changelog-content">
+        <div class="changelog-title">Site report v1.0 — first OperStack EN dashboard</div>
+        <div class="changelog-desc">GSC sc-domain verified · GA4 G-X4NJ5MB5BD live · Bing sitemap Success · IndexNow · Singapore indexing bot 3/3 smoke. Corpus: 49 URLs, ~126K words. Sister site oper-stack.ru analytics parallel track.</div>
+        <div class="changelog-tags"><span class="tag green">Report v1.0</span><span class="tag blue">Analytics</span><span class="tag amber">MCP</span></div>
+      </div>
+    </div>
+    <div class="changelog-item">
+      <div class="changelog-date">8 Sep 2026</div>
+      <div class="changelog-content">
+        <div class="changelog-title">3 new guides + service cluster expansion</div>
+        <div class="changelog-desc">top-ai-consulting-companies, top-ai-automation-agencies, n8n-vs-zapier-vs-make published. 22 programmatic service pages in sitemap.</div>
+        <div class="changelog-tags"><span class="tag green">Content</span><span class="tag blue">SEO</span></div>
+      </div>
+    </div>
+    <div class="changelog-item">
+      <div class="changelog-date">21 Aug 2026</div>
+      <div class="changelog-content">
+        <div class="changelog-title">Pilot launch — 21 guides + lead-ops-stack pillar</div>
+        <div class="changelog-desc">oper-stack.com + oper-stack.ru sister sites. Content OS pilot: topic discovery, EN/RU slug sync. Vercel production on max-diver999 account.</div>
+        <div class="changelog-tags"><span class="tag green">Launch</span><span class="tag amber">Pilot</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Next steps — 8 September 2026 · Goal: qualified B2B inbound</div>
+  <div class="next-steps">
+    <div class="next-item" style="background:#fef2f2;border-color:#fecaca;">
+      <div class="priority high">P0</div>
+      <div>
+        <div class="text" style="font-weight:700;">Wait for first GSC rows + re-run report</div>
+        <div class="subtext">Baseline 0/0 is expected. Refresh v1.1 when impressions &gt; 100/week.</div>
+      </div>
+    </div>
+    <div class="next-item" style="background:#fff7ed;border-color:#fed7aa;">
+      <div class="priority medium">P1</div>
+      <div>
+        <div class="text" style="font-weight:700;">Index new guides via explicit Google API batch</div>
+        <div class="subtext">3 Sep-published URLs · indexing-bot-singapore · after Maxim «отправляй».</div>
+      </div>
+    </div>
+    <div class="next-item" style="background:#fff7ed;border-color:#fed7aa;">
+      <div class="priority medium">P1</div>
+      <div>
+        <div class="text" style="font-weight:700;">GA4 key event: lead_form_submit</div>
+        <div class="subtext">Mark in GA4 Admin once form traffic starts. lead_form_start is the funnel step above it; qualify_lead has no website trigger and would come from the CRM.</div>
+      </div>
+    </div>
+    <div class="next-item" style="background:#f0fdf4;border-color:#bbf7d0;">
+      <div class="priority low">DONE</div>
+      <div>
+        <div class="text" style="font-weight:700;">Analytics MCP trio + Bing + indexing bot</div>
+        <div class="subtext">search-console-oper-stack · ga4-analytics-oper-stack · bing-webmaster-oper-stack · 8 Sep.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">Quick links</div>
+  <div class="links-grid">
+    <a class="link-card" href="https://oper-stack.com" target="_blank">
+      <div class="link-label">Live site</div>
+      <div class="link-url">oper-stack.com</div>
+    </a>
+    <a class="link-card" href="https://oper-stack.ru" target="_blank">
+      <div class="link-label">Sister site (RU)</div>
+      <div class="link-url">oper-stack.ru</div>
+    </a>
+    <a class="link-card" href="https://github.com/max-diver999/oper-stack-website" target="_blank">
+      <div class="link-label">GitHub repository</div>
+      <div class="link-url">github.com/max-diver999/oper-stack-website</div>
+    </a>
+    <a class="link-card" href="https://search.google.com/search-console" target="_blank">
+      <div class="link-label">Google Search Console</div>
+      <div class="link-url">sc-domain:oper-stack.com</div>
+    </a>
+    <a class="link-card" href="https://analytics.google.com" target="_blank">
+      <div class="link-label">Google Analytics 4</div>
+      <div class="link-url">Property 553035819 · G-X4NJ5MB5BD</div>
+    </a>
+    <a class="link-card" href="https://www.bing.com/webmasters" target="_blank">
+      <div class="link-label">Bing Webmaster Tools</div>
+      <div class="link-url">bing.com/webmasters</div>
+    </a>
+    <a class="link-card" href="https://oper-stack.com/sitemap-index.xml" target="_blank">
+      <div class="link-label">Sitemap</div>
+      <div class="link-url">oper-stack.com/sitemap-index.xml</div>
+    </a>
+  </div>
+
+</div>
+
+  <div class="footer">
+  <strong>OperStack</strong> · oper-stack.com · Report updated {reportDate} {reportVersion} · {totalFiles} URLs · ~{Math.round(totalWords / 1000)}K words · GSC {totalClicks} clicks / {totalImp} imp · GA4 {totalGa4} sessions
+  <br>Internal dashboard · noindex · data via GSC + GA4 + Bing MCP · refresh: node scripts/build-site-report.mjs
+</div>
+
+<script is:inline id="chart-data" set:html={chartPayload}></script>
+<script is:inline>
+  const raw = document.getElementById('chart-data')?.textContent || '{}';
+  const data = JSON.parse(raw);
+  const grid = '#e7e5e4';
+  if (typeof Chart !== 'undefined') {
+    const m = data.monthlyGsc || [];
+    new Chart(document.getElementById('chartMonthly'), {
+      type: 'bar',
+      data: {
+        labels: m.map(x => x.label),
+        datasets: [
+          { label: 'Impressions', data: m.map(x => x.impressions), backgroundColor: '#93c5fd' },
+          { label: 'Clicks', data: m.map(x => x.clicks), backgroundColor: '#1A8A7D' },
+        ],
+      },
+      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, grid: { color: grid } } } },
+    });
+    new Chart(document.getElementById('chartGa4'), {
+      type: 'line',
+      data: { labels: (data.monthlyGa4 || []).map(x => x.month), datasets: [{ label: 'Sessions', data: (data.monthlyGa4 || []).map(x => x.sessions), borderColor: '#1A8A7D', tension: 0.3, fill: false }] },
+      options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } },
+    });
+    const d = data.dailyRaw || [];
+    new Chart(document.getElementById('chartDaily'), {
+      type: 'line',
+      data: {
+        labels: d.map(x => x.d),
+        datasets: [
+          { label: 'Impressions', data: d.map(x => x.i), borderColor: '#93c5fd', tension: 0.2 },
+          { label: 'Clicks', data: d.map(x => x.c), borderColor: '#1A8A7D', tension: 0.2 },
+        ],
+      },
+      options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false } },
+    });
+    const c = data.contentBreakdown || [];
+    new Chart(document.getElementById('chartContent'), {
+      type: 'doughnut',
+      data: { labels: c.map(x => x.type), datasets: [{ data: c.map(x => x.count), backgroundColor: c.map(x => x.color) }] },
+      options: { responsive: true, maintainAspectRatio: false },
+    });
+  }
+</script>
+</body>
+</html>

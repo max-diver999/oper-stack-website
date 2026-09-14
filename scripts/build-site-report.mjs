@@ -8,11 +8,11 @@ const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const OUT = join(ROOT, 'src/pages/site-report/index.astro');
 
 const dailyRaw = [];
-for (let d = 21; d <= 31; d++) {
-  dailyRaw.push({ d: `08-${String(d).padStart(2, '0')}`, c: 0, i: 0 });
-}
-for (let d = 1; d <= 7; d++) {
-  dailyRaw.push({ d: `09-${String(d).padStart(2, '0')}`, c: 0, i: 0 });
+for (let d = 21; d <= 31; d++) dailyRaw.push({ d: `08-${String(d).padStart(2, '0')}`, c: 0, i: 0 });
+const gscDaily = { '09-07': 4, '09-08': 2, '09-09': 0, '09-10': 1, '09-11': 3 };
+for (let d = 1; d <= 13; d++) {
+  const key = `09-${String(d).padStart(2, '0')}`;
+  dailyRaw.push({ d: key, c: 0, i: gscDaily[key] ?? 0 });
 }
 
 const monthlyGsc = [
@@ -22,26 +22,26 @@ const monthlyGsc = [
     clicks: 0,
     impressions: 0,
     position: 0,
-    note: '21 Aug pilot launch · GSC property live · no search rows yet (3-day lag)',
+    note: '21 Aug pilot launch · GSC sc-domain · no rows until Sep',
   },
   {
     month: 'Sep 2026',
     label: 'Sep',
     clicks: 0,
-    impressions: 0,
-    position: 0,
-    note: 'Through 5 Sep · indexing + analytics stack completed 8 Sep',
+    impressions: 10,
+    position: 3.5,
+    note: 'Through 11 Sep · first 10 impressions · avg pos 3.5 · MCP 14 Sep',
   },
 ];
 
 const monthlyGa4 = [
   { month: 'Aug', sessions: 0 },
-  { month: 'Sep', sessions: 1 },
+  { month: 'Sep', sessions: 43 },
 ];
 
 const contentBreakdown = [
-  { type: 'Guides', count: 21, words: 99212, color: '#1A8A7D' },
-  { type: 'Services', count: 22, words: 18270, color: '#3DB8A9' },
+  { type: 'Guides', count: 22, words: 96298, color: '#1A8A7D' },
+  { type: 'Services', count: 22, words: 7215, color: '#3DB8A9' },
   { type: 'Core pages', count: 6, words: 8400, color: '#C9922A' },
 ];
 
@@ -55,12 +55,13 @@ const chartData = {
 const frontmatter = `---
 export const prerender = true;
 
-const reportDate = '8 September 2026';
-const reportVersion = 'v1.0';
+const reportDate = '14 September 2026';
+const reportVersion = 'v1.2';
 const launchDate = '21 August 2026';
-const dataThrough = '5 September 2026';
+const dataThrough = '11 September 2026';
 
-const gsc28d = { clicks: 0, impressions: 0, ctr: 0, position: 0 };
+const gsc28d = { clicks: 0, impressions: 10, ctr: 0, position: 3.5 };
+const sitemapUrls = 76;
 
 const monthlyGsc = ${JSON.stringify(monthlyGsc, null, 2)};
 
@@ -132,14 +133,14 @@ html = html.replace(
   `<div class="section-title">At a glance</div>
   <div class="stats-grid">
     <div class="stat-card">
-      <div class="num teal">49</div>
+      <div class="num teal">{sitemapUrls}</div>
       <div class="label">URLs in sitemap</div>
-      <div class="sublabel">21 guides · 22 services · 6 core pages</div>
+      <div class="sublabel">22 guides · 22 services · 6 core pages</div>
     </div>
     <div class="stat-card">
-      <div class="num amber">1</div>
+      <div class="num amber">{monthlyGa4[1].sessions}</div>
       <div class="label">GA4 sessions (Sep)</div>
-      <div class="sublabel">Counter live 8 Sep · baseline week starting now</div>
+      <div class="sublabel">43 sessions Sep 7–13 · traffic ramp after analytics live</div>
     </div>
     <div class="stat-card">
       <div class="num">{Math.round(totalWords / 1000)}K</div>
@@ -147,9 +148,9 @@ html = html.replace(
       <div class="sublabel">{totalFiles} pages · ~{Math.round(totalWords / totalFiles).toLocaleString('en-US')} avg · B2B corpus</div>
     </div>
     <div class="stat-card">
-      <div class="num teal">0</div>
-      <div class="label">GSC clicks (28d)</div>
-      <div class="sublabel">Pre-indexation window · sc-domain verified · sitemap 0 errors</div>
+      <div class="num teal">{gsc28d.impressions}</div>
+      <div class="label">GSC impressions (Sep)</div>
+      <div class="sublabel">10 imp through 11 Sep · 0 clicks · first query rows appearing</div>
     </div>
     <div class="stat-card">
       <div class="num">3</div>
@@ -164,7 +165,7 @@ html = html.replace(
     <div class="stat-card">
       <div class="num teal">{totalGa4}</div>
       <div class="label">GA4 sessions total</div>
-      <div class="sublabel">Aug 0 · Sep 1 · G-X4NJ5MB5BD · property 553035819</div>
+      <div class="sublabel">Aug 0 · Sep 43 · G-X4NJ5MB5BD · property 553035819</div>
     </div>
   </div>
 
@@ -179,9 +180,9 @@ const seoPulse = `  <!-- SEO PULSE — Google Search Console, GA4 -->
     <div class="pulse-header">
       <div>
         <h2>Search Performance</h2>
-        <p style="font-size:12px;color:#9ca3af;margin-top:2px;">oper-stack.com · 21 Aug – 5 Sep 2026 · sc-domain · Updated 8 Sep via GSC MCP</p>
+        <p style="font-size:12px;color:#9ca3af;margin-top:2px;">oper-stack.com · 21 Aug – 11 Sep 2026 · sc-domain · MCP 14 Sep</p>
       </div>
-      <div class="pulse-updated"><span class="pulse-updated-dot"></span>Updated 8 September 2026</div>
+      <div class="pulse-updated"><span class="pulse-updated-dot"></span>Updated 14 September 2026</div>
     </div>
 
     <div class="pulse-kpi-row">
@@ -189,13 +190,13 @@ const seoPulse = `  <!-- SEO PULSE — Google Search Console, GA4 -->
         <div class="kpi-trend trend-new">baseline</div>
         <div class="kpi-label">Total Clicks</div>
         <div class="kpi-val">0</div>
-        <div class="kpi-sub">GSC API returns 0 rows — normal for new domain pre-ranking</div>
+        <div class="kpi-sub">First clicks pending · 10 impressions logged Sep 7–11</div>
       </div>
       <div class="pulse-kpi kpi-blue">
-        <div class="kpi-trend trend-new">baseline</div>
+        <div class="kpi-trend trend-new">+10</div>
         <div class="kpi-label">Impressions</div>
-        <div class="kpi-val">0</div>
-        <div class="kpi-sub">Sitemap submitted · Google Indexing bot smoke 3/3 OK</div>
+        <div class="kpi-val">10</div>
+        <div class="kpi-sub">GSC daily rows live · avg position 3.5</div>
       </div>
       <div class="pulse-kpi kpi-amber">
         <div class="kpi-trend" style="background:#f3f4f6;color:#374151;">—</div>
@@ -205,15 +206,15 @@ const seoPulse = `  <!-- SEO PULSE — Google Search Console, GA4 -->
       </div>
       <div class="pulse-kpi kpi-orange">
         <div class="kpi-label">GA4 Sessions</div>
-        <div class="kpi-val">1</div>
-        <div class="kpi-sub">Sep 7 · analytics deployed 8 Sep · key events pending traffic</div>
+        <div class="kpi-val">43</div>
+        <div class="kpi-sub">Sep 7–13 · peak 14 sessions (10 Sep) · G-X4NJ5MB5BD</div>
       </div>
     </div>
 
     <div class="pulse-insight" style="margin-top:16px;">
       <div class="pulse-insight-icon">📡</div>
       <div class="pulse-insight-text">
-        <strong>Launch phase:</strong> Analytics stack completed 8 Sep (GSC sc-domain, GA4 G-X4NJ5MB5BD, Bing Webmaster, IndexNow, Singapore indexing bot). Search rows will appear after crawl + ranking — expect 2–4 weeks for first GSC query data on competitive B2B terms.
+        <strong>Early traction:</strong> GSC 10 impressions (Sep 7–11), GA4 43 sessions in Sep. Analytics stack live since 8 Sep. Indexing + content growth to 76 sitemap URLs.
       </div>
     </div>
 
@@ -251,6 +252,14 @@ html = html.replace(
 );
 
 const changelog = `  <div class="changelog">
+    <div class="changelog-item">
+      <div class="changelog-date">14 Sep 2026 (v1.2)</div>
+      <div class="changelog-content">
+        <div class="changelog-title">Report refresh — first GSC impressions + GA4 ramp</div>
+        <div class="changelog-desc">GSC 10 imp / 0 clk through 11 Sep · GA4 43 sessions Sep · 76 sitemap URLs · 44 MDX · ~112K words.</div>
+        <div class="changelog-tags"><span class="tag green">v1.2</span><span class="tag blue">MCP</span></div>
+      </div>
+    </div>
     <div class="changelog-item">
       <div class="changelog-date">8 Sep 2026 (v1.0)</div>
       <div class="changelog-content">
@@ -355,7 +364,7 @@ html = html.replace(
 
 html = html.replace(
   /<div class="label" style="margin-top:6px;font-size:11px;">Data: GSC through[\s\S]*?<\/div>/,
-  `<div class="label" style="margin-top:6px;font-size:11px;">Data: GSC through {dataThrough} · GA4 from 8 Sep 2026</div>`,
+  `<div class="label" style="margin-top:6px;font-size:11px;">Data: GSC through {dataThrough} · GA4 through 13 Sep 2026</div>`,
 );
 
 html = html.replace(
@@ -369,9 +378,9 @@ html = html.replace(
     </div>
     <div class="kpi-card">
       <div class="kpi-label">Impressions</div>
-      <div class="kpi-value">0</div>
-      <span class="kpi-delta neutral">awaiting</span>
-      <div class="kpi-sub">First GSC rows expected within 2–4 weeks</div>
+      <div class="kpi-value">{gsc28d.impressions}</div>
+      <span class="kpi-delta neutral">+10 Sep</span>
+      <div class="kpi-sub">First impressions Sep 7–11 · clicks still 0</div>
     </div>
     <div class="kpi-card">
       <div class="kpi-label">GA4 Sessions</div>
@@ -383,7 +392,7 @@ html = html.replace(
       <div class="kpi-label">Content corpus</div>
       <div class="kpi-value">{Math.round(totalWords / 1000)}K</div>
       <span class="kpi-delta neutral">{totalFiles} URLs</span>
-      <div class="kpi-sub">21 guides · 22 services · B2B lead-ops cluster</div>
+      <div class="kpi-sub">22 guides · 22 services · {sitemapUrls} sitemap URLs</div>
     </div>
   </div>
 
@@ -402,13 +411,13 @@ html = html.replace(
 
 html = html.replace(
   /<strong>Traffic mix:<\/strong>[\s\S]*?(?=<\/div>\s*<\/div>\s*<\/div>\s*\n\s*<div class="card" style="margin-top:20px;">)/,
-  `<strong>Traffic mix:</strong> {totalGa4} GA4 session(s) since counter deployed 8 Sep. GSC baseline 0/0 — indexing stack live, rankings not yet visible.
+  `<strong>Traffic mix:</strong> {totalGa4} GA4 sessions in Sep · GSC {gsc28d.impressions} impressions / {gsc28d.clicks} clicks through 11 Sep. Peak day 10 Sep (14 sessions).
         `,
 );
 
 html = html.replace(
   /<strong>Impression ramp continues:<\/strong>[\s\S]*?(?=<\/div>\s*<\/div>\s*<\/section>)/,
-  `<strong>Launch baseline:</strong> {totalImp} GSC impressions and {totalClicks} clicks since 21 Aug pilot launch. Analytics completed 8 Sep — first search rows expected within 2–4 weeks after crawl.
+  `<strong>Sep progress:</strong> {totalImp} GSC impressions and {totalClicks} clicks since launch. First impression rows Sep 7 · {sitemapUrls} URLs in sitemap · corpus ~{Math.round(totalWords/1000)}K words.
       `,
 );
 
