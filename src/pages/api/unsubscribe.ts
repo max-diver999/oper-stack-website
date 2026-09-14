@@ -56,14 +56,14 @@ export const GET: APIRoute = async ({ url }) => {
   const secret = env('KIT_DOWNLOAD_SECRET');
   const email = secret ? readUnsubToken(url.searchParams.get('t') || '', secret) : null;
   if (!email) {
-    return page('Link not valid', '<h1>This link is not valid</h1><p>Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> from the address you want removed and we will do it by hand, same day.</p>', 400);
+    return page('Link not valid', '<h1>This link is not valid</h1><p>Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> from the address you want removed and we will do it by hand.</p>', 400);
   }
   const done = await markUnsubscribed(email);
   return page(
     done ? 'Unsubscribed' : 'Almost',
     done
       ? `<h1>Done. No more email.</h1><p>We will not write to <strong>${email.replace(/[<>&"]/g, '')}</strong> again.</p><p>The free check itself stays open, no account and no email needed: <a href="https://oper-stack.com/ai-visibility/">oper-stack.com/ai-visibility</a>.</p>`
-      : `<h1>We could not do it automatically</h1><p>Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> and we will remove <strong>${email.replace(/[<>&"]/g, '')}</strong> by hand, same day.</p>`,
+      : `<h1>We could not do it automatically</h1><p>Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> and we will remove <strong>${email.replace(/[<>&"]/g, '')}</strong> by hand.</p>`,
     done ? 200 : 502,
   );
 };
