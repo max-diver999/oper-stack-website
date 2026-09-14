@@ -11,7 +11,7 @@
  *      Russian site loses the same five points for writing Russian.
  * Plus the number agreement, which is what a person notices first.
  */
-import { checkVisibility, MESSAGES } from '../src/lib/ai-visibility.mjs';
+import { checkVisibility, MESSAGES } from '@operstack/audit';
 
 let failures = 0;
 const ok = (cond, what) => { if (!cond) { failures += 1; console.log(`  ✗ ${what}`); } else console.log(`  ✓ ${what}`); };

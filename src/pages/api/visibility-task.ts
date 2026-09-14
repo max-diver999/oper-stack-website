@@ -14,7 +14,7 @@
  * об этом сразу, а не ждать письма, которого не будет.
  */
 import type { APIRoute } from 'astro';
-import { checkVisibility, normaliseInput } from '../../lib/ai-visibility.mjs';
+import { VISIBILITY_DEFAULTS, checkVisibility, normaliseInput } from '@operstack/audit';
 import { buildRunBody, buildRunSubject } from '../../lib/report-fulfilment';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 import { logLead, originOf } from '../../lib/sheets-log';
@@ -49,12 +49,15 @@ const QUEUE_TO = 'info@oper-stack.com';
  * Не получилось поставить в очередь, значит человек всё равно уже получил список письмом:
  * ошибку глотаем и ответ не портим.
  */
-async function queueFreeReport(url: string, email: string, score: number): Promise<boolean> {
+async function queueFreeReport(url: string, email: string, visibility: unknown): Promise<boolean> {
   const secret = env('KIT_DOWNLOAD_SECRET');
   if (!secret) return false;
   // Балл едет вместе с заявкой: письмо должно назвать ту же цифру, которую человек
   // только что видел на странице, а не свою собственную из другой шкалы.
-  const job = { url, email, lang: 'en' as const, tier: 'free' as const, score };
+  // Вместе с заявкой едет весь результат проверки, а не одно число. Отчёт берёт его как есть
+  // и второй раз не мерит: два честных замера одного живого сайта расходятся на пару баллов,
+  // и покупатель увидел бы на странице одно, а в письме другое.
+  const job = { url, email, lang: 'en' as const, tier: 'free' as const, visibility };
   try {
     await sendTransactionalMail({ to: QUEUE_TO, subject: buildRunSubject(job), ...buildRunBody(job, secret) });
     return true;
@@ -121,13 +124,13 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   if (limited(clientAddress || 'unknown')) return json({ ok: false, error: 'Too many requests from this connection. Try again in ten minutes.' }, 429);
 
   let result: any;
-  try { result = await checkVisibility(url); } catch { return json({ ok: false, error: 'We could not read that site just now' }, 502); }
+  try { result = await checkVisibility(url, { ...VISIBILITY_DEFAULTS, lang: 'en' }); } catch { return json({ ok: false, error: 'We could not read that site just now' }, 502); }
   if (!result?.ok) return json({ ok: false, error: 'We could not read that site just now' }, 502);
 
   // Заявка в очередь. Письмо человеку собирает она: у неё есть браузер, чтобы напечатать
   // PDF, а здесь его нет. Если заявку поставить не удалось, человек не получит ничего, и
   // сказать об этом надо сразу, а не молча.
-  const queued = await queueFreeReport(result.url ?? url, email, Number(result.score));
+  const queued = await queueFreeReport(result.url ?? url, email, result);
   if (!queued) {
     return json({ ok: false, error: 'We could not start your report just now. Write to info@oper-stack.com and we will run it by hand.' }, 502);
   }

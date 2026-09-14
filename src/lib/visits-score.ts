@@ -8,7 +8,7 @@
  * So the score is recorded rather than recomputed and forgotten, and both numbers appear together
  * with how they moved.
  */
-import { checkVisibility } from './ai-visibility.mjs';
+import { checkVisibility } from '@operstack/audit';
 import { visitsDb } from './visits-db';
 
 export type ScorePoint = { day: string; score: number; areas: Array<{ label: string; score: number; max: number }> };
