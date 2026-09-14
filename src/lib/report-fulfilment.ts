@@ -114,7 +114,11 @@ export function normaliseSiteUrl(raw: string): { ok: true; url: string } | { ok:
   return { ok: true, url: `${u.origin}${u.pathname === '/' ? '/' : u.pathname}` };
 }
 
-export type ReportJob = { url: string; email: string; lang: 'ru' | 'en'; tier: ReportTier; rivals?: string[] };
+export type ReportJob = {
+  url: string; email: string; lang: 'ru' | 'en'; tier: ReportTier; rivals?: string[];
+  /** Балл со страницы проверки, из ста. Письмо обязано называть ту же цифру, что видел человек. */
+  score?: number;
+};
 
 /**
  * Служебное письмо, которое ставит заявку в очередь.

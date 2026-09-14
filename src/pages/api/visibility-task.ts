@@ -15,11 +15,7 @@
  */
 import type { APIRoute } from 'astro';
 import { checkVisibility, normaliseInput } from '../../lib/ai-visibility.mjs';
-import { topTask, renderTask } from '../../lib/ai-visibility-tasks.mjs';
 import { buildRunBody, buildRunSubject } from '../../lib/report-fulfilment';
-import { makeUnsubToken } from './unsubscribe';
-import { makeOfferToken } from './offer';
-import { button, emailShell, esc as escHtml, findings, note, p as par, scoreBlock, taskBlock } from '../../lib/email-shell';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 import { logLead, originOf } from '../../lib/sheets-log';
 import { SITE } from '../../data/site';
@@ -53,13 +49,47 @@ const QUEUE_TO = 'info@oper-stack.com';
  * Не получилось поставить в очередь, значит человек всё равно уже получил список письмом:
  * ошибку глотаем и ответ не портим.
  */
-async function queueFreeReport(url: string, email: string): Promise<boolean> {
+async function queueFreeReport(url: string, email: string, score: number): Promise<boolean> {
   const secret = env('KIT_DOWNLOAD_SECRET');
   if (!secret) return false;
-  const job = { url, email, lang: 'en' as const, tier: 'free' as const };
+  // Балл едет вместе с заявкой: письмо должно назвать ту же цифру, которую человек
+  // только что видел на странице, а не свою собственную из другой шкалы.
+  const job = { url, email, lang: 'en' as const, tier: 'free' as const, score };
   try {
     await sendTransactionalMail({ to: QUEUE_TO, subject: buildRunSubject(job), ...buildRunBody(job, secret) });
     return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Разбудить очередь прямо сейчас.
+ *
+ * Простым языком: обычно очередь сама просыпается раз в пять минут. Здесь мы стучимся к ней
+ * сразу, чтобы человек получил отчёт примерно через минуту, а не ждал.
+ *
+ * Не вышло, значит ничего страшного: заявка уже лежит в ящике, и очередь возьмёт её на
+ * ближайшем круге. Поэтому ошибку глотаем и ответ человеку не портим.
+ *
+ * Env: OPS_DISPATCH_TOKEN, токен GitHub с правом запускать задачи в oper-stack/ops-notify.
+ */
+async function wakeQueue(): Promise<boolean> {
+  const token = env('OPS_DISPATCH_TOKEN');
+  if (!token) return false;
+  try {
+    const res = await fetch('https://api.github.com/repos/oper-stack/ops-notify/actions/workflows/notify.yml/dispatches', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: 'application/vnd.github+json',
+        'X-GitHub-Api-Version': '2022-11-28',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ ref: 'main', inputs: { job: 'report' } }),
+      signal: AbortSignal.timeout(6000),
+    });
+    return res.status === 204;
   } catch {
     return false;
   }
@@ -74,99 +104,6 @@ function limited(ip: string): boolean {
   if (!h || now - h.at > 10 * 60 * 1000) { hits.set(ip, { at: now, n: 1 }); return false; }
   h.n += 1;
   return h.n > 6;
-}
-
-/**
- * Письмо в обмен на почту.
- *
- * На странице человек видит балл, всё, что пройдено, и первые три проблемы. Остальные проблемы
- * спрятаны, и письмо это ровно то, что он за них получает. Поэтому здесь идёт ПОЛНЫЙ список
- * найденного, а не одна задача: иначе обещание на странице было бы враньём.
- *
- * Порядок: сначала весь список, потом первая задача целиком как образец, потом ступень за 9.
- */
-function buildEmail(task: ReturnType<typeof topTask>, result: any, unsubUrl: string, offerUrl: string | null) {
-  const host = String(result?.host ?? '');
-  const score = Number(result?.score ?? 0);
-  type Finding = { level: string; text: string };
-  const problems: { area: string; level: string; text: string }[] = [];
-  for (const area of (result?.areas ?? []) as { label: string; findings: Finding[] }[]) {
-    for (const f of area.findings ?? []) {
-      if (f.level !== 'pass') problems.push({ area: area.label, level: f.level, text: f.text });
-    }
-  }
-  const n = problems.length;
-  const subject = n
-    ? `${host}: ${score} of 100, and the ${n} problem${n === 1 ? '' : 's'} behind it`
-    : `${host} scored ${score} of 100, and nothing is failing`;
-
-  const listText = problems.map((p, i) => `${i + 1}. [${p.level === 'warn' ? 'partial' : 'problem'}] ${p.area}: ${p.text}`).join('\n');
-  const listHtml = problems.map((p) => `<li style="margin:7px 0"><span style="display:inline-block;min-width:62px;font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:${p.level === 'warn' ? '#9a7b1f' : '#a33'}">${p.level === 'warn' ? 'Partial' : 'Problem'}</span> <strong>${esc(p.area)}.</strong> ${esc(p.text)}</li>`).join('');
-
-  const text = [
-    `${host} scored ${score} of 100 on the AI visibility check.`,
-    '',
-    n ? `Everything the check found, ${n} item${n === 1 ? '' : 's'}:` : 'Nothing is failing on this site.',
-    listText,
-    '',
-    'The one that moves your score most, written out in full:',
-    '',
-    renderTask(task, host),
-    '',
-    `This check reads one page. The site fix list reads up to twenty and turns every problem above into a task written the same way: ${SITE.url}/products/site-report/`,
-    ...(offerUrl
-      ? ['',
-         'If you want the whole picture, not just your own site: the full report puts you beside up to three rivals and re-checks your site every week for a month.',
-         'It is 29 USD. For the next 24 hours it is 19, and then this link goes back to 29 and does not come back. One offer per address.',
-         offerUrl]
-      : []),
-    '',
-    'OperStack · info@oper-stack.com',
-    `Not interested in the follow-ups? One click and we stop: ${unsubUrl}`,
-  ].join('\n');
-
-  const html = emailShell({
-    preheader: n
-      ? `${n} problem${n === 1 ? '' : 's'} found, and the one to fix first`
-      : 'Nothing is failing on this site',
-    heading: n
-      ? `${n} problem${n === 1 ? '' : 's'} on ${host}`
-      : `${host} is clean`,
-    blocks: [
-      scoreBlock(host, score),
-      n
-        ? par('Everything the check found on your site:') + findings(problems)
-        : par('Nothing is failing on this site. That is a good result, and rarer than you would think.'),
-      ...(task
-        ? [
-            par('Here is the one that moves your score most, written out in full. Copy it whole and hand it to whoever looks after your site, or paste it into ChatGPT, Claude or Cursor. Keep the Now and How to check lines: without them nobody knows where to start or when it is done.'),
-            taskBlock(task as Record<string, string>),
-          ]
-        : []),
-      par(`A five-page measurement of <strong>${escHtml(host)}</strong> follows as a PDF, usually within twenty minutes.`),
-      par('This check reads one page. The site fix list reads up to twenty and turns every problem above into a task written the same way.'),
-      button(`${SITE.url}/products/site-report/`, 'Get the full list of tasks, 9 USD →'),
-      note('For scale: an agency charges 2,000 to 7,500 USD for a technical audit and takes 30 to 45 days. Most of that bill is the measuring, and measuring is what a machine does best. What an agency adds on top, a person who reads your findings and says what they mean for your business, is our 149 USD audit.'),
-      /**
-       * Срочная цена. Она обязана быть здесь, а не только в письме следующего дня: то письмо
-       * говорит «остаётся четыре часа», и если про цену не сказали сегодня, человек читает
-       * про конец срока, о начале которого не слышал.
-       *
-       * Блока нет, пока скрытый тариф не заведён: обещать цену, которой нет, нельзя.
-       */
-      ...(offerUrl
-        ? [
-            `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 0"><tr><td bgcolor="#FFF6E4" style="padding:20px 22px;border-radius:10px">
-              <p style="margin:0 0 10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#14181C"><strong>If you want the whole picture, not just your own site.</strong> The full report puts you beside up to three rivals on the same measurement, and re-checks your site every week for a month, so you can see what your fixes actually moved.</p>
-              <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#14181C">It is 29 USD. <strong>For the next 24 hours it is 19</strong>, and then this link goes back to 29 and does not come back. One offer per address.</p>
-            </td></tr></table>`,
-            button(offerUrl, 'Take the full report at 19 USD →'),
-          ]
-        : []),
-    ],
-    unsubUrl,
-  });
-  return { subject, text, html };
 }
 
 export const POST: APIRoute = async ({ request, clientAddress }) => {
@@ -187,29 +124,18 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   try { result = await checkVisibility(url); } catch { return json({ ok: false, error: 'We could not read that site just now' }, 502); }
   if (!result?.ok) return json({ ok: false, error: 'We could not read that site just now' }, 502);
 
-  const task = topTask(result);
-  if (!task) {
-    return json({ ok: true, sent: false, message: 'Nothing is failing on this site, so there is no task to send. That is a good result.' });
+  // Заявка в очередь. Письмо человеку собирает она: у неё есть браузер, чтобы напечатать
+  // PDF, а здесь его нет. Если заявку поставить не удалось, человек не получит ничего, и
+  // сказать об этом надо сразу, а не молча.
+  const queued = await queueFreeReport(result.url ?? url, email, Number(result.score));
+  if (!queued) {
+    return json({ ok: false, error: 'We could not start your report just now. Write to info@oper-stack.com and we will run it by hand.' }, 502);
   }
+  // Будим очередь, чтобы отчёт пришёл через минуту, а не на ближайшем круге.
+  const woken = await wakeQueue();
 
-  try {
-    const secret = env('KIT_DOWNLOAD_SECRET');
-    const unsubUrl = `${SITE.url}/api/unsubscribe/?t=${makeUnsubToken(email, secret)}`;
-    // Ссылка живёт сутки: столько же, сколько обещает письмо. Письмо следующего дня выпишет
-    // свою, на оставшиеся четыре часа.
-    const offerUrl = secret && env('WHOP_CHECKOUT_RIVALS_19')
-      ? `${SITE.url}/api/offer/?t=${makeOfferToken({ email: email.toLowerCase(), exp: Math.floor(Date.now() / 1000) + 24 * 3600 }, secret)}`
-      : null;
-    await sendTransactionalMail({ to: email, ...buildEmail(task, result, unsubUrl, offerUrl) });
-  } catch {
-    return json({ ok: false, error: 'We could not send the email just now. Write to info@oper-stack.com and we will send it by hand.' }, 502);
-  }
-
-  // PDF ставим в очередь до записи в таблицу, чтобы в строке было видно, что именно ушло.
-  const queued = await queueFreeReport(result.url ?? url, email);
-
-  // Строка в таблицу пишется только после того, как письмо ушло: записываем состоявшийся
-  // обмен, а не намерение. Если таблица недоступна, человек всё равно получил свою задачу.
+  // Строка в таблицу пишется после того, как заявка принята: записываем состоявшийся обмен,
+  // а не намерение.
   const { source, campaign, page } = originOf(
     { source: body.from, campaign: body.campaign },
     request.headers.get('referer'),
@@ -224,11 +150,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     source,
     campaign,
     page,
-    sent: queued ? 'список письмом + PDF в очереди' : 'список письмом',
+    sent: woken ? 'отчёт собирается, очередь разбужена' : 'отчёт в очереди',
     tier: 'бесплатно',
   });
 
-  return json({ ok: true, sent: true, taskId: task.id, queued });
+  return json({ ok: true, sent: true, queued, woken });
 };
 
 export const GET: APIRoute = async ({ url }) => {
