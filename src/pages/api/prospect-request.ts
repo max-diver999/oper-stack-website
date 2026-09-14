@@ -36,7 +36,12 @@ export const POST: APIRoute = async ({ request }) => {
   const secret = env('KIT_DOWNLOAD_SECRET');
   if (!secret) return page(500, 'Something is not set up on our side', '<p>Write to support@oper-stack.com and we will run it by hand.</p>');
 
-  const form = await request.formData();
+  // Тело не формой (кривой запрос, чужой скрипт, JSON без полей) раньше роняло обработчик в 500.
+  // Это не ошибка сервера, это не та форма: отвечаем 400 и той же страницей.
+  let form: FormData;
+  try { form = await request.formData(); } catch {
+    return page(400, 'That was not the form', '<p>Open the link from your email and paste the list there.</p>');
+  }
   const token = String(form.get('t') || '');
   const check = verifyReportToken(token, secret);
   if (!check.ok || !check.claims?.email) {
