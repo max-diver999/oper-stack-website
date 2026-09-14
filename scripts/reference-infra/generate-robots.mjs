@@ -59,9 +59,22 @@ export function generateRobots(config) {
   ) {
     throw new Error('robots.contentSignal must be a single line')
   }
+  /*
+   * Content-Signal объявляется внутри блока `*`, как его и читают: это надпись на входе
+   * («читать и цитировать можно, обучать модель нельзя»), а не комментарий в конце файла.
+   * Раньше генератор дописывал её строкой-комментарием, поэтому живые файлы обоих сайтов
+   * правили руками, и первый же запуск `npm run aeo:robots` молча стирал настоящую директиву.
+   * Доступ роботов задаётся блоками ниже и этой строкой не отменяется.
+   */
+  const signalLines = robots.contentSignal
+    ? ['# Content Signals (contentsignals.org / IETF draft-romm-aipref-contentsignals)',
+       ...(robots.contentSignalNote ? [`# ${robots.contentSignalNote}`] : []),
+       `Content-Signal: ${robots.contentSignal}`, 'Allow: /']
+    : []
   const blocks = [
     [
       'User-agent: *',
+      ...signalLines,
       ...disallow.map((pathname) => `Disallow: ${pathname}`),
     ].join('\n'),
     '# Search indexing and user-requested fetchers',
@@ -76,8 +89,12 @@ export function generateRobots(config) {
 
   // Content-Signal may be emitted as an additional declaration, but crawler
   // access above remains authoritative and is never replaced by this header.
-  if (robots.contentSignal) {
-    blocks.push(`# Content-Signal: ${robots.contentSignal}`)
+  /*
+   * Подсказка агентам про markdown-версии страниц. Тоже дописывалась руками и тоже терялась
+   * при каждом запуске генератора: всё, что должно быть в файле, лежит в настройке.
+   */
+  if (Array.isArray(robots.footerNote) && robots.footerNote.length) {
+    blocks.push(robots.footerNote.map((line) => `# ${line}`).join('\n'))
   }
   blocks.push(`Sitemap: ${new URL('/sitemap-index.xml', config.siteUrl).href}`)
   return `${blocks.join('\n\n')}\n`

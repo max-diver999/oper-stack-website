@@ -21,6 +21,9 @@
       "/api/",
       "/thanks/"
     ],
+    "contentSignal": "search=yes, ai-input=yes, ai-train=no",
+    "contentSignalNote": "Citation in AI search and retrieval is allowed. Training on this content is not.",
+    "footerNote": ["Markdown renditions for agents: append .md to any guide or service URL,", "or send `Accept: text/markdown`. Start here:", "https://oper-stack.com/index.md", "https://oper-stack.com/llms.txt", "https://oper-stack.com/.well-known/agent.json"],
     "allowSearchCrawlers": true,
     "allowTrainingCrawlers": true
   },
