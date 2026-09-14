@@ -18,6 +18,7 @@ import { checkVisibility, normaliseInput } from '../../lib/ai-visibility.mjs';
 import { topTask, renderTask } from '../../lib/ai-visibility-tasks.mjs';
 import { buildRunBody, buildRunSubject } from '../../lib/report-fulfilment';
 import { makeUnsubToken } from './unsubscribe';
+import { makeOfferToken } from './offer';
 import { button, emailShell, esc as escHtml, findings, note, p as par, scoreBlock, taskBlock } from '../../lib/email-shell';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 import { logLead, originOf } from '../../lib/sheets-log';
@@ -84,7 +85,7 @@ function limited(ip: string): boolean {
  *
  * Порядок: сначала весь список, потом первая задача целиком как образец, потом ступень за 9.
  */
-function buildEmail(task: ReturnType<typeof topTask>, result: any, unsubUrl: string) {
+function buildEmail(task: ReturnType<typeof topTask>, result: any, unsubUrl: string, offerUrl: string | null) {
   const host = String(result?.host ?? '');
   const score = Number(result?.score ?? 0);
   type Finding = { level: string; text: string };
@@ -113,6 +114,12 @@ function buildEmail(task: ReturnType<typeof topTask>, result: any, unsubUrl: str
     renderTask(task, host),
     '',
     `This check reads one page. The site fix list reads up to twenty and turns every problem above into a task written the same way: ${SITE.url}/products/site-report/`,
+    ...(offerUrl
+      ? ['',
+         'If you want the whole picture, not just your own site: the full report puts you beside up to three rivals and re-checks your site every week for a month.',
+         'It is 29 USD. For the next 24 hours it is 19, and then this link goes back to 29 and does not come back. One offer per address.',
+         offerUrl]
+      : []),
     '',
     'OperStack · info@oper-stack.com',
     `Not interested in the follow-ups? One click and we stop: ${unsubUrl}`,
@@ -140,6 +147,22 @@ function buildEmail(task: ReturnType<typeof topTask>, result: any, unsubUrl: str
       par('This check reads one page. The site fix list reads up to twenty and turns every problem above into a task written the same way.'),
       button(`${SITE.url}/products/site-report/`, 'Get the full list of tasks, 9 USD →'),
       note('For scale: an agency charges 2,000 to 7,500 USD for a technical audit and takes 30 to 45 days. Most of that bill is the measuring, and measuring is what a machine does best. What an agency adds on top, a person who reads your findings and says what they mean for your business, is our 149 USD audit.'),
+      /**
+       * Срочная цена. Она обязана быть здесь, а не только в письме следующего дня: то письмо
+       * говорит «остаётся четыре часа», и если про цену не сказали сегодня, человек читает
+       * про конец срока, о начале которого не слышал.
+       *
+       * Блока нет, пока скрытый тариф не заведён: обещать цену, которой нет, нельзя.
+       */
+      ...(offerUrl
+        ? [
+            `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:26px 0 0"><tr><td bgcolor="#FFF6E4" style="padding:20px 22px;border-radius:10px">
+              <p style="margin:0 0 10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#14181C"><strong>If you want the whole picture, not just your own site.</strong> The full report puts you beside up to three rivals on the same measurement, and re-checks your site every week for a month, so you can see what your fixes actually moved.</p>
+              <p style="margin:0 0 4px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:16px;line-height:1.5;color:#14181C">It is 29 USD. <strong>For the next 24 hours it is 19</strong>, and then this link goes back to 29 and does not come back. One offer per address.</p>
+            </td></tr></table>`,
+            button(offerUrl, 'Take the full report at 19 USD →'),
+          ]
+        : []),
     ],
     unsubUrl,
   });
@@ -170,8 +193,14 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   }
 
   try {
-    const unsubUrl = `${SITE.url}/api/unsubscribe/?t=${makeUnsubToken(email, env('KIT_DOWNLOAD_SECRET'))}`;
-    await sendTransactionalMail({ to: email, ...buildEmail(task, result, unsubUrl) });
+    const secret = env('KIT_DOWNLOAD_SECRET');
+    const unsubUrl = `${SITE.url}/api/unsubscribe/?t=${makeUnsubToken(email, secret)}`;
+    // Ссылка живёт сутки: столько же, сколько обещает письмо. Письмо следующего дня выпишет
+    // свою, на оставшиеся четыре часа.
+    const offerUrl = secret && env('WHOP_CHECKOUT_RIVALS_19')
+      ? `${SITE.url}/api/offer/?t=${makeOfferToken({ email: email.toLowerCase(), exp: Math.floor(Date.now() / 1000) + 24 * 3600 }, secret)}`
+      : null;
+    await sendTransactionalMail({ to: email, ...buildEmail(task, result, unsubUrl, offerUrl) });
   } catch {
     return json({ ok: false, error: 'We could not send the email just now. Write to info@oper-stack.com and we will send it by hand.' }, 502);
   }
