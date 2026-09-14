@@ -311,7 +311,10 @@ export function readWhopPayment(event: any, idToPlan: Record<string, Plan>): {
     .filter((x): x is string => typeof x === 'string' && x.length > 0);
   const matchedId = candidates.find((id) => idToPlan[id]) ?? null;
   return {
-    type: String(event?.type ?? event?.event ?? ''),
+    // Имя события: Whop кладёт его в разные поля в разных версиях API, и в их документации
+    // схемы payload нет вовсе. Читаем все три. Если бы мы читали только type, а Whop прислал
+    // action, оплата молча осталась бы без выдачи, и узнали бы мы об этом от покупателя.
+    type: String(event?.type ?? event?.event ?? event?.action ?? ''),
     paymentId: String(d.id ?? event?.id ?? ''),
     email: email ? email.trim().toLowerCase() : null,
     userId,
