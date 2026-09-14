@@ -26,13 +26,19 @@ function serve(files) {
     return mk(200, hit.type, hit.body, url);
   };
 }
-function mk(status, type, body, url) {
+function mk(status, type, body, url, extra = {}) {
   const bytes = new TextEncoder().encode(body);
+  const headers = { 'content-type': type, ...extra };
   return {
     ok: status >= 200 && status < 300, status, url: String(url),
-    headers: { get: (h) => (h.toLowerCase() === 'content-type' ? type : null) },
+    headers: { get: (h) => headers[h.toLowerCase()] ?? null },
     arrayBuffer: async () => bytes.buffer,
   };
+}
+
+/** Сайт, который отвечает всем 403 с признаком проверки браузера Cloudflare. */
+function serveWall() {
+  globalThis.fetch = async (url) => mk(403, 'text/html', '<html><body>Checking your browser</body></html>', url, { 'cf-mitigated': 'challenge', server: 'cloudflare' });
 }
 
 const page = ({ h1, lead, body = '', schema = [], date = true, table = false }) => ({
@@ -85,6 +91,15 @@ const pustoTexts = [...pusto.areas.map((a) => a.label), ...pusto.areas.flatMap((
 ok(pustoTexts.every((t) => CYR.test(t)), 'все находки пустого сайта по-русски');
 ok(pustoTexts.some((t) => /Единственная проверенная страница короче 300 слов/.test(t)), 'одна страница названа единственной, а не «1 из 1 проверенных страница»');
 ok(pusto.areas.find((a) => a.id === 'access').findings.some((f) => /Закрыты поисковые роботы/.test(f.text)), 'закрытые роботы названы по-русски');
+
+console.log('\n── сайт за проверкой браузера');
+serveWall();
+const wallRu = await checkVisibility('stena.ru', { lang: 'ru', budgetMs: 6000 });
+const wallEn = await checkVisibility('stena.ru', { lang: 'en', budgetMs: 6000 });
+ok(wallRu.ok === false && wallRu.blocked === true && wallRu.challenged === true, 'проверка браузера распознана, а не принята за сломанный сайт');
+ok(CYR.test(wallRu.error) && /проверкой браузера/.test(wallRu.error), `объяснение по-русски: «${wallRu.error.slice(0, 60)}…»`);
+ok(/browser challenge/.test(wallEn.error), 'по-английски объяснение прежнее');
+ok(wallRu.status === 403, 'код ответа отдан наружу');
 
 console.log('\n── склонения после чисел');
 const R = MESSAGES.ru;

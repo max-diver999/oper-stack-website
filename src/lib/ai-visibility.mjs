@@ -7,6 +7,11 @@
  * The measurement is language-neutral; only the words a person reads come from the MESSAGES
  * table below, picked by the `lang` option ('en' by default, 'ru' on oper-stack.ru). Finding ids
  * and area ids never change with the language, so task lists and reports can key on them.
+ *
+ * This file is also vendored by the Apify actor (OperStack/apify-ai-visibility/src). The two
+ * copies must stay byte for byte identical, and `npm test` in the actor fails if they drift.
+ * That is why `samplePages` lives here although both sites leave it at three: a copy that has
+ * to differ is a copy nobody keeps in sync, and this one had drifted by 304 lines.
  */
 
 const UA = 'Mozilla/5.0 (compatible; OperStackVisibility/0.1; +https://oper-stack.com/ai-visibility/)';
@@ -44,6 +49,8 @@ export const MESSAGES = {
     badInput: 'Enter a public site address, for example example.com',
     tooSlow: 'The site took too long to answer',
     badAnswer: (status, url) => `The site answered ${status || 'nothing'} for ${url}`,
+    botWall: (status) => `The site refuses unknown clients (HTTP ${status}). AI fetchers that do not run a browser get the same answer, so nothing here can be read or quoted.`,
+    botChallenge: (status) => `The site sits behind a browser challenge (Cloudflare, HTTP ${status}). AI fetchers do not run one, so ChatGPT, Perplexity and the rest are turned away exactly as this check was, and nothing on the site can be quoted.`,
     area: { access: 'Can AI crawlers read it', index: 'Is there a map for agents (llms.txt)', entity: 'Is the entity clear (schema)', content: 'Is there something to quote', trust: 'Can it be dated and trusted' },
     robotsAllBlocked: 'robots.txt disallows the whole site for every crawler. Nothing can read it.',
     fetchersBlocked: (list) => `Blocked answer-engine fetchers: ${list}. These are the bots that cite pages live.`,
@@ -83,6 +90,8 @@ export const MESSAGES = {
     badInput: 'Введите адрес публичного сайта, например example.ru',
     tooSlow: 'Сайт слишком долго не отвечал',
     badAnswer: (status, url) => `Сайт ответил ${status ? `кодом ${status}` : 'ничем'} на ${url}`,
+    botWall: (status) => `Сайт отказывает незнакомым клиентам (код ${status}). Роботы ИИ, которые не запускают браузер, получают тот же ответ, поэтому прочитать и процитировать здесь нечего.`,
+    botChallenge: (status) => `Сайт закрыт проверкой браузера (Cloudflare, код ${status}). Роботы ИИ её не проходят, поэтому ChatGPT, Perplexity и остальных разворачивают ровно так же, как развернули эту проверку, и процитировать с сайта нельзя ничего.`,
     area: { access: 'Могут ли роботы ИИ прочитать сайт', index: 'Есть ли карта для агентов (llms.txt)', entity: 'Понятно ли, кто вы (разметка)', content: 'Есть ли что процитировать', trust: 'Можно ли датировать и доверять' },
     robotsAllBlocked: 'robots.txt закрывает весь сайт для всех роботов. Его никто не может прочитать.',
     fetchersBlocked: (list) => `Закрыты поисковые роботы ответных систем: ${list}. Именно они достают страницу, чтобы процитировать её в ответе.`,
@@ -159,7 +168,7 @@ async function get(url, { timeout = 6000, method = 'GET' } = {}) {
     const res = await fetch(url, { method, redirect: 'follow', signal: c.signal, headers: { 'user-agent': UA, accept: 'text/html,application/xml,text/plain,*/*' } });
     let text = '';
     if (method === 'GET') { const buf = await res.arrayBuffer(); text = new TextDecoder('utf-8', { fatal: false }).decode(buf.slice(0, MAX_BODY)); }
-    return { ok: res.ok, status: res.status, url: res.url, type: res.headers.get('content-type') || '', text, ms: Date.now() - started };
+    return { ok: res.ok, status: res.status, url: res.url, type: res.headers.get('content-type') || '', server: res.headers.get('server') || '', mitigated: res.headers.get('cf-mitigated') || '', text, ms: Date.now() - started };
   } catch (e) { return { ok: false, status: 0, url, type: '', text: '', ms: Date.now() - started, error: e.name === 'AbortError' ? 'timeout' : 'unreachable' }; }
   finally { clearTimeout(t); }
 }
@@ -260,7 +269,7 @@ async function readSitemap(origin, robotsText, timeoutFn = () => 3000) {
   return { found: false, url: '', count: 0, lastmod: false, pages: [], timedOut };
 }
 
-export async function checkVisibility(input, { budgetMs = 8500, lang = 'en' } = {}) {
+export async function checkVisibility(input, { budgetMs = 8500, lang = 'en', samplePages = 3 } = {}) {
   const T = MESSAGES[lang] || MESSAGES.en;
   const agentLabel = (a) => (lang === 'ru' ? a.labelRu : a.label);
   const started = Date.now();
@@ -270,14 +279,27 @@ export async function checkVisibility(input, { budgetMs = 8500, lang = 'en' } = 
   if (!url) return { ok: false, error: T.badInput };
   const origin = new URL(url).origin; const host = new URL(url).host;
   const [home, robotsRes, llmsRes] = await Promise.all([get(url, { timeout: Math.min(6000, left() - 300) }), get(`${origin}/robots.txt`, { timeout: Math.min(4000, left() - 300) }), get(`${origin}/llms.txt`, { timeout: Math.min(4000, left() - 300) })]);
-  if (!home.ok || !/html/i.test(home.type)) return { ok: false, error: home.error === 'timeout' ? T.tooSlow : T.badAnswer(home.status, url) };
+  if (!home.ok || !/html/i.test(home.type)) {
+    // Код 401/403/405/429 это бот-стена, а не сломанный сайт, и это находка сама по себе: та же
+    // стена, что развернула эту проверку, разворачивает и роботов ответных систем.
+    const blocked = [401, 403, 405, 429].includes(home.status);
+    // Проверка браузера и простой отказ лечатся по-разному, и первое дороже: робот ИИ никогда
+    // её не проходит, поэтому сайт за ней невидим для всех ассистентов, что бы ни было на
+    // страницах. Пришло из актора Apify, где это работало, а на сайтах человек видел «403».
+    const challenged = blocked && (/challenge|managed/i.test(home.mitigated) || (/cloudflare/i.test(home.server) && home.status === 403));
+    const error = home.error === 'timeout' ? T.tooSlow
+      : challenged ? T.botChallenge(home.status)
+        : blocked ? T.botWall(home.status)
+          : T.badAnswer(home.status, url);
+    return { ok: false, blocked, challenged, status: home.status, error };
+  }
   const homePage = analysePage(home.text, home.url);
   const robots = parseRobots(robotsRes.ok ? robotsRes.text : '');
   const sitemap = left() > 1500 ? await readSitemap(origin, robotsRes.ok ? robotsRes.text : '', () => Math.min(3000, left() - 300)) : { found: false, url: '', count: 0, lastmod: false, pages: [], skipped: true };
   let sampled = [];
   if (left() > 2000 && sitemap.pages.length) {
     const norm = (u) => u.replace(/\/$/, '').toLowerCase();
-    const picks = sitemap.pages.filter((p) => norm(p) !== norm(home.url) && p.startsWith(origin)).sort((a, b) => b.length - a.length).slice(0, 12).filter((_, i) => i % 4 === 0).slice(0, 3);
+    const picks = sitemap.pages.filter((p) => norm(p) !== norm(home.url) && p.startsWith(origin)).sort((a, b) => b.length - a.length).slice(0, Math.max(12, samplePages * 4)).filter((_, i) => i % 4 === 0).slice(0, samplePages);
     const rs = await Promise.all(picks.map((p) => get(p, { timeout: Math.min(4000, left() - 300) })));
     sampled = rs.filter((r) => r.ok && /html/i.test(r.type)).map((r) => analysePage(r.text, r.url));
   }
