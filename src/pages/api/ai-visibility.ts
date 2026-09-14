@@ -13,7 +13,14 @@ const hits = new Map<string, { at: number; n: number }>();
 const CACHE_MS = 10 * 60 * 1000;
 const LIMIT = 12; // checks per IP per 10 minutes, per instance
 
+/**
+ * Ограничение считается по адресу посетителя. Если адрес определить не удалось, не ограничиваем
+ * вовсе: 13 сентября 2026 заголовок x-forwarded-for до обработчика не доходил, все запросы падали
+ * в одно ведро с ключом "unknown", и двенадцать проверок в десять минут закрывали инструмент
+ * для всех сразу. Пустить лишний прогон дешевле, чем погасить бесплатную проверку всему свету.
+ */
 function limited(ip: string): boolean {
+  if (!ip || ip === 'unknown') return false;
   const now = Date.now();
   const h = hits.get(ip);
   if (!h || now - h.at > CACHE_MS) { hits.set(ip, { at: now, n: 1 }); return false; }
@@ -48,16 +55,18 @@ async function handle(rawUrl: string, ip: string, request: Request, from: { sour
   return json(result, result.ok ? 200 : 422);
 }
 
-const ipOf = (request: Request) => (request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown').split(',')[0].trim();
+/** Адрес берём тем же способом, что и соседний обработчик задач: сначала clientAddress. */
+const ipOf = (request: Request, clientAddress?: string) =>
+  (clientAddress || request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown').split(',')[0].trim();
 
-export const GET: APIRoute = async ({ request, url }) =>
-  handle(url.searchParams.get('url') || '', ipOf(request), request, {
+export const GET: APIRoute = async ({ request, url, clientAddress }) =>
+  handle(url.searchParams.get('url') || '', ipOf(request, clientAddress), request, {
     source: url.searchParams.get('from') || undefined,
     campaign: url.searchParams.get('campaign') || undefined,
   });
 
-export const POST: APIRoute = async ({ request }) => {
+export const POST: APIRoute = async ({ request, clientAddress }) => {
   let body: { url?: string; from?: string; campaign?: string } = {};
   try { body = await request.json(); } catch { /* fall through with an empty url */ }
-  return handle(String(body.url || ''), ipOf(request), request, { source: body.from, campaign: body.campaign });
+  return handle(String(body.url || ''), ipOf(request, clientAddress), request, { source: body.from, campaign: body.campaign });
 };
