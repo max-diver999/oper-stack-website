@@ -8,7 +8,7 @@
  * So the score is recorded rather than recomputed and forgotten, and both numbers appear together
  * with how they moved.
  */
-import { checkVisibility } from '@operstack/audit';
+import { VISIBILITY_DEFAULTS, checkVisibility } from '@operstack/audit';
 import { visitsDb } from './visits-db';
 
 export type ScorePoint = { day: string; score: number; areas: Array<{ label: string; score: number; max: number }> };
@@ -36,7 +36,7 @@ export async function recentScores(siteId: string, limit = 2): Promise<ScorePoin
  * overwrites rather than adding a second point, so a page refresh cannot invent a trend.
  */
 export async function recordScore(siteId: string, domain: string): Promise<ScorePoint | null> {
-  const result: any = await checkVisibility(domain, { budgetMs: 11000 });
+  const result: any = await checkVisibility(domain, { ...VISIBILITY_DEFAULTS, lang: 'en' });
   if (!result || result.ok === false) return null;
   const areas = (result.areas || []).map((a: any) => ({ label: a.label, score: a.score, max: a.max }));
   const sql = visitsDb();

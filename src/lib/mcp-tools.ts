@@ -5,7 +5,7 @@
  * number on a page can never disagree. Nothing here needs an account, except the one tool that
  * reads somebody's own visit counter, and that one is unlocked by their own private token.
  */
-import { checkVisibility } from '@operstack/audit';
+import { VISIBILITY_DEFAULTS, checkVisibility } from '@operstack/audit';
 import { checkLlms } from './llms-check';
 import { visitsDb, visitsDbConfigured } from './visits-db';
 import { snippetInstalled } from './visits-install';
@@ -58,7 +58,7 @@ export const TOOLS: McpTool[] = [
       properties: { url: { type: 'string', description: 'A public site address, for example example.com' } },
       required: ['url'],
     },
-    run: async (a) => visibilityReport(await checkVisibility(site(a.url), { budgetMs: 12000 })),
+    run: async (a) => visibilityReport(await checkVisibility(site(a.url), { ...VISIBILITY_DEFAULTS, lang: 'en' })),
   },
   {
     name: 'compare_sites',
@@ -75,7 +75,7 @@ export const TOOLS: McpTool[] = [
     run: async (a) => {
       const urls: string[] = (Array.isArray(a.urls) ? a.urls : []).map(site).filter(Boolean).slice(0, 4);
       if (urls.length < 2) return 'Give at least two site addresses.';
-      const results = await Promise.all(urls.map((u) => checkVisibility(u, { budgetMs: 12000 })));
+      const results = await Promise.all(urls.map((u) => checkVisibility(u, { ...VISIBILITY_DEFAULTS, lang: 'en' })));
       const good = results.filter((r: any) => r && r.ok !== false);
       if (!good.length) return 'None of those sites could be read. They may turn away automated readers.';
       const labels = good[0].areas.map((x: any) => x.label);
