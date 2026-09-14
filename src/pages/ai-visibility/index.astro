@@ -225,6 +225,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
             <p class="label">Grade ${esc(r.grade)} · ${esc(r.host)}</p>
             <h2 class="verdict">${r.score >= 80 ? 'AI systems can read and quote this site.' : r.score >= 65 ? 'Readable, with gaps that cost citations.' : r.score >= 45 ? 'Readable, but there is little to quote.' : 'Mostly invisible to answer engines.'}</h2>
             <p class="note">Checked ${new Date(r.checkedAt).toLocaleString('en-GB')} in ${(r.ms / 1000).toFixed(1)} s. Sitemap: ${r.sitemap.found ? `${r.sitemap.count} URLs${r.sitemap.lastmod ? ', dated' : ', no dates'}` : r.sitemap.unchecked ? 'did not answer in time, not checked' : 'not found'}.</p>
+            <p class="note">${(() => { const n = r.sample.length; return `This is a first pass: ${n} page${n === 1 ? '' : 's'} of the site ${n === 1 ? 'was' : 'were'} read. The full report carries this same score, from the same code, and shows what it is made of. Running the check again can move it by a point or two: a check that answers in time on one run may not on the next, and this score never counts against a site what it could not read.`; })()}</p>
           </div>
         </div>
         ${fixes}
