@@ -3,7 +3,7 @@
  * Public signals only, hard time budget, small in-memory cache and rate limit per instance.
  */
 import type { APIRoute } from 'astro';
-import { checkVisibility, normaliseInput } from '../../lib/ai-visibility.mjs';
+import { VISIBILITY_DEFAULTS, checkVisibility, normaliseInput } from '@operstack/audit';
 import { logCheck, originOf } from '../../lib/sheets-log';
 
 export const prerender = false;
@@ -48,7 +48,9 @@ async function handle(rawUrl: string, ip: string, request: Request, from: { sour
   const key = new URL(url).host.toLowerCase();
   const hit = cache.get(key);
   if (hit && Date.now() - hit.at < CACHE_MS) return new Response(hit.body, { status: 200, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store', 'X-Robots-Tag': 'noindex', 'X-Cache': 'hit' } });
-  const result = await checkVisibility(url, { budgetMs: 8500, lang: 'en' });
+  // Настройки берём из пакета и руками не задаём: любое расхождение параметров это
+  // расхождение чисел между страницей, письмом и отчётом.
+  const result = await checkVisibility(url, { ...VISIBILITY_DEFAULTS, lang: 'en' });
   const body = JSON.stringify(result);
   if (result.ok) cache.set(key, { at: Date.now(), body });
   await record(result, request, from);

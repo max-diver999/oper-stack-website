@@ -5,7 +5,7 @@
  * number on a page can never disagree. Nothing here needs an account, except the one tool that
  * reads somebody's own visit counter, and that one is unlocked by their own private token.
  */
-import { checkVisibility } from './ai-visibility.mjs';
+import { checkVisibility } from '@operstack/audit';
 import { checkLlms } from './llms-check';
 import { visitsDb, visitsDbConfigured } from './visits-db';
 import { snippetInstalled } from './visits-install';
