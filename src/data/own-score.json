@@ -1,0 +1,34 @@
+{
+  "host": "oper-stack.com",
+  "score": 100,
+  "grade": "A",
+  "measured": "2026-09-14",
+  "areas": [
+    {
+      "label": "Can AI crawlers read it",
+      "score": 25,
+      "max": 25
+    },
+    {
+      "label": "Is there a map for agents (llms.txt)",
+      "score": 15,
+      "max": 15
+    },
+    {
+      "label": "Is the entity clear (schema)",
+      "score": 20,
+      "max": 20
+    },
+    {
+      "label": "Is there something to quote",
+      "score": 25,
+      "max": 25
+    },
+    {
+      "label": "Can it be dated and trusted",
+      "score": 15,
+      "max": 15
+    }
+  ],
+  "pagesRead": 4
+}
