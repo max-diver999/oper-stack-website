@@ -12,6 +12,7 @@
  */
 import type { APIRoute } from 'astro';
 import { SITE } from '../../data/site';
+import { button, emailShell, note, p as par } from '../../lib/email-shell';
 import { buildAgencyEmail,
   buildLicenceEmail, handleWhopPayment, issueLicenceKey, makeDownloadToken, parsePriceMap, readWhopPayment, verifyWhopSignature } from '../../lib/licence-fulfilment';
 import { buildReportWelcomeEmail, makeReportToken, readWhopReport, reportTierMap, TOKEN_DAYS } from '../../lib/report-fulfilment';
@@ -43,13 +44,19 @@ function buildAuditOrderEmail(email: string): { subject: string; text: string; h
     '',
     'OperStack · info@oper-stack.com',
   ];
-  const html = [
-    '<p>Thank you, your <strong>SEO, AEO and GEO audit</strong> is paid for.</p>',
-    '<p><strong>One thing we need:</strong> reply to this email with the address of the site to audit. That is all, no access to anything of yours is required.</p>',
-    '<p>What happens then: a person reads the measurements of your site and writes what they mean for your business and in what order to close them. Usually one to three working days, never later than five.</p>',
-    '<p>If you have context worth knowing, who your buyers are, which pages matter most, which rivals you lose to, put it in the same reply. It changes what the audit looks at first.</p>',
-    '<p style="color:#888;font-size:13px">OperStack · info@oper-stack.com</p>',
-  ].join('\n');
+  const html = emailShell({
+    preheader: 'One thing we need: the address of the site to audit',
+    heading: 'Your audit is booked',
+    blocks: [
+      par('Thank you. Your <strong>SEO, AEO and GEO audit</strong> is paid for.'),
+      par('<strong>One thing we need:</strong> reply to this email with the address of the site to audit. That is all. No access to anything of yours is required.'),
+      button('mailto:info@oper-stack.com?subject=My%20site%20for%20the%20audit', 'Reply with your site address →'),
+      par('What happens then: a person reads the measurements of your site and writes what they mean for your business and in what order to close them. Usually one to three working days, never later than five.'),
+      par('If you have context worth knowing, who your buyers are, which pages matter most, which rivals you lose to, put it in the same reply. It changes what the audit looks at first.'),
+      note('This one is read by a person, not a machine. That is the whole point of it.'),
+    ],
+  });
+
   return { subject, text: lines.join('\n'), html };
 }
 
