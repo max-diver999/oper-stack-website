@@ -24,7 +24,8 @@
     "ai:card": "node scripts/ai-visibility/generate-agent-card.mjs",
     "ai:lastmod": "node scripts/ai-visibility/page-lastmod.mjs",
     "ai:check": "node scripts/ai-visibility/check-agent-index.mjs",
-    "ai:verify": "node scripts/ai-visibility/verify-live.mjs"
+    "ai:verify": "node scripts/ai-visibility/verify-live.mjs",
+    "smoke": "node scripts/smoke-live.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.1",
@@ -33,5 +34,8 @@
     "astro": "6.0.8",
     "google-auth-library": "^10.9.1",
     "nodemailer": "^10.0.3"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.63.0"
   }
 }

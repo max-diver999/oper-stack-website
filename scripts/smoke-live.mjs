@@ -1,0 +1,138 @@
+/**
+ * Проверка живых сайтов после выкладки: то, что 13 сентября 2026 делалось руками и нашло пять
+ * дефектов, которых сборка не видит. Сборка отвечает на вопрос «собралось ли», этот скрипт на
+ * вопрос «работает ли у человека».
+ *
+ *   node scripts/smoke-live.mjs            оба сайта
+ *   node scripts/smoke-live.mjs --site en  один
+ *
+ * Что проверяется и почему именно это:
+ *   1. каждый адрес из карты сайта отвечает 200 (страницы пропадают молча);
+ *   2. каждая кнопка «купить» ведёт на живую страницу Whop, и цена на ней та же, что у нас;
+ *   3. каждый обработчик отвечает разумным кодом, а не 500 (кривое тело роняло prospect-request);
+ *   4. бесплатная проверка реально отвечает ok:true (ограничитель закрывал её всему миру);
+ *   5. результат проверки нарисован: кольцо 132px, а не чёрный круг (стили Astro не видят innerHTML);
+ *   6. ключевые экраны на телефоне и десктопе без ошибок в консоли и без горизонтальной прокрутки.
+ * Выход ненулевой при любом провале, чтобы цеплять к CI и к ops-notify.
+ */
+// playwright-core ничего не качает при установке (полный playwright тянет браузеры в postinstall
+// и замедлил бы каждую сборку на Vercel). Он запускает уже стоящий Google Chrome; где Chrome нет,
+// шаги 5 и 6 пропускаются с предупреждением, а не роняют скрипт.
+import { chromium, devices } from 'playwright-core';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+
+const SITES = {
+  en: {
+    origin: 'https://oper-stack.com',
+    check: '/ai-visibility/',
+    keyPages: ['/', '/products/', '/products/course/', '/pricing/', '/ai-visibility/', '/visits/'],
+    endpoints: [
+      ['GET', '/api/ai-visibility/?url=example.net', [200]],
+      ['GET', '/api/mcp/', [200]], ['GET', '/api/whop-webhook/', [200]], ['GET', '/api/paddle-webhook/', [200]],
+      ['POST', '/api/lead/', [400]], ['POST', '/api/whop-webhook/', [401]], ['POST', '/api/paddle-webhook/', [401]],
+      ['POST', '/api/visibility-task/', [400]], ['POST', '/api/prospect-request/', [400]], ['POST', '/api/report-request/', [400, 403]],
+      ['GET', '/api/kit-download/?t=x', [403]], ['GET', '/api/unsubscribe/?t=x', [400]],
+    ],
+    products: resolve('src/data/products.ts'),
+  },
+  ru: {
+    origin: 'https://oper-stack.ru',
+    check: '/ai-visibility/',
+    keyPages: ['/', '/produkty/', '/pricing/', '/zakaz/', '/ai-visibility/'],
+    endpoints: [
+      ['GET', '/api/ai-visibility/?url=example.net', [200]],
+      ['POST', '/api/lead/', [400]], ['POST', '/api/order/', [400]],
+    ],
+    products: null,
+  },
+};
+
+const only = process.argv.includes('--site') ? process.argv[process.argv.indexOf('--site') + 1] : null;
+const failures = [];
+const fail = (s) => { failures.push(s); console.log('  ✗ ' + s); };
+const ok = (s) => console.log('  ✓ ' + s);
+const get = (url, init = {}) => fetch(url, { redirect: 'manual', signal: AbortSignal.timeout(45000), ...init });
+
+async function sitemap(origin) {
+  const xml = await (await get(`${origin}/sitemap-0.xml`)).text();
+  return [...xml.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+}
+
+async function checkSite(key) {
+  const site = SITES[key];
+  console.log(`\n── ${site.origin}`);
+
+  // 1. Карта сайта.
+  const urls = await sitemap(site.origin);
+  let bad = 0;
+  for (const u of urls) {
+    const r = await get(u).catch(() => null);
+    if (!r || r.status !== 200) { bad++; fail(`${r ? r.status : 'нет ответа'} ${u}`); }
+  }
+  if (!bad) ok(`карта сайта: ${urls.length} адресов, все 200`);
+
+  // 2. Кнопки «купить» и цены (только там, где есть массив продуктов).
+  if (site.products) {
+    const src = readFileSync(site.products, 'utf8');
+    const items = [...src.matchAll(/slug: '([^']+)'[\s\S]*?price: '([^']+)'[\s\S]*?cta: \{ text: '[^']*', href: '(https:\/\/whop\.com[^']+)'/g)];
+    for (const [, slug, price, href] of items) {
+      const r = await get(href, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null);
+      if (!r || r.status !== 200) { fail(`${slug}: кнопка ведёт на ${r ? r.status : 'нет ответа'} ${href}`); continue; }
+      const html = await r.text();
+      const ours = price.match(/\d+/)?.[0];
+      // Whop рисует зачёркнутую цену «+20 %» рядом с настоящей, поэтому ищем именно нашу.
+      if (ours && !new RegExp(`\\$${ours}(\\D|$)`).test(html)) fail(`${slug}: на Whop не видно цены ${ours}`);
+      else ok(`${slug}: Whop 200, цена ${price} на месте`);
+    }
+  }
+
+  // 3. Обработчики.
+  for (const [method, path, want] of site.endpoints) {
+    const init = method === 'POST' ? { method, headers: { 'Content-Type': 'application/json' }, body: '{}' } : {};
+    const r = await get(site.origin + path, init).catch(() => null);
+    if (!r || !want.includes(r.status)) fail(`${method} ${path} → ${r ? r.status : 'нет ответа'}, ждали ${want.join('/')}`);
+  }
+  ok(`обработчики: ${site.endpoints.length} проверены`);
+
+  // 4. Бесплатная проверка отвечает по существу.
+  const api = await (await get(`${site.origin}/api/ai-visibility/?url=example.net`)).json().catch(() => ({}));
+  if (api.ok && typeof api.score === 'number') ok(`бесплатная проверка: ok, балл ${api.score}`);
+  else fail(`бесплатная проверка не отвечает: ${JSON.stringify(api).slice(0, 120)}`);
+
+  // 5 и 6. Живая страница в браузере: кольцо, консоль, прокрутка.
+  let browser;
+  try { browser = await chromium.launch({ channel: 'chrome' }); } catch (e) { console.log('  ! Chrome не найден, экраны и кольцо не проверены: ' + e.message.split('\n')[0].slice(0, 80)); return; }
+  for (const [kind, opts] of [['десктоп', { viewport: { width: 1440, height: 900 } }], ['телефон', { ...devices['iPhone 13'] }]]) {
+    const ctx = await browser.newContext(opts);
+    const page = await ctx.newPage();
+    const errors = [];
+    page.on('pageerror', (e) => errors.push(e.message));
+    page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
+    for (const path of site.keyPages) {
+      errors.length = 0;
+      try {
+        await page.goto(site.origin + path, { waitUntil: 'networkidle', timeout: 45000 });
+        const wide = await page.evaluate(() => document.documentElement.scrollWidth > document.documentElement.clientWidth + 2);
+        if (wide) fail(`${path} (${kind}): горизонтальная прокрутка`);
+        if (errors.length) fail(`${path} (${kind}): ${errors.length} ошибок в консоли, первая: ${errors[0].slice(0, 100)}`);
+      } catch (e) { fail(`${path} (${kind}): ${e.message.slice(0, 80)}`); }
+    }
+    if (kind === 'десктоп') {
+      await page.goto(site.origin + site.check, { waitUntil: 'networkidle' });
+      await page.fill('input#vis-url', 'example.net');
+      await page.click('button[type=submit]');
+      await page.waitForSelector('#vis-result .ring', { timeout: 40000 }).catch(() => null);
+      const width = await page.evaluate(() => { const r = document.querySelector('#vis-result .ring'); return r ? getComputedStyle(r).width : null; });
+      if (width === '132px') ok('результат проверки нарисован: кольцо 132px');
+      else fail(`результат проверки без оформления: кольцо ${width}`);
+    }
+    await ctx.close();
+  }
+  await browser.close();
+  ok(`ключевые экраны: ${site.keyPages.length} страниц, десктоп и телефон`);
+}
+
+for (const key of Object.keys(SITES)) if (!only || only === key) await checkSite(key);
+console.log(failures.length ? `\nПРОВАЛОВ: ${failures.length}` : '\nВсё работает.');
+process.exit(failures.length ? 1 : 0);
