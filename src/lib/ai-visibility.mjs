@@ -121,10 +121,19 @@ function analysePage(html, url) {
 
 async function readSitemap(origin, robotsText, timeoutFn = () => 3000) {
   const fromRobots = [...(robotsText || '').matchAll(/^sitemap:\s*(\S+)/gim)].map((m) => m[1]);
-  const candidates = fromRobots.length ? fromRobots.slice(0, 2) : [`${origin}/sitemap-index.xml`, `${origin}/sitemap.xml`];
-  for (const u of candidates) {
-    if (timeoutFn() < 500) break;
+  const candidates = fromRobots.length
+    ? [...fromRobots.slice(0, 2), `${origin}/sitemap_index.xml`, `${origin}/sitemap-index.xml`, `${origin}/sitemap.xml`]
+    : [`${origin}/sitemap_index.xml`, `${origin}/sitemap-index.xml`, `${origin}/sitemap.xml`];
+  /*
+   * "We ran out of time" and "there is no sitemap" are different answers and used to score the
+   * same. A slow response once cost a real site three points and made the same site score 78, 81
+   * and 84 on different days, which is the one thing a number we sell must never do.
+   */
+  let timedOut = false;
+  for (const u of [...new Set(candidates)]) {
+    if (timeoutFn() < 500) { timedOut = true; break; }
     const r = await get(u, { timeout: timeoutFn() });
+    if (r.error === 'timeout') { timedOut = true; continue; }
     if (!r.ok || !/<(urlset|sitemapindex)/.test(r.text)) continue;
     let locs = [...r.text.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].map((m) => m[1]);
     let lastmod = /<lastmod>/.test(r.text);
@@ -134,7 +143,7 @@ async function readSitemap(origin, robotsText, timeoutFn = () => 3000) {
     }
     return { found: true, url: u, count: locs.length, lastmod, pages: locs.filter((l) => !/\.(xml|pdf|jpe?g|png)$/i.test(l)) };
   }
-  return { found: false, url: '', count: 0, lastmod: false, pages: [] };
+  return { found: false, url: '', count: 0, lastmod: false, pages: [], timedOut };
 }
 
 export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
@@ -216,6 +225,8 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
 
   // Area 4: answer-first content (25)
   const contentPages = sampled.length ? sampled : [homePage];
+  /* Say so. A score built from one page is not the same measurement as one built from four. */
+  const homeOnly = !sampled.length;
   const thin = contentPages.filter((p) => p.words < 300).length;
   const answerFirst = contentPages.filter((p) => p.answerFirst).length;
   const structured = contentPages.filter((p) => p.h2Count >= 3).length;
@@ -228,6 +239,7 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   content += Math.round(4 * (structured / contentPages.length)) + Math.round(3 * (withTables / contentPages.length));
   if (structured < contentPages.length) contentFindings.push({ id: 'few-h2', level: 'warn', text: `${contentPages.length - structured} sampled page(s) have fewer than three H2 sections.` });
   if (!withTables) contentFindings.push({ id: 'no-tables', level: 'warn', text: 'No tables on the sampled pages. Tables are the second most quoted format after the first paragraph.' });
+  if (homeOnly) contentFindings.push({ level: 'warn', text: 'Only the homepage could be read, so this area is measured on one page rather than several. A sitemap that answers would give a fuller picture.' });
 
   // Area 5: freshness and sources (15)
   const dated = contentPages.filter((p) => p.datePublished || p.dateModified).length;
@@ -252,7 +264,17 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
       trustFindings.push({ level: 'pass', text: 'Every sampled page that states figures names where they came from.' });
     }
   }
-  if (sitemap.found) { trust += sitemap.lastmod ? 3 : 1; if (!sitemap.lastmod) trustFindings.push({ id: 'sitemap-no-lastmod', level: 'warn', text: 'The sitemap carries no lastmod dates.' }); } else trustFindings.push({ level: 'fail', text: 'No XML sitemap found at the usual paths or in robots.txt.' });
+  if (sitemap.found) {
+    trust += sitemap.lastmod ? 3 : 1;
+    if (!sitemap.lastmod) trustFindings.push({ id: 'sitemap-no-lastmod', level: 'warn', text: 'The sitemap carries no lastmod dates.' });
+  } else if (sitemap.timedOut || sitemap.skipped) {
+    // Not measured, so not scored down. Printing a low number for something we never read is the
+    // error this check exists to avoid in other people's tools.
+    trust += 3;
+    trustFindings.push({ level: 'warn', text: 'The sitemap did not answer in time, so it was not checked. The score does not count this either way.' });
+  } else {
+    trustFindings.push({ level: 'fail', text: 'No XML sitemap found at the usual paths or in robots.txt.' });
+  }
 
   const areas = [
     { id: 'access', label: 'Can AI crawlers read it', score: access, max: 25, findings: accessFindings },
