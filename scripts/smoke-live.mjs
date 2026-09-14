@@ -25,6 +25,7 @@ import { resolve } from 'node:path';
 const SITES = {
   en: {
     origin: 'https://oper-stack.com',
+    lang: 'en',
     check: '/ai-visibility/',
     keyPages: ['/', '/products/', '/products/course/', '/pricing/', '/ai-visibility/', '/visits/'],
     endpoints: [
@@ -38,6 +39,7 @@ const SITES = {
   },
   ru: {
     origin: 'https://oper-stack.ru',
+    lang: 'ru',
     check: '/ai-visibility/',
     keyPages: ['/', '/produkty/', '/pricing/', '/zakaz/', '/ai-visibility/'],
     endpoints: [
@@ -99,6 +101,21 @@ async function checkSite(key) {
   const api = await (await get(`${site.origin}/api/ai-visibility/?url=example.net`)).json().catch(() => ({}));
   if (api.ok && typeof api.score === 'number') ok(`бесплатная проверка: ok, балл ${api.score}`);
   else fail(`бесплатная проверка не отвечает: ${JSON.stringify(api).slice(0, 120)}`);
+
+  /*
+   * Язык ответа. Движок проверки один на два сайта, и до 14 сентября 2026 русский посетитель
+   * получал весь результат по-английски: названия областей и все находки. Сборка этого не видит,
+   * потому что собирается она одинаково, а язык выбирается в обработчике.
+   * Имена роботов не переводятся: это названия продуктов.
+   */
+  if (api.ok) {
+    const строки = [...(api.areas || []).map((a) => a.label), ...(api.areas || []).flatMap((a) => (a.findings || []).map((f) => f.text))];
+    const кириллица = /[А-Яа-яЁё]/;
+    const чужие = site.lang === 'ru' ? строки.filter((t) => !кириллица.test(t)) : строки.filter((t) => кириллица.test(t));
+    if (!строки.length) fail('в ответе проверки нет ни одной области');
+    else if (чужие.length) fail(`ответ проверки не на том языке (${чужие.length} из ${строки.length}): ${чужие.slice(0, 2).join(' | ')}`);
+    else ok(`ответ проверки на нужном языке: ${строки.length} строк`);
+  }
 
   // 5 и 6. Живая страница в браузере: кольцо, консоль, прокрутка.
   let browser;
