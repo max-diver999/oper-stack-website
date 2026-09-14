@@ -18,6 +18,7 @@ import { checkVisibility, normaliseInput } from '../../lib/ai-visibility.mjs';
 import { topTask, renderTask } from '../../lib/ai-visibility-tasks.mjs';
 import { buildRunBody, buildRunSubject } from '../../lib/report-fulfilment';
 import { makeUnsubToken } from './unsubscribe';
+import { button, emailShell, esc as escHtml, findings, note, p as par, scoreBlock, taskBlock } from '../../lib/email-shell';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 import { logLead, originOf } from '../../lib/sheets-log';
 import { SITE } from '../../data/site';
@@ -117,20 +118,31 @@ function buildEmail(task: ReturnType<typeof topTask>, result: any, unsubUrl: str
     `Not interested in the follow-ups? One click and we stop: ${unsubUrl}`,
   ].join('\n');
 
-  const html = [
-    `<p>Your site <strong>${esc(host)}</strong> scored <strong>${score} of 100</strong> on the AI visibility check.</p>`,
-    n ? `<p>Everything the check found on it, ${n} item${n === 1 ? '' : 's'}:</p><ul style="padding-left:18px;margin:14px 0">${listHtml}</ul>` : '<p>Nothing is failing on this site. That is a good result.</p>',
-    '<p>Here is the one that moves your score most, written out in full. Copy it whole and hand it to whoever looks after your site, or paste it into ChatGPT, Claude or Cursor. Keep the "Now" and "How to check" lines: without them nobody knows where to start or when it is done.</p>',
-    '<div style="border-left:3px solid #888;padding:12px 16px;margin:18px 0;background:#fafafa">',
-    `<p style="margin:0 0 10px"><strong>Now:</strong> ${esc(task?.now || '')}</p>`,
-    `<p style="margin:0 0 10px"><strong>What to do:</strong> ${esc(task?.task || '')}</p>`,
-    `<p style="margin:0 0 10px"><strong>How to check:</strong> ${esc(task?.verify || '')}</p>`,
-    `<p style="margin:0;color:#666;font-size:13px">${esc(task?.rule || '')}</p>`,
-    '</div>',
-    `<p>This check reads one page. The <a href="${SITE.url}/products/site-report/">site fix list</a> reads up to twenty and turns every problem above into a task written the same way, for 9 USD.</p>`,
-    '<p style="color:#888;font-size:13px">OperStack · info@oper-stack.com<br>'
-      + `Not interested in the follow-ups? <a href="${unsubUrl}" style="color:#888">One click and we stop.</a></p>`,
-  ].join('\n');
+  const html = emailShell({
+    preheader: n
+      ? `${n} problem${n === 1 ? '' : 's'} found, and the one to fix first`
+      : 'Nothing is failing on this site',
+    heading: n
+      ? `${n} problem${n === 1 ? '' : 's'} on ${host}`
+      : `${host} is clean`,
+    blocks: [
+      scoreBlock(host, score),
+      n
+        ? par('Everything the check found on your site:') + findings(problems)
+        : par('Nothing is failing on this site. That is a good result, and rarer than you would think.'),
+      ...(task
+        ? [
+            par('Here is the one that moves your score most, written out in full. Copy it whole and hand it to whoever looks after your site, or paste it into ChatGPT, Claude or Cursor. Keep the Now and How to check lines: without them nobody knows where to start or when it is done.'),
+            taskBlock(task as Record<string, string>),
+          ]
+        : []),
+      par(`A five-page measurement of <strong>${escHtml(host)}</strong> follows as a PDF, usually within twenty minutes.`),
+      par('This check reads one page. The site fix list reads up to twenty and turns every problem above into a task written the same way.'),
+      button(`${SITE.url}/products/site-report/`, 'Get the full list of tasks, 9 USD →'),
+      note('For scale: an agency charges 2,000 to 7,500 USD for a technical audit and takes 30 to 45 days. Most of that bill is the measuring, and measuring is what a machine does best. What an agency adds on top, a person who reads your findings and says what they mean for your business, is our 149 USD audit.'),
+    ],
+    unsubUrl,
+  });
   return { subject, text, html };
 }
 
