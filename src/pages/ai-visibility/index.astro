@@ -54,6 +54,18 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       </form>
     </section>
 
+    <!-- Врезка стоит сразу под результатом: человек только что увидел свой балл, и это
+         самый естественный момент сказать, что то же самое работает у него в рабочем окне.
+         Блок статический, не прячется: до проверки он читается как возможность, после
+         проверки как следующий шаг. -->
+    <section class="mcp">
+      <h2>Prefer to do this inside Claude or ChatGPT?</h2>
+      <p>If you already work with Claude, ChatGPT or Cursor, they can run this check for you, in the window you are already in. You write in plain words: <em>look at my site</em>, <em>compare me with these three</em>, <em>how many AI visits did I get this month</em>.</p>
+      <p class="addr"><code id="mcp-url">https://oper-stack.com/api/mcp/</code><button type="button" id="mcp-copy" class="copy">Copy</button></p>
+      <p class="note">Paste it into your program's settings once. Nothing to install, no account, no payment. The slash at the end matters: without it some programs do not follow the redirect.</p>
+      <p class="note"><a href="/mcp/">Step-by-step setup for each program →</a></p>
+    </section>
+
     <h2>What the check measures</h2>
     <ol class="areas-list">
       <li><strong>Access, 25 points.</strong> robots.txt read per user agent for fourteen AI crawlers and fetchers. A blocked search fetcher costs more than a blocked training crawler, because the fetchers are the bots that cite pages live.</li>
@@ -245,6 +257,22 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       out.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
+    const mcpCopy = document.getElementById('mcp-copy') as HTMLButtonElement | null;
+    mcpCopy?.addEventListener('click', async () => {
+      const url = document.getElementById('mcp-url')?.textContent?.trim() || '';
+      try {
+        await navigator.clipboard.writeText(url);
+        mcpCopy.textContent = 'Copied';
+      } catch {
+        // Буфер обмена может быть закрыт настройками браузера. Тогда выделяем адрес,
+        // чтобы человеку осталось нажать только «копировать» самому.
+        const node = document.getElementById('mcp-url');
+        if (node) { const r = document.createRange(); r.selectNodeContents(node); const sel = getSelection(); sel?.removeAllRanges(); sel?.addRange(r); }
+        mcpCopy.textContent = 'Select and copy';
+      }
+      setTimeout(() => { mcpCopy.textContent = 'Copy'; }, 2500);
+    });
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const url = input.value.trim();
@@ -328,6 +356,15 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
      чтобы человек увидел его ровно там, где список обрывается. */
   #vis-result .locked { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; border: 1px dashed rgba(61,184,169,.45); background: rgba(26,138,125,.07); font-size: 15px; line-height: 1.5; }
   #vis-result .locked strong { color: var(--paper); }
+  /* Врезка про адрес для ИИ-помощников. Тише, чем блок обмена на почту: она не должна
+     перетягивать внимание с того, ради чего человек пришёл. */
+  .mcp { margin: 34px 0 10px; padding: 22px 24px; border-radius: 14px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03); }
+  .mcp h2 { margin-top: 0; }
+  .mcp em { font-style: normal; color: rgba(245,242,236,.95); }
+  .mcp .addr { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 14px 0 10px; }
+  .mcp code { font-family: var(--fm); font-size: 15px; padding: 9px 13px; border-radius: 8px; background: rgba(0,0,0,.32); border: 1px solid rgba(61,184,169,.3); color: var(--paper); word-break: break-all; }
+  .mcp .copy { font: inherit; font-size: 14px; font-weight: 600; padding: 9px 16px; border-radius: 8px; border: 1px solid rgba(61,184,169,.45); background: none; color: #3DB8A9; cursor: pointer; }
+  .mcp .copy:hover { background: rgba(61,184,169,.12); }
   .capture { margin-top: 28px; padding: 24px; border-radius: 16px; border: 1px solid rgba(61,184,169,.28); background: rgba(26,138,125,.08); }
   .capture h2 { margin-top: 0; }
   .capture form { display: grid; gap: 14px; margin-top: 12px; }
