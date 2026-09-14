@@ -20,6 +20,16 @@ const error = Astro.url.searchParams.get('e') || '';
 const secret = String(import.meta.env.KIT_DOWNLOAD_SECRET ?? process.env.KIT_DOWNLOAD_SECRET ?? '').trim();
 const check = token && secret ? verifyReportToken(token, secret) : { ok: false as const };
 const claims = check.ok ? check.claims : undefined;
+/**
+ * Показывать форму можно только по настоящей ссылке.
+ *
+ * Раньше здесь проверялось лишь то, что в адресе вообще что-то стоит после t=. Поэтому любой
+ * мусор, просроченная ссылка или ссылка с опечаткой открывали форму, человек вводил адрес
+ * своего сайта, жал кнопку и только тогда узнавал, что ссылка не годится. Хуже того, он мог
+ * решить, что заявка ушла. Теперь негодная ссылка сразу говорит, что с ней не так.
+ */
+const linkBroken = Boolean(token) && !check.ok;
+const brokenReason = check.ok ? '' : String((check as { reason?: string }).reason ?? '');
 const ru = claims ? claims.lang === 'ru' : Astro.url.searchParams.get('lang') === 'ru';
 const withRivals = claims?.tier === '29';
 const t = ru
@@ -33,6 +43,8 @@ const t = ru
       rivalsLabel: 'Конкуренты, до трёх',
       rivalsNote: 'Кого с вами сравнить. Можно оставить пустым: тогда будет только ваш сайт.',
       noToken: 'Эта страница открывается по ссылке из письма об оплате. Если письма нет, напишите на info@oper-stack.com с адреса, с которого оплачивали.',
+      expired: 'Срок этой ссылки вышел. Напишите на info@oper-stack.com с адреса, с которого оплачивали, и мы пришлём свежую в тот же день.',
+      badLink: 'Эта ссылка не открывается: похоже, она скопирована не целиком или изменилась по дороге. Откройте её прямо из письма об оплате, а если не выходит, напишите на info@oper-stack.com с адреса, с которого оплачивали.',
       back: '← На сайт',
     }
   : {
@@ -45,6 +57,8 @@ const t = ru
       rivalsLabel: 'Rivals, up to three',
       rivalsNote: 'Who to put beside you. Leave empty and the report covers your site alone.',
       noToken: 'This page opens from the link in your payment email. If it never arrived, write to info@oper-stack.com from the address you paid with.',
+      expired: 'This link has expired. Write to info@oper-stack.com from the address you paid with and we will send a fresh one the same day.',
+      badLink: 'This link does not open: it looks like it was copied partially or changed on the way. Open it straight from your payment email, and if that fails write to info@oper-stack.com from the address you paid with.',
       back: '← Back to the site',
     };
 ---
@@ -89,7 +103,7 @@ const t = ru
 <body>
   <main>
     <h1>{t.title}</h1>
-    {token ? (
+    {check.ok ? (
       <>
         <p>{t.lead}</p>
         {error && <p class="err">{error}</p>}
@@ -110,6 +124,8 @@ const t = ru
         </form>
         <p class="note">{t.note}</p>
       </>
+    ) : linkBroken ? (
+      <p class="err">{brokenReason === 'link expired' ? t.expired : t.badLink}</p>
     ) : (
       <p>{t.noToken}</p>
     )}
