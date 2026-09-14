@@ -48,7 +48,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     <ol class="areas-list">
       <li><strong>Access, 25 points.</strong> robots.txt read per user agent for fourteen AI crawlers and fetchers. A blocked search fetcher costs more than a blocked training crawler, because the fetchers are the bots that cite pages live.</li>
       <li><strong>Agent map, 15 points.</strong> llms.txt exists, is text, and links to the site's own pages rather than a template demo.</li>
-      <li><strong>Entity, 20 points.</strong> Organization or business schema, FAQPage and Article schema, a canonical tag and Open Graph on the homepage.</li>
+      <li><strong>Entity, 20 points.</strong> Organization or business schema, FAQPage, a page-level type (Article, Service, Product, Course and the like), a canonical tag and Open Graph on the homepage.</li>
       <li><strong>Quotable content, 25 points.</strong> On up to three sampled pages: at least 300 words, an answer-first paragraph with a figure right after the H1, three or more H2 sections, a table.</li>
       <li><strong>Dates and sources, 15 points.</strong> Publication dates in meta or schema, source phrases in the text, a sitemap with lastmod.</li>
     </ol>
@@ -202,7 +202,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
           <div>
             <p class="label">Grade ${esc(r.grade)} · ${esc(r.host)}</p>
             <h2 class="verdict">${r.score >= 80 ? 'AI systems can read and quote this site.' : r.score >= 65 ? 'Readable, with gaps that cost citations.' : r.score >= 45 ? 'Readable, but there is little to quote.' : 'Mostly invisible to answer engines.'}</h2>
-            <p class="note">Checked ${new Date(r.checkedAt).toLocaleString('en-GB')} in ${(r.ms / 1000).toFixed(1)} s. Sitemap: ${r.sitemap.found ? `${r.sitemap.count} URLs${r.sitemap.lastmod ? ', dated' : ', no dates'}` : 'not found'}.</p>
+            <p class="note">Checked ${new Date(r.checkedAt).toLocaleString('en-GB')} in ${(r.ms / 1000).toFixed(1)} s. Sitemap: ${r.sitemap.found ? `${r.sitemap.count} URLs${r.sitemap.lastmod ? ', dated' : ', no dates'}` : r.sitemap.unchecked ? 'did not answer in time, not checked' : 'not found'}.</p>
           </div>
         </div>
         ${fixes}

@@ -25,7 +25,8 @@
     "ai:lastmod": "node scripts/ai-visibility/page-lastmod.mjs",
     "ai:check": "node scripts/ai-visibility/check-agent-index.mjs",
     "ai:verify": "node scripts/ai-visibility/verify-live.mjs",
-    "smoke": "node scripts/smoke-live.mjs"
+    "smoke": "node scripts/smoke-live.mjs",
+    "test:lang": "node scripts/test-ai-visibility-lang.mjs"
   },
   "dependencies": {
     "@astrojs/sitemap": "3.7.1",

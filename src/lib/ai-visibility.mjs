@@ -3,27 +3,132 @@
  * and cite this site? Public signals only, one homepage fetch plus robots, llms.txt, the
  * sitemap head and up to three sampled pages, all in parallel, under a hard time budget so it
  * runs inside a serverless function. Plain ESM so the same module runs in Node for tests.
+ *
+ * The measurement is language-neutral; only the words a person reads come from the MESSAGES
+ * table below, picked by the `lang` option ('en' by default, 'ru' on oper-stack.ru). Finding ids
+ * and area ids never change with the language, so task lists and reports can key on them.
  */
 
 const UA = 'Mozilla/5.0 (compatible; OperStackVisibility/0.1; +https://oper-stack.com/ai-visibility/)';
 const MAX_BODY = 600_000;
 
 const AI_AGENTS = [
-  { agent: 'oai-searchbot', label: 'ChatGPT search (OAI-SearchBot)', kind: 'search' },
-  { agent: 'chatgpt-user', label: 'ChatGPT browsing (ChatGPT-User)', kind: 'search' },
-  { agent: 'gptbot', label: 'OpenAI training (GPTBot)', kind: 'train' },
-  { agent: 'perplexitybot', label: 'Perplexity (PerplexityBot)', kind: 'search' },
-  { agent: 'perplexity-user', label: 'Perplexity browsing (Perplexity-User)', kind: 'search' },
-  { agent: 'claudebot', label: 'Claude (ClaudeBot)', kind: 'train' },
-  { agent: 'claude-searchbot', label: 'Claude search (Claude-SearchBot)', kind: 'search' },
-  { agent: 'claude-user', label: 'Claude browsing (Claude-User)', kind: 'search' },
-  { agent: 'anthropic-ai', label: 'Anthropic (anthropic-ai)', kind: 'train' },
-  { agent: 'google-extended', label: 'Gemini grounding (Google-Extended)', kind: 'train' },
-  { agent: 'bingbot', label: 'Copilot and Bing (Bingbot)', kind: 'search' },
-  { agent: 'applebot-extended', label: 'Apple Intelligence (Applebot-Extended)', kind: 'train' },
-  { agent: 'ccbot', label: 'Common Crawl (CCBot)', kind: 'train' },
-  { agent: 'duckassistbot', label: 'DuckDuckGo AI (DuckAssistBot)', kind: 'search' },
+  { agent: 'oai-searchbot', label: 'ChatGPT search (OAI-SearchBot)', labelRu: 'Поиск ChatGPT (OAI-SearchBot)', kind: 'search' },
+  { agent: 'chatgpt-user', label: 'ChatGPT browsing (ChatGPT-User)', labelRu: 'Просмотр страниц ChatGPT (ChatGPT-User)', kind: 'search' },
+  { agent: 'gptbot', label: 'OpenAI training (GPTBot)', labelRu: 'Обучение OpenAI (GPTBot)', kind: 'train' },
+  { agent: 'perplexitybot', label: 'Perplexity (PerplexityBot)', labelRu: 'Perplexity (PerplexityBot)', kind: 'search' },
+  { agent: 'perplexity-user', label: 'Perplexity browsing (Perplexity-User)', labelRu: 'Просмотр страниц Perplexity (Perplexity-User)', kind: 'search' },
+  { agent: 'claudebot', label: 'Claude (ClaudeBot)', labelRu: 'Claude (ClaudeBot)', kind: 'train' },
+  { agent: 'claude-searchbot', label: 'Claude search (Claude-SearchBot)', labelRu: 'Поиск Claude (Claude-SearchBot)', kind: 'search' },
+  { agent: 'claude-user', label: 'Claude browsing (Claude-User)', labelRu: 'Просмотр страниц Claude (Claude-User)', kind: 'search' },
+  { agent: 'anthropic-ai', label: 'Anthropic (anthropic-ai)', labelRu: 'Anthropic (anthropic-ai)', kind: 'train' },
+  { agent: 'google-extended', label: 'Gemini grounding (Google-Extended)', labelRu: 'Gemini (Google-Extended)', kind: 'train' },
+  { agent: 'bingbot', label: 'Copilot and Bing (Bingbot)', labelRu: 'Copilot и Bing (Bingbot)', kind: 'search' },
+  { agent: 'applebot-extended', label: 'Apple Intelligence (Applebot-Extended)', labelRu: 'Apple Intelligence (Applebot-Extended)', kind: 'train' },
+  { agent: 'ccbot', label: 'Common Crawl (CCBot)', labelRu: 'Common Crawl (CCBot)', kind: 'train' },
+  { agent: 'duckassistbot', label: 'DuckDuckGo AI (DuckAssistBot)', labelRu: 'DuckDuckGo AI (DuckAssistBot)', kind: 'search' },
 ];
+
+/**
+ * Russian plural form: pl(1, ...) is "страница", pl(2, ...) "страницы", pl(5, ...) "страниц".
+ * Two shapes are needed and they differ: a bare count takes the counted form, while "из N"
+ * always takes the genitive, which is plural for every N but one. Getting this wrong reads as
+ * broken Russian on the one screen we send catalogue traffic to.
+ */
+const pl = (n, one, few, many) => { const a = Math.abs(n) % 100; const b = a % 10; return a > 10 && a < 20 ? many : b > 1 && b < 5 ? few : b === 1 ? one : many; };
+const ofPages = (n) => (n === 1 ? 'проверенной страницы' : 'проверенных страниц');
+
+/** Exported so the offline test can assert the Russian forms without hitting the network. */
+export const MESSAGES = {
+  en: {
+    badInput: 'Enter a public site address, for example example.com',
+    tooSlow: 'The site took too long to answer',
+    badAnswer: (status, url) => `The site answered ${status || 'nothing'} for ${url}`,
+    area: { access: 'Can AI crawlers read it', index: 'Is there a map for agents (llms.txt)', entity: 'Is the entity clear (schema)', content: 'Is there something to quote', trust: 'Can it be dated and trusted' },
+    robotsAllBlocked: 'robots.txt disallows the whole site for every crawler. Nothing can read it.',
+    fetchersBlocked: (list) => `Blocked answer-engine fetchers: ${list}. These are the bots that cite pages live.`,
+    trainingBlocked: (list) => `Blocked training crawlers: ${list}. Models will not learn the brand from the site.`,
+    noaiMeta: 'A page carries a noai robots meta tag.',
+    allAllowed: (n, signal) => `All ${n} AI crawlers and fetchers are allowed${signal ? ` (Content-Signal: ${signal})` : ''}.`,
+    llmsMissing: 'No llms.txt. Answer engines get no map of what the site is and which pages matter.',
+    llmsNotText: '/llms.txt answers with an HTML page instead of a text index.',
+    llmsForeign: (hosts) => `llms.txt links mostly to other hosts (${hosts}). An AI system may misidentify the business.`,
+    llmsOk: (n) => `llms.txt present with ${n} link(s) to the site's own pages.`,
+    orgOk: 'Organization or business schema names the entity behind the site.',
+    orgMissing: 'No Organization or business schema: AI systems have no entity to attach the site to.',
+    faqOk: 'FAQPage schema found, the easiest format for an engine to quote.',
+    faqMissing: 'No FAQPage schema on the sampled pages.',
+    articleOk: 'Article schema on the sampled pages: an engine can name and date what it is quoting.',
+    pageTypeOk: (type) => `${type} schema on the sampled pages: an engine can name what it is quoting.`,
+    pageTypeMissing: 'The sampled pages carry no page-level type (Article, Service, Product, Course and the like), so an engine cannot say what kind of thing it is quoting.',
+    canonicalMissing: 'The homepage has no canonical tag.',
+    ogMissing: 'No Open Graph tags on the homepage: shared links and previews render without a title or image.',
+    thinPages: (thin, total) => `${thin} of ${total} sampled page(s) hold under 300 words. Engines rarely cite thin pages.`,
+    avgWords: (avg) => `Sampled pages carry ${avg} words on average.`,
+    answerFirstMissing: (n, total) => `${n} of ${total} sampled page(s) open with an answer-first paragraph (20 to 90 words with a figure right after the H1). That paragraph is what gets quoted.`,
+    answerFirstOk: 'Every sampled page opens with an answer-first paragraph carrying a figure.',
+    fewH2: (n) => `${n} sampled page(s) have fewer than three H2 sections.`,
+    noTables: 'No tables on the sampled pages. Tables are the second most quoted format after the first paragraph.',
+    homeOnly: 'Only the homepage could be read, so this area is measured on one page rather than several. A sitemap that answers would give a fuller picture.',
+    datesMissing: (n) => `${n} sampled page(s) expose no publication or modified date. Engines prefer sources they can date.`,
+    datesOk: 'Sampled pages expose publication dates.',
+    noFigures: 'The sampled pages state no figures, so there is nothing that needs a source named.',
+    sourcesMissing: (n, total) => `${n} of ${total} sampled page(s) state figures without naming where they came from ("according to", "data from").`,
+    sourcesOk: 'Every sampled page that states figures names where they came from.',
+    sitemapNoLastmod: 'The sitemap carries no lastmod dates.',
+    sitemapTimedOut: 'The sitemap did not answer in time, so it was not checked. The score does not count this either way.',
+    sitemapMissing: 'No XML sitemap found at the usual paths or in robots.txt.',
+  },
+  ru: {
+    badInput: 'Введите адрес публичного сайта, например example.ru',
+    tooSlow: 'Сайт слишком долго не отвечал',
+    badAnswer: (status, url) => `Сайт ответил ${status ? `кодом ${status}` : 'ничем'} на ${url}`,
+    area: { access: 'Могут ли роботы ИИ прочитать сайт', index: 'Есть ли карта для агентов (llms.txt)', entity: 'Понятно ли, кто вы (разметка)', content: 'Есть ли что процитировать', trust: 'Можно ли датировать и доверять' },
+    robotsAllBlocked: 'robots.txt закрывает весь сайт для всех роботов. Его никто не может прочитать.',
+    fetchersBlocked: (list) => `Закрыты поисковые роботы ответных систем: ${list}. Именно они достают страницу, чтобы процитировать её в ответе.`,
+    trainingBlocked: (list) => `Закрыты обучающие роботы: ${list}. Модели не узнают о бренде с сайта.`,
+    noaiMeta: 'На одной из страниц стоит мета-тег robots со значением noai.',
+    allAllowed: (n, signal) => `Все ${n} роботов ИИ допущены на сайт${signal ? ` (Content-Signal: ${signal})` : ''}.`,
+    llmsMissing: 'Нет llms.txt. Ответные системы не получают карты: что это за сайт и какие страницы главные.',
+    llmsNotText: '/llms.txt отдаёт HTML-страницу вместо текстового указателя.',
+    llmsForeign: (hosts) => `Ссылки в llms.txt ведут в основном на чужие домены (${hosts}). Система ИИ может перепутать, чей это бизнес.`,
+    llmsOk: (n) => `llms.txt есть, в нём ${n} ${pl(n, 'ссылка', 'ссылки', 'ссылок')} на страницы самого сайта.`,
+    orgOk: 'Разметка Organization или бизнеса называет, кто стоит за сайтом.',
+    orgMissing: 'Нет разметки Organization или бизнеса: системам ИИ не к кому привязать сайт.',
+    faqOk: 'Найдена разметка FAQPage, самый удобный для цитирования формат.',
+    faqMissing: 'На проверенных страницах нет разметки FAQPage.',
+    articleOk: 'На проверенных страницах есть разметка Article: система может назвать и датировать то, что цитирует.',
+    pageTypeOk: (type) => `На проверенных страницах есть разметка ${type}: система может назвать, что именно цитирует.`,
+    pageTypeMissing: 'На проверенных страницах нет типа страницы (Article, Service, Product, Course и подобных), поэтому система не может сказать, что за вещь она цитирует.',
+    canonicalMissing: 'На главной нет канонического адреса (тега canonical).',
+    ogMissing: 'На главной нет тегов Open Graph: ссылка в мессенджерах и соцсетях показывается без заголовка и картинки.',
+    thinPages: (thin, total) => (total === 1
+      ? 'Единственная проверенная страница короче 300 слов. Короткие страницы цитируют редко.'
+      : `Из ${total} ${ofPages(total)} ${thin} короче 300 слов. Короткие страницы цитируют редко.`),
+    avgWords: (avg) => `На проверенных страницах в среднем ${avg} ${pl(avg, 'слово', 'слова', 'слов')}.`,
+    answerFirstMissing: (n, total) => (total === 1
+      ? 'Единственная проверенная страница не начинается с абзаца-ответа (20-90 слов с цифрой сразу после H1). Именно этот абзац попадает в цитату.'
+      : `Из ${total} ${ofPages(total)} с абзаца-ответа (20-90 слов с цифрой сразу после H1) ${n === 0 ? 'не начинается ни одна' : n === 1 ? 'начинается одна' : `начинаются ${n}`}. Именно этот абзац попадает в цитату.`),
+    answerFirstOk: 'Каждая проверенная страница начинается с абзаца-ответа с цифрой.',
+    fewH2: (n, total) => (total === 1
+      ? 'У единственной проверенной страницы меньше трёх подзаголовков H2.'
+      : `У ${n} из ${total} ${ofPages(total)} меньше трёх подзаголовков H2.`),
+    noTables: 'На проверенных страницах нет таблиц. Таблица второй по цитируемости формат после первого абзаца.',
+    homeOnly: 'Прочитать удалось только главную, поэтому эта область измерена по одной странице, а не по нескольким. Отвечающая карта сайта дала бы полную картину.',
+    datesMissing: (n, total) => (total === 1
+      ? 'Единственная проверенная страница не показывает дату публикации или изменения. Системы предпочитают источники, которые можно датировать.'
+      : `${n} из ${total} ${ofPages(total)} не ${n === 1 ? 'показывает' : 'показывают'} дату публикации или изменения. Системы предпочитают источники, которые можно датировать.`),
+    datesOk: 'Проверенные страницы показывают даты публикации.',
+    noFigures: 'На проверенных страницах нет цифр, поэтому и источники называть нечему.',
+    sourcesMissing: (n, total) => (total === 1
+      ? 'Единственная проверенная страница с цифрами не называет, откуда они («по данным», «источник»).'
+      : `${n} из ${total} ${ofPages(total)} ${n === 1 ? 'приводит' : 'приводят'} цифры, не называя, откуда они («по данным», «источник»).`),
+    sourcesOk: 'Каждая проверенная страница с цифрами называет их источник.',
+    sitemapNoLastmod: 'В карте сайта нет дат изменения (lastmod).',
+    sitemapTimedOut: 'Карта сайта не ответила вовремя, поэтому её не проверяли. На оценку это не влияет ни в какую сторону.',
+    sitemapMissing: 'XML-карта сайта не найдена ни по обычным адресам, ни в robots.txt.',
+  },
+};
 
 function isPrivateHost(host) {
   const h = host.toLowerCase();
@@ -85,6 +190,15 @@ export function agentVerdict(robots, agent) {
   return fullBlock ? 'blocked' : 'allowed';
 }
 
+/*
+ * Source phrases and figure units in English and Russian. A Russian page that writes «по данным
+ * Росстата, 12 500 ₽» names a source and states a figure just as an English one does, and the
+ * check must see both, or every Russian site loses the same five points for no reason. \b is
+ * ASCII-only in JavaScript, so the Cyrillic words are fenced with letter lookarounds instead.
+ */
+const SOURCE_RE = /(?<!\p{L})(according to|source:|sources:|data from|reported by|published by|registry|statistics office|central bank|по данным|источник:|источники:|согласно|по информации|по сведениям|росстат|центробанк|банк россии|росреестр|минфин|минэкономразвития)(?!\p{L})/giu;
+const FIGURE_RE = /\d[\d,.]*\s*(%|percent|процент\w*|[A-Z]{3}\b|km|км|m²|м²|sqm|кв\.?\s?м|min|мин|тыс|млн|млрд|₽|руб)/gu;
+
 function analysePage(html, url) {
   const head = html.slice(0, 200_000);
   const title = strip(attr(head, /<title[^>]*>([\s\S]*?)<\/title>/i));
@@ -114,8 +228,8 @@ function analysePage(html, url) {
   const firstPara = strip((afterH1.match(/<p[^>]*>([\s\S]*?)<\/p>/i) || ['', ''])[1]);
   const firstParaWords = (firstPara.match(/[\p{L}\p{N}][\p{L}\p{N}'’-]*/gu) || []).length;
   const answerFirst = firstParaWords >= 20 && firstParaWords <= 90 && /\d/.test(firstPara);
-  const sourcePhrases = (text.match(/\b(according to|source:|sources:|data from|reported by|published by|registry|statistics office|central bank)\b/gi) || []).length;
-  const numbers = (text.match(/\d[\d,.]*\s*(%|percent|[A-Z]{3}\b|km|m²|sqm|min)/g) || []).length;
+  const sourcePhrases = (text.match(SOURCE_RE) || []).length;
+  const numbers = (text.match(FIGURE_RE) || []).length;
   return { url, title, description, robotsMeta, canonical, ogTitle, schemaTypes: [...types], datePublished, dateModified, words, h1, h2Count, tables, firstPara: firstPara.slice(0, 220), answerFirst, sourcePhrases, numbers, noai: /noai|noimageai/.test(robotsMeta) };
 }
 
@@ -146,15 +260,17 @@ async function readSitemap(origin, robotsText, timeoutFn = () => 3000) {
   return { found: false, url: '', count: 0, lastmod: false, pages: [], timedOut };
 }
 
-export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
+export async function checkVisibility(input, { budgetMs = 8500, lang = 'en' } = {}) {
+  const T = MESSAGES[lang] || MESSAGES.en;
+  const agentLabel = (a) => (lang === 'ru' ? a.labelRu : a.label);
   const started = Date.now();
   const deadline = started + budgetMs;
   const left = () => deadline - Date.now();
   const url = normaliseInput(input);
-  if (!url) return { ok: false, error: 'Enter a public site address, for example example.com' };
+  if (!url) return { ok: false, error: T.badInput };
   const origin = new URL(url).origin; const host = new URL(url).host;
   const [home, robotsRes, llmsRes] = await Promise.all([get(url, { timeout: Math.min(6000, left() - 300) }), get(`${origin}/robots.txt`, { timeout: Math.min(4000, left() - 300) }), get(`${origin}/llms.txt`, { timeout: Math.min(4000, left() - 300) })]);
-  if (!home.ok || !/html/i.test(home.type)) return { ok: false, error: home.error === 'timeout' ? 'The site took too long to answer' : `The site answered ${home.status || 'nothing'} for ${url}` };
+  if (!home.ok || !/html/i.test(home.type)) return { ok: false, error: home.error === 'timeout' ? T.tooSlow : T.badAnswer(home.status, url) };
   const homePage = analysePage(home.text, home.url);
   const robots = parseRobots(robotsRes.ok ? robotsRes.text : '');
   const sitemap = left() > 1500 ? await readSitemap(origin, robotsRes.ok ? robotsRes.text : '', () => Math.min(3000, left() - 300)) : { found: false, url: '', count: 0, lastmod: false, pages: [], skipped: true };
@@ -182,18 +298,18 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   if (starBlocked) access = 0; else { access -= Math.min(15, blockedSearch.length * 4); access -= Math.min(8, blockedTrain.length * 2); if (noai) access -= 5; }
   access = Math.max(0, access);
   const accessFindings = [];
-  if (starBlocked) accessFindings.push({ id: 'robots-all-blocked', level: 'fail', text: 'robots.txt disallows the whole site for every crawler. Nothing can read it.' });
-  if (blockedSearch.length) accessFindings.push({ id: 'robots-fetchers-blocked', level: 'fail', text: `Blocked answer-engine fetchers: ${blockedSearch.map((v) => v.label).join(', ')}. These are the bots that cite pages live.` });
-  if (blockedTrain.length) accessFindings.push({ id: 'robots-training-blocked', level: 'warn', text: `Blocked training crawlers: ${blockedTrain.map((v) => v.label).join(', ')}. Models will not learn the brand from the site.` });
-  if (noai) accessFindings.push({ id: 'noai-meta', level: 'warn', text: 'A page carries a noai robots meta tag.' });
-  if (!accessFindings.length) accessFindings.push({ level: 'pass', text: `All ${AI_AGENTS.length} AI crawlers and fetchers are allowed${robots.signal ? ` (Content-Signal: ${robots.signal})` : ''}.` });
+  if (starBlocked) accessFindings.push({ id: 'robots-all-blocked', level: 'fail', text: T.robotsAllBlocked });
+  if (blockedSearch.length) accessFindings.push({ id: 'robots-fetchers-blocked', level: 'fail', text: T.fetchersBlocked(blockedSearch.map(agentLabel).join(', ')) });
+  if (blockedTrain.length) accessFindings.push({ id: 'robots-training-blocked', level: 'warn', text: T.trainingBlocked(blockedTrain.map(agentLabel).join(', ')) });
+  if (noai) accessFindings.push({ id: 'noai-meta', level: 'warn', text: T.noaiMeta });
+  if (!accessFindings.length) accessFindings.push({ level: 'pass', text: T.allAllowed(AI_AGENTS.length, robots.signal) });
 
   // Area 2: agent index (15)
   let index = 0; const indexFindings = [];
-  if (!llmsRes.ok) indexFindings.push({ id: 'llms-missing', level: 'fail', text: 'No llms.txt. Answer engines get no map of what the site is and which pages matter.' });
-  else if (!llmsIsText) { index = 3; indexFindings.push({ id: 'llms-not-text', level: 'fail', text: '/llms.txt answers with an HTML page instead of a text index.' }); }
-  else if (llmsLinks.length && llmsForeign.length > llmsLinks.length / 2) { index = 5; indexFindings.push({ id: 'llms-foreign', level: 'fail', text: `llms.txt links mostly to other hosts (${[...new Set(llmsForeign.map((l) => new URL(l).host))].slice(0, 3).join(', ')}). An AI system may misidentify the business.` }); }
-  else { index = llmsLinks.length >= 5 ? 15 : 10; indexFindings.push({ level: 'pass', text: `llms.txt present with ${llmsLinks.length} link(s) to the site's own pages.` }); }
+  if (!llmsRes.ok) indexFindings.push({ id: 'llms-missing', level: 'fail', text: T.llmsMissing });
+  else if (!llmsIsText) { index = 3; indexFindings.push({ id: 'llms-not-text', level: 'fail', text: T.llmsNotText }); }
+  else if (llmsLinks.length && llmsForeign.length > llmsLinks.length / 2) { index = 5; indexFindings.push({ id: 'llms-foreign', level: 'fail', text: T.llmsForeign([...new Set(llmsForeign.map((l) => new URL(l).host))].slice(0, 3).join(', ')) }); }
+  else { index = llmsLinks.length >= 5 ? 15 : 10; indexFindings.push({ level: 'pass', text: T.llmsOk(llmsLinks.length) }); }
 
   // Area 3: entity and structure (20)
   const allTypes = new Set(pages.flatMap((p) => p.schemaTypes));
@@ -209,19 +325,19 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   const PAGE_TYPES = /^(Service|Product|Course|Event|HowTo|Recipe|SoftwareApplication|WebApplication|MobileApplication|JobPosting|Book|Review|QAPage|MedicalWebPage|CollectionPage|ItemPage|AboutPage|ProfilePage)$/;
   const pageType = [...allTypes].find((t) => PAGE_TYPES.test(t)) || null;
   let entity = 0; const entityFindings = [];
-  if (hasOrg) { entity += 8; entityFindings.push({ level: 'pass', text: 'Organization or business schema names the entity behind the site.' }); } else entityFindings.push({ id: 'schema-org-missing', level: 'fail', text: 'No Organization or business schema: AI systems have no entity to attach the site to.' });
-  if (hasFaq) { entity += 5; entityFindings.push({ level: 'pass', text: 'FAQPage schema found, the easiest format for an engine to quote.' }); } else entityFindings.push({ id: 'schema-faq-missing', level: 'warn', text: 'No FAQPage schema on the sampled pages.' });
+  if (hasOrg) { entity += 8; entityFindings.push({ level: 'pass', text: T.orgOk }); } else entityFindings.push({ id: 'schema-org-missing', level: 'fail', text: T.orgMissing });
+  if (hasFaq) { entity += 5; entityFindings.push({ level: 'pass', text: T.faqOk }); } else entityFindings.push({ id: 'schema-faq-missing', level: 'warn', text: T.faqMissing });
   if (hasArticle) {
     entity += 3;
-    entityFindings.push({ level: 'pass', text: 'Article schema on the sampled pages: an engine can name and date what it is quoting.' });
+    entityFindings.push({ level: 'pass', text: T.articleOk });
   } else if (pageType) {
     entity += 3;
-    entityFindings.push({ level: 'pass', text: `${pageType} schema on the sampled pages: an engine can name what it is quoting.` });
+    entityFindings.push({ level: 'pass', text: T.pageTypeOk(pageType) });
   } else if (sampled.length) {
-    entityFindings.push({ id: 'schema-article-missing', level: 'warn', text: 'The sampled pages carry no page-level type (Article, Service, Product, Course and the like), so an engine cannot say what kind of thing it is quoting.' });
+    entityFindings.push({ id: 'schema-article-missing', level: 'warn', text: T.pageTypeMissing });
   }
-  if (homePage.canonical) entity += 2; else entityFindings.push({ id: 'canonical-missing', level: 'warn', text: 'The homepage has no canonical tag.' });
-  if (homePage.ogTitle) entity += 2; else entityFindings.push({ id: 'og-missing', level: 'warn', text: 'No Open Graph tags on the homepage: shared links and previews render without a title or image.' });
+  if (homePage.canonical) entity += 2; else entityFindings.push({ id: 'canonical-missing', level: 'warn', text: T.canonicalMissing });
+  if (homePage.ogTitle) entity += 2; else entityFindings.push({ id: 'og-missing', level: 'warn', text: T.ogMissing });
 
   // Area 4: answer-first content (25)
   const contentPages = sampled.length ? sampled : [homePage];
@@ -233,13 +349,13 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   const withTables = contentPages.filter((p) => p.tables > 0).length;
   let content = 0; const contentFindings = [];
   content += Math.round(10 * (1 - thin / contentPages.length));
-  if (thin) contentFindings.push({ id: 'thin-pages', level: thin === contentPages.length ? 'fail' : 'warn', text: `${thin} of ${contentPages.length} sampled page(s) hold under 300 words. Engines rarely cite thin pages.` }); else contentFindings.push({ level: 'pass', text: `Sampled pages carry ${Math.round(contentPages.reduce((a, p) => a + p.words, 0) / contentPages.length)} words on average.` });
+  if (thin) contentFindings.push({ id: 'thin-pages', level: thin === contentPages.length ? 'fail' : 'warn', text: T.thinPages(thin, contentPages.length) }); else contentFindings.push({ level: 'pass', text: T.avgWords(Math.round(contentPages.reduce((a, p) => a + p.words, 0) / contentPages.length)) });
   content += Math.round(8 * (answerFirst / contentPages.length));
-  if (answerFirst < contentPages.length) contentFindings.push({ id: 'answer-first-missing', level: answerFirst ? 'warn' : 'fail', text: `${answerFirst} of ${contentPages.length} sampled page(s) open with an answer-first paragraph (20 to 90 words with a figure right after the H1). That paragraph is what gets quoted.` }); else contentFindings.push({ level: 'pass', text: 'Every sampled page opens with an answer-first paragraph carrying a figure.' });
+  if (answerFirst < contentPages.length) contentFindings.push({ id: 'answer-first-missing', level: answerFirst ? 'warn' : 'fail', text: T.answerFirstMissing(answerFirst, contentPages.length) }); else contentFindings.push({ level: 'pass', text: T.answerFirstOk });
   content += Math.round(4 * (structured / contentPages.length)) + Math.round(3 * (withTables / contentPages.length));
-  if (structured < contentPages.length) contentFindings.push({ id: 'few-h2', level: 'warn', text: `${contentPages.length - structured} sampled page(s) have fewer than three H2 sections.` });
-  if (!withTables) contentFindings.push({ id: 'no-tables', level: 'warn', text: 'No tables on the sampled pages. Tables are the second most quoted format after the first paragraph.' });
-  if (homeOnly) contentFindings.push({ level: 'warn', text: 'Only the homepage could be read, so this area is measured on one page rather than several. A sitemap that answers would give a fuller picture.' });
+  if (structured < contentPages.length) contentFindings.push({ id: 'few-h2', level: 'warn', text: T.fewH2(contentPages.length - structured, contentPages.length) });
+  if (!withTables) contentFindings.push({ id: 'no-tables', level: 'warn', text: T.noTables });
+  if (homeOnly) contentFindings.push({ level: 'warn', text: T.homeOnly });
 
   // Area 5: freshness and sources (15)
   const dated = contentPages.filter((p) => p.datePublished || p.dateModified).length;
@@ -252,36 +368,36 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
   const sourced = withFigures.filter((p) => p.sourcePhrases > 0).length;
   let trust = 0; const trustFindings = [];
   trust += Math.round(7 * (dated / contentPages.length));
-  if (dated < contentPages.length) trustFindings.push({ id: 'dates-missing', level: dated ? 'warn' : 'fail', text: `${contentPages.length - dated} sampled page(s) expose no publication or modified date. Engines prefer sources they can date.` }); else trustFindings.push({ level: 'pass', text: 'Sampled pages expose publication dates.' });
+  if (dated < contentPages.length) trustFindings.push({ id: 'dates-missing', level: dated ? 'warn' : 'fail', text: T.datesMissing(contentPages.length - dated, contentPages.length) }); else trustFindings.push({ level: 'pass', text: T.datesOk });
   if (!withFigures.length) {
     trust += 5;
-    trustFindings.push({ level: 'pass', text: 'The sampled pages state no figures, so there is nothing that needs a source named.' });
+    trustFindings.push({ level: 'pass', text: T.noFigures });
   } else {
     trust += Math.round(5 * (sourced / withFigures.length));
     if (sourced < withFigures.length) {
-      trustFindings.push({ id: 'sources-missing', level: 'warn', text: `${withFigures.length - sourced} of ${withFigures.length} sampled page(s) state figures without naming where they came from ("according to", "data from").` });
+      trustFindings.push({ id: 'sources-missing', level: 'warn', text: T.sourcesMissing(withFigures.length - sourced, withFigures.length) });
     } else {
-      trustFindings.push({ level: 'pass', text: 'Every sampled page that states figures names where they came from.' });
+      trustFindings.push({ level: 'pass', text: T.sourcesOk });
     }
   }
   if (sitemap.found) {
     trust += sitemap.lastmod ? 3 : 1;
-    if (!sitemap.lastmod) trustFindings.push({ id: 'sitemap-no-lastmod', level: 'warn', text: 'The sitemap carries no lastmod dates.' });
+    if (!sitemap.lastmod) trustFindings.push({ id: 'sitemap-no-lastmod', level: 'warn', text: T.sitemapNoLastmod });
   } else if (sitemap.timedOut || sitemap.skipped) {
     // Not measured, so not scored down. Printing a low number for something we never read is the
     // error this check exists to avoid in other people's tools.
     trust += 3;
-    trustFindings.push({ level: 'warn', text: 'The sitemap did not answer in time, so it was not checked. The score does not count this either way.' });
+    trustFindings.push({ level: 'warn', text: T.sitemapTimedOut });
   } else {
-    trustFindings.push({ level: 'fail', text: 'No XML sitemap found at the usual paths or in robots.txt.' });
+    trustFindings.push({ level: 'fail', text: T.sitemapMissing });
   }
 
   const areas = [
-    { id: 'access', label: 'Can AI crawlers read it', score: access, max: 25, findings: accessFindings },
-    { id: 'index', label: 'Is there a map for agents (llms.txt)', score: index, max: 15, findings: indexFindings },
-    { id: 'entity', label: 'Is the entity clear (schema)', score: entity, max: 20, findings: entityFindings },
-    { id: 'content', label: 'Is there something to quote', score: content, max: 25, findings: contentFindings },
-    { id: 'trust', label: 'Can it be dated and trusted', score: trust, max: 15, findings: trustFindings },
+    { id: 'access', label: T.area.access, score: access, max: 25, findings: accessFindings },
+    { id: 'index', label: T.area.index, score: index, max: 15, findings: indexFindings },
+    { id: 'entity', label: T.area.entity, score: entity, max: 20, findings: entityFindings },
+    { id: 'content', label: T.area.content, score: content, max: 25, findings: contentFindings },
+    { id: 'trust', label: T.area.trust, score: trust, max: 15, findings: trustFindings },
   ];
   const total = areas.reduce((a, x) => a + x.score, 0);
   const grade = total >= 80 ? 'A' : total >= 65 ? 'B' : total >= 45 ? 'C' : total >= 25 ? 'D' : 'E';
@@ -290,7 +406,7 @@ export async function checkVisibility(input, { budgetMs = 8500 } = {}) {
     ok: true, url: home.url, host, checkedAt: new Date().toISOString(), ms: Date.now() - started,
     score: total, grade, areas, fixes,
     sample: pages.map((p) => ({ url: p.url, title: p.title, words: p.words, answerFirst: p.answerFirst, dated: Boolean(p.datePublished || p.dateModified), schema: p.schemaTypes.slice(0, 4) })),
-    sitemap: { found: sitemap.found, count: sitemap.count, lastmod: sitemap.lastmod },
-    crawlers: verdicts.map((v) => ({ label: v.label, kind: v.kind, verdict: v.verdict })),
+    sitemap: { found: sitemap.found, count: sitemap.count, lastmod: sitemap.lastmod, unchecked: Boolean(!sitemap.found && (sitemap.timedOut || sitemap.skipped)) },
+    crawlers: verdicts.map((v) => ({ label: agentLabel(v), kind: v.kind, verdict: v.verdict })),
   };
 }
