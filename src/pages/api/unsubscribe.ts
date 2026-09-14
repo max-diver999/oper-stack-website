@@ -67,3 +67,23 @@ export const GET: APIRoute = async ({ url }) => {
     done ? 200 : 502,
   );
 };
+
+/**
+ * One-click unsubscribe (RFC 8058).
+ *
+ * In plain words: mail programs show their own unsubscribe button and, when it is pressed,
+ * post here without opening the page. Gmail, Mail.ru and Yandex weigh this: a letter that is
+ * easy to leave is reported as spam far less often than one that is not.
+ *
+ * The reply is plain text on purpose: no person sees this, a program reads it.
+ */
+export const POST: APIRoute = async ({ url }) => {
+  const secret = env('KIT_DOWNLOAD_SECRET');
+  const email = secret ? readUnsubToken(url.searchParams.get('t') || '', secret) : null;
+  if (!email) return new Response('bad token', { status: 400, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
+  const done = await markUnsubscribed(email);
+  return new Response(done ? 'unsubscribed' : 'queued', {
+    status: done ? 200 : 202,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },
+  });
+};
