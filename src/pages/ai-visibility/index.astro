@@ -1,6 +1,7 @@
 ---
 import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
+import ownScore from '../../data/own-score.json';
 import FaqSection from '../../components/FaqSection.astro';
 import { SITE } from '../../data/site';
 
@@ -28,6 +29,15 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       <button type="submit" class="btn" id="vis-btn">Check the site →</button>
     </form>
     <p class="note" id="vis-note">Public signals only. We log the address checked and the score, never your IP.</p>
+
+    {ownScore?.score != null && (
+      <p class="ownscore">
+        <b>Our own site scores {ownScore.score} of 100</b> on this same check, measured {ownScore.measured} across
+        {' '}{ownScore.pagesRead} pages. Put <code>{ownScore.host}</code> in the box above and see for yourself: a tool
+        that grades your site should be willing to say what it gives its maker. The number is measured on every build,
+        never typed, so it drops the day we let something slip.
+      </p>
+    )}
 
     <section id="vis-result" class="result" hidden aria-live="polite"></section>
 
@@ -349,6 +359,8 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   #vis-result .label { font-family: var(--fm); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   #vis-result h3 { font-family: var(--fd); font-size: 18px; margin: 0 0 8px; }
   #vis-result .note { font-size: 13px; color: var(--muted); }
+  .ownscore { border-left: 3px solid var(--teal); padding-left: 14px; font-size: 15px; line-height: 1.6; max-width: 68ch; margin: 0 0 22px; color: rgba(245,242,236,.86); }
+  .ownscore code { font-family: var(--fm); font-size: 13.5px; background: rgba(0,0,0,.3); padding: 1px 6px; border-radius: 4px; }
   #vis-result .compare { margin-top: 26px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); }
   #vis-result .cmp-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 8px; }
   #vis-result .cmp-row input { flex: 1 1 160px; min-width: 0; padding: 11px 13px; border-radius: 10px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.25); color: var(--paper); font-size: 16px; min-height: 46px; }
