@@ -8,11 +8,31 @@
  */
 import CommercialLayout from '../../components/CommercialLayout.astro';
 import { SITE } from '../../data/site';
+import { visitsDb, visitsDbConfigured } from '../../lib/visits-db';
 
 export const prerender = false;
 
-/** The Russian site sells the same counter, and a Russian owner should not land on English. */
-const ru = Astro.url.searchParams.get('lang') === 'ru';
+/*
+ * The Russian site sells the same counter, and a Russian owner should not land on English.
+ *
+ * Язык берём из адреса, а если его там нет, спрашиваем у записи по самому токену: человек мог
+ * сохранить ссылку без хвоста, переслать её себе или открыть из истории, и тогда он получал
+ * английскую панель, купив счётчик на русской странице.
+ */
+const q = Astro.url.searchParams.get('lang');
+let ru = q === 'ru';
+if (!q) {
+  const token = (Astro.url.searchParams.get('t') || '').trim();
+  if (token && visitsDbConfigured()) {
+    try {
+      const sql = visitsDb();
+      const row = await sql`select lang from sites where view_token = ${token} limit 1`;
+      ru = row.length > 0 && row[0].lang === 'ru';
+    } catch {
+      /* база молчит, значит остаёмся на английском: язык это не повод не показать числа */
+    }
+  }
+}
 
 const T = ru
   ? {
