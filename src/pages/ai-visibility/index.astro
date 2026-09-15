@@ -49,7 +49,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         <div><label for="pdf-email">Email</label><input id="pdf-email" name="email" type="email" required autocomplete="email" placeholder="you@company.com" /></div>
         <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive the report and, at most once a month, a note when a check changes. One click unsubscribes.</label></div>
         <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
-        <button type="submit" class="btn" id="pdf-btn">Email me the full list →</button>
+        <button type="submit" class="btn" id="pdf-btn">Email me the report →</button>
         <p class="msg" id="pdf-msg" hidden></p>
       </form>
     </section>
@@ -293,6 +293,10 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         note.textContent = 'Public signals only. We log the address checked and the score, never your IP.';
       } catch (err: any) {
         out.innerHTML = `<p class="err">${esc(err.message || 'The check failed')}</p>`; out.hidden = false;
+        // Прочитать сайт не вышло, значит отчёта по нему не будет. Форму обмена на почту
+        // прячем вместе со старым «Отправили»: иначе на экране остаётся приглашение
+        // получить отчёт по ПРЕДЫДУЩЕМУ сайту, и человек думает, что письмо уже ушло.
+        capture.hidden = true; pdfMsg.hidden = true; pdfMsg.textContent = '';
         note.textContent = 'Public signals only. We log the address checked and the score, never your IP.';
       } finally { btn.disabled = false; btn.textContent = 'Check the site →'; }
     });
