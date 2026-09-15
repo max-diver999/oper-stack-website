@@ -132,25 +132,45 @@ export const POST: APIRoute = async ({ request }) => {
     if (!mayEmail) throw new Error('emailed recently');
     await sendTransactionalMail({
       to: email,
-      subject: 'Your AI visit counter for ' + domain,
-      text: [
-        'Paste this line into your site, just before </head>:',
-        '',
-        snippet,
-        '',
-        'Then open this link to see who sent you visitors:',
-        dashboard,
-        '',
-        'Keep the link. It is the only way to see your numbers, and anyone who has it can see them too.',
-        'Nothing about your visitors is stored: only which assistant, which day, and how many.',
-      ].join('\n'),
-      html: `<p>Paste this line into your site, just before <code>&lt;/head&gt;</code>:</p>
-<pre style="background:#f4f4f5;padding:12px;border-radius:8px;overflow-x:auto"><code>${snippet
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')}</code></pre>
+      subject: lang === 'ru' ? `Ваш счётчик визитов из ИИ для ${domain}` : 'Your AI visit counter for ' + domain,
+      text: (lang === 'ru'
+        ? [
+            'Вставьте эту строчку в шапку сайта, прямо перед </head>:',
+            '',
+            snippet,
+            '',
+            'Потом откройте эту ссылку, по ней видно, кто прислал вам людей:',
+            dashboard,
+            '',
+            'Сохраните ссылку. Это единственный путь к вашим числам, и любой, у кого она есть, увидит их тоже.',
+            'О самих посетителях не хранится ничего: только какой ассистент, какой день и сколько.',
+          ]
+        : [
+            'Paste this line into your site, just before </head>:',
+            '',
+            snippet,
+            '',
+            'Then open this link to see who sent you visitors:',
+            dashboard,
+            '',
+            'Keep the link. It is the only way to see your numbers, and anyone who has it can see them too.',
+            'Nothing about your visitors is stored: only which assistant, which day, and how many.',
+          ]).join('\n'),
+      html: (() => {
+        const code = snippet.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+        const pre = `<pre style="background:#f4f4f5;padding:12px;border-radius:8px;overflow-x:auto"><code>${code}</code></pre>`;
+        return lang === 'ru'
+          ? `<p>Вставьте эту строчку в шапку сайта, прямо перед <code>&lt;/head&gt;</code>:</p>
+${pre}
+<p>Потом откройте эту ссылку, по ней видно, кто прислал вам людей:<br><a href="${dashboard}">${dashboard}</a></p>
+<p>Сохраните ссылку. Это единственный путь к вашим числам, и любой, у кого она есть, увидит их тоже.</p>
+<p>О самих посетителях не хранится ничего: только какой ассистент, какой день и сколько.</p>`
+          : `<p>Paste this line into your site, just before <code>&lt;/head&gt;</code>:</p>
+${pre}
 <p>Then open this link to see who sent you visitors:<br><a href="${dashboard}">${dashboard}</a></p>
 <p>Keep the link. It is the only way to see your numbers, and anyone who has it can see them too.</p>
-<p>Nothing about your visitors is stored: only which assistant, which day, and how many.</p>`,
+<p>Nothing about your visitors is stored: only which assistant, which day, and how many.</p>`;
+      })(),
     });
     await sql`update sites set last_email_at = now() where id = ${key}`;
   } catch {
