@@ -162,12 +162,20 @@ export async function logLead(r: CheckRow & { email: string; name: string; sent:
  * Возвращаем true, только если отметка действительно проставлена. Иначе страница отписки
  * честно скажет человеку написать нам письмом, а не соврёт, что всё готово.
  */
-export async function markUnsubscribed(email: string): Promise<boolean> {
-  if (!sheetsConfigured()) return false;
+/**
+ * Отписка: «адреса нет в списке» и «у нас не вышло» это разные ответы.
+ *
+ * Человек, которого в таблице нет (отписался раньше, или никогда не оставлял почту), уже получил
+ * то, чего хотел: писать ему мы не будем. Показывать ему ошибку и звать написать нам значит
+ * пугать его там, где всё в порядке. Ошибка остаётся только для настоящей поломки: таблица не
+ * отвечает, ключа нет, запись не прошла.
+ */
+export async function markUnsubscribed(email: string): Promise<'marked' | 'absent' | 'failed'> {
+  if (!sheetsConfigured()) return 'failed';
   const wanted = email.trim().toLowerCase();
   try {
     const token = await accessToken();
-    if (!token) return false;
+    if (!token) return 'failed';
     const id = env('FREE_CHECKS_SHEET_ID');
     const head = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
     const range = encodeURIComponent(`${SHEET_LEADS}!A2:N`);
@@ -175,13 +183,14 @@ export async function markUnsubscribed(email: string): Promise<boolean> {
       headers: head,
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    if (!res.ok) return false;
+    if (!res.ok) return 'failed';
     const rows = ((await res.json()) as { values?: string[][] }).values ?? [];
     // Колонка F это почта, шестая по счёту. Первая строка данных это вторая строка листа.
     const hits = rows
       .map((row, i) => ({ row: i + 2, email: String(row[5] ?? '').trim().toLowerCase() }))
       .filter((r) => r.email === wanted);
-    if (!hits.length) return false;
+    // Не нашли, значит писать некому: цель достигнута, это не поломка.
+    if (!hits.length) return 'absent';
     const body = {
       valueInputOption: 'RAW',
       data: hits.map((h) => ({ range: `${SHEET_LEADS}!N${h.row}`, values: [['да']] })),
@@ -192,8 +201,8 @@ export async function markUnsubscribed(email: string): Promise<boolean> {
       body: JSON.stringify(body),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    return put.ok;
+    return put.ok ? 'marked' : 'failed';
   } catch {
-    return false;
+    return 'failed';
   }
 }

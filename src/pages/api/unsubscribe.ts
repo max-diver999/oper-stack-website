@@ -58,7 +58,10 @@ export const GET: APIRoute = async ({ url }) => {
   if (!email) {
     return page('Link not valid', '<h1>This link is not valid</h1><p>Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> from the address you want removed and we will do it by hand.</p>', 400);
   }
-  const done = await markUnsubscribed(email);
+  // «Нет в списке» это тоже успех: писать этому человеку мы не будем, а значит он получил
+  // то, за чем пришёл. Ошибку показываем только при настоящей поломке.
+  const outcome = await markUnsubscribed(email);
+  const done = outcome !== 'failed';
   return page(
     done ? 'Unsubscribed' : 'Almost',
     done
@@ -81,7 +84,10 @@ export const POST: APIRoute = async ({ url }) => {
   const secret = env('KIT_DOWNLOAD_SECRET');
   const email = secret ? readUnsubToken(url.searchParams.get('t') || '', secret) : null;
   if (!email) return new Response('bad token', { status: 400, headers: { 'Content-Type': 'text/plain; charset=utf-8' } });
-  const done = await markUnsubscribed(email);
+  // «Нет в списке» это тоже успех: писать этому человеку мы не будем, а значит он получил
+  // то, за чем пришёл. Ошибку показываем только при настоящей поломке.
+  const outcome = await markUnsubscribed(email);
+  const done = outcome !== 'failed';
   return new Response(done ? 'unsubscribed' : 'queued', {
     status: done ? 200 : 202,
     headers: { 'Content-Type': 'text/plain; charset=utf-8', 'Cache-Control': 'no-store' },
