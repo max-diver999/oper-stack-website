@@ -170,8 +170,11 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         const head = '<tr><th>Site</th><th class="n">Score</th>' + labels.map((l: string) => `<th class="n">${esc(l)}</th>`).join('') + '</tr>';
         const rows = all.map((r: any, i: number) => {
           const cells = r.areas.map((a: any, k: number) => {
-            const better = i > 0 && a.score > mine.areas[k].score;
-            return `<td class="n${better ? ' beat' : ''}">${a.score}/${a.max}</td>`;
+            // Неизмеренную область нельзя сравнивать: null в сравнении ведёт себя как ноль,
+            // и сайт, у которого robots.txt не прочитался, выглядел бы хуже, чем он есть.
+            const mineScore = mine.areas[k] ? mine.areas[k].score : null;
+            const better = i > 0 && a.score != null && mineScore != null && a.score > mineScore;
+            return `<td class="n${better ? ' beat' : ''}">${a.score == null ? 'not measured' : `${a.score}/${a.max}`}</td>`;
           }).join('');
           const beatsMe = i > 0 && r.score > mine.score;
           return `<tr${i === 0 ? ' class="me"' : ''}><td>${esc(r.host)}${i === 0 ? ' <span class="you">you</span>' : ''}</td><td class="n${beatsMe ? ' beat' : ''}">${r.score}</td>${cells}</tr>`;
@@ -207,8 +210,8 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         }
         return `
         <div class="area">
-          <div class="area-head"><span>${esc(a.label)}</span><strong>${a.score}/${a.max}</strong></div>
-          <div class="bar"><i style="width:${Math.round((a.score / a.max) * 100)}%"></i></div>
+          <div class="area-head"><span>${esc(a.label)}</span><strong>${a.score == null ? 'not measured' : `${a.score}/${a.max}`}</strong></div>
+          ${a.score == null ? '' : `<div class="bar"><i style="width:${Math.round((a.score / a.max) * 100)}%"></i></div>`}
           <ul>${shown.join('')}</ul>
         </div>`;
       }).join('');

@@ -67,6 +67,7 @@ const JS_STRINGS = ru
       moveUp: 'выросла на ', moveDown: 'упала на ', moveSame: 'не изменилась',
       sinceDay: ' с ',
       areasH: 'Из чего складывается оценка',
+      notMeasured: 'не измерялось',
       areaNames: {
         'Can AI crawlers read it': 'Пускает ли сайт читателей ИИ',
         'Is there a map for agents (llms.txt)': 'Есть ли карта для агентов (llms.txt)',
@@ -105,6 +106,7 @@ const JS_STRINGS = ru
       moveUp: 'up ', moveDown: 'down ', moveSame: 'unchanged',
       sinceDay: ' since ',
       areasH: 'What the score is made of',
+      notMeasured: 'not measured',
       areaNames: {},
       whyBoth: 'The counter says how many people arrived. The score says whether anybody can quote you at all. A site nobody can quote will never have visits to count, and visits with no idea why cannot be repeated.',
       fixLink: 'What to fix first',
@@ -207,11 +209,14 @@ const JS_STRINGS = ru
       var areas = sc && sc.areas && sc.areas.length
         ? '<div class="areas"><p class="areas-h">' + S.areasH + '</p><ul>' +
           sc.areas.map(function (a) {
-            var pct = Math.round((a.score / a.max) * 100);
+            // Область может прийти без балла: robots.txt не прочитался, и считать это нулём
+            // значит нарисовать пустую полосу там, где мы просто не смотрели.
+            var missing = a.score == null;
+            var pct = missing ? 0 : Math.round((a.score / a.max) * 100);
             var name = (S.areaNames && S.areaNames[a.label]) || a.label;
             return '<li><span class="a-name">' + esc(name) + '</span>' +
-              '<span class="a-bar"><i style="width:' + pct + '%"></i></span>' +
-              '<span class="a-num">' + a.score + '/' + a.max + '</span></li>';
+              (missing ? '<span class="a-bar"></span>' : '<span class="a-bar"><i style="width:' + pct + '%"></i></span>') +
+              '<span class="a-num">' + (missing ? S.notMeasured : a.score + '/' + a.max) + '</span></li>';
           }).join('') + '</ul></div>'
         : '';
 

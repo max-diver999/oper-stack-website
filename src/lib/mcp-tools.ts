@@ -27,7 +27,7 @@ function visibilityReport(r: any): string {
   lines.push(`${r.host}: ${r.score}/100 (grade ${r.grade}).`);
   lines.push('');
   for (const a of r.areas || []) {
-    lines.push(`${a.label}: ${a.score}/${a.max}`);
+    lines.push(`${a.label}: ${a.score == null ? 'not measured' : `${a.score}/${a.max}`}`);
     for (const f of a.findings || []) {
       const mark = f.level === 'pass' ? 'ok' : f.level === 'warn' ? 'partial' : 'problem';
       lines.push(`  [${mark}] ${f.text}`);
@@ -80,7 +80,7 @@ export const TOOLS: McpTool[] = [
       if (!good.length) return 'None of those sites could be read. They may turn away automated readers.';
       const labels = good[0].areas.map((x: any) => x.label);
       const rows = good.map((r: any) => {
-        const cells = r.areas.map((x: any) => `${x.score}/${x.max}`).join('  ');
+        const cells = r.areas.map((x: any) => (x.score == null ? 'not measured' : `${x.score}/${x.max}`)).join('  ');
         return `${r.host.padEnd(28)} ${String(r.score).padStart(3)}   ${cells}`;
       });
       const failed = results.filter((r: any) => !r || r.ok === false).length;
