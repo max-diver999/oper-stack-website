@@ -153,23 +153,23 @@ export function buildRunBody(job: ReportJob, secret: string): { text: string; ht
 
 const COPY = {
   en: {
-    subject: (tier: ReportTier) => (tier === '29' ? 'Your OperStack report and month of watching: one step left' : 'Your OperStack report: one step left'),
+    subject: (tier: ReportTier) => (tier === '29' ? 'Your OperStack rival comparison: one step left' : 'Your OperStack report: one step left'),
     hello: 'Thank you. One thing left: tell us which site to read.',
     action: 'Open this link and enter your address:',
     what: (tier: ReportTier) =>
       tier === '29'
-        ? 'You will get the full measurement of your site and of up to three competitors side by side, then four weekly re-checks by email showing what changed. The first report usually arrives within the hour.'
+        ? 'You will get the full measurement of your site and of up to three competitors side by side in one table, so you can see who gets named instead of you and where they are ahead. It usually arrives within the hour.'
         : 'You will get two files. A list of tasks, one for every problem found, each written in plain words: what your site does now, what to change, how to check it worked. Hand one to your developer or paste it into ChatGPT, Claude or Cursor. And the measurement behind them: six area scores, every check with its finding, how much of your text disappears without JavaScript. It usually arrives within the hour.',
     validity: `The link works for ${TOKEN_DAYS} days. If it stops working, write to info@oper-stack.com from the address you paid with.`,
     sign: 'OperStack · info@oper-stack.com',
   },
   ru: {
-    subject: (tier: ReportTier) => (tier === '29' ? 'Отчёт OperStack и месяц наблюдения: остался один шаг' : 'Отчёт OperStack: остался один шаг'),
+    subject: (tier: ReportTier) => (tier === '29' ? 'Сравнение с конкурентами от OperStack: остался один шаг' : 'Отчёт OperStack: остался один шаг'),
     hello: 'Спасибо. Остался один шаг: сказать, какой сайт читать.',
     action: 'Откройте ссылку и введите адрес:',
     what: (tier: ReportTier) =>
       tier === '29'
-        ? 'Вы получите полный замер своего сайта и до трёх конкурентов рядом, а потом четыре еженедельных перепроверки письмом: что изменилось. Первый отчёт обычно приходит в течение часа.'
+        ? 'Вы получите полный замер своего сайта и до трёх конкурентов в одной таблице: видно, кого называют вместо вас и в чём именно они вас обходят. Обычно приходит в течение часа.'
         : 'Вы получите два файла. Список задач, по одной на каждую найденную проблему, каждая обычными словами: что на сайте сейчас, что поменять, как проверить. Задачу отдаёте тому, кто ведёт ваш сайт, или вставляете в ChatGPT, Claude или Cursor. И замер, из которого эти задачи выросли: оценки по шести областям, каждая проверка со своей находкой, сколько текста пропадает без скриптов. Обычно приходит в течение часа.',
     validity: `Ссылка работает ${TOKEN_DAYS} дней. Если перестала, напишите на info@oper-stack.com с того адреса, с которого оплачивали.`,
     sign: 'OperStack · info@oper-stack.com',
