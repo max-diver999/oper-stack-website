@@ -312,7 +312,8 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
   </nav>
   ) : (
   <nav class="site-nav" aria-label="Site">
-    <a href="/">Map</a>
+    <a href="/">Check</a>
+    <a href="/map/" class:list={{ active: Astro.url.pathname.startsWith('/map') }}>Map</a>
     <a href="/services/" class:list={{ active: Astro.url.pathname.startsWith('/services') }}>Services</a>
     <a href="/products/" class:list={{ active: Astro.url.pathname.startsWith('/products') }}>Products</a>
     <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
