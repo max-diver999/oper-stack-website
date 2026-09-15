@@ -75,13 +75,13 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
   
 'rival-watch': {
     plain:
-      'You get the same report as the nine dollar one, and next to it the same measurements for up to three competitors you name, in one table. That is where you see who an answer engine can quote instead of you and exactly which checks put them ahead. You pay once and get one comparison: there is nothing to cancel and we keep no card.',
+      'You get the same fix list as the nine dollar one, and next to it the same measurements for up to three competitors you name, in one table. That is where you see who an answer engine can quote instead of you and exactly which checks put them ahead. Then for four weeks a short email arrives once a week: what your fixes moved and how the gap changed. It stops by itself after a month: there is nothing to cancel and we keep no card.',
     who: [
       'An owner who suspects a specific competitor is being quoted instead of them and wants to see where the gap actually is',
-      'A marketer who has just had work done on the site and wants to see where it now stands against the competition',
+      'A marketer who has just had work done on the site and wants to see, week by week, what it moved',
       'Anyone who does not want to log into another dashboard and would rather get a short email',
     ],
-    youDo: ['Pay by card', 'Open the link from the email and name your site and up to three competitors', 'Read the comparison that arrives'],
+    youDo: ['Pay by card', 'Open the link from the email and name your site and up to three competitors', 'Read the comparison, then one short email a week for four weeks'],
   },
   'pain-to-seo': {
     plain:
