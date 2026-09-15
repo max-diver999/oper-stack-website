@@ -27,7 +27,9 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
   <div class="wrap">
     <p class="crumb"><a href="/products/">Products</a> / {p.name}</p>
     <p class="label">{p.label}</p>
-    <h1>{p.title}</h1>
+    {/* Заголовок страницы это имя товара: тем же именем он назван в кассе, в письме и в
+        порядке выдачи. Поле title остаётся поисковым заголовком вкладки, там своя работа. */}
+    <h1>{p.name}</h1>
     <p class="lede">{p.description}</p>
 
     {plain && (
