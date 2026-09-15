@@ -311,6 +311,11 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       setTimeout(() => { mcpCopy.textContent = 'Copy'; }, 2500);
     });
 
+    // The homepage form lands here with ?url=: fill the field and run at once, so the person
+    // who typed the address on the homepage does not have to type it a second time.
+    const preset = (new URLSearchParams(location.search).get('url') || '').trim();
+    if (preset) { input.value = preset; setTimeout(() => form.requestSubmit(), 0); }
+
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
       const url = input.value.trim();
@@ -320,7 +325,12 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         const o = origin();
         const tail = o.from ? `&from=${encodeURIComponent(o.from)}&campaign=${encodeURIComponent(o.campaign)}` : '';
         const res = await fetch(`/api/ai-visibility/?url=${encodeURIComponent(url)}${tail}`);
-        const data = await res.json();
+        // The server can answer with something that is not JSON (a host error page, a function
+        // that is off). The person used to see a JSON parse error like "Unexpected token '<'".
+        // Now they see a sentence that says what to do.
+        const raw = await res.text();
+        let data: any;
+        try { data = JSON.parse(raw); } catch { throw new Error('The check is unavailable right now. Try again in a minute, or write to info@oper-stack.com.'); }
         if (!data.ok) throw new Error(data.error || 'The check failed');
         last = data; render(data);
         track('ai_visibility_check', { host: data.host, score: data.score, grade: data.grade });
