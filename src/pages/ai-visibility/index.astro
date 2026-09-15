@@ -16,7 +16,7 @@ const FAQ = [
 const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: FAQ.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
 const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication', name: 'OperStack AI Visibility Check', url: canonical, applicationCategory: 'SEO tool', operatingSystem: 'Web', offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }, provider: { '@type': 'Organization', name: SITE.name, url: SITE.url } };
 ---
-<CommercialLayout title="AI Visibility Check: Can ChatGPT Cite Your Site? · OperStack" description="Free ten-second check of whether ChatGPT, Perplexity, Copilot, Claude and Gemini can read, understand and cite your site: crawler access, llms.txt, schema, quotable content, dates." canonical={canonical} jsonLd={[appSchema, faqSchema]}>
+<CommercialLayout title="AI Visibility Check: Can AI Assistants Cite Your Site? · OperStack" description="Free ten-second check of whether ChatGPT, Perplexity, Copilot, Claude and Gemini can read, understand and cite your site: crawler access, llms.txt, schema, quotable content, dates." canonical={canonical} jsonLd={[appSchema, faqSchema]}>
   <div class="wrap">
     <p class="label">Free tool</p>
     <h1>Can AI assistants read and cite your site?</h1>
