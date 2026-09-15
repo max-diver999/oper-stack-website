@@ -41,6 +41,42 @@ async function record(result: any, request: Request, from: { source?: string; ca
   await logCheck({ lang: 'en', host: result.host, score: result.score, grade: result.grade, source, campaign, page });
 }
 
+/**
+ * Что из результата уезжает в браузер.
+ *
+ * Простым языком. Бесплатная проверка показывает балл, области, пройденные проверки и одну
+ * правку целиком. Остальные найденные проблемы человек видит списком под размытием: он видит,
+ * что список настоящий и какой он длины, а содержание получает в списке правок за деньги.
+ *
+ * Поэтому полный текст спрятанных находок сюда не кладётся вовсе. Размытие это картинка, и
+ * «выделить всё» или отключённые стили сняли бы его за секунду. Честно и в обратную сторону:
+ * заголовок обрезан до четырёх слов на сервере, то есть прятать нечего, скрыт только смысл.
+ *
+ * Пройденные проверки остаются целиком: хорошая новость про свой сайт не товар.
+ */
+const TEASER_WORDS = 4;
+const teaser = (text: unknown): string =>
+  String(text ?? '').trim().split(/\s+/).slice(0, TEASER_WORDS).join(' ').replace(/[.,;:!?\u2026]+$/, '');
+
+function forVisitor(result: any): any {
+  if (!result?.ok || !Array.isArray(result.areas)) return result;
+  const firstId = result.fixes?.[0]?.id ?? null;
+  const rest: Array<{ area: string; level: string; teaser: string }> = [];
+  const areas = result.areas.map((a: any) => {
+    const kept: any[] = [];
+    let problems = 0;
+    for (const f of a.findings || []) {
+      if (f.level === 'pass') { kept.push(f); continue; }
+      if (firstId && f.id === firstId) continue; // показана целиком отдельной правкой
+      problems += 1;
+      rest.push({ area: a.label, level: f.level, teaser: teaser(f.text) });
+    }
+    return { ...a, findings: kept, problems };
+  });
+  // Правок в ответе одна: та, что показывается целиком. Остальные живут в rest заголовками.
+  return { ...result, areas, fixes: (result.fixes || []).slice(0, 1), rest };
+}
+
 async function handle(rawUrl: string, ip: string, request: Request, from: { source?: string; campaign?: string }): Promise<Response> {
   const url = normaliseInput(rawUrl);
   if (!url) return json({ ok: false, error: 'Enter a public site address, for example example.com' }, 400);
@@ -51,10 +87,12 @@ async function handle(rawUrl: string, ip: string, request: Request, from: { sour
   // Настройки берём из пакета и руками не задаём: любое расхождение параметров это
   // расхождение чисел между страницей, письмом и отчётом.
   const result = await checkVisibility(url, { ...VISIBILITY_DEFAULTS, lang: 'en' });
-  const body = JSON.stringify(result);
-  if (result.ok) cache.set(key, { at: Date.now(), body });
+  // В таблицу пишем по полному результату, в браузер отдаём урезанный.
   await record(result, request, from);
-  return json(result, result.ok ? 200 : 422);
+  const visible = forVisitor(result);
+  const body = JSON.stringify(visible);
+  if (result.ok) cache.set(key, { at: Date.now(), body });
+  return json(visible, result.ok ? 200 : 422);
 }
 
 /** Адрес берём тем же способом, что и соседний обработчик задач: сначала clientAddress. */
