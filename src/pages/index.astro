@@ -23,8 +23,8 @@ const websiteSchema = {
   publisher: { '@id': `${SITE.url}/#organization` },
   inLanguage: 'en',
 };
-const title = 'Your site through the eyes of AI: a free half-minute check · OperStack';
-const description = 'What ChatGPT, Claude, Perplexity, Gemini, Copilot and the rest see on your site. Which of the 14 AI crawlers it lets in, whether it has a map for agents, whether there is anything to quote. A score out of 100 and the first fix on screen, no signup.';
+const title = 'Free AI Visibility Check: Your Site Through the Eyes of AI · OperStack';
+const description = 'Generative engine optimization starts with a measurement. What ChatGPT, Claude, Perplexity, Gemini, Copilot and the rest see on your site: which of the 14 AI crawlers it lets in, whether it has a map for agents, whether there is anything to quote. A score out of 100 and the first fix on screen, no signup.';
 ---
 <CommercialLayout title={title} description={description} canonical={`${SITE.url}/`} jsonLd={websiteSchema}>
   <main class="hm">
@@ -87,6 +87,7 @@ const description = 'What ChatGPT, Claude, Perplexity, Gemini, Copilot and the r
         <p><b>The score can be checked by hand.</b> Five areas add up to exactly the number at the top. No weight taken from thin air.</p>
         <p><b>Could not measure, we say so.</b> If a file could not be read, the area is marked "not measured" and counts neither for nor against. A zero would claim you are doing badly, and we do not know that.</p>
         <p><b>No "our AI thinks".</b> Every finding is a specific file, a line, or its absence. Open it and see for yourself.</p>
+        <p><b>This work has names.</b> GEO, generative engine optimization, and AEO, answer engine optimization. We measure the things behind the names rather than the names: the files, the markup and the text. <a href="/guides/aeo-geo-inbound-marketing/">How it works end to end</a>.</p>
         {score !== null && <p><b>And we measure ourselves with the same tool.</b> This site scores <b class="amber">{score} of 100</b>{measured ? ` as of ${measured}` : ''}. Same code, same settings, and the number is refreshed every time the site is built.</p>}
       </div>
     </section>
