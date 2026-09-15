@@ -16,7 +16,6 @@ import {
   type NotionLeadData,
 } from '../../lib/notion-leads';
 import { sendLeadNotifyEmail } from '../../lib/lead-notify-email';
-import { recordPrimary } from '../../lib/ru-primary';
 
 /** REQUIRED: without this POST returns 405 on Vercel static output */
 export const prerender = false;
@@ -113,11 +112,6 @@ export const POST: APIRoute = async ({ request }) => {
     ]
       .filter(Boolean)
       .join('\n');
-
-    // Первая запись на российской стороне, до Telegram, почты и Notion.
-    if (!isHealthcheck) {
-      await recordPrimary('lead', { name: nameText, phone: resolvedPhone, email: contactText, message: messageText, source: body.source ?? '', page: body.page ?? '', lang: 'en' });
-    }
 
     await sendTelegram(lines);
     if (!isHealthcheck) {
