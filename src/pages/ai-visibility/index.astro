@@ -314,7 +314,19 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     // The homepage form lands here with ?url=: fill the field and run at once, so the person
     // who typed the address on the homepage does not have to type it a second time.
     const preset = (new URLSearchParams(location.search).get('url') || '').trim();
-    if (preset) { input.value = preset; setTimeout(() => form.requestSubmit(), 0); }
+    /*
+     * requestSubmit появился в Safari только в версии 16, а на айфонах, которые больше не
+     * обновляются, живут версии старше. Там вызов просто ничего не делает, и человек,
+     * пришедший с главной, видит свой адрес в поле и пустой экран под ним. Поэтому запасной
+     * путь: отправить форму событием, которое слушает тот же обработчик.
+     */
+    if (preset) {
+      input.value = preset;
+      setTimeout(() => {
+        if (typeof form.requestSubmit === 'function') form.requestSubmit();
+        else form.dispatchEvent(new Event('submit', { cancelable: true, bubbles: true }));
+      }, 0);
+    }
 
     form.addEventListener('submit', async (e) => {
       e.preventDefault();
