@@ -9,7 +9,7 @@ const canonical = `${SITE.url}/ai-visibility/`;
 const FAQ = [
   { question: 'What does the check look at?', answer: 'Five things an answer engine needs before it can cite a site: whether its crawlers are allowed in robots.txt, whether there is an llms.txt map, whether schema names the entity, whether the sampled pages open with a quotable answer and carry tables, and whether pages expose dates and name sources. It reads the homepage, robots.txt, llms.txt, the sitemap and up to three pages.' },
   { question: 'Does it measure traffic from ChatGPT or Perplexity?', answer: 'No. Traffic lives in your analytics. This check measures whether the site is readable and quotable in the first place, which is the part you control. The OperStack plugin for Claude Code has an ai-visibility command that reads the GA4 side.' },
-  { question: 'Is anything stored?', answer: 'We keep a line for each check: the address checked, the score, and which link brought you here. We do not keep your IP address, and we do not sell or share any of it. Your email is kept only if you leave it for the report, and every email we send has one-click unsubscribe.' },
+  { question: 'Is anything stored?', answer: 'We keep a line for each check: the address checked, the score, and which link brought you here. We do not keep your IP address, and we do not sell or share any of it. Your email is kept only if you leave it to get the fix, and every email we send has one-click unsubscribe.' },
   { question: 'Why did my site score low on content when the pages are long?', answer: 'Length is not the signal. The check looks for an answer-first paragraph of 20 to 90 words with a figure right after the H1, at least three H2 sections and a table. Long pages that bury the answer score low because engines quote the opening, not the middle.' },
   { question: 'What is the difference between this and the audit?', answer: 'This is the free, automatic, ten-second version of the first two pages of the audit. The audit adds an analyst, Search Console data, competitor pages, and a ten-page report with a price on every fix.' },
 ];
@@ -42,14 +42,14 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     <section id="vis-result" class="result" hidden aria-live="polite"></section>
 
     <section id="vis-capture" class="capture" hidden>
-      <h2 id="capture-head">See the rest, free</h2>
-      <p id="capture-sub">A five-page report on your site as a PDF, with everything this check found, and the one fix that moves your score most written out in full: what your site does now, what to change, and how to check it worked. It arrives in a few minutes.</p>
+      <h2 id="capture-head">Get the first fix as a letter</h2>
+      <p id="capture-sub">The fix that moves your score most, written out in full: what your site does now, what to change, and how to check it worked. One letter, so you can hand it to whoever runs the site. It arrives in a few minutes.</p>
       <form id="pdf-form" novalidate>
         <input type="hidden" name="source" id="pdf-source" value="ai-visibility" />
         <div><label for="pdf-email">Email</label><input id="pdf-email" name="email" type="email" required autocomplete="email" placeholder="you@company.com" /></div>
-        <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive the report and, at most once a month, a note when a check changes. One click unsubscribes.</label></div>
+        <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive this fix by email and, at most once a month, a note when a check changes. One click unsubscribes.</label></div>
         <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
-        <button type="submit" class="btn" id="pdf-btn">Email me the report →</button>
+        <button type="submit" class="btn" id="pdf-btn">Email me the fix →</button>
         <p class="msg" id="pdf-msg" hidden></p>
       </form>
     </section>
@@ -198,27 +198,42 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       // Балл, области и всё, что пройдено, видно сразу: это и есть приманка, цифра про его сайт.
       // Из проблем показываем первые три, остальные считаем и отдаём за почту. Иначе человеку
       // незачем её оставлять, а без почты вся дальнейшая воронка не существует.
-      const SHOWN = 3;
-      let left = SHOWN;
-      let hidden = 0;
+      // Пройденные проверки показываем целиком: хорошая новость про свой сайт не товар.
+      // Проблемы сюда не приходят вовсе, обработчик их не отдаёт: одна показана целиком
+      // правкой выше, остальные лежат в r.rest заголовками по четыре слова.
+      const rest: Array<{ area: string; level: string; teaser: string }> = Array.isArray(r.rest) ? r.rest : [];
+      const hidden = rest.length;
       const areas = r.areas.map((a: any) => {
-        const shown: string[] = [];
-        for (const f of a.findings) {
-          if (f.level === 'pass') { shown.push(`<li class="f-pass"><span class="chip">OK</span>${esc(f.text)}</li>`); continue; }
-          if (left > 0) { left -= 1; shown.push(`<li class="f-${f.level}"><span class="chip">${f.level === 'warn' ? 'Partial' : 'Problem'}</span>${esc(f.text)}</li>`); }
-          else hidden += 1;
-        }
+        const shown = (a.findings || [])
+          .filter((f: any) => f.level === 'pass')
+          .map((f: any) => `<li class="f-pass"><span class="chip">OK</span>${esc(f.text)}</li>`);
+        const n = Number(a.problems) || 0;
+        const tail = n ? `<li class="f-more">${n} ${n === 1 ? 'finding' : 'findings'} in the list below</li>` : '';
         return `
         <div class="area">
           <div class="area-head"><span>${esc(a.label)}</span><strong>${a.score == null ? 'not measured' : `${a.score}/${a.max}`}</strong></div>
           ${a.score == null ? '' : `<div class="bar"><i style="width:${Math.round((a.score / a.max) * 100)}%"></i></div>`}
-          <ul>${shown.join('')}</ul>
+          <ul>${shown.join('')}${tail}</ul>
         </div>`;
       }).join('');
+      /**
+       * Остальные находки этого же прогона. Число здесь ровно столько, сколько их нашлось,
+       * а заголовки настоящие: они приходят с сервера обрезанными до четырёх слов, поэтому
+       * размытие показывает форму списка и не прячет то, что уже уехало в браузер.
+       * Находок кроме первой нет, значит блока нет: ноль правок это хорошая новость,
+       * и сказать её надо словами, а не строкой «ещё 0».
+       */
       const locked = hidden
-        ? `<p class="locked"><strong>${hidden} more problem${hidden === 1 ? '' : 's'} found on ${esc(r.host)}.</strong> They are all in the free report: a five-page PDF on ${esc(r.host)} with the first fix written out in full, sent to your email in a few minutes.</p>`
-        : '';
-      const fixes = r.fixes.length ? `<div class="fixes"><h3>Fix these first</h3><ol>${r.fixes.map((f: any) => `<li><strong>${esc(f.area)}.</strong> ${esc(f.text)}</li>`).join('')}</ol></div>` : '';
+        ? `<div class="rest">
+            <h3>${hidden} more ${hidden === 1 ? 'fix' : 'fixes'} on ${esc(r.host)}</h3>
+            <ul class="rest-list">${rest.map((x) => `<li class="r-${esc(x.level)}"><span class="chip">${x.level === 'warn' ? 'Partial' : 'Problem'}</span><span class="r-area">${esc(x.area)}:</span> <span class="smudge">${esc(x.teaser)}</span></li>`).join('')}</ul>
+            <p class="note">These are the findings of this very run on ${esc(r.host)}, and the count is exactly how many there are. What to change and how to check it belongs to the fix list.</p>
+            <a class="btn" href="/products/site-report/">Every fix for your site, as a list you can hand over</a>
+          </div>`
+        : r.fixes.length
+          ? `<p class="clean">Nothing else was found: apart from the fix above, there is nothing to repair on ${esc(r.host)}.</p>`
+          : `<p class="clean">The check found nothing to fix on ${esc(r.host)}. That is the whole result, and it is a good one.</p>`;
+      const fixes = r.fixes.length ? `<div class="fixes"><h3>The fix that moves the score most</h3><p class="fix-one"><strong>${esc(r.fixes[0].area)}.</strong> ${esc(r.fixes[0].text)}</p></div>` : '';
       const pages = r.sample.length ? `<details class="more"><summary>Pages sampled (${r.sample.length})</summary><table><tr><th>Page</th><th>Words</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr>${r.sample.map((p: any) => `<tr><td><a href="${esc(p.url)}" rel="nofollow noopener" target="_blank">${esc(new URL(p.url).pathname)}</a></td><td>${p.words}</td><td>${p.answerFirst ? 'yes' : 'no'}</td><td>${p.dated ? 'yes' : 'no'}</td><td>${esc(p.schema.join(', ') || 'none')}</td></tr>`).join('')}</table></details>` : '';
       const crawlers = `<details class="more"><summary>Crawlers checked (${r.crawlers.length})</summary><table><tr><th>Crawler</th><th>Kind</th><th>robots.txt</th></tr>${r.crawlers.map((c: any) => `<tr><td>${esc(c.label)}</td><td>${c.kind === 'search' ? 'search and citation' : 'training'}</td><td class="${c.verdict === 'blocked' ? 'bad' : 'ok'}">${c.verdict}</td></tr>`).join('')}</table></details>`;
       out.innerHTML = `
@@ -250,12 +265,14 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         <p class="next">This check reads one page. The <a href="/products/site-report/">site fix list</a> reads up to twenty and turns every failure into a task written in plain words: what your site does now, what to change, how to check it worked. Hand a task to your developer or paste it into ChatGPT, Claude or Cursor. 9 USD, no code, nothing to install.</p>`;
       wireCompare(r);
       out.hidden = false;
-      capture.hidden = false;
+      // Чинить нечего, значит и обменивать почту не на что. Предлагать «первую правку письмом»
+      // сайту, у которого правок нет, значит обещать письмо, которого не будет.
+      capture.hidden = !r.fixes.length;
       const head = document.getElementById('capture-head') as HTMLElement;
       const sub = document.getElementById('capture-sub') as HTMLElement;
       if (hidden) {
-        head.textContent = hidden === 1 ? 'See the last problem, free' : `See the other ${hidden} problems, free`;
-        sub.textContent = `A five-page report on ${r.host} as a PDF, with every problem this check found and the one fix that moves your score most written out in full. It arrives in a few minutes.`;
+        head.textContent = 'Get the first fix as a letter';
+        sub.textContent = `The fix above, written out in full for ${r.host}: what the site does now, what to change, how to check it worked. One letter, so you can hand it to whoever runs the site.`;
       }
       pdfSource.value = `ai-visibility:${r.host}:${r.score}`;
       out.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -449,5 +466,19 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   #vis-result .more td.bad { color: #e07a5f; }
   #vis-result .more td.ok { color: var(--teal-soft); }
   #vis-result .next { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1); font-size: .95rem; line-height: 1.6; }
+  #vis-result .fix-one { margin: 0; color: rgba(245,242,236,.9); line-height: 1.55; }
+  #vis-result .f-more { color: var(--muted); font-size: 13px; padding-left: 2px; }
+  #vis-result .clean { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(61,184,169,.35); background: rgba(26,138,125,.08); font-size: 15px; line-height: 1.5; }
+  /* Размытый список. Заголовки приходят с сервера уже обрезанными до четырёх слов, поэтому
+     размытие показывает длину и форму списка, а не прячет то, что уже уехало в браузер. */
+  #vis-result .rest { margin: 22px 0 0; padding: 16px 18px; border-radius: 12px; border: 1px dashed rgba(61,184,169,.45); background: rgba(26,138,125,.07); }
+  #vis-result .rest-list { list-style: none; margin: 10px 0 12px; padding: 0; display: grid; gap: 7px; }
+  #vis-result .rest-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: rgba(245,242,236,.85); }
+  #vis-result .rest-list .r-warn .chip, #vis-result .rest-list li.r-warn .chip { color: var(--amber-soft); }
+  #vis-result .rest-list li.r-fail .chip { color: #e07a5f; }
+  #vis-result .r-area { color: rgba(245,242,236,.7); }
+  #vis-result .smudge { filter: blur(4.5px); user-select: none; -webkit-user-select: none; }
+  #vis-result .rest .btn { display: inline-block; margin-top: 4px; }
+  @media (prefers-reduced-motion: reduce) { #vis-result .smudge { filter: blur(4.5px); } }
   #vis-result .err { color: #f5a962; margin: 0; }
 </style>
