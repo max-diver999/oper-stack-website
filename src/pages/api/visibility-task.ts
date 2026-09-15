@@ -18,6 +18,7 @@ import { VISIBILITY_DEFAULTS, checkVisibility, normaliseInput } from '@operstack
 import { buildRunBody, buildRunSubject } from '../../lib/report-fulfilment';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
 import { logLead, originOf } from '../../lib/sheets-log';
+import { recordPrimary } from '../../lib/ru-primary';
 import { SITE } from '../../data/site';
 
 export const prerender = false;
@@ -130,6 +131,10 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   // Заявка в очередь. Письмо человеку собирает она: у неё есть браузер, чтобы напечатать
   // PDF, а здесь его нет. Если заявку поставить не удалось, человек не получит ничего, и
   // сказать об этом надо сразу, а не молча.
+  // Первая запись на российской стороне, до всего, что уходит за границу. Сбой Диска лид не
+  // отменяет: человек важнее нашего порядка записи, поэтому результат только помечаем.
+  const primary = await recordPrimary('check', { email, url: result.url ?? url, host: result.host, score: result.score, lang: 'en' });
+
   const queued = await queueFreeReport(result.url ?? url, email, result);
   if (!queued) {
     return json({ ok: false, error: 'We could not start your report just now. Write to info@oper-stack.com and we will run it by hand.' }, 502);
@@ -153,7 +158,8 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     source,
     campaign,
     page,
-    sent: woken ? 'отчёт собирается, очередь разбужена' : 'отчёт в очереди',
+    // Сбой первичной записи виден там, где вы и так смотрите: в колонке «Что отправили».
+    sent: `${woken ? 'отчёт собирается, очередь разбужена' : 'отчёт в очереди'}${primary === 'failed' ? ', первичная запись в РФ не прошла' : ''}`,
     tier: 'бесплатно',
   });
 
