@@ -77,10 +77,31 @@ async function checkSite(key) {
   // 2. Кнопки «купить» и цены (только там, где есть массив продуктов).
   if (site.products) {
     const src = readFileSync(site.products, 'utf8');
-    const items = [...src.matchAll(/slug: '([^']+)'[\s\S]*?price: '([^']+)'[\s\S]*?cta: \{ text: '[^']*', href: '(https:\/\/whop\.com[^']+)'/g)];
+    /*
+     * Разбираем по одному товару за раз. Раньше стояло одно жадное выражение на весь файл, и
+     * оно склеивало слаг одного товара с адресом другого: 15.09.2026 проверка ругалась на
+     * «visits», показывая при этом ссылку от site-report. Ошибка была в проверке, не на сайте.
+     */
+    const blocks = src.split(/\n\s*\{\n\s*slug: '/).slice(1);
+    const items = blocks.map((b) => {
+      const slug = b.slice(0, b.indexOf("'"));
+      const price = b.match(/\n\s*price: '([^']+)'/)?.[1];
+      const href = b.match(/\n\s*cta: \{[^}]*href: '(https:\/\/whop\.com[^']+)'/)?.[1];
+      return href && price ? [null, slug, price, href] : null;
+    }).filter(Boolean);
     for (const [, slug, price, href] of items) {
-      const r = await get(href, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null);
-      if (!r || r.status !== 200) { fail(`${slug}: кнопка ведёт на ${r ? r.status : 'нет ответа'} ${href}`); continue; }
+      /*
+       * Whop иногда не отвечает нам, хотя в настоящем браузере страница открывается: после
+       * десятка запросов подряд он режет наш адрес. Поэтому одна повторная попытка с паузой,
+       * и только потом вывод. Иначе проверка кричит «магазин лежит» ровно тогда, когда мы
+       * сами же его и опросили ([[vercel-challenges-polling-ip]] про тот же приём у Vercel).
+       */
+      let r = await get(href, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null);
+      if (!r || r.status !== 200) {
+        await new Promise((res) => setTimeout(res, 5000));
+        r = await get(href, { redirect: 'follow', headers: { 'User-Agent': 'Mozilla/5.0' } }).catch(() => null);
+      }
+      if (!r || r.status !== 200) { fail(`${slug}: Whop не ответил нам дважды (${r ? r.status : 'нет ответа'}) ${href}. Проверьте адрес в настоящем браузере: он мог просто закрыться от нас`); continue; }
       const html = await r.text();
       const ours = price.match(/\d+/)?.[0];
       // Whop рисует зачёркнутую цену «+20 %» рядом с настоящей, поэтому ищем именно нашу.
