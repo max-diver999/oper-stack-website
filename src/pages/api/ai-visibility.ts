@@ -3,7 +3,7 @@
  * Public signals only, hard time budget, small in-memory cache and rate limit per instance.
  */
 import type { APIRoute } from 'astro';
-import { VISIBILITY_DEFAULTS, checkVisibility, normaliseInput } from '@operstack/audit';
+import { VISIBILITY_DEFAULTS, checkVisibility, firstFixParts, normaliseInput } from '@operstack/audit';
 import { logCheck, originOf } from '../../lib/sheets-log';
 
 export const prerender = false;
@@ -73,8 +73,22 @@ function forVisitor(result: any): any {
     }
     return { ...a, findings: kept, problems };
   });
+  /*
+   * Первая правка тремя частями. Текст берётся из пакета, а не сочиняется здесь: те же слова,
+   * что уходят в письме и в файле задач за 9, поэтому человек читает на экране и в письме одно
+   * и то же. Пакет вернул null, значит у этой находки задания в наборе нет: тогда трёх частей
+   * на экране не будет, и страница честно скажет, что правка целиком приходит письмом.
+   */
+  const first = (result.fixes || [])[0] || null;
+  let parts: unknown = null;
+  try {
+    const got = first ? firstFixParts(first, { lang: 'en' }) : null;
+    parts = got ? { area: first.area, now: got.now, task: got.task, verify: got.verify, labels: got.labels } : null;
+  } catch {
+    parts = null;
+  }
   // Правок в ответе одна: та, что показывается целиком. Остальные живут в rest заголовками.
-  return { ...result, areas, fixes: (result.fixes || []).slice(0, 1), rest };
+  return { ...result, areas, fixes: (result.fixes || []).slice(0, 1), rest, firstFix: parts };
 }
 
 async function handle(rawUrl: string, ip: string, request: Request, from: { source?: string; campaign?: string }): Promise<Response> {

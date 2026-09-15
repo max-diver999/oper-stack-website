@@ -233,7 +233,24 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         : r.fixes.length
           ? `<p class="clean">Nothing else was found: apart from the fix above, there is nothing to repair on ${esc(r.host)}.</p>`
           : `<p class="clean">The check found nothing to fix on ${esc(r.host)}. That is the whole result, and it is a good one.</p>`;
-      const fixes = r.fixes.length ? `<div class="fixes"><h3>The fix that moves the score most</h3><p class="fix-one"><strong>${esc(r.fixes[0].area)}.</strong> ${esc(r.fixes[0].text)}</p></div>` : '';
+      /*
+       * Первая правка тремя частями: что сейчас, что сделать, как проверить. Текст приходит
+       * готовым из обработчика, который берёт его из пакета, поэтому на экране, в письме и в
+       * файле задач за 9 стоят одни и те же слова. Пакет не знает этой находки, значит трёх
+       * частей нет: показываем находку как есть, а развёрнутую правку человек получит письмом.
+       */
+      const fp = r.firstFix;
+      const fixes = !r.fixes.length ? '' : fp
+        ? `<div class="fixes"><h3>The fix that moves the score most</h3>
+            <p class="fix-area">${esc(fp.area)}</p>
+            <dl class="fix-parts">
+              <dt>${esc(fp.labels.now)}</dt><dd>${esc(fp.now)}</dd>
+              <dt>${esc(fp.labels.task)}</dt><dd>${esc(fp.task)}</dd>
+              <dt>${esc(fp.labels.verify)}</dt><dd>${esc(fp.verify)}</dd>
+            </dl>
+            <p class="note">Copy all three lines and hand them over as they are: without "now" and "how to check" whoever does the work cannot tell where to start or when it is done.</p>
+          </div>`
+        : `<div class="fixes"><h3>The fix that moves the score most</h3><p class="fix-one"><strong>${esc(r.fixes[0].area)}.</strong> ${esc(r.fixes[0].text)}</p><p class="note">Leave an email below and this fix arrives written out in full: what is there now, what to change, how to check it worked.</p></div>`;
       const pages = r.sample.length ? `<details class="more"><summary>Pages sampled (${r.sample.length})</summary><table><tr><th>Page</th><th>Words</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr>${r.sample.map((p: any) => `<tr><td><a href="${esc(p.url)}" rel="nofollow noopener" target="_blank">${esc(new URL(p.url).pathname)}</a></td><td>${p.words}</td><td>${p.answerFirst ? 'yes' : 'no'}</td><td>${p.dated ? 'yes' : 'no'}</td><td>${esc(p.schema.join(', ') || 'none')}</td></tr>`).join('')}</table></details>` : '';
       const crawlers = `<details class="more"><summary>Crawlers checked (${r.crawlers.length})</summary><table><tr><th>Crawler</th><th>Kind</th><th>robots.txt</th></tr>${r.crawlers.map((c: any) => `<tr><td>${esc(c.label)}</td><td>${c.kind === 'search' ? 'search and citation' : 'training'}</td><td class="${c.verdict === 'blocked' ? 'bad' : 'ok'}">${c.verdict}</td></tr>`).join('')}</table></details>`;
       out.innerHTML = `
@@ -467,6 +484,11 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   #vis-result .more td.ok { color: var(--teal-soft); }
   #vis-result .next { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1); font-size: .95rem; line-height: 1.6; }
   #vis-result .fix-one { margin: 0; color: rgba(245,242,236,.9); line-height: 1.55; }
+  #vis-result .fix-area { margin: 0 0 10px; font-family: var(--fm); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  #vis-result .fix-parts { margin: 0 0 10px; display: grid; gap: 4px; }
+  #vis-result .fix-parts dt { font-family: var(--fm); font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--amber-soft); margin-top: 8px; }
+  #vis-result .fix-parts dt:first-child { margin-top: 0; }
+  #vis-result .fix-parts dd { margin: 0; color: rgba(245,242,236,.9); line-height: 1.55; }
   #vis-result .f-more { color: var(--muted); font-size: 13px; padding-left: 2px; }
   #vis-result .clean { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(61,184,169,.35); background: rgba(26,138,125,.08); font-size: 15px; line-height: 1.5; }
   /* Размытый список. Заголовки приходят с сервера уже обрезанными до четырёх слов, поэтому
