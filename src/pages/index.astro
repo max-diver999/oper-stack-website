@@ -23,15 +23,15 @@ const websiteSchema = {
   publisher: { '@id': `${SITE.url}/#organization` },
   inLanguage: 'en',
 };
-const title = 'Can AI see your site? A free half-minute check · OperStack';
-const description = 'Which of the 14 AI crawlers your site lets in, whether it has a map for agents, whether there is anything to quote. A score out of 100 you can add up by hand, and the first fix on screen. No signup.';
+const title = 'Your site through the eyes of AI: a free half-minute check · OperStack';
+const description = 'What ChatGPT, Claude, Perplexity, Gemini, Copilot and the rest see on your site. Which of the 14 AI crawlers it lets in, whether it has a map for agents, whether there is anything to quote. A score out of 100 and the first fix on screen, no signup.';
 ---
 <CommercialLayout title={title} description={description} canonical={`${SITE.url}/`} jsonLd={websiteSchema}>
   <main class="hm">
 
     <section class="hero">
-      <h1>What does <em>ChatGPT</em> see when it reads your site?</h1>
-      <p class="lede">People increasingly ask an assistant instead of a search engine. It reads a few sites and names two or three. This check shows whether you make that list and what stands in the way.</p>
+      <h1>Your site through the eyes of <em>AI</em></h1>
+      <p class="lede">People increasingly ask an assistant instead of a search engine: ChatGPT, Claude, Perplexity, Gemini, Copilot and the rest. The assistant reads a few sites and names two or three. This check shows what it sees on yours, whether you make that list, and what stands in the way.</p>
       <form class="check" action="/ai-visibility/" method="get">
         <label class="sr" for="home-url">Site address</label>
         <input id="home-url" name="url" type="text" inputmode="url" placeholder="your-site.com" autocomplete="url" required />
