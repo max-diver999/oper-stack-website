@@ -362,7 +362,16 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
           pdfMsg.className = 'msg'; pdfMsg.hidden = false; pdfBtn.disabled = false;
           return;
         }
-        location.href = '/thanks/first-fix/';
+        /*
+         * Остаёмся на странице, как на русской стороне. Уводить человека на отдельную
+         * «спасибо» значит забирать у него результат, размытый список и кнопку, ради которых
+         * он сюда и пришёл. Подтверждение и что делать дальше говорим на месте.
+         */
+        pdfMsg.textContent = 'Sent. The fix lands in your inbox in a few minutes. Copy all three lines and hand them over as they are; if the letter is not there, look in spam.';
+        pdfMsg.className = 'msg ok';
+        pdfMsg.hidden = false;
+        pdfForm.reset();
+        pdfBtn.disabled = false;
       } catch (err: any) { pdfMsg.textContent = err.message || 'Something went wrong. Email info@oper-stack.com'; pdfMsg.className = 'msg err'; pdfMsg.hidden = false; pdfBtn.disabled = false; }
     });
   </script>
