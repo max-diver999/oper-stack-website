@@ -14,7 +14,7 @@ export type PlainCopy = {
 export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
   'ai-visibility': {
     plain:
-      'Type in your website address and in ten seconds you see whether ChatGPT, Perplexity and Google\'s AI answers can read your site and quote it when someone asks a question you answer. You get a score out of 100 and the three things to fix first, in plain words. Nothing to install, no account.',
+      'Type in your website address and in ten seconds you see whether ChatGPT, Perplexity and Google\'s AI answers can read your site and quote it when someone asks a question you answer. You get a score out of 100, the one thing to fix first in plain words, and an honest list of everything else it found. Nothing to install, no account.',
     who: [
       'A business owner who wants to know why AI assistants recommend competitors and not them',
       'A marketer who needs one number and three fixes to bring to the next meeting',
