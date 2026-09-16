@@ -10,6 +10,7 @@
  * от самой функции.
  */
 import type { APIRoute } from 'astro';
+import { sendTransactionalMail, lastResendError } from '../../lib/mail-smtp';
 export const prerender = false;
 
 const env = (key: string, fallback = ''): string =>
@@ -55,6 +56,18 @@ export const GET: APIRoute = async ({ url }) => {
     out.resend = { код: res.status, ответ: (await res.text()).slice(0, 300) };
   } catch (e) {
     out.resend = { упало: String((e as Error).message).slice(0, 300), тип: (e as Error).name };
+  }
+
+  // А теперь то же самое, но настоящим отправщиком: он и есть подозреваемый.
+  const target = url.searchParams.get('to') || '';
+  if (target) {
+    try {
+      await sendTransactionalMail({ to: target, subject: 'диагностика отправщика', text: 'диагностика', html: '<p>диагностика</p>' });
+      const { lastResendError: err } = await import('../../lib/mail-smtp');
+      out.черезОтправщик = err ? { каналGoogle: true, причинаОтказаResend: err } : { каналResend: true };
+    } catch (e) {
+      out.черезОтправщик = { упало: String((e as Error).message).slice(0, 300) };
+    }
   }
 
   return new Response(JSON.stringify(out, null, 2), {

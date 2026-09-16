@@ -34,8 +34,10 @@ const goesOutside = (to: string, cc?: string): boolean =>
  * 16.09.2026 из-за этого письма молча уходили старым каналом.
  */
 const RESEND_API_KEY = (
-  import.meta.env.RESEND_API_KEY ||
+  // Сначала окружение выполнения, потом подставленное сборщиком: подставленное могло устареть,
+  // если ключ поменяли после сборки, и тогда письма молча уходили бы запасным каналом.
   process.env.RESEND_API_KEY ||
+  import.meta.env.RESEND_API_KEY ||
   ''
 ).trim();
 
@@ -62,6 +64,9 @@ async function sendViaResend(letter: {
   });
   if (!res.ok) throw new Error(`resend ${res.status}: ${(await res.text()).slice(0, 200)}`);
 }
+
+/** Почему письмо ушло запасным каналом. Нужно диагностике: журналы функции нам недоступны. */
+export let lastResendError: string | null = null;
 
 const timeouts = { connectionTimeout: 10_000, greetingTimeout: 10_000, socketTimeout: 15_000 };
 
@@ -91,10 +96,12 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
   if (RESEND_API_KEY && goesOutside(msg.to, cc)) {
     try {
       await sendViaResend(letter);
+      lastResendError = null;
       return;
     } catch (e) {
       // Домен не подтверждён, лимит выбран, служба недоступна: причина неважна, человек ждёт письмо.
-      console.error('resend refused, falling back to google:', (e as Error).message);
+      lastResendError = String((e as Error).message).slice(0, 300);
+      console.error('resend refused, falling back to google:', lastResendError);
     }
   }
 
