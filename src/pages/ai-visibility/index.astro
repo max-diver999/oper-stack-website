@@ -47,12 +47,19 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       <form id="pdf-form" novalidate>
         <input type="hidden" name="source" id="pdf-source" value="ai-visibility" />
         <div><label for="pdf-email">Email</label><input id="pdf-email" name="email" type="email" required autocomplete="email" placeholder="you@company.com" /></div>
-        <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive this fix by email and, at most once a month, a note when a check changes. One click unsubscribes.</label></div>
+        <div class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /><label for="pdf-consent">I agree to receive this letter by email and, at most once a month, a note when a check changes. One click unsubscribes.</label></div>
         <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
         <button type="submit" class="btn" id="pdf-btn">Email me the fix →</button>
         <p class="msg" id="pdf-msg" hidden></p>
       </form>
     </section>
+
+    <!--
+      Everything below the exchange. Split on purpose: the form has to sit right after the blurred
+      list, while the person has just seen what was withheld. On 16.09.2026 it sat 2817px down the
+      page, three screens below the score, and almost nobody reached it.
+    -->
+    <section id="vis-more" class="result" hidden></section>
 
     <!-- Врезка стоит сразу под результатом: человек только что увидел свой балл, и это
          самый естественный момент сказать, что то же самое работает у него в рабочем окне.
@@ -260,12 +267,14 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
             <p class="label">Grade ${esc(r.grade)} · ${esc(r.host)}</p>
             <h2 class="verdict">${r.score >= 80 ? 'AI systems can read and quote this site.' : r.score >= 65 ? 'Readable, with gaps that cost citations.' : r.score >= 45 ? 'Readable, but there is little to quote.' : 'Mostly invisible to answer engines.'}</h2>
             <p class="note">Checked ${new Date(r.checkedAt).toLocaleString('en-GB')} in ${(r.ms / 1000).toFixed(1)} s. Sitemap: ${r.sitemap.found ? `${r.sitemap.count} URLs${r.sitemap.lastmod ? ', dated' : ', no dates'}` : r.sitemap.unchecked ? 'did not answer in time, not checked' : 'not found'}.</p>
-            <p class="note">${(() => { const n = r.sample.length; return `This is a first pass: ${n} page${n === 1 ? '' : 's'} of the site ${n === 1 ? 'was' : 'were'} read. The full report carries this same score, from the same code, and shows what it is made of. Running the check again can move it by a point or two: a check that answers in time on one run may not on the next, and this score never counts against a site what it could not read.`; })()}</p>
+            <p class="note">${(() => { const n = r.sample.length; const of = r.sitemap.found && r.sitemap.count > n ? ` of the ${r.sitemap.count} listed in the sitemap` : ' of the site'; return `This is a first pass: ${n} page${n === 1 ? '' : 's'}${of} ${n === 1 ? 'was' : 'were'} read. The full report carries this same score, from the same code, and shows what it is made of. Running the check again can move it by a point or two: a check that answers in time on one run may not on the next, and this score never counts against a site what it could not read.`; })()}</p>
           </div>
         </div>
         ${fixes}
+        ${locked}`;
+      const more = document.getElementById('vis-more') as HTMLElement;
+      more.innerHTML = `
         <div class="areas">${areas}</div>
-        ${locked}
         ${pages}${crawlers}
         <div class="compare">
           <h3>How do you compare?</h3>
@@ -280,6 +289,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
           <div class="cmp-out" hidden></div>
         </div>
         <p class="next">This check reads one page. The <a href="/products/site-report/">site fix list</a> reads up to twenty and turns every failure into a task written in plain words: what your site does now, what to change, how to check it worked. Hand a task to your developer or paste it into ChatGPT, Claude or Cursor. 9 USD, no code, nothing to install.</p>`;
+      more.hidden = false;
       wireCompare(r);
       out.hidden = false;
       // Чинить нечего, значит и обменивать почту не на что. Предлагать «первую правку письмом»
@@ -287,10 +297,20 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       capture.hidden = !r.fixes.length;
       const head = document.getElementById('capture-head') as HTMLElement;
       const sub = document.getElementById('capture-sub') as HTMLElement;
-      if (hidden) {
-        head.textContent = 'Get the first fix as a letter';
-        sub.textContent = `The fix above, written out in full for ${r.host}: what the site does now, what to change, how to check it worked. One letter, so you can hand it to whoever runs the site.`;
-      }
+      /*
+       * The ask is made in the visitor's own numbers. "Get the first fix as a letter" meant nothing
+       * to someone who had just read that first fix in full above. The letter now buys the second
+       * fix and the names of the remaining findings; how to fix each of those stays in the paid
+       * list, and that line does not move.
+       */
+      const n = r.rest.length;
+      head.innerHTML = n
+        ? `You scored ${r.score} out of 100.<br>We did not show you ${n} more finding${n === 1 ? '' : 's'} on ${esc(r.host)}.`
+        : `You scored ${r.score} out of 100.`;
+      sub.textContent = n
+        ? 'We will email you the second fix written out in full, like the one above, and the names of the rest, so you see the whole picture. Keep it, or hand it to whoever runs the site.'
+        : `The fix above, written out in full for ${r.host}: what the site does now, what to change, how to check it worked.`;
+      if (pdfBtn) pdfBtn.textContent = n ? 'Email me the full list →' : 'Email me the fix →';
       pdfSource.value = `ai-visibility:${r.host}:${r.score}`;
       out.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
@@ -349,6 +369,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         note.textContent = 'Public signals only. We log the address checked and the score, never your IP.';
       } catch (err: any) {
         out.innerHTML = `<p class="err">${esc(err.message || 'The check failed')}</p>`; out.hidden = false;
+        const m2 = document.getElementById('vis-more') as HTMLElement; if (m2) { m2.hidden = true; m2.innerHTML = ''; }
         // Прочитать сайт не вышло, значит отчёта по нему не будет. Форму обмена на почту
         // прячем вместе со старым «Отправили»: иначе на экране остаётся приглашение
         // получить отчёт по ПРЕДЫДУЩЕМУ сайту, и человек думает, что письмо уже ушло.
@@ -427,8 +448,8 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   .err { color: #f5a962; margin: 0; }
   /* Сообщение о том, сколько проблем осталось за почтой. Стоит сразу под областями,
      чтобы человек увидел его ровно там, где список обрывается. */
-  #vis-result .locked { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; border: 1px dashed rgba(61,184,169,.45); background: rgba(26,138,125,.07); font-size: 15px; line-height: 1.5; }
-  #vis-result .locked strong { color: var(--paper); }
+  .result .locked { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; border: 1px dashed rgba(61,184,169,.45); background: rgba(26,138,125,.07); font-size: 15px; line-height: 1.5; }
+  .result .locked strong { color: var(--paper); }
   /* Врезка про адрес для ИИ-помощников. Тише, чем блок обмена на почту: она не должна
      перетягивать внимание с того, ради чего человек пришёл. */
   .mcp { margin: 34px 0 10px; padding: 22px 24px; border-radius: 14px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03); }
@@ -464,74 +485,74 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
 <!-- Результат проверки вставляется скриптом уже после сборки, поэтому разметка не получает
      метку, по которой Astro ограничивает стили страницы, и правила выше на неё не действуют:
      кольцо со счётом рисовалось чёрным кругом в 722 пикселя вместо 132. Те же правила
-     повторены здесь глобально, но с префиксом #vis-result, чтобы они не вышли за карточку. -->
+     повторены здесь глобально, но с префиксом .result, чтобы они не вышли за карточку. -->
 <style is:global>
-  #vis-result .label { font-family: var(--fm); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
-  #vis-result h3 { font-family: var(--fd); font-size: 18px; margin: 0 0 8px; }
-  #vis-result .note { font-size: 13px; color: var(--muted); }
+  .result .label { font-family: var(--fm); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
+  .result h3 { font-family: var(--fd); font-size: 18px; margin: 0 0 8px; }
+  .result .note { font-size: 13px; color: var(--muted); }
   .ownscore { border-left: 3px solid var(--teal); padding-left: 14px; font-size: 15px; line-height: 1.6; max-width: 68ch; margin: 0 0 22px; color: rgba(245,242,236,.86); }
   .ownscore code { font-family: var(--fm); font-size: 13.5px; background: rgba(0,0,0,.3); padding: 1px 6px; border-radius: 4px; }
-  #vis-result .compare { margin-top: 26px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); }
-  #vis-result .cmp-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 8px; }
-  #vis-result .cmp-row input { flex: 1 1 160px; min-width: 0; padding: 11px 13px; border-radius: 10px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.25); color: var(--paper); font-size: 16px; min-height: 46px; }
-  #vis-result .cmp-verdict { font-size: 15.5px; margin: 14px 0 10px; }
-  #vis-result .cmp-wrap { overflow-x: auto; }
-  #vis-result .cmp-out table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
-  #vis-result .cmp-out th, #vis-result .cmp-out td { padding: 9px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.07); white-space: nowrap; }
-  #vis-result .cmp-out th { font-family: var(--fm); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-  #vis-result .cmp-out td.n, #vis-result .cmp-out th.n { text-align: right; font-variant-numeric: tabular-nums; }
-  #vis-result .cmp-out tr.me td { background: rgba(61,184,169,.07); }
-  #vis-result .cmp-out td.beat { color: var(--amber-soft); font-weight: 600; }
-  #vis-result .cmp-out .you { font-family: var(--fm); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--teal-soft); }
-  #vis-result .score-row { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
-  #vis-result .ring { width: 132px; height: 132px; flex-shrink: 0; transform: rotate(-90deg); }
-  #vis-result .ring-bg { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 10; }
-  #vis-result .ring-fg { fill: none; stroke: var(--teal-soft); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
-  #vis-result .ring-fg.g-D, #vis-result .ring-fg.g-E { stroke: #e07a5f; }
-  #vis-result .ring-fg.g-C { stroke: var(--amber-soft); }
-  #vis-result .ring-num { font-family: var(--fd); font-size: 34px; fill: var(--paper); transform: rotate(90deg); transform-origin: 60px 60px; }
-  #vis-result .ring-sub { font-family: var(--fm); font-size: 9px; fill: var(--muted); letter-spacing: .1em; text-transform: uppercase; transform: rotate(90deg); transform-origin: 60px 60px; }
-  #vis-result .verdict { font-family: var(--fd); margin: 4px 0 8px; font-size: 24px; }
-  #vis-result .fixes { margin: 22px 0; padding: 16px 18px; border-radius: 12px; border: 1px solid rgba(232,184,74,.35); background: rgba(232,184,74,.06); }
-  #vis-result .fixes ol { margin: 0 0 0 18px; color: rgba(245,242,236,.88); }
-  #vis-result .fixes li { margin-bottom: 8px; line-height: 1.5; }
-  #vis-result .areas { display: grid; gap: 14px; margin-top: 22px; }
-  #vis-result .area { padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); }
-  #vis-result .area-head { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; margin-bottom: 8px; }
-  #vis-result .bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-bottom: 10px; }
-  #vis-result .bar i { display: block; height: 100%; background: var(--teal-soft); }
-  #vis-result .area ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-  #vis-result .area li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: rgba(245,242,236,.85); }
-  #vis-result .chip { flex-shrink: 0; font-family: var(--fm); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; border: 1px solid currentColor; margin-top: 3px; }
-  #vis-result .f-pass .chip { color: var(--teal-soft); }
-  #vis-result .f-warn .chip { color: var(--amber-soft); }
-  #vis-result .f-fail .chip { color: #e07a5f; }
-  #vis-result .more { margin-top: 14px; }
-  #vis-result .more summary { cursor: pointer; color: var(--teal-soft); font-family: var(--fm); font-size: 13px; padding: 8px 0; }
-  #vis-result .more table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; display: block; overflow-x: auto; }
-  #vis-result .more th { text-align: left; font-family: var(--fm); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.12); }
-  #vis-result .more td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.06); color: rgba(245,242,236,.85); }
-  #vis-result .more td.bad { color: #e07a5f; }
-  #vis-result .more td.ok { color: var(--teal-soft); }
-  #vis-result .next { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1); font-size: .95rem; line-height: 1.6; }
-  #vis-result .fix-one { margin: 0; color: rgba(245,242,236,.9); line-height: 1.55; }
-  #vis-result .fix-area { margin: 0 0 10px; font-family: var(--fm); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
-  #vis-result .fix-parts { margin: 0 0 10px; display: grid; gap: 4px; }
-  #vis-result .fix-parts dt { font-family: var(--fm); font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--amber-soft); margin-top: 8px; }
-  #vis-result .fix-parts dt:first-child { margin-top: 0; }
-  #vis-result .fix-parts dd { margin: 0; color: rgba(245,242,236,.9); line-height: 1.55; }
-  #vis-result .f-more { color: var(--muted); font-size: 13px; padding-left: 2px; }
-  #vis-result .clean { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(61,184,169,.35); background: rgba(26,138,125,.08); font-size: 15px; line-height: 1.5; }
+  .result .compare { margin-top: 26px; padding-top: 20px; border-top: 1px solid rgba(255,255,255,.1); }
+  .result .cmp-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 8px; }
+  .result .cmp-row input { flex: 1 1 160px; min-width: 0; padding: 11px 13px; border-radius: 10px; border: 1px solid rgba(255,255,255,.14); background: rgba(0,0,0,.25); color: var(--paper); font-size: 16px; min-height: 46px; }
+  .result .cmp-verdict { font-size: 15.5px; margin: 14px 0 10px; }
+  .result .cmp-wrap { overflow-x: auto; }
+  .result .cmp-out table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+  .result .cmp-out th, .result .cmp-out td { padding: 9px 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,.07); white-space: nowrap; }
+  .result .cmp-out th { font-family: var(--fm); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .result .cmp-out td.n, .result .cmp-out th.n { text-align: right; font-variant-numeric: tabular-nums; }
+  .result .cmp-out tr.me td { background: rgba(61,184,169,.07); }
+  .result .cmp-out td.beat { color: var(--amber-soft); font-weight: 600; }
+  .result .cmp-out .you { font-family: var(--fm); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--teal-soft); }
+  .result .score-row { display: flex; gap: 22px; align-items: center; flex-wrap: wrap; }
+  .result .ring { width: 132px; height: 132px; flex-shrink: 0; transform: rotate(-90deg); }
+  .result .ring-bg { fill: none; stroke: rgba(255,255,255,.08); stroke-width: 10; }
+  .result .ring-fg { fill: none; stroke: var(--teal-soft); stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset .6s ease; }
+  .result .ring-fg.g-D, .result .ring-fg.g-E { stroke: #e07a5f; }
+  .result .ring-fg.g-C { stroke: var(--amber-soft); }
+  .result .ring-num { font-family: var(--fd); font-size: 34px; fill: var(--paper); transform: rotate(90deg); transform-origin: 60px 60px; }
+  .result .ring-sub { font-family: var(--fm); font-size: 9px; fill: var(--muted); letter-spacing: .1em; text-transform: uppercase; transform: rotate(90deg); transform-origin: 60px 60px; }
+  .result .verdict { font-family: var(--fd); margin: 4px 0 8px; font-size: 24px; }
+  .result .fixes { margin: 22px 0; padding: 16px 18px; border-radius: 12px; border: 1px solid rgba(232,184,74,.35); background: rgba(232,184,74,.06); }
+  .result .fixes ol { margin: 0 0 0 18px; color: rgba(245,242,236,.88); }
+  .result .fixes li { margin-bottom: 8px; line-height: 1.5; }
+  .result .areas { display: grid; gap: 14px; margin-top: 22px; }
+  .result .area { padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); }
+  .result .area-head { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; margin-bottom: 8px; }
+  .result .bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-bottom: 10px; }
+  .result .bar i { display: block; height: 100%; background: var(--teal-soft); }
+  .result .area ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+  .result .area li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: rgba(245,242,236,.85); }
+  .result .chip { flex-shrink: 0; font-family: var(--fm); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; border: 1px solid currentColor; margin-top: 3px; }
+  .result .f-pass .chip { color: var(--teal-soft); }
+  .result .f-warn .chip { color: var(--amber-soft); }
+  .result .f-fail .chip { color: #e07a5f; }
+  .result .more { margin-top: 14px; }
+  .result .more summary { cursor: pointer; color: var(--teal-soft); font-family: var(--fm); font-size: 13px; padding: 8px 0; }
+  .result .more table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 8px; display: block; overflow-x: auto; }
+  .result .more th { text-align: left; font-family: var(--fm); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.12); }
+  .result .more td { padding: 6px 8px; border-bottom: 1px solid rgba(255,255,255,.06); color: rgba(245,242,236,.85); }
+  .result .more td.bad { color: #e07a5f; }
+  .result .more td.ok { color: var(--teal-soft); }
+  .result .next { margin-top: 22px; padding-top: 18px; border-top: 1px solid rgba(255,255,255,.1); font-size: .95rem; line-height: 1.6; }
+  .result .fix-one { margin: 0; color: rgba(245,242,236,.9); line-height: 1.55; }
+  .result .fix-area { margin: 0 0 10px; font-family: var(--fm); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+  .result .fix-parts { margin: 0 0 10px; display: grid; gap: 4px; }
+  .result .fix-parts dt { font-family: var(--fm); font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--amber-soft); margin-top: 8px; }
+  .result .fix-parts dt:first-child { margin-top: 0; }
+  .result .fix-parts dd { margin: 0; color: rgba(245,242,236,.9); line-height: 1.55; }
+  .result .f-more { color: var(--muted); font-size: 13px; padding-left: 2px; }
+  .result .clean { margin: 18px 0 0; padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(61,184,169,.35); background: rgba(26,138,125,.08); font-size: 15px; line-height: 1.5; }
   /* Размытый список. Заголовки приходят с сервера уже обрезанными до четырёх слов, поэтому
      размытие показывает длину и форму списка, а не прячет то, что уже уехало в браузер. */
-  #vis-result .rest { margin: 22px 0 0; padding: 16px 18px; border-radius: 12px; border: 1px dashed rgba(61,184,169,.45); background: rgba(26,138,125,.07); }
-  #vis-result .rest-list { list-style: none; margin: 10px 0 12px; padding: 0; display: grid; gap: 7px; }
-  #vis-result .rest-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: rgba(245,242,236,.85); }
-  #vis-result .rest-list .r-warn .chip, #vis-result .rest-list li.r-warn .chip { color: var(--amber-soft); }
-  #vis-result .rest-list li.r-fail .chip { color: #e07a5f; }
-  #vis-result .r-area { color: rgba(245,242,236,.7); }
-  #vis-result .smudge { filter: blur(4.5px); user-select: none; -webkit-user-select: none; }
-  #vis-result .rest .btn { display: inline-block; margin-top: 4px; }
-  @media (prefers-reduced-motion: reduce) { #vis-result .smudge { filter: blur(4.5px); } }
-  #vis-result .err { color: #f5a962; margin: 0; }
+  .result .rest { margin: 22px 0 0; padding: 16px 18px; border-radius: 12px; border: 1px dashed rgba(61,184,169,.45); background: rgba(26,138,125,.07); }
+  .result .rest-list { list-style: none; margin: 10px 0 12px; padding: 0; display: grid; gap: 7px; }
+  .result .rest-list li { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.5; color: rgba(245,242,236,.85); }
+  .result .rest-list .r-warn .chip, .result .rest-list li.r-warn .chip { color: var(--amber-soft); }
+  .result .rest-list li.r-fail .chip { color: #e07a5f; }
+  .result .r-area { color: rgba(245,242,236,.7); }
+  .result .smudge { filter: blur(4.5px); user-select: none; -webkit-user-select: none; }
+  .result .rest .btn { display: inline-block; margin-top: 4px; }
+  @media (prefers-reduced-motion: reduce) { .result .smudge { filter: blur(4.5px); } }
+  .result .err { color: #f5a962; margin: 0; }
 </style>
