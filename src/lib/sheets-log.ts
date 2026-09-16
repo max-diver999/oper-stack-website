@@ -145,6 +145,12 @@ export function originOf(
 export type CheckRow = {
   /** Заголовок User-Agent запроса. Без него прогон считается нашим, а не человеческим. */
   agent?: string;
+  /**
+   * Пять областей через дробь: доступ, карта, сущность, содержимое, доверие.
+   * Без них расхождение между двумя прогонами доказать нельзя, остаётся гадать по итогу.
+   * 15.09.2026 один сайт получил 52 и 67 с разницей в две минуты, и разобрать это было нечем.
+   */
+  areas?: string;
   lang: string;
   host: string;
   score: number;
@@ -158,7 +164,7 @@ export type CheckRow = {
 export async function logCheck(r: CheckRow): Promise<void> {
   if (!sheetsConfigured()) return;
   try {
-    const row = [stamp(), r.lang, r.host, r.score, r.grade, r.source, r.campaign, r.page];
+    const row = [stamp(), r.lang, r.host, r.score, r.grade, r.source, r.campaign, r.page, r.areas ?? ''];
     // Свои прогоны в отдельный лист: лист живых людей должен отвечать на вопрос «есть ли спрос».
     if (looksHuman(r.agent ?? '')) await append(SHEET_ALL, row);
     else await append(SHEET_OURS, [...row, 'не браузер']);
