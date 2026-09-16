@@ -27,6 +27,42 @@ const goesOutside = (to: string, cc?: string): boolean =>
   [to, cc].flatMap((v) => String(v || '').split(',')).map((s) => s.trim()).filter(Boolean)
     .some((a) => !OURS.test(a));
 
+/**
+ * Ключ читается статически, а не по строке-ключу. Так его подставляет сборщик, и это тот же
+ * способ, которым пользуется давно работающая отправка оповещений о лидах. Динамическое чтение
+ * вида env('RESEND_API_KEY') на сборке не подставляется и в рабочей функции оказалось пустым:
+ * 16.09.2026 из-за этого письма молча уходили старым каналом.
+ */
+const RESEND_API_KEY = (
+  import.meta.env.RESEND_API_KEY ||
+  process.env.RESEND_API_KEY ||
+  ''
+).trim();
+
+/**
+ * Отправка обычным веб-запросом, а не по почтовому протоколу. Причина та же: оповещения о лидах
+ * уходят так с самого начала и доходят, а почтовый протокол из функции повёл себя иначе. Берём
+ * проверенный способ, а не тот, который кажется правильнее.
+ */
+async function sendViaResend(letter: {
+  from: string; to: string; cc?: string; replyTo: string; subject: string; text: string; html: string;
+}): Promise<void> {
+  const res = await fetch('https://api.resend.com/emails', {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      from: letter.from,
+      to: [letter.to],
+      ...(letter.cc ? { cc: [letter.cc] } : {}),
+      reply_to: letter.replyTo,
+      subject: letter.subject,
+      text: letter.text,
+      html: letter.html,
+    }),
+  });
+  if (!res.ok) throw new Error(`resend ${res.status}: ${(await res.text()).slice(0, 200)}`);
+}
+
 const timeouts = { connectionTimeout: 10_000, greetingTimeout: 10_000, socketTimeout: 15_000 };
 
 export async function sendTransactionalMail(msg: { to: string; subject: string; text: string; html: string }): Promise<void> {
@@ -52,19 +88,14 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
 
   // No pool, explicit timeouts, and close() after the send: an open SMTP socket keeps a serverless
   // function alive until the platform kills it, which is what a 504 after a delivered email looks like.
-  const key = env('RESEND_API_KEY');
-  if (key && goesOutside(msg.to, cc)) {
-    const resend = nodemailer.createTransport({
-      host: 'smtp.resend.com', port: 465, secure: true, auth: { user: 'resend', pass: key },
-      pool: false, ...timeouts,
-    });
+  if (RESEND_API_KEY && goesOutside(msg.to, cc)) {
     try {
-      await resend.sendMail(letter);
+      await sendViaResend(letter);
       return;
     } catch (e) {
-      // Ключа нет, домен не подтверждён, лимит выбран: причина неважна, человек ждёт письмо.
+      // Домен не подтверждён, лимит выбран, служба недоступна: причина неважна, человек ждёт письмо.
       console.error('resend refused, falling back to google:', (e as Error).message);
-    } finally { resend.close(); }
+    }
   }
 
   const google = nodemailer.createTransport({
