@@ -18,7 +18,26 @@ export type McpTool = {
   run: (args: Record<string, any>) => Promise<string>;
 };
 
-const site = (s: unknown) => String(s ?? '').trim();
+/**
+ * Адрес, как его написал человек, приведённый к корню сайта.
+ *
+ * Люди пишут адрес как придётся: «oper-stack.com», «www.oper-stack.com», со страницей внутри,
+ * а иногда прямо ссылку на сам файл. До 16.09.2026 здесь была только обрезка пробелов, и
+ * check_llms_txt отвечал «файла нет» на сайте, где файл есть, на любом написании кроме
+ * «https://домен/». Живой пользователь потерял на этом время и написал нам об этом первым же
+ * отзывом. Разбирать написание это наша работа, а не его.
+ *
+ * Если разобрать не вышло, отдаём как есть: пусть решает движок, он умеет больше.
+ */
+const site = (s: unknown): string => {
+  const raw = String(s ?? '').trim();
+  if (!raw) return raw;
+  try {
+    return new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`).origin;
+  } catch {
+    return raw;
+  }
+};
 
 /** Assistants read text far better than they read our JSON, so every tool answers in sentences. */
 function visibilityReport(r: any): string {
