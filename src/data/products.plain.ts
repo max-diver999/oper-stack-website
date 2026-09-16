@@ -85,13 +85,19 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
   },
   'pain-to-seo': {
     plain:
-      'Your customers have already told you what your site should say. It is written down in your chat history, your support tickets and your notes after calls, and nobody has read it because there is far too much of it. This reads that pile and tells you which of the questions people actually ask your site says nothing about, and how often each one came up. The conversations stay on your own computer: nothing is uploaded anywhere.',
+      'Your customers already told you what your website should say. It is sitting in your call recordings, your chat history and the notes you type after a call, and nobody has ever read it back because there is far too much of it. This reads the whole pile for you, finds the questions people keep asking that your site answers nowhere, and then takes the best one all the way: it checks the subject will not clash with a page you already have, gives your own AI assistant everything it needs to write the page properly, puts it on your site as a draft for you to approve, and finally opens the published page to make sure it actually looks right to a visitor. Your conversations and recordings never leave your computer.',
     who: [
-      'An owner who has been asked the same question on the phone fifty times and never thought to put it on the site',
-      'A marketer who needs a list of topics that is not guesswork',
-      'Anyone paying for content and wanting the order decided by customers rather than by a content plan',
+      'An owner who has answered the same question on the phone fifty times and never thought to put it on the site',
+      'A marketer who needs a list of topics that is not guesswork, and the finished pages to go with it',
+      'Anyone paying for content who wants the order decided by customers rather than by a content plan',
+      'Anyone who has published a page and only found out later that it was broken on the live site',
     ],
-    youDo: ['Export your chats, tickets or call notes into a folder', 'Run one command pointing at that folder and at your site', 'Write the pages at the top of the list'],
+    youDo: [
+      'Put your call recordings, chat exports or notes in a folder',
+      'Ask your assistant, in your own words, to find what your site is not answering',
+      'Read the shortlist and pick the question worth a page',
+      'Approve the draft it writes and let it publish and check the result',
+    ],
   },
   'site-kit': {
     plain:
