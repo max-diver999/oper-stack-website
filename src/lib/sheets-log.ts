@@ -33,17 +33,22 @@ const SHEET_ALL = 'Все прогоны';
 const SHEET_OURS = 'Наши прогоны';
 
 /**
- * Похоже ли это на живого человека в браузере.
+ * Наш ли это прогон.
  *
- * Считаем человеком только то, что представляется настоящим браузером. Наши инструменты,
- * curl, node и прочие библиотеки сюда не попадают, и это ровно то, что нужно: в лист живых
- * людей не должно попадать ничего из того, что запускаем мы сами.
+ * Правило нарочно перевёрнуто по сравнению с первой попыткой. 15.09.2026 я сделал наоборот:
+ * человеком считалось только то, что похоже на известный браузер. Наутро в листе наших прогонов
+ * оказались два НАСТОЯЩИХ покупателя, zavadskiiartem@gmail.com и lady.bookman@inbox.ru: их
+ * браузеры под шаблон не подошли. Письма они получили, а из списка заявок пропали.
+ *
+ * Цена ошибки несимметрична. Принять свой прогон за человека значит немного намусорить в
+ * таблице. Принять человека за свой прогон значит потерять из виду покупателя. Поэтому своим
+ * считается только то, что мы узнаём явно: наши инструменты, библиотеки и поисковые роботы.
+ * Всё остальное, включая незнакомый браузер и пустую строку, считается человеком.
  */
-function looksHuman(agent: string): boolean {
+function looksOurs(agent: string): boolean {
   const a = String(agent || '');
-  if (!a) return false;
-  if (/OperStack|curl|wget|node-fetch|python-requests|axios|Go-http|Java\/|HeadlessChrome|bot|spider|crawler/i.test(a)) return false;
-  return /Mozilla\/5\.0/.test(a) && /(Chrome|Safari|Firefox|Edg|OPR)\//.test(a);
+  if (/OperStack|curl|wget|node-fetch|python-requests|axios|Go-http|Java\/|okhttp|HeadlessChrome|PhantomJS|Puppeteer|Playwright/i.test(a)) return true;
+  return /\bbot\b|spider|crawler|slurp|facebookexternalhit|bingpreview|Googlebot|YandexBot|AhrefsBot|SemrushBot/i.test(a);
 }
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
@@ -166,8 +171,8 @@ export async function logCheck(r: CheckRow): Promise<void> {
   try {
     const row = [stamp(), r.lang, r.host, r.score, r.grade, r.source, r.campaign, r.page, r.areas ?? ''];
     // Свои прогоны в отдельный лист: лист живых людей должен отвечать на вопрос «есть ли спрос».
-    if (looksHuman(r.agent ?? '')) await append(SHEET_ALL, row);
-    else await append(SHEET_OURS, [...row, 'не браузер']);
+    if (looksOurs(r.agent ?? '')) await append(SHEET_OURS, [...row, `наш инструмент: ${String(r.agent ?? '').slice(0, 120)}`]);
+    else await append(SHEET_ALL, row);
   } catch {
     // Таблица недоступна. Проверка сайта от этого не страдает, и человек ничего не замечает.
   }
@@ -179,8 +184,8 @@ export async function logLead(r: CheckRow & { email: string; name: string; sent:
   try {
     const row = [stamp(), r.lang, r.host, r.score, r.grade, r.email, r.name, r.source, r.campaign, r.page, r.sent, r.tier];
     // То же правило, что и у прогонов: в лист заявок попадает только живой человек из браузера.
-    if (looksHuman(r.agent ?? '')) await append(SHEET_LEADS, row);
-    else await append(SHEET_OURS, [stamp(), r.lang, r.host, r.score, r.grade, r.source, r.campaign, r.page, `заявка, не браузер: ${r.email}`]);
+    if (looksOurs(r.agent ?? '')) await append(SHEET_OURS, [stamp(), r.lang, r.host, r.score, r.grade, r.source, r.campaign, r.page, `наша заявка: ${r.email} · ${String(r.agent ?? '').slice(0, 100)}`]);
+    else await append(SHEET_LEADS, row);
   } catch {
     // То же самое: письмо человеку уже ушло, и это важнее строки в таблице.
   }
