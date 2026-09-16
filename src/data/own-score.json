@@ -1,6 +1,6 @@
 {
   "host": "oper-stack.com",
-  "score": 100,
+  "score": 90,
   "grade": "A",
   "measured": "2026-09-16",
   "areas": [
@@ -21,12 +21,12 @@
     },
     {
       "label": "Is there something to quote",
-      "score": 25,
+      "score": 20,
       "max": 25
     },
     {
       "label": "Can it be dated and trusted",
-      "score": 15,
+      "score": 10,
       "max": 15
     }
   ],

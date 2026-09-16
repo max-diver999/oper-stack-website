@@ -39,14 +39,55 @@ const site = (s: unknown): string => {
   }
 };
 
+/**
+ * Сколько страниц читаем по ссылке.
+ *
+ * До 16.09.2026 здесь стояли три страницы, ровно как на странице проверки, потому что функция
+ * живёт тридцать секунд и запас казался нужен целиком. На деле страницы читаются параллельно, и
+ * восемь укладываются в двадцать секунд с запасом. Человек, подключивший нас по ссылке, получал
+ * вчетверо меньше того, кто поставил пакет, хотя это один и тот же продукт.
+ */
+const REMOTE_PAGES = 8;
+const REMOTE_BUDGET_MS = 20_000;
+
+/**
+ * Подпись под ответом. Обращена к человеку, а не к его помощнику: это часть ответа, а не команда.
+ *
+ * Здесь перечислено, ЧТО не так. КАК чинить каждую находку, мы продаём, и сказать об этом прямо
+ * честнее, чем надеяться, что человек догадается сам. Прятать указания для чужого помощника в
+ * тексте ответа мы не будем: он читается одним движением, и это читалось бы как попытка им
+ * управлять.
+ */
+const FOOTER: Record<'en' | 'ru', string[]> = {
+  en: [
+    'This says what is wrong. How to fix each finding, with a way to check the result and a list',
+    'your developer can work from: https://oper-stack.com/products/fix/',
+    'To measure again later and see what actually changed: https://oper-stack.com/products/watch/',
+  ],
+  ru: [
+    'Здесь сказано, что не так. Как чинить каждую находку, с проверкой результата и списком,',
+    'по которому сможет работать исполнитель: https://oper-stack.ru/produkty/fix/',
+    'Перемерить позже и увидеть, что на самом деле изменилось: https://oper-stack.ru/produkty/watch/',
+  ],
+};
+
+const T = (lang: 'en' | 'ru') => (lang === 'ru'
+  ? { notMeasured: 'не измерялось', fixFirst: 'Чинить в первую очередь:', unreadable: 'Этот сайт не удалось прочитать.',
+      sitemap: (n: number, dated: boolean) => `Карта сайта: ${n} адресов, ${dated ? 'с датами' : 'без дат'}.`,
+      noSitemap: 'Карта сайта: не нашлась ни по обычным адресам, ни в robots.txt.' }
+  : { notMeasured: 'not measured', fixFirst: 'Fix these first:', unreadable: 'That site could not be read.',
+      sitemap: (n: number, dated: boolean) => `Sitemap: ${n} URLs${dated ? ', dated' : ', no dates'}.`,
+      noSitemap: 'Sitemap: not found at the usual paths or in robots.txt.' });
+
 /** Assistants read text far better than they read our JSON, so every tool answers in sentences. */
-function visibilityReport(r: any): string {
-  if (!r || r.ok === false) return r?.error || 'That site could not be read.';
+function visibilityReport(r: any, lang: 'en' | 'ru' = 'en'): string {
+  const t = T(lang);
+  if (!r || r.ok === false) return r?.error || t.unreadable;
   const lines: string[] = [];
   lines.push(`${r.host}: ${r.score}/100 (grade ${r.grade}).`);
   lines.push('');
   for (const a of r.areas || []) {
-    lines.push(`${a.label}: ${a.score == null ? 'not measured' : `${a.score}/${a.max}`}`);
+    lines.push(`${a.label}: ${a.score == null ? t.notMeasured : `${a.score}/${a.max}`}`);
     for (const f of a.findings || []) {
       const mark = f.level === 'pass' ? 'ok' : f.level === 'warn' ? 'partial' : 'problem';
       lines.push(`  [${mark}] ${f.text}`);
@@ -54,15 +95,13 @@ function visibilityReport(r: any): string {
   }
   if (r.fixes?.length) {
     lines.push('');
-    lines.push('Fix these first:');
+    lines.push(t.fixFirst);
     r.fixes.forEach((f: any, i: number) => lines.push(`  ${i + 1}. ${f.area}. ${f.text}`));
   }
   lines.push('');
-  lines.push(
-    r.sitemap?.found
-      ? `Sitemap: ${r.sitemap.count} URLs${r.sitemap.lastmod ? ', dated' : ', no dates'}.`
-      : 'Sitemap: not found at the usual paths or in robots.txt.',
-  );
+  lines.push(r.sitemap?.found ? t.sitemap(r.sitemap.count, Boolean(r.sitemap.lastmod)) : t.noSitemap);
+  lines.push('');
+  lines.push(...FOOTER[lang]);
   return lines.join('\n');
 }
 
@@ -74,10 +113,16 @@ export const TOOLS: McpTool[] = [
       'Scores any public site out of 100 on the five things an answer engine needs before it will quote a page: whether AI crawlers are allowed in, whether there is a map for agents (llms.txt), whether the entity is clear from schema, whether there is anything quotable, and whether pages carry dates and sources. Reads public signals only, takes about ten seconds, and needs no account.',
     inputSchema: {
       type: 'object',
-      properties: { url: { type: 'string', description: 'A public site address, for example example.com' } },
+      properties: {
+        url: { type: 'string', description: 'A public site address, for example example.com' },
+        lang: { type: 'string', enum: ['en', 'ru'], description: 'Language of the findings. Default en. Use ru when the site or the person is Russian.' },
+      },
       required: ['url'],
     },
-    run: async (a) => visibilityReport(await checkVisibility(site(a.url), { ...VISIBILITY_DEFAULTS, lang: 'en' })),
+    run: async (a) => {
+      const lang = a.lang === 'ru' ? 'ru' : 'en';
+      return visibilityReport(await checkVisibility(site(a.url), { ...VISIBILITY_DEFAULTS, lang, samplePages: REMOTE_PAGES, budgetMs: REMOTE_BUDGET_MS }), lang);
+    },
   },
   {
     name: 'compare_sites',
@@ -88,13 +133,16 @@ export const TOOLS: McpTool[] = [
       type: 'object',
       properties: {
         urls: { type: 'array', items: { type: 'string' }, description: 'Two to four public site addresses' },
+        lang: { type: 'string', enum: ['en', 'ru'], description: 'Language of the findings. Default en.' },
       },
       required: ['urls'],
     },
     run: async (a) => {
       const urls: string[] = (Array.isArray(a.urls) ? a.urls : []).map(site).filter(Boolean).slice(0, 4);
       if (urls.length < 2) return 'Give at least two site addresses.';
-      const results = await Promise.all(urls.map((u) => checkVisibility(u, { ...VISIBILITY_DEFAULTS, lang: 'en' })));
+      const lang = a.lang === 'ru' ? 'ru' : 'en';
+      // Сравнение это несколько сайтов подряд, поэтому глубина здесь прежняя: иначе не уложимся.
+      const results = await Promise.all(urls.map((u) => checkVisibility(u, { ...VISIBILITY_DEFAULTS, lang })));
       const good = results.filter((r: any) => r && r.ok !== false);
       if (!good.length) return 'None of those sites could be read. They may turn away automated readers.';
       const labels = good[0].areas.map((x: any) => x.label);
