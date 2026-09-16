@@ -103,6 +103,8 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     const input = document.getElementById('vis-url') as HTMLInputElement;
     const btn = document.getElementById('vis-btn') as HTMLButtonElement;
     const note = document.getElementById('vis-note') as HTMLElement;
+    /** Host of the last run: the confirmation names it. */
+    let lastHost = '';
     const out = document.getElementById('vis-result') as HTMLElement;
     const capture = document.getElementById('vis-capture') as HTMLElement;
     const pdfForm = document.getElementById('pdf-form') as HTMLFormElement;
@@ -303,6 +305,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
        * fix and the names of the remaining findings; how to fix each of those stays in the paid
        * list, and that line does not move.
        */
+      lastHost = r.host;
       const n = r.rest.length;
       head.innerHTML = n
         ? `You scored ${r.score} out of 100.<br>We did not show you ${n} more finding${n === 1 ? '' : 's'} on ${esc(r.host)}.`
@@ -400,17 +403,37 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
          * «спасибо» значит забирать у него результат, размытый список и кнопку, ради которых
          * он сюда и пришёл. Подтверждение и что делать дальше говорим на месте.
          */
-        pdfMsg.textContent = 'Sent. The fix lands in your inbox in a few minutes. Copy all three lines and hand them over as they are; if the letter is not there, look in spam.';
-        pdfMsg.className = 'msg ok';
-        pdfMsg.hidden = false;
-        pdfForm.reset();
-        pdfBtn.disabled = false;
+        /*
+         * The confirmation replaces the form instead of sitting under it.
+         *
+         * The field used to clear, the button re-enabled, and a grey line appeared below. Anyone
+         * who looked away for a second came back to an empty form with a live button and read it
+         * as "reset", not "sent". On 16.09.2026 two people sent themselves a second letter that way.
+         *
+         * The form goes away entirely: no form, no second letter. The address is named, which
+         * settles the "did it send?" question. The result above is left alone: that is what they
+         * came for.
+         */
+        const sentTo = String(fd.get('email') || '').trim();
+        const box = document.getElementById('vis-capture') as HTMLElement;
+        box.classList.add('sent');
+        box.innerHTML = `
+          <p class="sent-tick" aria-hidden="true">✓</p>
+          <h2>The letter is on its way to ${esc(sentTo)}</h2>
+          <p>It arrives within a couple of minutes from <b>info@oper-stack.com</b>. If you do not see it, look in spam and mark it "not spam", and the next ones land in your inbox.</p>
+          <p class="note">Inside: the second fix in full and the names of the remaining findings on ${esc(lastHost || '')}.</p>`;
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (err: any) { pdfMsg.textContent = err.message || 'Something went wrong. Email info@oper-stack.com'; pdfMsg.className = 'msg err'; pdfMsg.hidden = false; pdfBtn.disabled = false; }
     });
   </script>
 </CommercialLayout>
 
 <style>
+  /* Sent state: different border and a tick, so the change reads without being read. */
+  .capture.sent { border: 1px solid rgba(61,184,169,.55); background: rgba(26,138,125,.10); }
+  .capture.sent .sent-tick { font-size: 30px; line-height: 1; color: var(--teal-soft); margin: 0 0 10px; }
+  .capture.sent h2 { margin: 0 0 12px; font-size: 22px; }
+  .capture.sent p { margin: 0 0 10px; }
   .label { font-family: var(--fm); font-size: 10px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 8px; }
   h2 { font-family: var(--fd); font-size: 22px; margin: 36px 0 12px; }
   h3 { font-family: var(--fd); font-size: 18px; margin: 0 0 8px; }
