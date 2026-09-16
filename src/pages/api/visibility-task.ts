@@ -22,6 +22,31 @@ import { SITE } from '../../data/site';
 
 export const prerender = false;
 
+/*
+ * Защита от второй отправки того же письма.
+ *
+ * 16.09.2026 двое покупателей получили одно и то же письмо дважды: `kuzviksi@ya.ru` с разницей в
+ * тринадцать секунд, `railmi@yandex.ru` через двадцать минут. Кнопка на форме гасится, значит
+ * человек отправлял ещё раз со второй попытки или после перезагрузки. Два одинаковых письма
+ * подряд выглядят неряшливо и портят репутацию отправителя у почтовиков.
+ *
+ * Память живёт в экземпляре функции, то есть защита не абсолютная: два запроса могут попасть на
+ * разные экземпляры. Это ловит частый случай, повтор в одну и ту же минуту, и стоит ноль.
+ */
+const QUEUED_MS = 15 * 60 * 1000;
+const queued = new Map<string, number>();
+function recentlyQueued(email: string, url: string): boolean {
+  const key = `${email.toLowerCase()}|${url.toLowerCase()}`;
+  const now = Date.now();
+  for (const [k, at] of queued) if (now - at > QUEUED_MS) queued.delete(k);
+  const was = queued.get(key);
+  if (was && now - was < QUEUED_MS) return true;
+  queued.set(key, now);
+  return false;
+}
+/** Что отвечаем на повтор: спокойно и без обвинений, письмо и правда уже в пути. */
+const ALREADY_SENT = 'That letter is already on its way to the same address. Check your inbox, spam included: it arrives within a few minutes.';
+
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), {
     status,
@@ -122,6 +147,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const url = normaliseInput(rawUrl);
   if (!url) return json({ ok: false, error: 'Run the check first, then ask for the task' }, 400);
   if (limited(clientAddress || 'unknown')) return json({ ok: false, error: 'Too many requests from this connection. Try again in ten minutes.' }, 429);
+
+  // Повтор той же пары «почта и сайт» письма не порождает: см. recentlyQueued.
+
+  if (recentlyQueued(email, url)) return json({ ok: true, sent: true, already: true, note: ALREADY_SENT });
+
 
   let result: any;
   try { result = await checkVisibility(url, { ...VISIBILITY_DEFAULTS, lang: 'en' }); } catch { return json({ ok: false, error: 'We could not read that site just now' }, 502); }
