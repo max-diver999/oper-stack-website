@@ -1,13 +1,33 @@
 /**
- * Transactional mail from the OperStack mailbox over Google Workspace SMTP.
- * Env: SMTP_USER (info@oper-stack.com), SMTP_PASS (an app password), LICENCE_FROM (display name and
- * address), LICENCE_NOTIFY_EMAIL (copy of every licence email, accounts@ by default).
+ * Transactional mail from OperStack.
+ *
+ * Простым языком: письмо постороннему человеку уходит через Resend, служебное самим себе через
+ * почтовый ящик Google. 16.09.2026 Яндекс отбил наше письмо живому человеку кодом
+ * «554 подозрение на спам», а Mail.ru клал в спам. С письмом всё было в порядке: подпись домена
+ * проходит, независимая проверка дала 10 из 10, чёрных списков нет. Дело было в канале: ящик
+ * Google Workspace сделан для переписки, а не для рассылки, и почтовые службы это видят. То же
+ * письмо через Resend легло во «Входящие» и у Яндекса, и у Mail.ru.
+ *
+ * Если Resend не принял письмо, оно тут же уходит через Google: молчание хуже, чем письмо из
+ * менее удачного канала, человек ждёт то, что заказал.
+ *
+ * Env: SMTP_USER (info@oper-stack.com), SMTP_PASS (an app password), RESEND_API_KEY,
+ * LICENCE_FROM (display name and address), LICENCE_NOTIFY_EMAIL (copy of every letter).
  */
 import nodemailer from 'nodemailer';
 import { canReceiveMail } from './deliverable';
 
 const env = (key: string, fallback = ''): string =>
   String((import.meta.env as Record<string, unknown>)[key] ?? process.env[key] ?? fallback).trim();
+
+/** Наши собственные адреса: письма на них это служебная переписка, а не доставка покупателю. */
+const OURS = /@(oper-stack\.(com|ru)|moregroup\.estate)$/i;
+
+const goesOutside = (to: string, cc?: string): boolean =>
+  [to, cc].flatMap((v) => String(v || '').split(',')).map((s) => s.trim()).filter(Boolean)
+    .some((a) => !OURS.test(a));
+
+const timeouts = { connectionTimeout: 10_000, greetingTimeout: 10_000, socketTimeout: 15_000 };
 
 export async function sendTransactionalMail(msg: { to: string; subject: string; text: string; html: string }): Promise<void> {
   const user = env('SMTP_USER');
@@ -17,30 +37,42 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
   // dead address is never written to. Details and boundaries live in deliverable.ts.
   const reachable = await canReceiveMail(msg.to);
   if (!reachable.ok) throw new Error(`not sent: ${reachable.why}`);
+
+  const ccRaw = env('LICENCE_NOTIFY_EMAIL', 'accounts@oper-stack.com');
+  const cc = ccRaw && ccRaw !== msg.to ? ccRaw : undefined;
+  const letter = {
+    from: env('LICENCE_FROM', `OperStack <${user}>`),
+    to: msg.to,
+    cc,
+    replyTo: 'info@oper-stack.com',
+    subject: msg.subject,
+    text: msg.text,
+    html: msg.html,
+  };
+
   // No pool, explicit timeouts, and close() after the send: an open SMTP socket keeps a serverless
   // function alive until the platform kills it, which is what a 504 after a delivered email looks like.
-  const transport = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth: { user, pass },
-    pool: false,
-    connectionTimeout: 10_000,
-    greetingTimeout: 10_000,
-    socketTimeout: 15_000,
-  });
-  const cc = env('LICENCE_NOTIFY_EMAIL', 'accounts@oper-stack.com');
-  try {
-    await transport.sendMail({
-      from: env('LICENCE_FROM', `OperStack <${user}>`),
-      to: msg.to,
-      cc: cc && cc !== msg.to ? cc : undefined,
-      replyTo: 'support@oper-stack.com',
-      subject: msg.subject,
-      text: msg.text,
-      html: msg.html,
+  const key = env('RESEND_API_KEY');
+  if (key && goesOutside(msg.to, cc)) {
+    const resend = nodemailer.createTransport({
+      host: 'smtp.resend.com', port: 465, secure: true, auth: { user: 'resend', pass: key },
+      pool: false, ...timeouts,
     });
+    try {
+      await resend.sendMail(letter);
+      return;
+    } catch (e) {
+      // Ключа нет, домен не подтверждён, лимит выбран: причина неважна, человек ждёт письмо.
+      console.error('resend refused, falling back to google:', (e as Error).message);
+    } finally { resend.close(); }
+  }
+
+  const google = nodemailer.createTransport({
+    host: 'smtp.gmail.com', port: 465, secure: true, auth: { user, pass }, pool: false, ...timeouts,
+  });
+  try {
+    await google.sendMail(letter);
   } finally {
-    transport.close();
+    google.close();
   }
 }
