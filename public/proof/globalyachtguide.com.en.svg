@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 520" width="900" height="520" font-family="'DM Sans',system-ui,sans-serif">
+  <rect width="900" height="520" rx="18" fill="#0B1017"/>
+  <text x="40" y="58" fill="#F5F1E8" font-size="27" font-weight="700">globalyachtguide.com</text>
+  <text x="40" y="88" fill="#8C979D" font-size="16">Search impressions, by month</text>
+  <g transform="translate(860, 0)">
+    <text x="0" y="58" fill="#3DB8A9" font-size="27" font-weight="700" text-anchor="end">1 573 → 6 838</text>
+    <text x="0" y="88" fill="#E8B84A" font-size="16" text-anchor="end">4.3x</text>
+  </g>
+  <g transform="translate(30, 110)"><g><line x1="78" y1="258.0" x2="816" y2="258.0" stroke="rgba(255,255,255,.07)" stroke-width="1"/><text x="66" y="262.0" fill="#8C979D" font-size="13" text-anchor="end">0</text><line x1="78" y1="198.0" x2="816" y2="198.0" stroke="rgba(255,255,255,.07)" stroke-width="1"/><text x="66" y="202.0" fill="#8C979D" font-size="13" text-anchor="end">1 846</text><line x1="78" y1="138.0" x2="816" y2="138.0" stroke="rgba(255,255,255,.07)" stroke-width="1"/><text x="66" y="142.0" fill="#8C979D" font-size="13" text-anchor="end">3 693</text><line x1="78" y1="78.0" x2="816" y2="78.0" stroke="rgba(255,255,255,.07)" stroke-width="1"/><text x="66" y="82.0" fill="#8C979D" font-size="13" text-anchor="end">5 539</text><line x1="78" y1="18.0" x2="816" y2="18.0" stroke="rgba(255,255,255,.07)" stroke-width="1"/><text x="66" y="22.0" fill="#8C979D" font-size="13" text-anchor="end">7 385</text><rect x="169.0" y="206.9" width="64.0" height="51.1" rx="4" fill="rgba(61,184,169,.18)"/><rect x="415.0" y="47.7" width="64.0" height="210.3" rx="4" fill="rgba(61,184,169,.18)"/><rect x="661.0" y="35.8" width="64.0" height="222.2" rx="4" fill="rgba(61,184,169,.18)"/><path d="M201.0,206.9 L447.0,47.7 L693.0,35.8" fill="none" stroke="#3DB8A9" stroke-width="2.5" stroke-linejoin="round"/><circle cx="201.0" cy="206.9" r="4.5" fill="#3DB8A9"/><circle cx="447.0" cy="47.7" r="4.5" fill="#3DB8A9"/><circle cx="693.0" cy="35.8" r="4.5" fill="#3DB8A9"/><text x="693.0" y="21.8" fill="#F5F1E8" font-size="17" font-weight="700" text-anchor="end">6 838</text><text x="201.0" y="286" fill="#8C979D" font-size="13" text-anchor="middle">Jun</text><text x="447.0" y="286" fill="#8C979D" font-size="13" text-anchor="middle">Jul</text><text x="693.0" y="286" fill="#8C979D" font-size="13" text-anchor="middle">Aug</text></g></g>
+  <line x1="40" y1="442" x2="860" y2="442" stroke="rgba(255,255,255,.07)"/>
+  <text x="40" y="470" fill="#8C979D" font-size="14">Google Search Console, Jun 2026 to Aug 2026. Measured 15.09.2026.</text>
+  <text x="40" y="494" fill="#8C979D" font-size="14">Verifiable in the owner’s own Search Console</text>
+  <text x="860" y="494" fill="#8C979D" font-size="14" text-anchor="end">oper-stack.com</text>
+</svg>
