@@ -31,7 +31,7 @@ ok('несуществующий домен отсекается',
 
 // ---- опечатка в известном домене ловится, если такого домена нет
 const typo = await canReceiveMail('kto@gmial-operstack-test-9f3a2.com');
-ok('опечатка в домене ловится', typo.ok === false && typo.why.includes('нет ни почтового сервера'));
+ok('опечатка в домене ловится', typo.ok === false && typo.why.includes('neither a mail server'));
 
 // ---- домены-обманки, которые существуют, но письмо там не прочитает никто
 for (const [a, hint] of [['kto@gmial.com', 'gmail.com'], ['kto@gmai.com', 'gmail.com'],
