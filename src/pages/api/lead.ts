@@ -113,7 +113,13 @@ export const POST: APIRoute = async ({ request }) => {
       .filter(Boolean)
       .join('\n');
 
-    await sendTelegram(lines);
+    /*
+     * Проверка живости сайта не человек и в Telegram ей не место. Она стучится сюда после
+     * каждой выкладки и раз в сутки по расписанию, и 15.09.2026 владелец ящика получил от неё
+     * столько сообщений, что настоящий лид в них терялся. Строка в таблицу по-прежнему пишется:
+     * по ней видно, что обработчик жив.
+     */
+    if (!isHealthcheck) await sendTelegram(lines);
     if (!isHealthcheck) {
       try {
         await sendLeadNotifyEmail({
