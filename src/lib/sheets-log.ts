@@ -24,6 +24,27 @@ import { createSign } from 'node:crypto';
 
 const SHEET_LEADS = 'С почтой';
 const SHEET_ALL = 'Все прогоны';
+/*
+ * Наши собственные прогоны: дымовая проверка продуктов, радары, ручные запросы из терминала.
+ * Раньше они ложились в один лист с живыми людьми и писались как «прямой заход», из-за чего
+ * 15.09.2026 в таблице было 158 строк, а настоящих посетителей среди них 28. По такой таблице
+ * нельзя понять ни спроса, ни доли тех, кто оставил почту.
+ */
+const SHEET_OURS = 'Наши прогоны';
+
+/**
+ * Похоже ли это на живого человека в браузере.
+ *
+ * Считаем человеком только то, что представляется настоящим браузером. Наши инструменты,
+ * curl, node и прочие библиотеки сюда не попадают, и это ровно то, что нужно: в лист живых
+ * людей не должно попадать ничего из того, что запускаем мы сами.
+ */
+function looksHuman(agent: string): boolean {
+  const a = String(agent || '');
+  if (!a) return false;
+  if (/OperStack|curl|wget|node-fetch|python-requests|axios|Go-http|Java\/|HeadlessChrome|bot|spider|crawler/i.test(a)) return false;
+  return /Mozilla\/5\.0/.test(a) && /(Chrome|Safari|Firefox|Edg|OPR)\//.test(a);
+}
 const TOKEN_URL = 'https://oauth2.googleapis.com/token';
 const SCOPE = 'https://www.googleapis.com/auth/spreadsheets';
 /** Столько ждём Google и не дольше: страница проверки не должна стоять из-за таблицы. */
@@ -122,6 +143,8 @@ export function originOf(
 }
 
 export type CheckRow = {
+  /** Заголовок User-Agent запроса. Без него прогон считается нашим, а не человеческим. */
+  agent?: string;
   lang: string;
   host: string;
   score: number;
@@ -135,7 +158,10 @@ export type CheckRow = {
 export async function logCheck(r: CheckRow): Promise<void> {
   if (!sheetsConfigured()) return;
   try {
-    await append(SHEET_ALL, [stamp(), r.lang, r.host, r.score, r.grade, r.source, r.campaign, r.page]);
+    const row = [stamp(), r.lang, r.host, r.score, r.grade, r.source, r.campaign, r.page];
+    // Свои прогоны в отдельный лист: лист живых людей должен отвечать на вопрос «есть ли спрос».
+    if (looksHuman(r.agent ?? '')) await append(SHEET_ALL, row);
+    else await append(SHEET_OURS, [...row, 'не браузер']);
   } catch {
     // Таблица недоступна. Проверка сайта от этого не страдает, и человек ничего не замечает.
   }
@@ -145,9 +171,10 @@ export async function logCheck(r: CheckRow): Promise<void> {
 export async function logLead(r: CheckRow & { email: string; name: string; sent: string; tier: string }): Promise<void> {
   if (!sheetsConfigured()) return;
   try {
-    await append(SHEET_LEADS, [
-      stamp(), r.lang, r.host, r.score, r.grade, r.email, r.name, r.source, r.campaign, r.page, r.sent, r.tier,
-    ]);
+    const row = [stamp(), r.lang, r.host, r.score, r.grade, r.email, r.name, r.source, r.campaign, r.page, r.sent, r.tier];
+    // То же правило, что и у прогонов: в лист заявок попадает только живой человек из браузера.
+    if (looksHuman(r.agent ?? '')) await append(SHEET_LEADS, row);
+    else await append(SHEET_OURS, [stamp(), r.lang, r.host, r.score, r.grade, r.source, r.campaign, r.page, `заявка, не браузер: ${r.email}`]);
   } catch {
     // То же самое: письмо человеку уже ушло, и это важнее строки в таблице.
   }

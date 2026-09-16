@@ -144,6 +144,7 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
     request.headers.get('referer'),
   );
   await logLead({
+    agent: request.headers.get('user-agent') ?? '',
     lang: 'en',
     host: result.host,
     score: result.score,
