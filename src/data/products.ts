@@ -4,6 +4,12 @@ export type Product = {
   slug: string;
   label: string;
   name: string;
+  /**
+   * Крупный заголовок на странице товара, если короткого имени человеку мало. Имя остаётся
+   * коротким нарочно: оно уходит в счёт, в тему письма покупателю и в хлебные крошки, и
+   * предложение на всю строку там выглядит нелепо.
+   */
+  heading?: string;
   title: string;
   description: string;
   answer: string;
@@ -105,6 +111,7 @@ export const PRODUCTS: Product[] = [
     slug: 'gates',
     label: 'Free, open source',
     name: 'Sixteen gates',
+    heading: 'Sixteen checks that read every page for you',
     title: 'Sixteen Content Gates for MDX Sites, Free',
     description: 'Sixteen automated quality gates for content sites: cut titles, copied paragraphs, hollow sections, dead links, stale llms.txt, unsourced figures, a missing agent surface. One command, one config, MIT.',
     answer: 'The gates are sixteen automated checks that run on an MDX content site in one command and report what must not ship: characters, compile errors, frontmatter, structure, duplication at paragraph and sentence level, hollow sections, links, redirects, the agent index, unsourced figures and the agent surface (the agent card and the markdown copies an assistant reads). 1,660 files take about 13 seconds.',
@@ -129,6 +136,7 @@ export const PRODUCTS: Product[] = [
     slug: 'starter',
     label: 'Free, open source',
     name: 'Astro starter',
+    heading: 'A content site that is ready on day one',
     title: 'Astro Starter That Ranks and Gets Cited',
     description: 'An Astro starter with five content collections, an answer-first article layout, data cards, a generated llms.txt, an honest sitemap, twelve Cursor rules and the sixteen gates wired in.',
     answer: 'The starter is an Astro project that already passes the sixteen gates: five collections, an answer-first layout with Article, Breadcrumb and FAQ schema, data cards for entities, llms.txt and llms-full.txt generated from the corpus on every build, a sitemap with real dates, IndexNow and Google Indexing scripts, and a fictional demo market you replace through one config file.',
@@ -155,6 +163,7 @@ export const PRODUCTS: Product[] = [
     slug: 'plugin',
     label: 'Free, for Claude Code',
     name: 'Claude Code plugin',
+    heading: 'Content checks inside your editor',
     title: 'OperStack SEO Plugin for Claude Code',
     description: 'Five commands, two skills, a reviewer agent and a post-edit hook that runs the fast gates on every content file Claude touches. Free.',
     answer: 'The operstack-seo plugin gives Claude Code five commands (seo-gates, content-preflight, llms-index, indexnow, ai-visibility), two skills that apply on their own when content is written, a content-reviewer agent, and a hook that runs gates 1, 2, 3, 4, 7 and 15 after every edit under src/content and prints the findings for that file.',
@@ -179,6 +188,7 @@ export const PRODUCTS: Product[] = [
     slug: 'mcp',
     label: 'Free, open source',
     name: 'MCP server',
+    heading: 'Check a site from inside Claude and Cursor',
     title: 'MCP Server: Your Assistant Measures a Site',
     description: 'Four tools for any MCP client: score a site across six areas, check the llms.txt map and where its links lead, compare rivals side by side, and run the sixteen gates on a local folder. Free, MIT, no account.',
     answer: 'The OperStack MCP server comes two ways: a remote server at https://oper-stack.com/api/mcp/ that any client reaches with a URL and nothing installed, and a local stdio package for Claude Desktop, Cursor and any other MCP client. It exposes four tools: audit_site scores six areas from public signals, check_llms_txt follows the map a site offers to machines, compare_sites puts two to four sites side by side on the same measurement, and run_gates runs the sixteen content gates on a folder of Markdown on your own machine. Every measurement runs through the same package as the paid reports, so the numbers agree.',
@@ -363,6 +373,7 @@ export const PRODUCTS: Product[] = [
     slug: 'pain-to-seo',
     label: 'Paid, one licence per owner',
     name: 'Pain to SEO',
+    heading: 'Turn what buyers actually ask into pages',
     title: 'Pain to SEO: Pages Your Customers Asked For',
     description: 'Reads your chat exports, tickets and call notes, pulls out the questions buyers actually ask, and reports which of them your site says nothing about. Runs on your own machine: the conversations never leave it. The report comes in three parts: questions with no page, questions mentioned in passing, questions already covered.',
     answer: 'Pain to SEO reads conversation exports on the owner\'s own machine, extracts the question-shaped lines from the customer side, merges the ones that are the same question asked differently, counts how often each was asked, then reads the site and looks for the paragraph that answers each one. It returns a report in three parts: questions with no page at all, questions only mentioned in passing, and questions already covered. The conversations are never uploaded anywhere.',
@@ -406,6 +417,7 @@ export const PRODUCTS: Product[] = [
     slug: 'site-kit',
     label: 'Paid, one licence',
     name: 'Site Kit',
+    heading: 'Everything one person needs to launch a content site',
     title: 'Site Kit: the Pipeline for a 300 Page Site',
     description: 'The starter plus the page generator, the niche discovery module, a WordPress importer, indexing runbooks and support: everything one person needs to launch a content site that passes the gates, or to move an old one onto them. 79 USD, one licence per owner, unlimited sites, updates for a year.',
     answer: 'Site Kit is the full pipeline the gates came from, packaged for one person: the Astro starter, a generator that turns a topic list into gate-passing pages through Claude, a niche discovery module that finds the queries a market actually types, indexing runbooks for Google, Bing and answer engines, a quick start and a licence key. If you already have a site, the WordPress importer turns your export into pages of the new one and then tells you what is wrong with those old texts: which are too short, which have no description for the search result, which have no dates. It is a one-time purchase per site owner.',
@@ -514,6 +526,7 @@ export const PRODUCTS: Product[] = [
     slug: 'fix',
     label: 'Paid, per site',
     name: 'Fix',
+    heading: 'We fix what breaks your site for search and AI',
     title: 'Fix: We Close the Checks Machines Can Close',
     description: 'We close the mechanical findings on your site: robots, sitemap, llms.txt, schema, headings, contact path, redirects, caching, plus the sixteen gates over every page. The list is agreed before you pay, and anything we do not close comes back as a refund of its share.',
     answer: 'Fix closes the findings that do not need to know anything about your business: crawler access, the sitemap and its hygiene, llms.txt, structured data, headings and descriptions, the contact path and the form, redirects, caching headers, broken internal links and duplicate images. Thirty-six of the forty-four checks the audit can raise fall in this group, thirty-three of them on a hosted site builder where we cannot touch the source. We name the exact list for your site before you pay, and we re-check the site thirty days later and email you what moved.',
@@ -562,6 +575,7 @@ export const PRODUCTS: Product[] = [
     slug: 'foundation',
     label: 'Paid, quoted per site',
     name: 'Foundation',
+    heading: 'The whole site put right: the machine part and the human part',
     title: 'Foundation: Fix Plus the Writing',
     description: 'Everything in Fix, plus the three things a machine cannot do for you: an opening paragraph that can be quoted, a named source next to every figure, and the pages your market asks for that do not exist yet. From 500 USD, quoted after the audit.',
     answer: 'Foundation is Fix plus the writing. Five of the forty-four checks need to know your business: whether a page opens with an answer carrying a figure, whether that figure names its source, whether the page has enough substance to be cited at all, whether it is broken into sections, and whether it carries a table worth quoting. We rewrite the openings on the pages that already earn impressions, add sources to the figures, and build the pages your market asks for and you do not have. The price depends on how many pages earn impressions and how much rewriting they need, so it is quoted after the audit rather than guessed here.',

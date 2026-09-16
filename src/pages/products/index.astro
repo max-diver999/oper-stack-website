@@ -33,7 +33,7 @@ const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
       {products.map((p) => (
         <a class="card" href={`/products/${p.slug}/`}>
           <span class="label">{p.label}</span>
-          <span class="name">{p.name}</span>
+          <span class="name">{p.heading ?? p.name}</span>
           <span class="desc">{p.description}</span>
           <span class="price">{p.price}{p.status === 'soon' ? ' · coming soon' : ''}</span>
           <span class="go">{p.status === 'soon' ? 'Read the scope' : p.price === 'Free' ? 'Get it' : 'See what you get'}</span>
