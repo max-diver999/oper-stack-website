@@ -62,12 +62,12 @@ const FOOTER: Record<'en' | 'ru', string[]> = {
   en: [
     'This says what is wrong. How to fix each finding, with a way to check the result and a list',
     'your developer can work from: https://oper-stack.com/products/fix/',
-    'To measure again later and see what actually changed: https://oper-stack.com/products/watch/',
+    'To measure again later and see what actually changed: https://oper-stack.com/products/rival-watch/',
   ],
   ru: [
     'Здесь сказано, что не так. Как чинить каждую находку, с проверкой результата и списком,',
     'по которому сможет работать исполнитель: https://oper-stack.ru/produkty/fix/',
-    'Перемерить позже и увидеть, что на самом деле изменилось: https://oper-stack.ru/produkty/watch/',
+    'Перемерить позже и увидеть, что на самом деле изменилось: https://oper-stack.ru/produkty/rival-watch/',
   ],
 };
 
