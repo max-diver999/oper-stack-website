@@ -65,9 +65,6 @@ async function sendViaResend(letter: {
   if (!res.ok) throw new Error(`resend ${res.status}: ${(await res.text()).slice(0, 200)}`);
 }
 
-/** Почему письмо ушло запасным каналом. Нужно диагностике: журналы функции нам недоступны. */
-export let lastResendError: string | null = null;
-
 const timeouts = { connectionTimeout: 10_000, greetingTimeout: 10_000, socketTimeout: 15_000 };
 
 export async function sendTransactionalMail(msg: { to: string; subject: string; text: string; html: string }): Promise<void> {
@@ -96,12 +93,10 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
   if (RESEND_API_KEY && goesOutside(msg.to, cc)) {
     try {
       await sendViaResend(letter);
-      lastResendError = null;
       return;
     } catch (e) {
       // Домен не подтверждён, лимит выбран, служба недоступна: причина неважна, человек ждёт письмо.
-      lastResendError = String((e as Error).message).slice(0, 300);
-      console.error('resend refused, falling back to google:', lastResendError);
+      console.error('resend refused, falling back to google:', (e as Error).message);
     }
   }
 
