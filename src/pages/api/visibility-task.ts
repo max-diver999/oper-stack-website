@@ -17,6 +17,7 @@ import type { APIRoute } from 'astro';
 import { VISIBILITY_DEFAULTS, checkVisibility, normaliseInput } from '@operstack/audit';
 import { buildRunBody, buildRunSubject } from '../../lib/report-fulfilment';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
+import { canReceiveMail } from '../../lib/deliverable';
 import { logLead, originOf } from '../../lib/sheets-log';
 import { SITE } from '../../data/site';
 
@@ -144,6 +145,11 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   const email = String(body.email ?? '').trim();
   const rawUrl = String(body.url ?? '').trim();
   if (!EMAIL.test(email)) return json({ ok: false, error: 'Enter an email we can send the task to' }, 400);
+  // A bounce hurts the domain's reputation, and the next letters to real people land in spam.
+  // The queue sends the visitor's letter, not this endpoint, so the address is checked here: the
+  // visitor sees the typo at once, and a dead address never enters the queue.
+  const reachable = await canReceiveMail(email);
+  if (!reachable.ok) return json({ ok: false, error: `Check the address: ${reachable.why}` }, 400);
   const url = normaliseInput(rawUrl);
   if (!url) return json({ ok: false, error: 'Run the check first, then ask for the task' }, 400);
   if (limited(clientAddress || 'unknown')) return json({ ok: false, error: 'Too many requests from this connection. Try again in ten minutes.' }, 429);
