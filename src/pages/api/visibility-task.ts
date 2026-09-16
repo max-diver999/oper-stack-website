@@ -159,14 +159,23 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   if (recentlyQueued(email, url)) return json({ ok: true, sent: true, already: true, note: ALREADY_SENT });
 
 
-  let result: any;
-  try { result = await checkVisibility(url, { ...VISIBILITY_DEFAULTS, lang: 'en' }); } catch { return json({ ok: false, error: 'We could not read that site just now' }, 502); }
-  if (!result?.ok) return json({ ok: false, error: 'We could not read that site just now' }, 502);
+  // Замер здесь нужен ровно для одного: чтобы письмо назвало ту же цифру, которую человек
+  // только что видел на странице. Если сайт в эту секунду не ответил, человека терять нельзя.
+  // Раньше здесь стоял отказ, и на нажатие кнопки приходило «не получилось прочитать сайт»:
+  // почта не сохранялась, письмо не уходило, лид пропадал из-за чужой секундной заминки.
+  // Теперь заявка уезжает в очередь без замера, а очередь измерит сама: у неё есть браузер,
+  // запас времени и повторная попытка. Балл в письме может разойтись с экраном на пункт, и это
+  // несопоставимо меньшая беда, чем молчание после нажатия.
+  let result: any = null;
+  try {
+    const measured = await checkVisibility(url, { ...VISIBILITY_DEFAULTS, lang: 'en' });
+    if (measured?.ok) result = measured;
+  } catch { result = null; }
 
   // Заявка в очередь. Письмо человеку собирает она: у неё есть браузер, чтобы напечатать
   // PDF, а здесь его нет. Если заявку поставить не удалось, человек не получит ничего, и
   // сказать об этом надо сразу, а не молча.
-  const queued = await queueFreeReport(result.url ?? url, email, result);
+  const queued = await queueFreeReport(result?.url ?? url, email, result ?? undefined);
   if (!queued) {
     return json({ ok: false, error: 'We could not start your report just now. Write to info@oper-stack.com and we will run it by hand.' }, 502);
   }
@@ -182,9 +191,9 @@ export const POST: APIRoute = async ({ request, clientAddress }) => {
   await logLead({
     agent: request.headers.get('user-agent') ?? '',
     lang: 'en',
-    host: result.host,
-    score: result.score,
-    grade: result.grade,
+    host: result?.host,
+    score: result?.score,
+    grade: result?.grade,
     email,
     name: String(body.name ?? '').trim().slice(0, 80),
     source,
