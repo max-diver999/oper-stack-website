@@ -2,15 +2,22 @@
 /**
  * Карточка доказательства: график роста наших сайтов или матрица сигналов ИИ-видимости.
  *
- * Простым языком. Отзывов у нас пока нет и рисовать их нельзя. Но у нас есть пятнадцать своих
- * сайтов, замеренных в Search Console, и это доказательство сильнее отзыва: покупатель проверяет
- * его сам. Карточки рисуются генератором из файлов замера, а не руками, иначе они разойдутся с
- * правдой ровно так же, как разошлись числа на витрине.
+ * Простым языком. Отзывов у нас пока нет и рисовать их нельзя. Но есть пятнадцать своих сайтов,
+ * замеренных в Search Console, и это доказательство сильнее отзыва: покупатель проверяет его сам.
+ * Карточки рисуются генератором из файлов замера, а не руками.
  *
  * Картинки лежат в public/proof/ и кладутся туда командой:
  *   node _СИСТЕМА/tools/proof/build-cards.mjs --to-sites
+ *
+ * Почему import.meta.glob, а не чтение файла через fs. 16.09.2026 первая версия читала файл через
+ * existsSync и new URL(..., import.meta.url). На dev-сервере это работало, в боевой сборке путь не
+ * находился, и карточки просто не рисовались. Я проверил на dev и выложил, а на живом сайте их не
+ * было. Здесь путь разрешает сборщик, то есть он либо найдёт файл, либо упадёт при сборке.
+ *
+ * И никакого тихого запасного пути. Первая версия при отсутствии файла молча ничего не рисовала,
+ * и поэтому поломка доехала до боевого. Нет файла, значит сборка падает.
  */
-import { readFileSync, existsSync } from 'node:fs';
+const CARDS = import.meta.glob('../../public/proof/*.svg', { query: '?raw', import: 'default', eager: true }) as Record<string, string>;
 
 type Props = {
   /** Имя файла без языка и расширения: network, signals или хост сайта. */
@@ -20,20 +27,21 @@ type Props = {
 };
 
 const { card, lang = 'en', caption } = Astro.props as Props;
-const file = new URL(`../../public/proof/${card}.${lang}.svg`, import.meta.url);
+const key = `../../public/proof/${card}.${lang}.svg`;
+const svg = CARDS[key];
 
-// Встраиваем разметку, а не тег img: карточка тогда масштабируется без потери резкости, читается
-// поиском как текст и не даёт лишнего запроса. Если файла нет, блок просто не рисуется: пустая
-// рамка на странице товара хуже, чем её отсутствие.
-const svg = existsSync(file) ? readFileSync(file, 'utf8') : null;
+if (!svg) {
+  throw new Error(
+    `ProofCard: карточки ${card}.${lang}.svg нет в public/proof/. Соберите набор: ` +
+      `node _СИСТЕМА/tools/proof/build-cards.mjs --to-sites. Есть: ${Object.keys(CARDS).map((k) => k.split('/').pop()).join(', ') || 'ничего'}`,
+  );
+}
 ---
 
-{svg && (
-  <figure class="proof-card">
-    <div class="proof-card__art" set:html={svg} />
-    {caption && <figcaption>{caption}</figcaption>}
-  </figure>
-)}
+<figure class="proof-card">
+  <div class="proof-card__art" set:html={svg} />
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>
 
 <style>
   .proof-card {
