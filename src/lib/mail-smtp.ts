@@ -4,6 +4,7 @@
  * address), LICENCE_NOTIFY_EMAIL (copy of every licence email, accounts@ by default).
  */
 import nodemailer from 'nodemailer';
+import { canReceiveMail } from './deliverable';
 
 const env = (key: string, fallback = ''): string =>
   String((import.meta.env as Record<string, unknown>)[key] ?? process.env[key] ?? fallback).trim();
@@ -12,6 +13,10 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
   const user = env('SMTP_USER');
   const pass = env('SMTP_PASS');
   if (!user || !pass) throw new Error('SMTP_USER or SMTP_PASS is not set');
+  // Отказ доставки бьёт по репутации домена и уводит следующие письма в спам, поэтому на
+  // заведомо мёртвый адрес не отправляем вовсе. Подробности и границы в deliverable.ts.
+  const reachable = await canReceiveMail(msg.to);
+  if (!reachable.ok) throw new Error(`письмо не отправлено: ${reachable.why}`);
   // No pool, explicit timeouts, and close() after the send: an open SMTP socket keeps a serverless
   // function alive until the platform kills it, which is what a 504 after a delivered email looks like.
   const transport = nodemailer.createTransport({
