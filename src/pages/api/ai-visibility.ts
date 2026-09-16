@@ -38,7 +38,7 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 async function record(result: any, request: Request, from: { source?: string; campaign?: string }): Promise<void> {
   if (!result?.ok) return;
   const { source, campaign, page } = originOf(from, request.headers.get('referer'));
-  await logCheck({ lang: 'en', host: result.host, score: result.score, grade: result.grade, source, campaign, page });
+  await logCheck({ agent: request.headers.get('user-agent') ?? '', lang: 'en', host: result.host, score: result.score, grade: result.grade, source, campaign, page });
 }
 
 /**
