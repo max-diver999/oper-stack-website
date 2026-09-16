@@ -426,7 +426,8 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         box.innerHTML = `
           <p class="sent-tick" aria-hidden="true">✓</p>
           <h2>The letter is on its way to ${esc(sentTo)}</h2>
-          <p>It arrives within a couple of minutes from <b>info@oper-stack.com</b>. If you do not see it, look in spam and mark it "not spam", and the next ones land in your inbox.</p>
+          <p>It arrives within a couple of minutes from <b>info@oper-stack.com</b>.</p>
+          <p class="sent-spam">If you do not see it, look in spam and mark it "not spam", and the next ones land in your inbox.</p>
           <p class="note">Inside: the second fix in full and the names of the remaining findings on ${esc(lastHost || '')}.</p>`;
         box.scrollIntoView({ behavior: 'smooth', block: 'center' });
       } catch (err: any) { pdfMsg.textContent = err.message || 'Something went wrong. Email info@oper-stack.com'; pdfMsg.className = 'msg err'; pdfMsg.hidden = false; pdfBtn.disabled = false; }
@@ -534,6 +535,18 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     font-size: 25px; font-weight: 700; line-height: 1; margin: 0 0 14px;
   }
   #vis-capture.sent h2 { margin: 0 0 12px; font-size: 24px; }
+  /* Просьба заглянуть в спам. Внутри подтверждения она тонула в остальном тексте, а это самая
+     полезная строка на экране: отметка «не спам» учит почтовую службу пропускать следующие
+     письма, и без неё человек просто не найдёт того, что заказал. Тёплая подложка отделяет её
+     от бирюзы самой панели, не превращая в крик. */
+  #vis-capture.sent .sent-spam {
+    margin: 0 0 12px;
+    padding: 11px 14px;
+    border-radius: 10px;
+    border-left: 3px solid rgba(232,184,74,.8);
+    background: rgba(232,184,74,.15);
+    color: var(--paper);
+  }
   #vis-capture.sent p { margin: 0 0 10px; }
   @keyframes sent-in { from { opacity: 0; transform: translateY(10px) scale(.985); } to { opacity: 1; transform: none; } }
   @keyframes sent-pulse {
