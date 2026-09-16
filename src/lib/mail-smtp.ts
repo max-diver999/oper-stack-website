@@ -13,10 +13,10 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
   const user = env('SMTP_USER');
   const pass = env('SMTP_PASS');
   if (!user || !pass) throw new Error('SMTP_USER or SMTP_PASS is not set');
-  // Отказ доставки бьёт по репутации домена и уводит следующие письма в спам, поэтому на
-  // заведомо мёртвый адрес не отправляем вовсе. Подробности и границы в deliverable.ts.
+  // A bounce hurts the domain's reputation and pushes the next letters into spam, so a plainly
+  // dead address is never written to. Details and boundaries live in deliverable.ts.
   const reachable = await canReceiveMail(msg.to);
-  if (!reachable.ok) throw new Error(`письмо не отправлено: ${reachable.why}`);
+  if (!reachable.ok) throw new Error(`not sent: ${reachable.why}`);
   // No pool, explicit timeouts, and close() after the send: an open SMTP socket keeps a serverless
   // function alive until the platform kills it, which is what a 504 after a delivered email looks like.
   const transport = nodemailer.createTransport({

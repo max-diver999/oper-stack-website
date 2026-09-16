@@ -77,15 +77,15 @@ export type Deliverable = { ok: true } | { ok: false; why: string };
 
 export async function canReceiveMail(address: string): Promise<Deliverable> {
   const at = String(address || '').lastIndexOf('@');
-  if (at < 1 || at === String(address).length - 1) return { ok: false, why: 'это не похоже на адрес почты' };
+  if (at < 1 || at === String(address).length - 1) return { ok: false, why: 'that does not look like an email address' };
   const domain = String(address).slice(at + 1).trim().toLowerCase();
-  if (!domain || /\s/.test(domain) || !domain.includes('.')) return { ok: false, why: `в адресе нет домена: ${address}` };
+  if (!domain || /\s/.test(domain) || !domain.includes('.')) return { ok: false, why: `the address has no domain: ${address}` };
   if (RESERVED_TLD.test(domain) || RESERVED_NAME.test(domain)) {
-    return { ok: false, why: `${domain} это служебное имя из стандарта, почты там не бывает` };
+    return { ok: false, why: `${domain} is a name the standard reserves for examples, no mailbox lives there` };
   }
 
   const near = lookalike(domain);
-  if (near) return { ok: false, why: `домен ${domain} похож на опечатку: вероятно, имелось в виду ${near}` };
+  if (near) return { ok: false, why: `${domain} looks like a typo, you probably meant ${near}` };
 
   const mx = await look(() => dns.resolveMx(domain));
   if (mx.found) return { ok: true };
@@ -97,5 +97,5 @@ export async function canReceiveMail(address: string): Promise<Deliverable> {
   const v6 = await look(() => dns.resolve6(domain));
   if (v6.found || !v6.sure) return { ok: true };
 
-  return { ok: false, why: `у домена ${domain} нет ни почтового сервера, ни адреса` };
+  return { ok: false, why: `${domain} has neither a mail server nor an address` };
 }
