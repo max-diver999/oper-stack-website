@@ -1,0 +1,54 @@
+---
+/**
+ * Карточка доказательства: график роста наших сайтов или матрица сигналов ИИ-видимости.
+ *
+ * Простым языком. Отзывов у нас пока нет и рисовать их нельзя. Но у нас есть пятнадцать своих
+ * сайтов, замеренных в Search Console, и это доказательство сильнее отзыва: покупатель проверяет
+ * его сам. Карточки рисуются генератором из файлов замера, а не руками, иначе они разойдутся с
+ * правдой ровно так же, как разошлись числа на витрине.
+ *
+ * Картинки лежат в public/proof/ и кладутся туда командой:
+ *   node _СИСТЕМА/tools/proof/build-cards.mjs --to-sites
+ */
+import { readFileSync, existsSync } from 'node:fs';
+
+type Props = {
+  /** Имя файла без языка и расширения: network, signals или хост сайта. */
+  card: string;
+  lang?: 'en' | 'ru';
+  caption?: string;
+};
+
+const { card, lang = 'en', caption } = Astro.props as Props;
+const file = new URL(`../../public/proof/${card}.${lang}.svg`, import.meta.url);
+
+// Встраиваем разметку, а не тег img: карточка тогда масштабируется без потери резкости, читается
+// поиском как текст и не даёт лишнего запроса. Если файла нет, блок просто не рисуется: пустая
+// рамка на странице товара хуже, чем её отсутствие.
+const svg = existsSync(file) ? readFileSync(file, 'utf8') : null;
+---
+
+{svg && (
+  <figure class="proof-card">
+    <div class="proof-card__art" set:html={svg} />
+    {caption && <figcaption>{caption}</figcaption>}
+  </figure>
+)}
+
+<style>
+  .proof-card {
+    margin: 2.5rem 0;
+  }
+  .proof-card__art :global(svg) {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 14px;
+  }
+  figcaption {
+    margin-top: 0.7rem;
+    font-size: 0.85rem;
+    color: var(--color-muted, #6b7280);
+    line-height: 1.5;
+  }
+</style>

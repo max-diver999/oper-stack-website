@@ -6,6 +6,8 @@ import FaqSection from '../../components/FaqSection.astro';
 import { PRODUCTS } from '../../data/products';
 import { PRODUCTS_PLAIN, FOUNDER_STORY } from '../../data/products.plain';
 import { SITE } from '../../data/site';
+import ProofCard from '../../components/ProofCard.astro';
+import { PRODUCT_PROOF } from '../../data/proof.ts';
 
 export function getStaticPaths() {
   return PRODUCTS.map((p) => ({ params: { slug: p.slug }, props: { product: p } }));
@@ -102,6 +104,10 @@ const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order 
 
     <h2>What it is not for</h2>
     <ul class="list">{p.notFor.map((n) => <li>{n}</li>)}</ul>
+
+    {PRODUCT_PROOF[p.slug] && (
+      <ProofCard card={PRODUCT_PROOF[p.slug].card} lang="en" caption={PRODUCT_PROOF[p.slug].caption} />
+    )}
 
     <section class="story" aria-label="Why I share this">
       <h2>{FOUNDER_STORY.heading}</h2>

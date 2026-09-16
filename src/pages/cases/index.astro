@@ -3,6 +3,7 @@ import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import { CASES, CASES_PERIOD, NETWORK_HERO, VERIFICATION_POINTS } from '../../data/cases';
 import { SITE } from '../../data/site';
+import ProofCard from '../../components/ProofCard.astro';
 
 const canonical = `${SITE.url}/cases/`;
 
@@ -61,6 +62,18 @@ const statusLabel = {
     <p class="period-note">
       Growth compares {CASES_PERIOD.current} with {CASES_PERIOD.previous}. Percentages are period over period, not daily totals.
     </p>
+
+    <h2 class="section-title">Measured, not claimed</h2>
+    <p class="section-lede">
+      Two pictures drawn from the raw measurements, not typed by hand. The first is search impressions
+      across the network, month by month, with the number of live sites printed under each month so the
+      early months cannot be read as one site. The second is the eight technical signals that decide
+      whether an AI assistant can read a site at all, on all fifteen sites, before and after the work.
+      Sites whose curve turned down are not shown here: a case is a case only while it is still going up.
+    </p>
+
+    <ProofCard card="network" lang="en" />
+    <ProofCard card="signals" lang="en" />
 
     <h2 class="section-title">Selected cases</h2>
     <p class="section-lede">
