@@ -1,8 +1,8 @@
 {
   "host": "oper-stack.com",
-  "score": 90,
+  "score": 89,
   "grade": "A",
-  "measured": "2026-09-16",
+  "measured": "2026-09-17",
   "areas": [
     {
       "label": "Can AI crawlers read it",
@@ -21,7 +21,7 @@
     },
     {
       "label": "Is there something to quote",
-      "score": 20,
+      "score": 19,
       "max": 25
     },
     {
@@ -30,5 +30,5 @@
       "max": 15
     }
   ],
-  "pagesRead": 4
+  "pagesRead": 10
 }
