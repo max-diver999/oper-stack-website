@@ -1,0 +1,62 @@
+---
+/**
+ * Цитата с указанием, кто это сказал.
+ *
+ * Простым языком. Утверждение без имени за ним читается как наше мнение, а с именем как факт,
+ * который можно проверить. Ровно это и меряют нейросети, когда решают, цитировать страницу или нет:
+ * в работе Aggarwal и др. (KDD 2024) добавление цитаты с атрибуцией дало +22% видимости, а
+ * называние источника до +40%.
+ *
+ * Поэтому здесь атрибуция не украшение, а обязательное поле: без `author` компонент не рисуется.
+ */
+type Props = {
+  /** Сама цитата, без кавычек: их ставит компонент. */
+  text: string;
+  /** Кто сказал. Без этого блок не выводится: цитата без автора хуже, чем её отсутствие. */
+  author: string;
+  /** Работа, издание или должность. */
+  source?: string;
+  /** Куда ведёт ссылка на источник. */
+  href?: string;
+};
+
+const { text, author, source, href } = Astro.props as Props;
+---
+
+{text && author && (
+  <figure class="quote">
+    <blockquote>{text}</blockquote>
+    <figcaption>
+      <span class="who">{author}</span>
+      {source && (
+        <span class="src">
+          {href ? <a href={href} rel="noopener">{source}</a> : source}
+        </span>
+      )}
+    </figcaption>
+  </figure>
+)}
+
+<style>
+  .quote {
+    margin: 2rem 0;
+    padding: 1.25rem 1.5rem;
+    border-left: 3px solid var(--color-teal, #3DB8A9);
+    background: color-mix(in srgb, var(--color-teal, #3DB8A9) 6%, transparent);
+    border-radius: 0 10px 10px 0;
+  }
+  blockquote {
+    margin: 0;
+    font-size: 1.1rem;
+    line-height: 1.55;
+    font-style: italic;
+  }
+  figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    opacity: 0.85;
+  }
+  .who { font-weight: 600; }
+  .src::before { content: ' · '; opacity: 0.6; }
+  .src a { text-decoration: underline; text-underline-offset: 2px; }
+</style>

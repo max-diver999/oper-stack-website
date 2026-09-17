@@ -5,6 +5,7 @@
 import type { APIRoute } from 'astro';
 import { VISIBILITY_DEFAULTS, checkVisibility, firstFixParts, normaliseInput } from '@operstack/audit';
 import { logCheck, originOf } from '../../lib/sheets-log';
+import { saveCheck } from '../../lib/check-store';
 
 export const prerender = false;
 
@@ -103,7 +104,19 @@ async function handle(rawUrl: string, ip: string, request: Request, from: { sour
   const result = await checkVisibility(url, { ...VISIBILITY_DEFAULTS, lang: 'en' });
   // В таблицу пишем по полному результату, в браузер отдаём урезанный.
   await record(result, request, from);
-  const visible = forVisitor(result);
+  const visible: any = forVisitor(result);
+  /*
+   * Сохраняем результат, чтобы у него появился свой адрес. До этого он жил только во вкладке: его
+   * нельзя было переслать разработчику, положить в закладки или показать через неделю. И человеку
+   * с хорошим баллом было нечего вставить к себе на сайт.
+   *
+   * Сохранение не может уронить проверку: любая ошибка базы проглатывается внутри saveCheck, и
+   * человек всё равно видит свой результат, просто без постоянной ссылки.
+   */
+  if (result.ok) {
+    const id = await saveCheck(new URL(result.url).host.replace(/^www\./, ''), Number(result.score) || 0, 'en', visible);
+    if (id) { visible.id = id; visible.permalink = `/result/${id}/`; visible.badge = `/badge/${id}.svg`; }
+  }
   const body = JSON.stringify(visible);
   if (result.ok) cache.set(key, { at: Date.now(), body });
   return json(visible, result.ok ? 200 : 422);

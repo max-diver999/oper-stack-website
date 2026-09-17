@@ -1,0 +1,72 @@
+---
+/**
+ * Лента последних проверок.
+ *
+ * Простым языком. Это доказательство, что инструмент работает и им пользуются: живые сайты, живые
+ * баллы, каждый можно открыть и посмотреть. У конкурентов такая лента стоит на главной, и это
+ * дешёвое доверие, которого у нас не было.
+ *
+ * Что показываем: домен, балл и дату, по одной самой свежей проверке на домен. Ничего о том, кто
+ * проверял. Каждая строка ведёт на страницу результата, которая сама закрыта от индексации.
+ */
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { recentChecks, checkStoreConfigured } from '../../lib/check-store';
+import { SITE } from '../../data/site';
+
+export const prerender = false;
+
+const rows = await recentChecks(30);
+const configured = checkStoreConfigured();
+const grade = (n: number) => (n >= 80 ? 'A' : n >= 65 ? 'B' : n >= 45 ? 'C' : 'D');
+---
+
+<CommercialLayout
+  title="Recently checked sites"
+  description="The most recent AI visibility checks run on this site: domain, score and date. Public signals only."
+  canonical={`${SITE.url}/checks/`}
+>
+  <div class="wrap">
+    <p class="eyebrow">Live</p>
+    <h1>Recently checked</h1>
+    <p class="lede">
+      The last thirty sites put through the free check, one row per site, newest first. Every score is
+      measured from public signals on ten pages. Other tools check one page.
+    </p>
+
+    {!configured && <p class="empty">The store is not configured on this deployment.</p>}
+    {configured && rows.length === 0 && <p class="empty">Nothing checked yet. <a href="/ai-visibility/">Be the first</a>.</p>}
+
+    {rows.length > 0 && (
+      <table>
+        <thead><tr><th>Site</th><th>Score</th><th>Checked</th></tr></thead>
+        <tbody>
+          {rows.map((r) => (
+            <tr>
+              <td><a href={`/result/${r.id}/`}>{r.domain}</a></td>
+              <td class="score"><span class={`g g-${grade(r.score).toLowerCase()}`}>{grade(r.score)}</span> {r.score}</td>
+              <td class="when">{new Date(r.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'short' })}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    )}
+
+    <p class="cta"><a class="btn" href="/ai-visibility/">Check your own site</a></p>
+  </div>
+</CommercialLayout>
+
+<style>
+  .wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+  .eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; margin: 0 0 0.5rem; }
+  .lede { font-size: 1.02rem; line-height: 1.55; max-width: 62ch; }
+  table { width: 100%; border-collapse: collapse; margin-top: 1.75rem; }
+  th { text-align: left; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.55; padding-bottom: 0.5rem; }
+  td { padding: 0.6rem 0; border-top: 1px solid var(--color-border, rgba(255,255,255,0.1)); }
+  .score { font-variant-numeric: tabular-nums; white-space: nowrap; }
+  .when { opacity: 0.6; white-space: nowrap; text-align: right; }
+  .g { display: inline-block; min-width: 1.35rem; text-align: center; border-radius: 5px; padding: 0.05rem 0.3rem; font-weight: 700; font-size: 0.8rem; color: #fff; }
+  .g-a { background: #2f9e6f; } .g-b { background: #4a8f5e; } .g-c { background: #c08a2e; } .g-d { background: #b8483c; }
+  .empty { margin-top: 1.5rem; opacity: 0.75; }
+  .cta { margin-top: 2.5rem; }
+  .btn { display: inline-block; padding: 0.6rem 1.1rem; border-radius: 8px; border: 1px solid var(--color-border, rgba(255,255,255,0.2)); text-decoration: none; }
+</style>

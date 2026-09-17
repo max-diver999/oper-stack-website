@@ -1,0 +1,87 @@
+---
+/**
+ * Карточки цифр, у каждой назван источник.
+ *
+ * Простым языком. Мы требуем от чужих сайтов, чтобы у каждой цифры был назван источник, и снижаем
+ * за это балл. Показывать при этом свои числа без источника было бы стыдно. Поэтому здесь источник
+ * обязателен на уровне кода: карточка без него не рисуется совсем.
+ *
+ * Это же и есть наше правило, сделанное видимым: посетитель видит формат, который мы от него ждём.
+ */
+type Stat = {
+  /** Само число, как его читают: «1 млрд», «48%», «+279%». */
+  value: string;
+  /** Что это за число, одной строкой. */
+  label: string;
+  /** Кто это посчитал. Без источника карточка не выводится. */
+  source: string;
+  /** Куда ведёт ссылка на источник, если он в сети. */
+  href?: string;
+  /** Окно замера: число без окна живёт вечно и врёт через месяц. */
+  window?: string;
+};
+
+type Props = { stats: Stat[]; heading?: string };
+const { stats, heading } = Astro.props as Props;
+const shown = (stats || []).filter((s) => s.value && s.label && s.source);
+---
+
+{shown.length > 0 && (
+  <section class="stats" aria-label={heading || 'Key figures'}>
+    {heading && <p class="stats-eyebrow">{heading}</p>}
+    <div class="stats-grid">
+      {shown.map((s) => (
+        <article class="stat">
+          <span class="stat-value">{s.value}</span>
+          <span class="stat-label">{s.label}</span>
+          <span class="stat-source">
+            {s.href ? <a href={s.href} rel="noopener">{s.source}</a> : s.source}
+            {s.window && <span class="stat-window">{s.window}</span>}
+          </span>
+        </article>
+      ))}
+    </div>
+  </section>
+)}
+
+<style>
+  .stats { margin: 2.5rem 0; }
+  .stats-eyebrow {
+    margin: 0 0 1rem;
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    opacity: 0.6;
+  }
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 1rem;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    padding: 1.25rem;
+    border: 1px solid var(--color-border, rgba(255, 255, 255, 0.1));
+    border-radius: 12px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 2.25rem;
+    font-weight: 700;
+    line-height: 1.05;
+    font-variant-numeric: tabular-nums;
+  }
+  .stat-label { font-size: 0.9rem; line-height: 1.4; }
+  .stat-source {
+    margin-top: 0.3rem;
+    font-size: 0.75rem;
+    opacity: 0.7;
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+  .stat-source a { text-decoration: underline; text-underline-offset: 2px; }
+  .stat-window { opacity: 0.8; }
+</style>
