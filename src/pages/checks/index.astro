@@ -60,10 +60,13 @@ const grade = (n: number) => (n >= 80 ? 'A' : n >= 65 ? 'B' : n >= 45 ? 'C' : 'D
   .eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; margin: 0 0 0.5rem; }
   .lede { font-size: 1.02rem; line-height: 1.55; max-width: 62ch; }
   table { width: 100%; border-collapse: collapse; margin-top: 1.75rem; }
+  /* Заголовок и значение в одном столбце выравниваются одинаково, иначе дата уезжает вбок от
+     слова «когда». Поймано Максимом 17.09.2026 на живой странице. */
   th { text-align: left; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.55; padding-bottom: 0.5rem; }
+  th:last-child, td:last-child { text-align: right; }
   td { padding: 0.6rem 0; border-top: 1px solid var(--color-border, rgba(255,255,255,0.1)); }
   .score { font-variant-numeric: tabular-nums; white-space: nowrap; }
-  .when { opacity: 0.6; white-space: nowrap; text-align: right; }
+  .when { opacity: 0.6; white-space: nowrap; }
   .g { display: inline-block; min-width: 1.35rem; text-align: center; border-radius: 5px; padding: 0.05rem 0.3rem; font-weight: 700; font-size: 0.8rem; color: #fff; }
   .g-a { background: #2f9e6f; } .g-b { background: #4a8f5e; } .g-c { background: #c08a2e; } .g-d { background: #b8483c; }
   .empty { margin-top: 1.5rem; opacity: 0.75; }
