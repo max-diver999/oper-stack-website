@@ -115,7 +115,7 @@ async function handle(rawUrl: string, ip: string, request: Request, from: { sour
    */
   if (result.ok) {
     const id = await saveCheck(new URL(result.url).host.replace(/^www\./, ''), Number(result.score) || 0, 'en', visible);
-    if (id) { visible.id = id; visible.permalink = `/result/${id}/`; visible.badge = `/badge/${id}.svg`; }
+    if (id) { visible.id = id; visible.permalink = `/result/${id}/`; visible.badge = `/badge/${id}/`; }
   }
   const body = JSON.stringify(visible);
   if (result.ok) cache.set(key, { at: Date.now(), body });

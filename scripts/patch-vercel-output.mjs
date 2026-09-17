@@ -60,17 +60,6 @@ async function main() {
         status: r.statusCode || 308,
       })),
     ...(vercel.headers || []).map((h) => ({ src: toSrc(h.source), headers: Object.fromEntries(h.headers.map((x) => [x.key, x.value])), continue: true })),
-    /*
-     * Значок с баллом доступен и как /badge/<id>.svg, и как /badge/<id>/.
-     *
-     * У сайта включено trailingSlash: 'always', поэтому адрес с расширением сам по себе отдаёт 404:
-     * 17.09.2026 значок так и лежал, хотя страница результата рядом работала. Проверять такое можно
-     * только живым запросом, сборка этого не видит.
-     *
-     * Расширение нужно потому, что значок вставляют на чужие сайты, а часть площадок ждёт от
-     * картинки привычного .svg на конце.
-     */
-    { src: '^/badge/([^/]+)\\.svg$', dest: '/badge/$1/' },
     // Link and Vary on every response; `continue` lets the later routes still run.
     { src: '^/(.*)$', headers: { Link: LINK_HEADER, Vary: 'Accept' }, continue: true },
     // A markdown rendition duplicates the HTML page, so it must never be indexed.
