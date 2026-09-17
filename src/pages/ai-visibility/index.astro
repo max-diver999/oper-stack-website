@@ -359,7 +359,14 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         <tr><th>Answered in</th><td>${(r.ms / 1000).toFixed(1)} s</td></tr>
         <tr><th>Pages read</th><td>${r.sample.length}${r.sitemap.found ? ` of ${r.sitemap.count} in the sitemap` : ''}</td></tr>
       </table></details>` : '';
-      const pages = r.sample.length ? `<details class="more"><summary>Pages sampled (${r.sample.length})</summary><table><tr><th>Page</th><th>Words</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr>${r.sample.map((p: any) => `<tr><td><a href="${esc(p.url)}" rel="nofollow noopener" target="_blank">${esc(new URL(p.url).pathname)}</a></td><td>${p.words}</td><td>${p.answerFirst ? 'yes' : 'no'}</td><td>${p.dated ? 'yes' : 'no'}</td><td>${esc(p.schema.join(', ') || 'none')}</td></tr>`).join('')}</table></details>` : '';
+      const pages = r.sample.length ? `<details class="more"><summary>Pages sampled (${r.sample.length})</summary><table><tr><th>Page</th><th>Words</th><th>H2</th><th>Tables</th><th>Links</th><th>Images</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr>${r.sample.map((p: any) => `<tr><td><a href="${esc(p.url)}" rel="nofollow noopener" target="_blank">${esc(new URL(p.url).pathname)}</a></td><td>${p.words}</td><td>${p.h2 ?? '—'}</td><td>${p.tables ?? '—'}</td><td>${p.links ?? '—'}</td><td>${p.images ?? '—'}</td><td>${p.answerFirst ? 'yes' : 'no'}</td><td>${p.dated ? 'yes' : 'no'}</td><td>${esc(p.schema.join(', ') || 'none')}</td></tr>`).join('')}</table></details>` : '';
+      /*
+       * Готовность по каждому движку. Число пересобрано из уже измеренного, поэтому под ним
+       * сразу написано, из чего оно и что тянет вниз: «Gemini 61» без объяснения это гадание.
+       */
+      const engines = Array.isArray(r.engines) && r.engines.length
+        ? `<div class="engines"><h3>Readiness by engine</h3><p class="eng-lede">The same measurements, regrouped per engine. Nothing new was measured: under each number you can see what it is made of.</p><div class="eng-grid">${r.engines.map((e: any) => `<div class="eng"><p class="eng-name">${esc(e.label)}</p><p class="eng-num">${e.score === null ? '—' : e.score}</p><div class="bar"><i style="width:${e.score || 0}%"></i></div><p class="eng-how">${esc(e.how)}</p>${e.blocked.length ? `<p class="eng-bad">blocked in robots.txt: ${esc(e.blocked.join(', '))}</p>` : e.weakest ? `<p class="eng-weak">pulls it down: ${esc(e.weakest)}</p>` : ''}</div>`).join('')}</div></div>`
+        : '';
       const crawlers = `<details class="more"><summary>Crawlers checked (${r.crawlers.length})</summary><table><tr><th>Crawler</th><th>Kind</th><th>robots.txt</th></tr>${r.crawlers.map((c: any) => `<tr><td>${esc(c.label)}</td><td>${c.kind === 'search' ? 'search and citation' : 'training'}</td><td class="${c.verdict === 'blocked' ? 'bad' : 'ok'}">${c.verdict}</td></tr>`).join('')}</table></details>`;
       /*
        * Ссылка на сохранённый результат и значок. До 17.09.2026 результат жил только во вкладке:
@@ -392,6 +399,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       more.innerHTML = `
         <p class="passed"><strong>${passedN} of ${totalN}</strong> checks passed on this run.</p>
         <div class="areas">${areas}</div>
+        ${engines}
         ${facts}
         ${pages}${crawlers}
         <div class="compare">
@@ -775,4 +783,18 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
 
   .rules-why { margin: 2.5rem 0 1rem; }
   .rules-lede { margin: 0 0 1rem; color: rgba(245,242,236,.8); }
+
+  .result .engines { margin: 22px 0 0; }
+  .result .engines h3 { font-family: var(--fd); font-size: 1.05rem; margin: 0 0 4px; color: var(--paper); }
+  .result .eng-lede { margin: 0 0 14px; font-size: 14px; color: rgba(245,242,236,.78); }
+  .result .eng-grid { display: grid; gap: 10px; grid-template-columns: repeat(5, 1fr); }
+  .result .eng { padding: 12px 13px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.02); }
+  .result .eng-name { margin: 0; font-weight: 600; color: var(--paper); font-size: 14px; }
+  .result .eng-num { margin: 2px 0 8px; font-family: var(--fd); font-size: 28px; line-height: 1; color: var(--teal-soft); font-variant-numeric: tabular-nums; }
+  .result .eng .bar { margin-bottom: 8px; }
+  .result .eng-how, .result .eng-weak, .result .eng-bad { margin: 0; font-size: 12px; line-height: 1.4; color: var(--muted); }
+  .result .eng-weak { margin-top: 5px; }
+  .result .eng-bad { margin-top: 5px; color: #e07a5f; }
+  @media (max-width: 860px) { .result .eng-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { .result .eng-grid { grid-template-columns: 1fr; } }
 </style>

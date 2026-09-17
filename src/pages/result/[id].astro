@@ -36,6 +36,9 @@ const areas: any[] = Array.isArray(p.areas) ? p.areas : [];
 const rest: any[] = Array.isArray(p.rest) ? p.rest : [];
 const sample: any[] = Array.isArray(p.sample) ? p.sample : [];
 const crawlers: any[] = Array.isArray(p.crawlers) ? p.crawlers : [];
+/* Готовность по движкам появилась в движке 0.27.0: у проверок, сохранённых раньше,
+   этого поля просто нет, и раздел тогда не рисуется вовсе. */
+const engines: any[] = Array.isArray(p.engines) ? p.engines : [];
 const sitemap: any = p.sitemap || {};
 const fix: any = p.firstFix || null;
 
@@ -115,6 +118,25 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
       )}
     </section>
 
+    {engines.length > 0 && (
+      <section class="engines">
+        <h2>Readiness by engine</h2>
+        <p class="eng-lede">The same measurements, regrouped per engine. Nothing new was measured: under each number you can see what it is made of.</p>
+        <div class="eng-grid">
+          {engines.map((e: any) => (
+            <div class="eng">
+              <p class="eng-name">{e.label}</p>
+              <p class="eng-num">{e.score === null ? '—' : e.score}</p>
+              <div class="bar"><i style={`width:${e.score || 0}%`}></i></div>
+              <p class="eng-how">{e.how}</p>
+              {e.blocked.length > 0 && <p class="eng-bad">blocked in robots.txt: {e.blocked.join(', ')}</p>}
+              {e.blocked.length === 0 && e.weakest && <p class="eng-weak">pulls it down: {e.weakest}</p>}
+            </div>
+          ))}
+        </div>
+      </section>
+    )}
+
     <section class="areas">
       <h2>The five areas</h2>
       {areas.map((a: any) => (
@@ -171,12 +193,16 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
         <h2>The pages we read</h2>
         <div class="scroll">
           <table>
-            <thead><tr><th>Page</th><th>Words</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr></thead>
+            <thead><tr><th>Page</th><th>Words</th><th>H2</th><th>Tables</th><th>Links</th><th>Images</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr></thead>
             <tbody>
               {sample.map((s: any) => (
                 <tr>
                   <td class="cell-url"><a href={s.url} rel="nofollow noopener" target="_blank">{path(s.url)}</a></td>
                   <td class="num-cell">{s.words}</td>
+                  <td class="num-cell">{s.h2 ?? '—'}</td>
+                  <td class="num-cell">{s.tables ?? '—'}</td>
+                  <td class="num-cell">{s.links ?? '—'}</td>
+                  <td class="num-cell">{s.images ?? '—'}</td>
                   <td class={s.answerFirst ? 'ok' : 'bad'}>{s.answerFirst ? 'yes' : 'no'}</td>
                   <td class={s.dated ? 'ok' : 'bad'}>{s.dated ? 'yes' : 'no'}</td>
                   <td>{(s.schema || []).join(', ') || 'none'}</td>
@@ -401,4 +427,16 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
     .fix, .rest { padding: 1.1rem 1.1rem; }
     .num { font-size: 2.2rem; }
   }
+
+  .engines .eng-lede { margin: 0 0 1.2rem; color: rgba(245,242,236,.8); }
+  .eng-grid { display: grid; gap: .9rem; grid-template-columns: repeat(5, 1fr); }
+  .eng { padding: .9rem 1rem; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.02); }
+  .eng-name { margin: 0; font-weight: 600; color: var(--paper); font-size: .95rem; }
+  .eng-num { margin: .2rem 0 .5rem; font-family: var(--fd); font-size: 1.9rem; line-height: 1; color: currentColor; font-variant-numeric: tabular-nums; }
+  .eng .bar { margin-bottom: .6rem; }
+  .eng-how, .eng-weak, .eng-bad { margin: 0; font-size: .78rem; line-height: 1.4; color: var(--muted); }
+  .eng-weak { margin-top: .35rem; }
+  .eng-bad { margin-top: .35rem; color: #e07a5f; }
+  @media (max-width: 860px) { .eng-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 460px) { .eng-grid { grid-template-columns: 1fr; } }
 </style>
