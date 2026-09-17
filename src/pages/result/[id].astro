@@ -1,0 +1,93 @@
+---
+/**
+ * Постоянный адрес одной проверки.
+ *
+ * Простым языком. Раньше результат жил во вкладке и умирал вместе с ней. Теперь у него есть адрес:
+ * его кладут в закладки, пересылают разработчику и открывают через неделю, чтобы сравнить. Здесь
+ * же владелец берёт код значка для своего сайта.
+ *
+ * Страница закрыта от индексации намеренно: это чужие сайты и их баллы, им незачем всплывать в
+ * поиске по чужому имени. Лента последних проверок на /checks/ показывает только домен и балл,
+ * и только по одному, самому свежему результату на домен.
+ */
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { loadCheck, latestForDomain } from '../../lib/check-store';
+import { SITE } from '../../data/site';
+
+export const prerender = false;
+
+const id = String(Astro.params.id || '');
+const stored = await loadCheck(id);
+if (!stored) return Astro.redirect('/ai-visibility/', 302);
+
+const current = await latestForDomain(stored.domain);
+const moved = current && current.id !== stored.id ? current : null;
+const p: any = stored.payload || {};
+const when = new Date(stored.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
+const badgeUrl = `${SITE.url}/badge/${stored.id}.svg`;
+const pageUrl = `${SITE.url}/result/${stored.id}/`;
+const grade = stored.score >= 80 ? 'A' : stored.score >= 65 ? 'B' : stored.score >= 45 ? 'C' : 'D';
+---
+
+<CommercialLayout
+  title={`${stored.domain} scored ${stored.score}/100 on AI visibility`}
+  description={`How ${stored.domain} reads to ChatGPT, Perplexity, Claude, Copilot and Gemini, measured ${when} on public signals only.`}
+  canonical={pageUrl}
+  noindex={true}
+>
+  <div class="wrap">
+    <p class="eyebrow">AI visibility check · {when}</p>
+    <h1>{stored.domain} scored {stored.score} of 100</h1>
+    <p class="grade">Grade {grade}</p>
+
+    {moved && (
+      <p class="moved">
+        This is the run from {when}. The site has been checked again since:
+        <a href={`/result/${moved.id}/`}>the latest run scored {moved.score}</a>.
+      </p>
+    )}
+
+    {p.headline && <p class="lede">{p.headline}</p>}
+
+    <section class="embed">
+      <h2>Put the score on your site</h2>
+      <p>The image updates itself: check the site again and the badge shows the new number, with nothing to change on your page.</p>
+      <p class="preview"><img src={`/badge/${stored.id}.svg`} alt={`AI visibility score for ${stored.domain}`} width="180" height="28" /></p>
+      <label for="embed-html">HTML</label>
+      <textarea id="embed-html" readonly rows="2">{`<a href="${pageUrl}"><img src="${badgeUrl}" alt="AI visibility score for ${stored.domain}" /></a>`}</textarea>
+      <label for="embed-md">Markdown</label>
+      <textarea id="embed-md" readonly rows="2">{`[![AI visibility score](${badgeUrl})](${pageUrl})`}</textarea>
+      <label for="embed-img">Image address</label>
+      <textarea id="embed-img" readonly rows="1">{badgeUrl}</textarea>
+    </section>
+
+    <section class="share">
+      <h2>Share it</h2>
+      <p>
+        <a class="btn" rel="noopener" target="_blank"
+           href={`https://x.com/intent/tweet?text=${encodeURIComponent(`${stored.domain} scores ${stored.score}/100 on AI visibility`)}&url=${encodeURIComponent(pageUrl)}`}>Share on X</a>
+        <a class="btn" href="/ai-visibility/">Check another site</a>
+      </p>
+    </section>
+
+    <p class="note">
+      Public signals only, measured {when}. This page is not indexed: it holds someone else's site and someone else's score.
+    </p>
+  </div>
+</CommercialLayout>
+
+<style>
+  .wrap { max-width: 780px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+  .eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; margin: 0 0 0.5rem; }
+  h1 { margin: 0 0 0.3rem; line-height: 1.15; }
+  .grade { margin: 0 0 1.25rem; font-weight: 600; opacity: 0.8; }
+  .lede { font-size: 1.05rem; line-height: 1.55; }
+  .moved { padding: 0.75rem 1rem; border-radius: 10px; background: color-mix(in srgb, currentColor 7%, transparent); }
+  section { margin-top: 2.5rem; }
+  h2 { font-size: 1.15rem; margin: 0 0 0.5rem; }
+  label { display: block; margin: 0.9rem 0 0.25rem; font-size: 0.8rem; opacity: 0.7; }
+  textarea { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--color-border, rgba(255,255,255,0.15)); background: transparent; color: inherit; resize: vertical; }
+  .preview { margin: 0.75rem 0; }
+  .btn { display: inline-block; padding: 0.55rem 1rem; border-radius: 8px; border: 1px solid var(--color-border, rgba(255,255,255,0.2)); text-decoration: none; margin-right: 0.5rem; }
+  .note { margin-top: 2.5rem; font-size: 0.85rem; opacity: 0.65; }
+</style>
