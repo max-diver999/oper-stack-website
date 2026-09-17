@@ -85,7 +85,7 @@ const gap = seo && seo.score !== null && seo.score - score >= 15 ? seo.score - s
 const SITE_REPORT = PRODUCTS.find((x) => x.slug === 'site-report');
 const restN = rest.length;
 const total = restN + (fix ? 1 : 0);
-const mailCta = !fix ? null : restN ? 'Email me the full list' : 'Email me the fix';
+const mailCta = !fix ? null : 'Email me the report';
 const path = (u: string) => { try { return new URL(u).pathname; } catch { return u; } };
 ---
 
@@ -100,17 +100,25 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
     <article class={`report t-${tone(score)}`}>
 
       <header class="card hero">
-        <div class={`tile tile-${tone(score)}`} aria-label={`Grade ${grade}`}>
-          <span class="tile-letter">{grade}</span>
-          <span class="tile-score">{score}/100</span>
-        </div>
+        {/*
+          Кольцо, а не буква. Буква «A» сама по себе ничего не объясняла: владелец спросил прямо,
+          что это такое. Кольцо показывает и число, и какую часть круга оно занимает, то есть
+          объясняет себя без подписи. Буква осталась в строке ниже, где рядом сказано, к чему она.
+        */}
+        <svg class={`ring r-${tone(score)}`} viewBox="0 0 148 148" width="148" height="148" role="img" aria-label=`${score} of 100, grade ${grade}`>
+          <circle cx="74" cy="74" r="58" fill="none" stroke="#ECE9E2" stroke-width="12" />
+          <circle cx="74" cy="74" r="58" fill="none" stroke="currentColor" stroke-width="12" stroke-linecap="round"
+                  stroke-dasharray="364.4" stroke-dashoffset={(364.4 * (1 - score / 100)).toFixed(1)} transform="rotate(-90 74 74)" />
+          <text class="ring-num" x="74" y="80" text-anchor="middle">{score}</text>
+          <text class="ring-of" x="74" y="101" text-anchor="middle">OF 100</text>
+        </svg>
         <div class="hero-body">
           <p class="eyebrow">AI visibility check · {when}{p.ms ? ` · ${(p.ms / 1000).toFixed(1)} s` : ''}</p>
           <h1>{stored.domain}</h1>
           <p class="twin">
-            <span class="twin-item"><span class="twin-k">AI visibility</span> <b class={`twin-g g-${tone(score)}`}>{grade}</b> <span class="twin-n">{score}/100</span></span>
+            <span class={`twin-item p-${tone(score)}`}><span class="twin-k">AI visibility</span> <b class={`twin-g g-${tone(score)}`}>{grade}</b> <span class="twin-n">{score}/100</span></span>
             {seo && seo.score !== null && (
-              <span class="twin-item"><span class="twin-k">SEO basics</span> <b class={`twin-g g-${tone(seo.score)}`}>{seo.score >= 80 ? 'A' : seo.score >= 65 ? 'B' : seo.score >= 45 ? 'C' : 'D'}</b> <span class="twin-n">{seo.score}/100</span></span>
+              <span class={`twin-item p-${tone(seo.score)}`}><span class="twin-k">SEO basics</span> <b class={`twin-g g-${tone(seo.score)}`}>{seo.score >= 80 ? 'A' : seo.score >= 65 ? 'B' : seo.score >= 45 ? 'C' : 'D'}</b> <span class="twin-n">{seo.score}/100</span></span>
             )}
           </p>
           {gap > 0 && (
@@ -236,7 +244,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
             <div class="row">
               <label class="sr" for="pdf-email">Email</label>
               <input id="pdf-email" name="email" type="email" required autocomplete="email" placeholder="you@company.com" />
-              <button type="submit" class="btn btn-main" id="pdf-btn">{restN ? 'Email me the full list' : 'Email me the fix'}</button>
+              <button type="submit" class="btn btn-main" id="pdf-btn">{'Email me the report'}</button>
             </div>
             <label class="consent"><input type="checkbox" id="pdf-consent" name="consent" required /> I agree to receive the report and follow-up emails about it. One click unsubscribes.</label>
             <div class="hp" aria-hidden="true"><label for="website">Website</label><input id="website" name="website" tabindex="-1" autocomplete="off" /></div>
@@ -321,7 +329,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
   {total > 0 && SITE_REPORT && (
     <div id="bar" class="scorebar" hidden aria-label="Buy the fix list">
       <div class="sb-in">
-        <span class={`sb-tile tile-${tone(score)}`}>{grade}</span>
+        <span class={`sb-tile tile-${tone(score)}`}>{score}</span>
         <span class="sb-two">
           <b>{total > 1 ? `All ${total} fixes as tasks you can hand over` : 'Every fix as a task you can hand over'}</b>
           <span>A full detailed report, the findings explained, and concrete tasks to fix them</span>
@@ -457,17 +465,25 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
   .note { margin: 1rem 0 0; font-size: .875rem; line-height: 1.55; color: var(--muted); }
 
   .hero { display: grid; grid-template-columns: 148px 1fr; gap: 1.6rem; align-items: start; padding: 1.8rem; }
-  .tile { display: grid; place-items: center; align-content: center; gap: .1rem; width: 148px; height: 148px; border-radius: 22px; color: #fff; box-shadow: 0 12px 30px rgba(11,16,23,.14); }
-  .tile-letter { font-family: var(--fd); font-size: 4.6rem; line-height: 1; font-weight: 600; }
-  .tile-score { font-family: var(--fm); font-size: 12px; letter-spacing: .06em; opacity: .92; }
+  .ring { flex: none; color: var(--good); }
+  .ring.r-fair { color: var(--fair-fill); }
+  .ring.r-poor { color: var(--poor-fill); }
+  .ring.r-none { color: var(--none); }
+  .ring-num { font-family: var(--fd); font-size: 42px; font-weight: 600; fill: #0B1017; }
+  .ring-of { font-family: var(--fm); font-size: 11px; letter-spacing: 1px; fill: var(--muted); }
   .tile-good { background: linear-gradient(160deg, #22a595, #1A8A7D); }
   .tile-fair { background: linear-gradient(160deg, #F0C25A, #D9A030); }
   .tile-poor { background: linear-gradient(160deg, #E07A5F, #C4553D); }
   .tile-none { background: var(--none); }
   .eyebrow { font-family: var(--fm); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 .4rem; }
   h1 { font-family: var(--fd); font-size: clamp(1.8rem, 4.5vw, 2.6rem); line-height: 1.05; margin: 0 0 .8rem; color: #0B1017; word-break: break-word; }
-  .twin { display: flex; flex-wrap: wrap; gap: .5rem 1.6rem; margin: 0 0 .9rem; font-family: var(--fm); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
-  .twin-item { display: inline-flex; align-items: baseline; gap: .45rem; }
+  /* Каждое число на своей подложке: строка сливалась с остальными, и было непонятно,
+     что это вообще такое. Цвет подложки идёт по значению, тем же правилом, что и всё на странице. */
+  .twin { display: flex; flex-wrap: wrap; gap: .5rem .7rem; margin: 0 0 .9rem; font-family: var(--fm); font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .twin-item { display: inline-flex; align-items: baseline; gap: .45rem; padding: .4rem .85rem; border-radius: 999px; background: var(--good-bg); }
+  .twin-item.p-fair { background: var(--fair-bg); }
+  .twin-item.p-poor { background: var(--poor-bg); }
+  .twin-item.p-none { background: #EEEFF1; }
   .twin-g { font-family: var(--fd); font-size: 1.3rem; letter-spacing: 0; }
   .twin-n { color: var(--ink-2); }
   .g-good { color: var(--good); } .g-fair { color: var(--fair); } .g-poor { color: var(--poor); }
@@ -579,7 +595,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
   .scorebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(255,255,255,.96); backdrop-filter: blur(8px); border-top: 1px solid var(--line); box-shadow: 0 -8px 24px rgba(11,16,23,.08); }
   .scorebar[hidden] { display: none; }
   .sb-in { max-width: 960px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
-  .sb-tile { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 10px; color: #fff; font-family: var(--fd); font-size: 1.2rem; font-weight: 600; flex: none; }
+  .sb-tile { display: grid; place-items: center; width: 40px; height: 36px; border-radius: 10px; color: #fff; font-family: var(--fd); font-size: 1.05rem; font-weight: 600; flex: none; font-variant-numeric: tabular-nums; }
   .sb-two { display: grid; gap: 1px; min-width: 0; flex: 1; }
   .buy-short { display: none; }
   .sb-two b { font-size: 14px; font-weight: 600; color: #0B1017; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -599,8 +615,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
     .buy-long { display: none; }
     .buy-short { display: inline; }
     .hero { grid-template-columns: 1fr; padding: 1.3rem; }
-    .tile { width: 112px; height: 112px; border-radius: 18px; }
-    .tile-letter { font-size: 3.4rem; }
+    .ring { width: 112px; height: 112px; }
     .card { padding: 1.1rem 1.1rem; }
     .seo { grid-template-columns: 1fr; }
   }
