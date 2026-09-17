@@ -35,7 +35,8 @@
     "@operstack/audit": "^0.26.0",
     "astro": "6.0.8",
     "google-auth-library": "^10.9.1",
-    "nodemailer": "^10.0.3"
+    "nodemailer": "^10.0.3",
+    "sharp": "^0.34.4"
   },
   "devDependencies": {
     "playwright-core": "^1.63.0"

@@ -3,12 +3,15 @@
  * Постоянный адрес одной проверки.
  *
  * Простым языком. Раньше результат жил во вкладке и умирал вместе с ней. Теперь у него есть адрес:
- * его кладут в закладки, пересылают разработчику и открывают через неделю, чтобы сравнить. Здесь
- * же владелец берёт код значка для своего сайта.
+ * его кладут в закладки, пересылают разработчику и открывают через неделю, чтобы сравнить.
+ *
+ * Здесь лежит ВЕСЬ сохранённый отчёт, а не один балл. До 17.09.2026 страница показывала балл,
+ * букву и код значка, хотя в базе рядом лежали пять областей с находками, первая правка целиком,
+ * десять прочитанных страниц и четырнадцать роботов. Человек открывал ссылку и не понимал, что
+ * ему прислали.
  *
  * Страница закрыта от индексации намеренно: это чужие сайты и их баллы, им незачем всплывать в
- * поиске по чужому имени. Лента последних проверок на /checks/ показывает только домен и балл,
- * и только по одному, самому свежему результату на домен.
+ * поиске по чужому имени.
  */
 import CommercialLayout from '../../components/CommercialLayout.astro';
 import { loadCheck, latestForDomain } from '../../lib/check-store';
@@ -26,54 +29,204 @@ const current = await latestForDomain(stored.domain);
  * дал 89» на странице, где и так 89.
  */
 const moved = current && current.id !== stored.id && current.score !== stored.score ? current : null;
+
 const p: any = stored.payload || {};
+const areas: any[] = Array.isArray(p.areas) ? p.areas : [];
+const rest: any[] = Array.isArray(p.rest) ? p.rest : [];
+const sample: any[] = Array.isArray(p.sample) ? p.sample : [];
+const crawlers: any[] = Array.isArray(p.crawlers) ? p.crawlers : [];
+const sitemap: any = p.sitemap || {};
+const fix: any = p.firstFix || null;
+
 const when = new Date(stored.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
 /*
- * Адрес значка со слешем на конце, а не с .svg. У сайта включено trailingSlash: 'always', при
- * котором адрес с расширением не находится вовсе: 17.09.2026 значок так и отдавал 404 на боевом.
- * Правило перезаписи в настройке Vercel не сработало, а гадать дальше дороже, чем взять рабочее.
- * Картинке расширение не нужно: браузер смотрит на content-type, а мы отдаём image/svg+xml.
+ * Адрес значка и карточки со слешем на конце, а не с расширением. У сайта включено
+ * trailingSlash: 'always', при котором адрес с расширением не находится вовсе: 17.09.2026 значок
+ * так и отдавал 404 на боевом. Картинке расширение не нужно: браузер смотрит на content-type.
  */
 const badgeUrl = `${SITE.url}/badge/${stored.id}/`;
+const cardUrl = `${SITE.url}/card/${stored.id}/`;
 const pageUrl = `${SITE.url}/result/${stored.id}/`;
-const grade = stored.score >= 80 ? 'A' : stored.score >= 65 ? 'B' : stored.score >= 45 ? 'C' : 'D';
+const grade = String(p.grade || (stored.score >= 80 ? 'A' : stored.score >= 65 ? 'B' : stored.score >= 45 ? 'C' : 'D'));
+
+const blocked = crawlers.filter((c) => c.verdict === 'blocked').length;
+const searchBlocked = crawlers.filter((c) => c.kind === 'search' && c.verdict === 'blocked').length;
+const problems = areas.reduce((n, a) => n + (a.problems || 0), 0);
+const passes = areas.reduce((n, a) => n + (a.findings || []).filter((f: any) => f.level === 'pass').length, 0);
+
+const R = 52, CIRC = 2 * Math.PI * R;
+const tone = stored.score >= 80 ? 'good' : stored.score >= 55 ? 'mid' : 'low';
+const path = (u: string) => { try { return new URL(u).pathname; } catch { return u; } };
 ---
 
 <CommercialLayout
   title={`${stored.domain} scored ${stored.score}/100 on AI visibility`}
   description={`How ${stored.domain} reads to ChatGPT, Perplexity, Claude, Copilot and Gemini, measured ${when} on public signals only.`}
   canonical={pageUrl}
+  ogImage={`${cardUrl}?png=1`}
   noindex={true}
 >
-  <div class="wrap">
-    <p class="eyebrow">AI visibility check · {when}</p>
-    <h1>{stored.domain} scored {stored.score} of 100</h1>
-    <p class="grade">Grade {grade}</p>
+  <article class={`report t-${tone}`}>
 
-    {moved && (
-      <p class="moved">
-        This is the run from {when}, when it scored {stored.score}. Checked again since:
-        <a href={`/result/${moved.id}/`}>now {moved.score}</a>.
-      </p>
+    <header class="head">
+      <p class="eyebrow">AI visibility check · {when}</p>
+      <h1>{stored.domain}</h1>
+
+      <div class="score">
+        <svg class="ring" viewBox="0 0 120 120" width="120" height="120" aria-hidden="true">
+          <circle cx="60" cy="60" r={R} fill="none" stroke="rgba(255,255,255,.1)" stroke-width="10" />
+          <circle cx="60" cy="60" r={R} fill="none" stroke="currentColor" stroke-width="10" stroke-linecap="round"
+                  stroke-dasharray={CIRC.toFixed(1)} stroke-dashoffset={(CIRC * (1 - stored.score / 100)).toFixed(1)}
+                  transform="rotate(-90 60 60)" />
+        </svg>
+        <div class="score-text">
+          <p class="num">{stored.score}<span>/100</span></p>
+          <p class="letter">Grade {grade}</p>
+          <p class="sum">{passes} checks passed, {problems} {problems === 1 ? 'thing' : 'things'} to fix</p>
+        </div>
+      </div>
+
+      {moved && (
+        <p class="moved">
+          This is the run from {when}, when it scored {stored.score}.
+          <a href={`/result/${moved.id}/`}>Checked again since: now {moved.score}</a>.
+        </p>
+      )}
+    </header>
+
+    <section class="facts">
+      <h2>What was read</h2>
+      <dl>
+        <div><dt>Pages read</dt><dd>{sample.length}{sitemap.found ? ` of ${sitemap.count} in the sitemap` : ''}</dd></div>
+        <div><dt>Sitemap</dt><dd>{sitemap.found ? `${sitemap.count} URLs${sitemap.lastmod ? ', dated' : ', no dates'}` : sitemap.unchecked ? 'did not answer in time' : 'not found'}</dd></div>
+        <div><dt>Crawlers asked about</dt><dd>{crawlers.length}{blocked ? `, ${blocked} blocked` : ', none blocked'}</dd></div>
+        <div><dt>Measured</dt><dd>{when}{p.ms ? ` in ${(p.ms / 1000).toFixed(1)} s` : ''}</dd></div>
+      </dl>
+      {searchBlocked > 0 && (
+        <p class="alarm">{searchBlocked} of the crawlers that fetch pages to cite them are turned away in robots.txt. Those are the bots that put a site into an answer.</p>
+      )}
+    </section>
+
+    <section class="areas">
+      <h2>The five areas</h2>
+      {areas.map((a: any) => (
+        <div class="area">
+          <div class="area-head">
+            <span class="area-name">{a.label}<em>worth {a.max} points</em></span>
+            <span class="area-score">{a.score}<span class="of">/{a.max}</span></span>
+          </div>
+          <div class="bar"><i style={`width:${a.max ? Math.round((a.score / a.max) * 100) : 0}%`}></i></div>
+          <ul>
+            {(a.findings || []).filter((f: any) => f.level === 'pass').map((f: any) => (
+              <li class="f-pass"><span class="chip">Pass</span><span>{f.text}</span></li>
+            ))}
+            {a.problems > 0 && (
+              <li class="f-more"><span class="chip">To fix</span><span>{a.problems} {a.problems === 1 ? 'thing' : 'things'} in this area, listed below</span></li>
+            )}
+          </ul>
+        </div>
+      ))}
+    </section>
+
+    {fix && (
+      <section class="fix">
+        <h2>The first fix, written out</h2>
+        <p class="fix-area">{fix.area}</p>
+        <dl class="fix-parts">
+          <dt>{fix.labels?.now || 'Now'}</dt><dd>{fix.now}</dd>
+          <dt>{fix.labels?.task || 'Task'}</dt><dd>{fix.task}</dd>
+          <dt>{fix.labels?.verify || 'How to check'}</dt><dd>{fix.verify}</dd>
+        </dl>
+        <p class="fix-note">Hand this to whoever runs the site. It is written so it can be done without asking us anything.</p>
+      </section>
     )}
 
-    {p.headline && <p class="lede">{p.headline}</p>}
+    {rest.length > 0 && (
+      <section class="rest">
+        <h2>{rest.length === 1 ? 'One more finding' : `The other ${rest.length} findings`}</h2>
+        <ul class="rest-list">
+          {rest.map((x: any) => (
+            <li class={`r-${x.level}`}>
+              <span class="chip">{x.level === 'warn' ? 'Partial' : 'Problem'}</span>
+              <span class="r-area">{x.area}:</span>
+              <span class="smudge">{x.teaser}</span>
+            </li>
+          ))}
+        </ul>
+        <p class="rest-note">The list is real and this is its length. The wording of each one comes with the full report, written the same way as the fix above.</p>
+        <a class="btn btn-main" href="/products/site-report/">Every fix for your site, as a list you can hand over</a>
+      </section>
+    )}
+
+    {sample.length > 0 && (
+      <section class="tables">
+        <h2>The pages we read</h2>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Page</th><th>Words</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr></thead>
+            <tbody>
+              {sample.map((s: any) => (
+                <tr>
+                  <td class="cell-url"><a href={s.url} rel="nofollow noopener" target="_blank">{path(s.url)}</a></td>
+                  <td class="num-cell">{s.words}</td>
+                  <td class={s.answerFirst ? 'ok' : 'bad'}>{s.answerFirst ? 'yes' : 'no'}</td>
+                  <td class={s.dated ? 'ok' : 'bad'}>{s.dated ? 'yes' : 'no'}</td>
+                  <td>{(s.schema || []).join(', ') || 'none'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+        <p class="t-note">Other checks read one page. This one read {sample.length}.</p>
+      </section>
+    )}
+
+    {crawlers.length > 0 && (
+      <section class="tables">
+        <h2>The crawlers we asked about</h2>
+        <div class="scroll">
+          <table>
+            <thead><tr><th>Crawler</th><th>What it does</th><th>robots.txt</th></tr></thead>
+            <tbody>
+              {crawlers.map((c: any) => (
+                <tr>
+                  <td>{c.label}</td>
+                  <td class="muted-cell">{c.kind === 'search' ? 'fetches pages to cite them' : 'collects text for training'}</td>
+                  <td class={c.verdict === 'blocked' ? 'bad' : 'ok'}>{c.verdict === 'blocked' ? 'turned away' : 'let in'}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    )}
+
+    <section class="share">
+      <h2>The picture</h2>
+      <p class="share-lede">This is the card for this result. Save it and post it, or paste the link anywhere and it shows up on its own.</p>
+      <div class="card-stage">
+        <img src={`/card/${stored.id}/`} alt={`${stored.domain} scored ${stored.score} of 100 on AI visibility`} width="1200" height="630" />
+      </div>
+      <div class="btn-row">
+        <button type="button" class="btn btn-main" id="dl" data-card={`/card/${stored.id}/`} data-name={`${stored.domain}-ai-visibility.png`}>Download the picture</button>
+        <button type="button" class="btn" data-copy={pageUrl}>Copy the link</button>
+        <a class="btn" rel="noopener" target="_blank"
+           href={`https://x.com/intent/tweet?text=${encodeURIComponent(`${stored.domain} scores ${stored.score}/100 on AI visibility`)}&url=${encodeURIComponent(pageUrl)}`}>Share on X</a>
+      </div>
+    </section>
 
     <section class="embed">
       <h2>Put the score on your site</h2>
-      <p class="embed-lede">The image updates itself: check the site again and it shows the new number, with nothing to change on your page.</p>
-
+      <p class="embed-lede">A small badge that updates itself: check the site again and it shows the new number, with nothing to change on your page.</p>
       <div class="badge-stage">
         <img src={`/badge/${stored.id}/`} alt={`AI visibility score for ${stored.domain}`} width="180" height="28" />
       </div>
-
-      <div class="copy-row">
-        <button type="button" class="btn btn-main" data-copy={`<a href="${pageUrl}"><img src="${badgeUrl}" alt="AI visibility score for ${stored.domain}" /></a>`}>Copy the code for your site</button>
+      <div class="btn-row">
+        <button type="button" class="btn btn-main" data-copy={`<a href="${pageUrl}"><img src="${badgeUrl}" alt="AI visibility score for ${stored.domain}" /></a>`}>Copy the code</button>
         <button type="button" class="btn" data-copy={badgeUrl}>Copy the image address</button>
       </div>
-
       <details class="code">
-        <summary>Show the full code</summary>
+        <summary>Show the code</summary>
         <label for="embed-html">HTML</label>
         <textarea id="embed-html" readonly rows="3">{`<a href="${pageUrl}"><img src="${badgeUrl}" alt="AI visibility score for ${stored.domain}" /></a>`}</textarea>
         <label for="embed-md">Markdown</label>
@@ -81,20 +234,11 @@ const grade = stored.score >= 80 ? 'A' : stored.score >= 65 ? 'B' : stored.score
       </details>
     </section>
 
-    <section class="share">
-      <h2>Share it</h2>
-      <p class="share-row">
-        <button type="button" class="btn" data-copy={pageUrl}>Copy the link</button>
-        <a class="btn" rel="noopener" target="_blank"
-           href={`https://x.com/intent/tweet?text=${encodeURIComponent(`${stored.domain} scores ${stored.score}/100 on AI visibility`)}&url=${encodeURIComponent(pageUrl)}`}>Share on X</a>
-      </p>
-      <p class="share-more"><a href="/ai-visibility/">Check another site</a></p>
-    </section>
-
-    <p class="note">
-      Public signals only, measured {when}. This page is not indexed: it holds someone else's site and someone else's score.
-    </p>
-  </div>
+    <footer class="foot">
+      <a class="btn" href="/ai-visibility/">Check another site</a>
+      <p class="note">Public signals only, measured {when}. Nothing here was guessed: every line comes from a page, a file or a header that anyone can fetch. This page is not indexed, because it holds someone else's site and someone else's score.</p>
+    </footer>
+  </article>
 </CommercialLayout>
 
 <script>
@@ -107,28 +251,144 @@ const grade = stored.score >= 80 ? 'A' : stored.score >= 65 ? 'B' : stored.score
       setTimeout(() => { b.textContent = was; }, 1600);
     });
   });
+
+  /*
+   * Скачивание картинки. Карточка нарисована в SVG, а в сторис и в пост загружают PNG, поэтому
+   * перерисовываем её в холст прямо в браузере и отдаём файлом. Ничего не считает сервер, и
+   * размер берём вдвое больше, чтобы картинка не мылилась на телефоне.
+   */
+  const dl = document.getElementById('dl') as HTMLButtonElement | null;
+  dl?.addEventListener('click', async () => {
+    const was = dl.textContent;
+    dl.disabled = true; dl.textContent = 'Drawing…';
+    try {
+      const svg = await fetch(dl.dataset.card || '').then((r) => r.text());
+      const blob = new Blob([svg], { type: 'image/svg+xml;charset=utf-8' });
+      const src = URL.createObjectURL(blob);
+      const img = new Image();
+      await new Promise((ok, no) => { img.onload = ok; img.onerror = no; img.src = src; });
+      const c = document.createElement('canvas');
+      c.width = 2400; c.height = 1260;
+      c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(src);
+      const png = await new Promise<Blob | null>((ok) => c.toBlob(ok, 'image/png'));
+      if (!png) throw new Error('no blob');
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(png);
+      a.download = dl.dataset.name || 'ai-visibility.png';
+      a.click();
+      setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+      dl.textContent = 'Saved';
+    } catch {
+      // Холст не сработал: отдаём саму картинку, её всё равно можно сохранить из вкладки.
+      window.open(dl.dataset.card || '', '_blank', 'noopener');
+      dl.textContent = was;
+    }
+    dl.disabled = false;
+    setTimeout(() => { dl.textContent = was; }, 2000);
+  });
 </script>
 
 <style>
-  .wrap { max-width: 780px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
-  .eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; margin: 0 0 0.5rem; }
-  h1 { margin: 0 0 0.3rem; line-height: 1.15; }
-  .grade { margin: 0 0 1.25rem; font-weight: 600; opacity: 0.8; }
-  .lede { font-size: 1.05rem; line-height: 1.55; }
-  .moved { padding: 0.75rem 1rem; border-radius: 10px; background: color-mix(in srgb, currentColor 7%, transparent); }
-  section { margin-top: 2.5rem; }
-  h2 { font-size: 1.15rem; margin: 0 0 0.5rem; }
-  label { display: block; margin: 0.9rem 0 0.25rem; font-size: 0.8rem; opacity: 0.7; }
-  textarea { width: 100%; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; padding: 0.6rem; border-radius: 8px; border: 1px solid var(--color-border, rgba(255,255,255,0.15)); background: transparent; color: inherit; resize: vertical; }
-  .embed-lede { margin: 0 0 1.25rem; }
-  .badge-stage { display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; border-radius: 12px; background: color-mix(in srgb, currentColor 5%, transparent); border: 1px solid var(--color-border, rgba(255,255,255,0.1)); }
+  .report { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
+  .report.t-good { color: var(--teal-soft); }
+  .report.t-mid { color: var(--amber-soft); }
+  .report.t-low { color: #e07a5f; }
+
+  .head { border-bottom: 1px solid rgba(255,255,255,.1); padding-bottom: 1.75rem; }
+  .eyebrow { font-family: var(--fm); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin: 0 0 .6rem; }
+  h1 { font-family: var(--fd); font-size: clamp(1.9rem, 5vw, 2.8rem); line-height: 1.1; margin: 0 0 1.5rem; color: var(--paper); word-break: break-word; }
+
+  .score { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+  .ring { flex-shrink: 0; }
+  .score-text { display: grid; gap: .15rem; }
+  .num { font-family: var(--fd); font-size: 2.6rem; line-height: 1; color: var(--paper); margin: 0; }
+  .num span { font-size: 1.1rem; color: var(--muted); }
+  .letter { font-family: var(--fm); font-size: 13px; letter-spacing: .1em; text-transform: uppercase; margin: .3rem 0 0; }
+  .sum { color: rgba(245,242,236,.7); font-size: .95rem; margin: .15rem 0 0; }
+
+  .moved { margin: 1.5rem 0 0; padding: .75rem 1rem; border-radius: 10px; background: rgba(255,255,255,.05); color: rgba(245,242,236,.85); font-size: .95rem; }
+
+  section { margin-top: 2.75rem; }
+  h2 { font-family: var(--fd); font-size: 1.35rem; color: var(--paper); margin: 0 0 1rem; }
+
+  .facts dl { display: grid; gap: 0; margin: 0; }
+  .facts dl > div { display: flex; justify-content: space-between; gap: 1rem; padding: .6rem 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+  .facts dt { color: var(--muted); font-size: .95rem; }
+  .facts dd { margin: 0; color: var(--paper); font-size: .95rem; text-align: right; font-variant-numeric: tabular-nums; }
+  .alarm { margin: 1rem 0 0; padding: .8rem 1rem; border-radius: 10px; border: 1px solid rgba(224,122,95,.4); background: rgba(224,122,95,.08); color: rgba(245,242,236,.9); font-size: .95rem; }
+
+  .areas { display: grid; gap: 0; }
+  .area { padding: 1.1rem 0; border-bottom: 1px solid rgba(255,255,255,.07); }
+  .area-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin-bottom: .6rem; }
+  .area-name { color: var(--paper); font-weight: 600; }
+  .area-name em { display: block; font-style: normal; font-family: var(--fm); font-size: 10.5px; letter-spacing: .07em; text-transform: uppercase; color: var(--muted); font-weight: 400; margin-top: .2rem; }
+  .area-score { font-family: var(--fd); font-size: 1.5rem; color: var(--paper); font-variant-numeric: tabular-nums; flex-shrink: 0; }
+  .area-score .of { font-size: .85rem; color: var(--muted); }
+  .bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-bottom: .8rem; }
+  .bar i { display: block; height: 100%; background: currentColor; }
+  .area ul { list-style: none; margin: 0; padding: 0; display: grid; gap: .45rem; }
+  .area li { display: flex; gap: .65rem; align-items: flex-start; font-size: .9rem; line-height: 1.5; color: rgba(245,242,236,.82); }
+  .chip { flex-shrink: 0; font-family: var(--fm); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 7px; border-radius: 999px; border: 1px solid currentColor; margin-top: 3px; }
+  .f-pass .chip { color: var(--teal-soft); }
+  .f-more { color: var(--muted); }
+  .f-more .chip { color: var(--amber-soft); }
+
+  .fix { padding: 1.4rem 1.5rem; border-radius: 14px; border: 1px solid rgba(232,184,74,.35); background: rgba(232,184,74,.06); }
+  .fix h2 { margin-bottom: .4rem; }
+  .fix-area { font-family: var(--fm); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); margin: 0 0 1rem; }
+  .fix-parts { margin: 0; display: grid; gap: .2rem; }
+  .fix-parts dt { font-family: var(--fm); font-size: 10.5px; letter-spacing: .09em; text-transform: uppercase; color: var(--amber-soft); margin-top: .9rem; }
+  .fix-parts dt:first-of-type { margin-top: 0; }
+  .fix-parts dd { margin: 0; color: rgba(245,242,236,.92); line-height: 1.55; }
+  .fix-note { margin: 1.2rem 0 0; font-size: .9rem; color: var(--muted); }
+
+  .rest { padding: 1.4rem 1.5rem; border-radius: 14px; border: 1px dashed rgba(61,184,169,.45); background: rgba(26,138,125,.07); }
+  .rest-list { list-style: none; margin: 0 0 1rem; padding: 0; display: grid; gap: .5rem; }
+  .rest-list li { display: flex; gap: .65rem; align-items: flex-start; font-size: .9rem; line-height: 1.5; color: rgba(245,242,236,.85); flex-wrap: wrap; }
+  .rest-list .r-warn .chip { color: var(--amber-soft); }
+  .rest-list .r-fail .chip { color: #e07a5f; }
+  .r-area { color: rgba(245,242,236,.7); }
+  /* Размытый текст. Заголовки приходят с сервера уже обрезанными до четырёх слов, поэтому
+     размытие показывает длину и форму списка, а не прячет то, что уже уехало в браузер. */
+  .smudge { filter: blur(4.5px); user-select: none; -webkit-user-select: none; }
+  .rest-note { margin: 0 0 1rem; font-size: .9rem; color: var(--muted); }
+
+  .scroll { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: .85rem; }
+  th { text-align: left; font-family: var(--fm); font-size: 9.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: .5rem .6rem; border-bottom: 1px solid rgba(255,255,255,.14); white-space: nowrap; }
+  td { padding: .5rem .6rem; border-bottom: 1px solid rgba(255,255,255,.06); color: rgba(245,242,236,.85); white-space: nowrap; }
+  .cell-url { max-width: 22rem; overflow: hidden; text-overflow: ellipsis; }
+  .cell-url a { color: var(--teal-soft); text-decoration: none; }
+  .cell-url a:hover { text-decoration: underline; }
+  .num-cell { font-variant-numeric: tabular-nums; }
+  .muted-cell { color: var(--muted); white-space: normal; }
+  td.ok { color: var(--teal-soft); }
+  td.bad { color: #e07a5f; }
+  .t-note { margin: .9rem 0 0; font-size: .9rem; color: var(--muted); }
+
+  .share-lede, .embed-lede { margin: 0 0 1.1rem; color: rgba(245,242,236,.8); }
+  .card-stage { padding: 1.25rem; border-radius: 16px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.1); line-height: 0; }
+  .card-stage img { width: 100%; height: auto; display: block; border-radius: 8px; box-shadow: 0 14px 40px rgba(0,0,0,.45); }
+  .badge-stage { display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); }
   .badge-stage img { width: 180px; height: 28px; }
-  .copy-row { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 1rem; }
-  .btn-main { border-color: currentColor; font-weight: 600; }
+
+  .btn-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.1rem; }
+  .btn { display: inline-block; cursor: pointer; background: transparent; color: var(--paper); font: inherit; font-size: .95rem; padding: .6rem 1.1rem; border-radius: 9px; border: 1px solid rgba(255,255,255,.22); text-decoration: none; }
+  .btn:hover { border-color: rgba(255,255,255,.45); }
+  .btn-main { border-color: currentColor; color: currentColor; font-weight: 600; }
+  .btn[disabled] { opacity: .6; cursor: default; }
+
   .code { margin-top: 1.25rem; }
-  .code summary { cursor: pointer; font-size: 0.875rem; opacity: 0.75; }
-  .share-row { display: flex; flex-wrap: wrap; gap: 0.6rem; }
-  .share-more { margin-top: 0.9rem; font-size: 0.9rem; }
-  .btn { display: inline-block; cursor: pointer; background: transparent; color: inherit; font: inherit; padding: 0.55rem 1rem; border-radius: 8px; border: 1px solid var(--color-border, rgba(255,255,255,0.2)); text-decoration: none; margin-right: 0.5rem; }
-  .note { margin-top: 2.5rem; font-size: 0.85rem; opacity: 0.65; }
+  .code summary { cursor: pointer; font-size: .875rem; color: var(--teal-soft); }
+  label { display: block; margin: .9rem 0 .25rem; font-size: .8rem; color: var(--muted); }
+  textarea { width: 100%; font-family: var(--fm); font-size: .8rem; padding: .6rem; border-radius: 8px; border: 1px solid rgba(255,255,255,.15); background: transparent; color: var(--paper); resize: vertical; }
+
+  .foot { margin-top: 3rem; padding-top: 1.75rem; border-top: 1px solid rgba(255,255,255,.1); }
+  .note { margin: 1.25rem 0 0; font-size: .85rem; line-height: 1.6; color: var(--muted); }
+
+  @media (max-width: 600px) {
+    .fix, .rest { padding: 1.1rem 1.1rem; }
+    .num { font-size: 2.2rem; }
+  }
 </style>
