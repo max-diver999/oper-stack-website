@@ -3,11 +3,25 @@ import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import ownScore from '../../data/own-score.json';
 import FaqSection from '../../components/FaqSection.astro';
+import StatCards from '../../components/StatCards.astro';
+import Quote from '../../components/Quote.astro';
 import { SITE } from '../../data/site';
 
 const canonical = `${SITE.url}/ai-visibility/`;
+
+/*
+ * Числа, на которых стоят наши правила. Каждое проверено по первоисточнику 17.09.2026, а не взято
+ * из пересказа: в моей собственной записи стояли +37% и +22%, а в самой работе +32% и +41%.
+ * Источник у каждого числа обязателен на уровне компонента: без него карточка не рисуется.
+ */
+const RULE_STATS = [
+  { value: '+41%', label: 'More often a page is picked up when it carries a quote with the speaker named', source: 'Aggarwal et al., GEO, KDD 2024', href: 'https://arxiv.org/abs/2311.09735', window: 'Position-Adjusted Word Count' },
+  { value: '+32%', label: 'What a concrete figure adds, instead of a general claim', source: 'Aggarwal et al., GEO, KDD 2024', href: 'https://arxiv.org/abs/2311.09735', window: 'same metric' },
+  { value: '44.2%', label: 'Share of ChatGPT citations taken from the first third of a page', source: 'Kevin Indig', href: 'https://searchengineland.com/chatgpt-citations-content-study-469483', window: '1.2M answers, 18,012 citations' },
+];
+
 const FAQ = [
-  { question: 'What does the check look at?', answer: 'Five things an answer engine needs before it can cite a site: whether its crawlers are allowed in robots.txt, whether there is an llms.txt map, whether schema names the entity, whether the sampled pages open with a quotable answer and carry tables, and whether pages expose dates and name sources. It reads the homepage, robots.txt, llms.txt, the sitemap and up to three pages.' },
+  { question: 'What does the check look at?', answer: 'Five things an answer engine needs before it can cite a site: whether its crawlers are allowed in robots.txt, whether there is an llms.txt map, whether schema names the entity, whether the sampled pages open with a quotable answer and carry tables, and whether pages expose dates and name sources. It reads the homepage, robots.txt, llms.txt, the sitemap and ten pages.' },
   { question: 'Does it measure traffic from ChatGPT or Perplexity?', answer: 'No. Traffic lives in your analytics. This check measures whether the site is readable and quotable in the first place, which is the part you control. The OperStack plugin for Claude Code has an ai-visibility command that reads the GA4 side.' },
   { question: 'Is anything stored?', answer: 'We keep a line for each check: the address checked, the score, and which link brought you here. We do not keep your IP address, and we do not sell or share any of it. Your email is kept only if you leave it to get the fix, and every email we send has one-click unsubscribe.' },
   { question: 'Why did my site score low on content when the pages are long?', answer: 'Length is not the signal. The check looks for an answer-first paragraph of 20 to 90 words with a figure right after the H1, at least three H2 sections and a table. Long pages that bury the answer score low because engines quote the opening, not the middle.' },
@@ -61,6 +75,26 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       page, three screens below the score, and almost nobody reached it.
     -->
     <section id="vis-more" class="result" hidden></section>
+    <!--
+      Липкая полоса с баллом.
+
+      Простым языком. Отчёт длинный, и человек, который до него дочитал, уносит с собой только
+      ощущение. Полоса держит перед глазами его число и следующий шаг всё время, пока он читает
+      находки. Появляется она только после проверки и только когда сам результат уехал вверх, и
+      прячется, когда нужная кнопка и так на экране: две одинаковые кнопки рядом это шум.
+    -->
+    <div id="vis-bar" class="scorebar" hidden aria-label="Your score">
+      <div class="sb-in">
+        <svg class="sb-ring" viewBox="0 0 26 26" width="26" height="26" aria-hidden="true">
+          <circle cx="13" cy="13" r="10" fill="none" stroke="rgba(255,255,255,.16)" stroke-width="3"/>
+          <circle id="sb-arc" cx="13" cy="13" r="10" fill="none" stroke="var(--teal-soft)" stroke-width="3" stroke-linecap="round"
+                  stroke-dasharray="62.8" stroke-dashoffset="62.8" transform="rotate(-90 13 13)"/>
+        </svg>
+        <span class="sb-txt"><b id="sb-score"></b><span id="sb-host"></span></span>
+        <a class="btn" id="sb-cta" href="#vis-capture">Email me the first fix</a>
+      </div>
+    </div>
+
 
     <!-- Врезка стоит сразу под результатом: человек только что увидел свой балл, и это
          самый естественный момент сказать, что то же самое работает у него в рабочем окне.
@@ -74,12 +108,18 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       <p class="note"><a href="/mcp/">Step-by-step setup for each program →</a></p>
     </section>
 
+    <section class="rules-why">
+      <p class="rules-lede">We did not decide on our own what counts. The five areas below come from work where this was measured.</p>
+      <StatCards heading="Where these rules come from" stats={RULE_STATS} />
+      <Quote text="GEO can boost visibility by up to 40% in generative engine responses." author="Aggarwal, Murahari, Rajpurohit, Kalyan, Narasimhan, Deshpande" source="GEO: Generative Engine Optimization, KDD 2024" href="https://arxiv.org/abs/2311.09735" />
+    </section>
+
     <h2>What the check measures</h2>
     <ol class="areas-list">
       <li><strong>Access, 25 points.</strong> robots.txt read per user agent for fourteen AI crawlers and fetchers. A blocked search fetcher costs more than a blocked training crawler, because the fetchers are the bots that cite pages live.</li>
       <li><strong>Agent map, 15 points.</strong> llms.txt exists, is text, and links to the site's own pages rather than a template demo.</li>
       <li><strong>Entity, 20 points.</strong> Organization or business schema, FAQPage, a page-level type (Article, Service, Product, Course and the like), a canonical tag and Open Graph on the homepage.</li>
-      <li><strong>Quotable content, 25 points.</strong> On up to three sampled pages: at least 300 words, an answer-first paragraph with a figure right after the H1, three or more H2 sections, a table.</li>
+      <li><strong>Quotable content, 25 points.</strong> On the ten sampled pages: at least 300 words, an answer-first paragraph with a figure right after the H1, three or more H2 sections, a table.</li>
       <li><strong>Dates and sources, 15 points.</strong> Publication dates in meta or schema, source phrases in the text, a sitemap with lastmod.</li>
     </ol>
 
@@ -107,6 +147,38 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     /** Host of the last run: the confirmation names it. */
     let lastHost = '';
     const out = document.getElementById('vis-result') as HTMLElement;
+
+    /*
+     * Липкая полоса. Показываем только когда результат уже уехал вверх, и прячем, когда кнопка
+     * обмена на почту и так на экране. Слушатель на прокрутку пассивный: полоса не должна
+     * подтормаживать чтение длинного отчёта.
+     */
+    const bar = document.getElementById('vis-bar') as HTMLElement | null;
+    const barArc = document.getElementById('sb-arc') as SVGCircleElement | null;
+    function fillBar(host: string, score: number, hasFix: boolean) {
+      if (!bar || !barArc) return;
+      (document.getElementById('sb-score') as HTMLElement).textContent = `${score}/100`;
+      (document.getElementById('sb-host') as HTMLElement).textContent = host;
+      const circ = 2 * Math.PI * 10;
+      barArc.setAttribute('stroke-dashoffset', String(circ * (1 - score / 100)));
+      barArc.setAttribute('stroke', score >= 80 ? 'var(--teal-soft)' : score >= 45 ? 'var(--amber-soft)' : '#e07a5f');
+      const cta = document.getElementById('sb-cta') as HTMLAnchorElement;
+      // Чинить нечего, значит и письма не будет: ведём туда, где есть что предложить.
+      cta.href = hasFix ? '#vis-capture' : '/products/site-report/';
+      cta.textContent = hasFix ? 'Email me the first fix' : 'Every fix for your site';
+      syncBar();
+    }
+    function syncBar() {
+      if (!bar || out.hidden) return;
+      const res = out.getBoundingClientRect();
+      const cap = capture.hidden ? null : capture.getBoundingClientRect();
+      const past = res.bottom < 0;
+      const ctaOnScreen = !!cap && cap.top < window.innerHeight && cap.bottom > 0;
+      bar.hidden = !(past && !ctaOnScreen);
+    }
+    window.addEventListener('scroll', syncBar, { passive: true });
+    window.addEventListener('resize', syncBar);
+
     const capture = document.getElementById('vis-capture') as HTMLElement;
     const pdfForm = document.getElementById('pdf-form') as HTMLFormElement;
     const pdfSource = document.getElementById('pdf-source') as HTMLInputElement;
@@ -338,6 +410,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       more.hidden = false;
       wireCompare(r);
       out.hidden = false;
+      fillBar(r.host, r.score, Boolean(r.fixes.length));
       // Чинить нечего, значит и обменивать почту не на что. Предлагать «первую правку письмом»
       // сайту, у которого правок нет, значит обещать письмо, которого не будет.
       capture.hidden = !r.fixes.length;
@@ -688,4 +761,18 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   .result .rest .btn { display: inline-block; margin-top: 4px; }
   @media (prefers-reduced-motion: reduce) { .result .smudge { filter: blur(4.5px); } }
   .result .err { color: #f5a962; margin: 0; }
+
+  /* Липкая полоса: узкая, поверх всего, не перекрывает текст на телефоне больше одной строки. */
+  .scorebar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 40; background: rgba(11,16,23,.94); backdrop-filter: blur(8px); border-top: 1px solid rgba(255,255,255,.12); }
+  .scorebar[hidden] { display: none; }
+  .sb-in { max-width: 880px; margin: 0 auto; padding: 10px 16px; display: flex; align-items: center; gap: 12px; }
+  .sb-ring { flex: none; }
+  .sb-txt { display: flex; align-items: baseline; gap: 8px; min-width: 0; }
+  .sb-txt b { font-family: var(--fd); font-size: 19px; color: var(--paper); }
+  .sb-txt span { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .scorebar .btn { margin-left: auto; flex: none; padding: 8px 14px; font-size: 14px; }
+  @media (max-width: 560px) { .sb-txt span { display: none; } .scorebar .btn { padding: 8px 12px; font-size: 13px; } }
+
+  .rules-why { margin: 2.5rem 0 1rem; }
+  .rules-lede { margin: 0 0 1rem; color: rgba(245,242,236,.8); }
 </style>

@@ -99,7 +99,7 @@ export const PRODUCTS: Product[] = [
       'Leave an email and that same fix arrives as a letter you can hand to whoever runs the site',
       'A table of the sampled pages: words, answer-first paragraph, dates, schema',
     ],
-    how: [{ step: 'Enter a site', text: 'Any public address. The checker reads the homepage, robots.txt, llms.txt, the sitemap and up to three pages.' }, { step: 'Read the score', text: 'Five areas, weighted by what answer engines need first: access, a map, an entity, something to quote, dates.' }, { step: 'Fix the first one', text: 'The fix that moves the score most is shown straight away in three lines: what is there now, what to change, how to check. Copy them and hand them over as they are.' }],
+    how: [{ step: 'Enter a site', text: 'Any public address. The checker reads the homepage, robots.txt, llms.txt, the sitemap and ten pages.' }, { step: 'Read the score', text: 'Five areas, weighted by what answer engines need first: access, a map, an entity, something to quote, dates.' }, { step: 'Fix the first one', text: 'The fix that moves the score most is shown straight away in three lines: what is there now, what to change, how to check. Copy them and hand them over as they are.' }],
     needs: [
       { item: 'Nothing at all', cost: 'Free', why: 'Paste a web address and read the score. No account, no card, no install, nothing to download.' },
     ],
