@@ -121,7 +121,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
     {engines.length > 0 && (
       <section class="engines">
         <h2>Readiness by engine</h2>
-        <p class="eng-lede">The same measurements, regrouped per engine. Nothing new was measured: under each number you can see what it is made of.</p>
+        <p class="eng-lede">The formula is the one behind the overall score. Engines differ in one real thing only: what robots.txt answers their own crawlers. So on a site that blocks nobody the numbers match, and that is the right answer, not a bug.</p>
         <div class="eng-grid">
           {engines.map((e: any) => (
             <div class="eng">

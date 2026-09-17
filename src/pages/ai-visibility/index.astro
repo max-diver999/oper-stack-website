@@ -109,7 +109,6 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
     </section>
 
     <section class="rules-why">
-      <p class="rules-lede">We did not decide on our own what counts. The five areas below come from work where this was measured.</p>
       <StatCards heading="Where these rules come from" stats={RULE_STATS} />
       <Quote text="GEO can boost visibility by up to 40% in generative engine responses." author="Aggarwal, Murahari, Rajpurohit, Kalyan, Narasimhan, Deshpande" source="GEO: Generative Engine Optimization, KDD 2024" href="https://arxiv.org/abs/2311.09735" />
     </section>
@@ -365,7 +364,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
        * сразу написано, из чего оно и что тянет вниз: «Gemini 61» без объяснения это гадание.
        */
       const engines = Array.isArray(r.engines) && r.engines.length
-        ? `<div class="engines"><h3>Readiness by engine</h3><p class="eng-lede">The same measurements, regrouped per engine. Nothing new was measured: under each number you can see what it is made of.</p><div class="eng-grid">${r.engines.map((e: any) => `<div class="eng"><p class="eng-name">${esc(e.label)}</p><p class="eng-num">${e.score === null ? '—' : e.score}</p><div class="bar"><i style="width:${e.score || 0}%"></i></div><p class="eng-how">${esc(e.how)}</p>${e.blocked.length ? `<p class="eng-bad">blocked in robots.txt: ${esc(e.blocked.join(', '))}</p>` : e.weakest ? `<p class="eng-weak">pulls it down: ${esc(e.weakest)}</p>` : ''}</div>`).join('')}</div></div>`
+        ? `<div class="engines"><h3>Readiness by engine</h3><p class="eng-lede">The formula is the one behind the overall score. Engines differ in one real thing only: what robots.txt answers their own crawlers. So on a site that blocks nobody the numbers match, and that is the right answer, not a bug.</p><div class="eng-grid">${r.engines.map((e: any) => `<div class="eng"><p class="eng-name">${esc(e.label)}</p><p class="eng-num">${e.score === null ? '—' : e.score}</p><div class="bar"><i style="width:${e.score || 0}%"></i></div><p class="eng-how">${esc(e.how)}</p>${e.blocked.length ? `<p class="eng-bad">blocked in robots.txt: ${esc(e.blocked.join(', '))}</p>` : e.weakest ? `<p class="eng-weak">pulls it down: ${esc(e.weakest)}</p>` : ''}</div>`).join('')}</div></div>`
         : '';
       const crawlers = `<details class="more"><summary>Crawlers checked (${r.crawlers.length})</summary><table><tr><th>Crawler</th><th>Kind</th><th>robots.txt</th></tr>${r.crawlers.map((c: any) => `<tr><td>${esc(c.label)}</td><td>${c.kind === 'search' ? 'search and citation' : 'training'}</td><td class="${c.verdict === 'blocked' ? 'bad' : 'ok'}">${c.verdict}</td></tr>`).join('')}</table></details>`;
       /*
@@ -782,7 +781,6 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   @media (max-width: 560px) { .sb-txt span { display: none; } .scorebar .btn { padding: 8px 12px; font-size: 13px; } }
 
   .rules-why { margin: 2.5rem 0 1rem; }
-  .rules-lede { margin: 0 0 1rem; color: rgba(245,242,236,.8); }
 
   .result .engines { margin: 22px 0 0; }
   .result .engines h3 { font-family: var(--fd); font-size: 1.05rem; margin: 0 0 4px; color: var(--paper); }
