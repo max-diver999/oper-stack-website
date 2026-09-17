@@ -406,14 +406,19 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
 </script>
 
 <style is:global>
-  /* The document is light; the site nav stays a dark strip above it. */
-  /* Colour tokens on body, not on .doc: the sticky bar lives outside .doc, and with the tokens on
-     .doc its button came out transparent with white text on white, which is invisible. */
-  body { background: #F5F2EC; color: #0B1017;
+  /* The document is light; the site nav stays a dark strip above it.
+     Colour tokens on body, not on .doc: the sticky bar lives outside .doc, and with the tokens on
+     .doc its button came out transparent with white text on white, which is invisible.
+
+     The selector is `html body`, not plain `body`, on purpose. In production the layout's inline
+     style comes AFTER this file, both weigh the same, and the later one won: the page shipped dark
+     although it was light on a laptop. The extra `html` raises the weight and removes the
+     dependency on load order. Only a live request catches this; the build says nothing. */
+  html body { background: #F5F2EC; color: #0B1017;
          --card: #fff; --line: rgba(11,16,23,.09); --ink-2: #4A5362; --muted: #6B7480;
          --good: #1A8A7D; --good-bg: #E1F2EE; --fair: #A66F12; --fair-fill: #E8B84A; --fair-bg: #FBF0D5; --poor: #B5412D; --poor-fill: #D2694F; --poor-bg: #F9E1DB; --none: #9AA3AE; }
-  .site-nav { background: #0B1017; border-bottom-color: rgba(255,255,255,.06); }
-  .site-foot { background: #0B1017; color: #F5F2EC; margin-top: 3rem; padding-bottom: 5rem; }
+  html body .site-nav { background: #0B1017; border-bottom-color: rgba(255,255,255,.06); }
+  html body .site-foot { background: #0B1017; color: #F5F2EC; margin-top: 3rem; padding-bottom: 5rem; }
 </style>
 
 <style>
