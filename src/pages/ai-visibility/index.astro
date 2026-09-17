@@ -213,6 +213,14 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       // правкой выше, остальные лежат в r.rest заголовками по четыре слова.
       const rest: Array<{ area: string; level: string; teaser: string }> = Array.isArray(r.rest) ? r.rest : [];
       const hidden = rest.length;
+      /*
+       * Сколько проверок пройдено, а не только сколько провалено. Конкуренты показывают «120
+       * пройдено» рядом с запертыми находками, и это одновременно успокаивает и показывает объём
+       * работы. У нас это число было, но мы его не называли.
+       */
+      const allFindings = (r.areas || []).flatMap((a: any) => a.findings || []);
+      const passedN = allFindings.filter((f: any) => f.level === 'pass').length;
+      const totalN = allFindings.length + (r.areas || []).reduce((n: number, a: any) => n + (Number(a.problems) || 0), 0);
       const areas = r.areas.map((a: any) => {
         const shown = (a.findings || [])
           .filter((f: any) => f.level === 'pass')
@@ -221,7 +229,10 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         const tail = n ? `<li class="f-more">${n} ${n === 1 ? 'finding' : 'findings'} in the list below</li>` : '';
         return `
         <div class="area">
-          <div class="area-head"><span>${esc(a.label)}</span><strong>${a.score == null ? 'not measured' : `${a.score}/${a.max}`}</strong></div>
+          <div class="area-head">
+            <span>${esc(a.label)}<em class="weight">weight ${a.max}%</em></span>
+            <strong>${a.score == null ? 'not measured' : `${a.score}/${a.max}`}</strong>
+          </div>
           ${a.score == null ? '' : `<div class="bar"><i style="width:${Math.round((a.score / a.max) * 100)}%"></i></div>`}
           <ul>${shown.join('')}${tail}</ul>
         </div>`;
@@ -261,6 +272,21 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
             <p class="note">Copy all three lines and hand them over as they are: without "now" and "how to check" whoever does the work cannot tell where to start or when it is done.</p>
           </div>`
         : `<div class="fixes"><h3>The fix that moves the score most</h3><p class="fix-one"><strong>${esc(r.fixes[0].area)}.</strong> ${esc(r.fixes[0].text)}</p><p class="note">Leave an email below and this fix arrives written out in full: what is there now, what to change, how to check it worked.</p></div>`;
+      /*
+       * Свойства проверенной страницы. Мелочь, которая говорит «мы правда её читали»: заголовок,
+       * сколько слов, за сколько ответил сервер, сколько страниц прочитано и сколько их в карте.
+       * Только измеренное: числа ссылок и картинок у нас нет, и выдумывать их сюда нельзя.
+       */
+      const first = r.sample[0];
+      const facts = first ? `<details class="more" open><summary>The page we read first</summary><table>
+        <tr><th>Title</th><td>${esc(first.title || 'none')}</td></tr>
+        <tr><th>Words</th><td>${first.words}</td></tr>
+        <tr><th>Answer-first opening</th><td>${first.answerFirst ? 'yes' : 'no'}</td></tr>
+        <tr><th>Dated</th><td>${first.dated ? 'yes' : 'no'}</td></tr>
+        <tr><th>Schema types</th><td>${esc((first.schema || []).join(', ') || 'none')}</td></tr>
+        <tr><th>Answered in</th><td>${(r.ms / 1000).toFixed(1)} s</td></tr>
+        <tr><th>Pages read</th><td>${r.sample.length}${r.sitemap.found ? ` of ${r.sitemap.count} in the sitemap` : ''}</td></tr>
+      </table></details>` : '';
       const pages = r.sample.length ? `<details class="more"><summary>Pages sampled (${r.sample.length})</summary><table><tr><th>Page</th><th>Words</th><th>Answer first</th><th>Dated</th><th>Schema</th></tr>${r.sample.map((p: any) => `<tr><td><a href="${esc(p.url)}" rel="nofollow noopener" target="_blank">${esc(new URL(p.url).pathname)}</a></td><td>${p.words}</td><td>${p.answerFirst ? 'yes' : 'no'}</td><td>${p.dated ? 'yes' : 'no'}</td><td>${esc(p.schema.join(', ') || 'none')}</td></tr>`).join('')}</table></details>` : '';
       const crawlers = `<details class="more"><summary>Crawlers checked (${r.crawlers.length})</summary><table><tr><th>Crawler</th><th>Kind</th><th>robots.txt</th></tr>${r.crawlers.map((c: any) => `<tr><td>${esc(c.label)}</td><td>${c.kind === 'search' ? 'search and citation' : 'training'}</td><td class="${c.verdict === 'blocked' ? 'bad' : 'ok'}">${c.verdict}</td></tr>`).join('')}</table></details>`;
       /*
@@ -292,7 +318,9 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         ${keep}`;
       const more = document.getElementById('vis-more') as HTMLElement;
       more.innerHTML = `
+        <p class="passed"><strong>${passedN} of ${totalN}</strong> checks passed on this run.</p>
         <div class="areas">${areas}</div>
+        ${facts}
         ${pages}${crawlers}
         <div class="compare">
           <h3>How do you compare?</h3>
@@ -616,6 +644,13 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   .result .fixes li { margin-bottom: 8px; line-height: 1.5; }
   .result .areas { display: grid; gap: 14px; margin-top: 22px; }
   .result .area { padding: 14px 16px; border-radius: 12px; border: 1px solid rgba(255,255,255,.08); }
+  /*
+   * Эти два класса живут в глобальном блоке намеренно: разметка результата вставляется скриптом
+   * через innerHTML, а областные стили Astro до неё не достают. Ловушка известная, наступали на
+   * неё уже дважды.
+   */
+  .result .weight { display: block; font-style: normal; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; opacity: 0.55; font-weight: 500; margin-top: 2px; }
+  .result .passed { margin: 0 0 14px; font-size: 0.95rem; }
   .result .area-head { display: flex; justify-content: space-between; gap: 12px; font-weight: 600; margin-bottom: 8px; }
   .result .bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.08); overflow: hidden; margin-bottom: 10px; }
   .result .bar i { display: block; height: 100%; background: var(--teal-soft); }
