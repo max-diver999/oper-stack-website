@@ -14,23 +14,6 @@
 import type { APIRoute } from 'astro';
 import { loadCheck, latestForDomain } from '../../lib/check-store';
 
-/*
- * PNG отдаём только по запросу ?png=1. Мессенджеры и соцсети не показывают SVG в превью ссылки
- * вовсе, поэтому og:image обязан быть растром. Рисует sharp, он уже стоит рядом с Astro.
- *
- * Шрифты на сервере это отдельный риск: в облачной функции их может не быть ни одного, и тогда
- * буквы просто не нарисуются. Поэтому ручка написана так, чтобы падение было видимым: не
- * получилось нарисовать растр, отдаём SVG с тем же содержимым, а не пустую картинку.
- */
-async function toPng(svg: string): Promise<Uint8Array | null> {
-  try {
-    const sharp = (await import('sharp')).default;
-    return await sharp(Buffer.from(svg), { density: 96 }).png({ compressionLevel: 9 }).toBuffer();
-  } catch {
-    return null;
-  }
-}
-
 export const prerender = false;
 
 const C = {
@@ -40,6 +23,61 @@ const C = {
 const tone = (n: number) => (n >= 80 ? C.good : n >= 45 ? C.fair : C.poor);
 const grade = (n: number) => (n >= 80 ? 'A' : n >= 65 ? 'B' : n >= 45 ? 'C' : 'D');
 const esc = (s: string) => String(s).replace(/[<>&]/g, (c) => ({ '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c] as string));
+
+/*
+ * PNG отдаём только по запросу ?png=1. Мессенджеры и соцсети не показывают SVG в превью ссылки
+ * вовсе, поэтому og:image обязан быть растром.
+ *
+ * Рисует resvg, и шрифт ему передаётся буферами из card-fonts.ts. Системными шрифтами тут
+ * пользоваться нельзя: 17.09.2026 боевой PNG, нарисованный через sharp, вышел набором пустых
+ * квадратов, потому что в облачной функции Vercel нет ни одного шрифта. Локально та же картинка
+ * рисовалась правильно, так что поймать это можно было только на живом сайте.
+ *
+ * Не получилось нарисовать растр, отдаём SVG с тем же содержимым: пустая картинка хуже, чем
+ * превью, которого просто нет.
+ */
+let fontPaths: string[] | null = null;
+
+/*
+ * Шрифт растеризатору отдаётся ПУТЯМИ, а не буферами, поэтому раскладываем его во временный
+ * каталог при первом запросе. Через fontBuffers картинка тоже рисуется, но начертание теряется:
+ * жирный текст выходит обычным, а на карточке жирным набраны домен, балл и оценка, то есть всё
+ * главное. Проверено на этой же карточке: одни и те же файлы, путями жирный есть, буферами нет.
+ *
+ * Во временный каталог писать можно и в облачной функции, и он переживает соседние запросы, пока
+ * функция тёплая, так что раскладка происходит раз на запуск, а не на каждую картинку.
+ */
+async function fonts(): Promise<string[]> {
+  if (fontPaths) return fontPaths;
+  const fs = await import('node:fs/promises');
+  const os = await import('node:os');
+  const path = await import('node:path');
+  const { cardFonts } = await import('../../lib/card-fonts');
+  const dir = path.join(os.tmpdir(), 'operstack-card-fonts');
+  await fs.mkdir(dir, { recursive: true });
+  const out: string[] = [];
+  const buffers = cardFonts();
+  for (let i = 0; i < buffers.length; i += 1) {
+    const file = path.join(dir, `face-${i}.ttf`);
+    // Перезаписываем, только если файла ещё нет: на тёплой функции это ноль работы.
+    try { await fs.access(file); } catch { await fs.writeFile(file, buffers[i]); }
+    out.push(file);
+  }
+  fontPaths = out;
+  return out;
+}
+
+async function toPng(svg: string): Promise<Uint8Array | null> {
+  try {
+    const { Resvg } = await import('@resvg/resvg-js');
+    const r = new Resvg(svg, {
+      font: { loadSystemFonts: false, fontFiles: await fonts(), defaultFontFamily: 'Inter' },
+    });
+    return r.render().asPng();
+  } catch {
+    return null;
+  }
+}
 
 function card(domain: string, score: number, areas: { label: string; score: number; max: number }[], lang: string): string {
   const ru = lang === 'ru';
@@ -65,7 +103,7 @@ function card(domain: string, score: number, areas: { label: string; score: numb
       <rect x="470" y="${y + 12}" width="${(650 * pct).toFixed(0)}" height="7" rx="3.5" fill="${col}"/>`;
   }).join('');
 
-  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" font-family="Inter,system-ui,-apple-system,Segoe UI,Roboto,sans-serif">
   <rect width="${W}" height="${H}" fill="${C.ink}"/>
   <circle cx="1130" cy="-70" r="430" fill="${col}" opacity="0.06"/>
 
