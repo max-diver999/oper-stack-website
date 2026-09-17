@@ -24,7 +24,13 @@ const current = await latestForDomain(stored.domain);
 const moved = current && current.id !== stored.id ? current : null;
 const p: any = stored.payload || {};
 const when = new Date(stored.created_at).toLocaleDateString('en-GB', { day: '2-digit', month: 'long', year: 'numeric' });
-const badgeUrl = `${SITE.url}/badge/${stored.id}.svg`;
+/*
+ * Адрес значка со слешем на конце, а не с .svg. У сайта включено trailingSlash: 'always', при
+ * котором адрес с расширением не находится вовсе: 17.09.2026 значок так и отдавал 404 на боевом.
+ * Правило перезаписи в настройке Vercel не сработало, а гадать дальше дороже, чем взять рабочее.
+ * Картинке расширение не нужно: браузер смотрит на content-type, а мы отдаём image/svg+xml.
+ */
+const badgeUrl = `${SITE.url}/badge/${stored.id}/`;
 const pageUrl = `${SITE.url}/result/${stored.id}/`;
 const grade = stored.score >= 80 ? 'A' : stored.score >= 65 ? 'B' : stored.score >= 45 ? 'C' : 'D';
 ---
@@ -52,7 +58,7 @@ const grade = stored.score >= 80 ? 'A' : stored.score >= 65 ? 'B' : stored.score
     <section class="embed">
       <h2>Put the score on your site</h2>
       <p>The image updates itself: check the site again and the badge shows the new number, with nothing to change on your page.</p>
-      <p class="preview"><img src={`/badge/${stored.id}.svg`} alt={`AI visibility score for ${stored.domain}`} width="180" height="28" /></p>
+      <p class="preview"><img src={`/badge/${stored.id}/`} alt={`AI visibility score for ${stored.domain}`} width="180" height="28" /></p>
       <label for="embed-html">HTML</label>
       <textarea id="embed-html" readonly rows="2">{`<a href="${pageUrl}"><img src="${badgeUrl}" alt="AI visibility score for ${stored.domain}" /></a>`}</textarea>
       <label for="embed-md">Markdown</label>
