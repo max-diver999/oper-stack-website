@@ -91,11 +91,19 @@ export async function loadCheck(id: string): Promise<StoredCheck | null> {
 }
 
 /** Последний балл домена: им живёт значок, чтобы обновляться сам при новой проверке. */
-export async function latestForDomain(domain: string): Promise<StoredCheck | null> {
+export async function latestForDomain(domain: string, lang?: string): Promise<StoredCheck | null> {
   if (!checkStoreConfigured()) return null;
   try {
     await ensure();
-    const rows = (await db()`select id, domain, score, lang, payload, created_at from checks where domain = ${domain} order by created_at desc limit 1`) as any[];
+    /*
+     * Язык обязателен по смыслу, хотя и необязателен по типу: один и тот же домен проверяют и на
+     * русском сайте, и на английском, а свежее из двух показывать нельзя. 17.09.2026 английский
+     * прогон moregroup.estate оказался на одиннадцать минут новее русского, и на русской странице
+     * карточка вышла целиком по-английски. Балл у прогонов один и тот же, а слова разные.
+     */
+    const rows = (lang
+      ? await db()`select id, domain, score, lang, payload, created_at from checks where domain = ${domain} and lang = ${lang} order by created_at desc limit 1`
+      : await db()`select id, domain, score, lang, payload, created_at from checks where domain = ${domain} order by created_at desc limit 1`) as any[];
     return rows[0] || null;
   } catch {
     return null;

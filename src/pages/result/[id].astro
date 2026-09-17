@@ -23,7 +23,7 @@ const id = String(Astro.params.id || '');
 const stored = await loadCheck(id);
 if (!stored) return Astro.redirect('/ai-visibility/', 302);
 
-const current = await latestForDomain(stored.domain);
+const current = await latestForDomain(stored.domain, stored.lang);
 /*
  * Показываем «проверяли снова» только если балл ПОМЕНЯЛСЯ: иначе человек читает «последний прогон
  * дал 89» на странице, где и так 89.

@@ -93,9 +93,9 @@ export const GET: APIRoute = async ({ params, url }) => {
   const stored = await loadCheck(id);
   if (!stored) return new Response('not found', { status: 404 });
   // Свежайший балл того же домена: карточка обязана показывать сегодняшнее состояние.
-  const current = (await latestForDomain(stored.domain)) || stored;
+  const current = (await latestForDomain(stored.domain, stored.lang)) || stored;
   const areas = ((current.payload || {}).areas || []).map((a: any) => ({ label: a.label, score: a.score, max: a.max }));
-  const svg = card(current.domain, current.score, areas, current.lang);
+  const svg = card(current.domain, current.score, areas, stored.lang);
 
   if (url.searchParams.has('png')) {
     const png = await toPng(svg);

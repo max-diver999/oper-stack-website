@@ -50,7 +50,7 @@ export const GET: APIRoute = async ({ params }) => {
   const stored = await loadCheck(id);
   // Свежайший балл того же домена: значок обязан показывать сегодняшнее состояние, а не то,
   // каким сайт был в день первой проверки.
-  const current = stored ? await latestForDomain(stored.domain) : null;
+  const current = stored ? await latestForDomain(stored.domain, stored.lang) : null;
   const score = current ? current.score : stored ? stored.score : null;
   return new Response(svg(score, 'AI visibility'), {
     headers: {
