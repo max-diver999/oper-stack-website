@@ -15,6 +15,7 @@
  */
 import CommercialLayout from '../../components/CommercialLayout.astro';
 import { loadCheck, latestForDomain } from '../../lib/check-store';
+import { BADGE_LABEL, badgeSize } from '../../lib/badge';
 import { SITE } from '../../data/site';
 
 export const prerender = false;
@@ -47,6 +48,13 @@ const when = new Date(stored.created_at).toLocaleDateString('en-GB', { day: '2-d
 const badgeUrl = `${SITE.url}/badge/${stored.id}/`;
 const cardUrl = `${SITE.url}/card/${stored.id}/`;
 const pageUrl = `${SITE.url}/result/${stored.id}/`;
+/*
+ * Размер значка спрашиваем у того же модуля, который его и рисует: иначе width и height в img
+ * разъедутся с картинкой, и вёрстка будет прыгать при загрузке. Балл берём тот, что значок и
+ * покажет, то есть свежайший по домену.
+ */
+const badgeBox = badgeSize(current ? current.score : stored.score, BADGE_LABEL);
+
 const grade = String(p.grade || (stored.score >= 80 ? 'A' : stored.score >= 65 ? 'B' : stored.score >= 45 ? 'C' : 'D'));
 
 const blocked = crawlers.filter((c) => c.verdict === 'blocked').length;
@@ -219,7 +227,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
       <h2>Put the score on your site</h2>
       <p class="embed-lede">A small badge that updates itself: check the site again and it shows the new number, with nothing to change on your page.</p>
       <div class="badge-stage">
-        <img src={`/badge/${stored.id}/`} alt={`AI visibility score for ${stored.domain}`} width="180" height="28" />
+        <img src={`/badge/${stored.id}/`} alt={`AI visibility score for ${stored.domain}`} width={badgeBox.width} height={badgeBox.height} />
       </div>
       <div class="btn-row">
         <button type="button" class="btn btn-main" data-copy={`<a href="${pageUrl}"><img src="${badgeUrl}" alt="AI visibility score for ${stored.domain}" /></a>`}>Copy the code</button>
@@ -370,8 +378,10 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
   .share-lede, .embed-lede { margin: 0 0 1.1rem; color: rgba(245,242,236,.8); }
   .card-stage { padding: 1.25rem; border-radius: 16px; background: rgba(255,255,255,.055); border: 1px solid rgba(255,255,255,.1); line-height: 0; }
   .card-stage img { width: 100%; height: auto; display: block; border-radius: 8px; box-shadow: 0 14px 40px rgba(0,0,0,.45); }
-  .badge-stage { display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; border-radius: 12px; background: rgba(255,255,255,.04); border: 1px solid rgba(255,255,255,.1); }
-  .badge-stage img { width: 180px; height: 28px; }
+  /* Подложка светлая намеренно: значок тёмный, и на нашем тёмном фоне его просто не видно.
+     Заодно человек сразу видит, как значок ляжет в подвал его собственного сайта. */
+  .badge-stage { display: flex; align-items: center; justify-content: center; padding: 2rem 1rem; border-radius: 12px; background: #F5F2EC; border: 1px solid rgba(255,255,255,.1); }
+  .badge-stage img { display: block; }
 
   .btn-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1.1rem; }
   .btn { display: inline-block; cursor: pointer; background: transparent; color: var(--paper); font: inherit; font-size: .95rem; padding: .6rem 1.1rem; border-radius: 9px; border: 1px solid rgba(255,255,255,.22); text-decoration: none; }
