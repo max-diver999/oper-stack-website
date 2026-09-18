@@ -70,7 +70,7 @@ export const POST: APIRoute = async ({ request }) => {
       const form = await request.formData();
       token = String(form.get('t') || '');
       site = String(form.get('site') || '');
-      rivalsRaw = [form.get('rival1'), form.get('rival2'), form.get('rival3')].map((x) => String(x || ''));
+      rivalsRaw = ['rival1', 'rival2', 'rival3', 'rival4', 'rival5'].map((k) => String(form.get(k) || ''));
     }
   } catch {
     return page('Bad request', '<h1>The form did not arrive</h1><p>Go back and send it again.</p>', 400);
@@ -90,10 +90,12 @@ export const POST: APIRoute = async ({ request }) => {
 
   // Заявка в очередь. Подпись лежит первой строкой тела: письмо нельзя подделать снаружи,
   // а тема при этом остаётся читаемой для человека, который откроет ящик.
-  // Конкуренты только у ступени за 29, и только те, что прошли ту же проверку адреса.
+  // Конкуренты есть у двух ступеней: трое за 29, пятеро в аудите. Потолок берётся по ступени,
+  // чтобы через форму нельзя было попросить больше, чем куплено.
   // Кривой адрес конкурента не должен ронять заявку: покупатель платил за свой сайт.
-  const rivals = tier === '29'
-    ? rivalsRaw.map((r) => normaliseSiteUrl(r)).filter((r): r is { ok: true; url: string } => r.ok).map((r) => r.url).slice(0, 3)
+  const rivalCap = tier === 'audit' ? 5 : tier === '29' ? 3 : 0;
+  const rivals = rivalCap
+    ? rivalsRaw.map((r) => normaliseSiteUrl(r)).filter((r): r is { ok: true; url: string } => r.ok).map((r) => r.url).slice(0, rivalCap)
     : [];
   const job = { url: url.url, email, lang, tier, rivals };
   try {
