@@ -116,13 +116,13 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
   },
   'seo-audit': {
     plain:
-      'You send your website address, we send back a ten-page report in plain words: what stops your site from being found in Google and quoted by AI assistants, what to fix first, what each fix costs, and a 90 day plan. Everything is written down, nothing depends on a call. You can hand the plan to any developer or ask us to do the work.',
+      'You send your website address, we read a hundred pages of it and send back a report in plain words: what stops your site from being found in Google and quoted by AI assistants, what to fix first, what each fix costs, and a plan. With it come three files you only have to put on the site, and five rivals measured beside you. Everything is written down, nothing depends on a call. You can hand the plan to any developer or ask us to do the work.',
     who: [
       'A business owner whose site does not bring enquiries and who wants to know why before spending more',
       'A marketer who needs a written plan with prices to get a budget approved',
       'An agency that wants a second opinion on a client site',
     ],
-    youDo: ['Send the site address and how to reach you', 'Pay the invoice when we confirm the scope', 'Receive the PDF by email, forward the plan to whoever will do the fixes'],
+    youDo: ['Send the site address and how to reach you', 'Pay the invoice when we confirm the scope', 'Receive the report and the finished files by email: put the files on the site, forward the plan to whoever will do the fixes'],
   },
 };
 
