@@ -30,5 +30,32 @@
       "max": 15
     }
   ],
-  "pagesRead": 10
+  "pagesRead": 10,
+  "counts": {
+    "pages": 10,
+    "seoRules": 6,
+    "seo": 60,
+    "contentFields": 8,
+    "content": 80,
+    "robots": 14,
+    "site": 5,
+    "engines": 5,
+    "total": 159,
+    "robotNames": [
+      "OAI-SearchBot",
+      "ChatGPT-User",
+      "GPTBot",
+      "PerplexityBot",
+      "Perplexity-User",
+      "ClaudeBot",
+      "Claude-SearchBot",
+      "Claude-User",
+      "anthropic-ai",
+      "Google-Extended",
+      "Bingbot",
+      "Applebot-Extended",
+      "CCBot",
+      "DuckAssistBot"
+    ]
+  }
 }
