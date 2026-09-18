@@ -11,7 +11,7 @@
  *   2. каждая кнопка «купить» ведёт на живую страницу Whop, и цена на ней та же, что у нас;
  *   3. каждый обработчик отвечает разумным кодом, а не 500 (кривое тело роняло prospect-request);
  *   4. бесплатная проверка реально отвечает ok:true (ограничитель закрывал её всему миру);
- *   5. результат проверки нарисован: кольцо 132px, а не чёрный круг (стили Astro не видят innerHTML);
+ *   5. проверка открывает свой адрес /result/<id>/ и рисует там кольцо с баллом, а не пустой блок;
  *   6. ключевые экраны на телефоне и десктопе без ошибок в консоли и без горизонтальной прокрутки.
  * Выход ненулевой при любом провале, чтобы цеплять к CI и к ops-notify.
  */
@@ -165,13 +165,28 @@ async function checkSite(key) {
       } catch (e) { fail(`${path} (${kind}): ${e.message.slice(0, 80)}`); }
     }
     if (kind === 'десктоп') {
+      /*
+       * Проверка с 17.09.2026 не рисует результат на месте, а открывает его на своём постоянном
+       * адресе. Поэтому сторож идёт за ней: дожидается /result/<id>/ и там смотрит на кольцо.
+       * Точное число пикселей не проверяем, иначе сторож падает от любой правки размера. Важно
+       * другое: кольцо нарисовано, а не осталось неоформленным блоком, и в нём стоит балл.
+       */
       await page.goto(site.origin + site.check, { waitUntil: 'networkidle' });
       await page.fill('input#vis-url', 'example.net');
-      await page.click('button[type=submit]');
-      await page.waitForSelector('#vis-result .ring', { timeout: 40000 }).catch(() => null);
-      const width = await page.evaluate(() => { const r = document.querySelector('#vis-result .ring'); return r ? getComputedStyle(r).width : null; });
-      if (width === '132px') ok('результат проверки нарисован: кольцо 132px');
-      else fail(`результат проверки без оформления: кольцо ${width}`);
+      await Promise.all([
+        page.waitForURL(/\/result\/[a-z0-9]+\/$/, { timeout: 60000 }).catch(() => null),
+        page.click('button[type=submit]'),
+      ]);
+      await page.waitForLoadState('networkidle').catch(() => null);
+      const ring = await page.evaluate(() => {
+        const r = document.querySelector('.ring');
+        if (!r) return null;
+        return { width: parseFloat(getComputedStyle(r).width), score: (document.querySelector('.ring-num') || {}).textContent };
+      });
+      const landed = /\/result\/[a-z0-9]+\/$/.test(page.url());
+      if (!landed) fail(`проверка не открыла свой адрес результата: ${page.url()}`);
+      else if (ring && ring.width >= 100 && /^\d+$/.test(String(ring.score || '').trim())) ok(`результат проверки нарисован: кольцо ${ring.width}px, балл ${ring.score}`);
+      else fail(`результат проверки без оформления: ${JSON.stringify(ring)}`);
     }
     await ctx.close();
   }
