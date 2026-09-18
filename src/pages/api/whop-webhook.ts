@@ -17,6 +17,7 @@ import { buildAgencyEmail,
   buildLicenceEmail, handleWhopPayment, issueLicenceKey, makeDownloadToken, parsePriceMap, readWhopPayment, verifyWhopSignature } from '../../lib/licence-fulfilment';
 import { buildReportWelcomeEmail, makeReportToken, readWhopReport, reportTierMap, TOKEN_DAYS } from '../../lib/report-fulfilment';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
+import { claimOnce, purchaseKey } from '../../lib/webhook-once';
 
 export const prerender = false;
 
@@ -114,6 +115,14 @@ export const POST: APIRoute = async ({ request }) => {
       await notifyTelegram(`Отчёт за ${report.tier} оплачен на Whop (${report.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать вручную.`);
       return json({ ok: true, handled: false, reason: 'buyer email not found' });
     }
+    /*
+     * С 18.09.2026 вебхук слушает и платёж, и появление членства: без второго не работает выдача
+     * по промокоду на сто процентов, потому что платежа там нет вовсе. Обычная покупка при этом
+     * порождает оба события подряд, поэтому первое берёт замок, а второе молчит.
+     */
+    if (!(await claimOnce(purchaseKey(`report:${report.tier}`, buyer)))) {
+      return json({ ok: true, handled: false, reason: 'already delivered' });
+    }
     const lang = env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en';
     const token = makeReportToken({ email: buyer, tier: report.tier, lang, exp: Math.floor(Date.now() / 1000) + TOKEN_DAYS * 24 * 3600 }, downloadSecret);
     const link = `${SITE.url}/report/?t=${encodeURIComponent(token)}${lang === 'ru' ? '&lang=ru' : ''}`;
@@ -165,6 +174,9 @@ export const POST: APIRoute = async ({ request }) => {
     if (!buyer) {
       await notifyTelegram(`«Боль в страницы» оплачена (${painPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать ключ вручную.`);
       return json({ ok: true, handled: false, reason: 'buyer email not found' });
+    }
+    if (!(await claimOnce(purchaseKey('pain-to-seo', buyer)))) {
+      return json({ ok: true, handled: false, reason: 'already delivered' });
     }
     const { key, expires } = issueLicenceKey({ email: buyer, plan: 'owner' }, privatePem);
     const link = `${SITE.url}/api/kit-download/?t=${makeDownloadToken({ email: buyer.toLowerCase(), product: 'pain-to-seo', exp: Math.floor(Date.now() / 1000) + 30 * 24 * 3600 }, downloadSecret)}`;
