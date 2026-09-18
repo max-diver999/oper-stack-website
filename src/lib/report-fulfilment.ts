@@ -13,13 +13,13 @@
  * секретом, что и ссылка на скачивание кита (KIT_DOWNLOAD_SECRET), и живёт тридцать дней.
  */
 import { createHmac, timingSafeEqual } from 'node:crypto';
-import { button, emailShell, note, p as par } from './email-shell';
+import { button, emailShell, note, p as par } from './email-shell.ts';
 
 /**
  * Ступени отчёта. 'free' не продаётся и не имеет товара на Whop: это то, что человек получает
  * за почту после бесплатной проверки. Пять страниц, только замер, без списка задач.
  */
-export type ReportTier = 'free' | '9' | '29';
+export type ReportTier = 'free' | '9' | '29' | 'audit';
 
 /** Товары Whop, которые означают отчёт. Пустое значение означает «товар ещё не заведён». */
 const TIER_BY_PRODUCT: Record<string, ReportTier> = {
@@ -30,6 +30,9 @@ const TIER_BY_PRODUCT: Record<string, ReportTier> = {
   // вебхука: открыть витрину товара и поискать в исходнике prod_.
   prod_k66PVan90WYS8: '9',
   prod_hgpRpk84Kf0hB: '29',
+  // Аудит за 149. С 18.09.2026 он идёт той же дорогой, что и остальные отчёты: письмо со
+  // ссылкой на форму, дальше очередь. До этого он просил ответить письмом и собирался руками.
+  prod_plySVogSlnVni: 'audit',
 };
 
 /**
@@ -44,6 +47,11 @@ const TIER_BY_PRODUCT: Record<string, ReportTier> = {
 const TIER_BY_NAME: [RegExp, ReportTier][] = [
   [/three\s+rivals/i, '29'],
   [/automatic\s+site\s+report/i, '9'],
+  // Аудит переименовывали, поэтому ловим и старое имя, и новое: название это запасной ключ,
+  // который должен пережить и пересоздание товара, и правку витрины.
+  [/what\s+to\s+put\s+on\s+the\s+site/i, 'audit'],
+  [/brings\s+no\s+leads/i, 'audit'],
+  [/seo,?\s*aeo\s+and\s+geo\s+audit/i, 'audit'],
 ];
 
 /** Переопределение через окружение: WHOP_REPORT_IDS="prod_a:9,prod_b:29". */
@@ -51,7 +59,7 @@ export function reportTierMap(spec = ''): Record<string, ReportTier> {
   const extra: Record<string, ReportTier> = {};
   for (const entry of String(spec).split(',')) {
     const [id, tier] = entry.trim().split(':');
-    if (id && (tier === '9' || tier === '29')) extra[id] = tier;
+    if (id && (tier === '9' || tier === '29' || tier === 'audit')) extra[id] = tier;
   }
   return { ...TIER_BY_PRODUCT, ...extra };
 }
@@ -60,7 +68,11 @@ export function reportTierMap(spec = ''): Record<string, ReportTier> {
 export const TIER_SPEC: Record<ReportTier, { pages: number; competitors: number; weeks: number }> = {
   free: { pages: 5, competitors: 0, weeks: 0 },
   '9': { pages: 20, competitors: 0, weeks: 0 },
-  '29': { pages: 20, competitors: 3, weeks: 4 },
+  // Тридцать, а не двадцать: владелец поднял число 17.09.2026, а здесь оно осталось старым.
+  '29': { pages: 30, competitors: 3, weeks: 4 },
+  // Флагман. Перепроверки у него не еженедельные, а раз в месяц три раза, поэтому weeks здесь 0:
+  // это поле про еженедельные срезы товара за 29 и врать им не надо.
+  audit: { pages: 100, competitors: 5, weeks: 0 },
 };
 
 /** Ссылка живёт месяц: покупатель может ввести адрес не сразу. */
@@ -153,22 +165,26 @@ export function buildRunBody(job: ReportJob, secret: string): { text: string; ht
 
 const COPY = {
   en: {
-    subject: (tier: ReportTier) => (tier === '29' ? 'Your OperStack rival comparison: one step left' : 'Your OperStack fix list: one step left'),
+    subject: (tier: ReportTier) => (tier === 'audit' ? 'Your OperStack audit: one step left' : tier === '29' ? 'Your OperStack rival comparison: one step left' : 'Your OperStack fix list: one step left'),
     hello: 'Thank you. One thing left: tell us which site to read.',
     action: 'Open this link and enter your address:',
     what: (tier: ReportTier) =>
-      tier === '29'
+      tier === 'audit'
+        ? 'You will get the full audit: a hundred pages of your site read one by one, five rivals measured beside you in one table, and three finished files you only have to put on the site, attached to the email. It usually arrives within minutes. A person then goes over the same report by hand and writes separately within three working days. After that, three re-checks by the same code, at 30, 60 and 90 days.'
+        : tier === '29'
         ? 'You will get every fix for your own site and, beside it, the same measurement on up to three competitors in one table, so you can see where they are ahead. It usually arrives within the hour, and once a week for four weeks a snapshot follows: what your fixes moved and how the gap changed.'
         : 'You will get two files. A list of tasks, one for every problem found, each written in plain words: what your site does now, what to change, how to check it worked. Hand one to your developer or paste it into ChatGPT, Claude or Cursor. And the measurement behind them: six area scores, every check with its finding, how much of your text disappears without JavaScript. It usually arrives within the hour.',
     validity: `The link works for ${TOKEN_DAYS} days. If it stops working, write to info@oper-stack.com from the address you paid with.`,
     sign: 'OperStack · info@oper-stack.com',
   },
   ru: {
-    subject: (tier: ReportTier) => (tier === '29' ? 'Сравнение с конкурентами от OperStack: остался один шаг' : 'Список правок OperStack: остался один шаг'),
+    subject: (tier: ReportTier) => (tier === 'audit' ? 'Аудит OperStack: остался один шаг' : tier === '29' ? 'Сравнение с конкурентами от OperStack: остался один шаг' : 'Список правок OperStack: остался один шаг'),
     hello: 'Спасибо. Остался один шаг: сказать, какой сайт читать.',
     action: 'Откройте ссылку и введите адрес:',
     what: (tier: ReportTier) =>
-      tier === '29'
+      tier === 'audit'
+        ? 'Вы получите полный аудит: сто страниц вашего сайта, прочитанных по одной, пять конкурентов рядом в одной таблице и три готовых файла, которые остаётся положить на сайт, приложенных к письму. Обычно приходит за несколько минут. Дальше тот же отчёт руками пересматривает человек и в течение трёх рабочих дней пишет отдельно. Затем три перепроверки тем же кодом, через 30, 60 и 90 дней.'
+        : tier === '29'
         ? 'Вы получите все правки по своему сайту и рядом те же замеры по трём конкурентам в одной таблице: видно, в чём именно они вас обходят. Обычно приходит в течение часа, а дальше четыре недели подряд, раз в неделю, приходит срез: что сдвинулось от ваших правок и как изменился разрыв.'
         : 'Вы получите два файла. Список задач, по одной на каждую найденную проблему, каждая обычными словами: что на сайте сейчас, что поменять, как проверить. Задачу отдаёте тому, кто ведёт ваш сайт, или вставляете в ChatGPT, Claude или Cursor. И замер, из которого эти задачи выросли: оценки по шести областям, каждая проверка со своей находкой, сколько текста пропадает без скриптов. Обычно приходит в течение часа.',
     validity: `Ссылка работает ${TOKEN_DAYS} дней. Если перестала, напишите на info@oper-stack.com с того адреса, с которого оплачивали.`,

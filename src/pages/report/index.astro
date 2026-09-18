@@ -31,7 +31,13 @@ const claims = check.ok ? check.claims : undefined;
 const linkBroken = Boolean(token) && !check.ok;
 const brokenReason = check.ok ? '' : String((check as { reason?: string }).reason ?? '');
 const ru = claims ? claims.lang === 'ru' : Astro.url.searchParams.get('lang') === 'ru';
-const withRivals = claims?.tier === '29';
+/*
+ * Конкуренты есть у двух ступеней, и их число разное: трое за 29, пятеро в аудите. Число берётся
+ * из ступени в ссылке, а не из вёрстки, иначе поля и товар разъедутся.
+ */
+const rivalSlots = claims?.tier === 'audit' ? 5 : claims?.tier === '29' ? 3 : 0;
+const withRivals = rivalSlots > 0;
+const isAudit = claims?.tier === 'audit';
 const t = ru
   ? {
       title: 'Адрес вашего сайта',
@@ -39,8 +45,10 @@ const t = ru
       label: 'Адрес сайта',
       placeholder: 'example.com',
       button: 'Сделать отчёт',
-      note: 'Проверяются главная и до двадцати страниц из вашей карты сайта. Ничего устанавливать не нужно, доступы не нужны.',
-      rivalsLabel: 'Конкуренты, до трёх',
+      note: isAudit
+        ? 'Читаются главная и до ста страниц из вашей карты сайта. Ничего устанавливать не нужно, доступы не нужны. Отчёт и готовые файлы приходят за несколько минут.'
+        : 'Проверяются главная и до тридцати страниц из вашей карты сайта. Ничего устанавливать не нужно, доступы не нужны.',
+      rivalsLabel: isAudit ? 'Конкуренты, до пяти' : 'Конкуренты, до трёх',
       rivalsNote: 'Кого с вами сравнить. Можно оставить пустым: тогда будет только ваш сайт.',
       noToken: 'Эта страница открывается по ссылке из письма об оплате. Если письма нет, напишите на info@oper-stack.com с адреса, с которого оплачивали.',
       expired: 'Срок этой ссылки вышел. Напишите на info@oper-stack.com с адреса, с которого оплачивали, и мы пришлём свежую в тот же день.',
@@ -53,8 +61,10 @@ const t = ru
       label: 'Site address',
       placeholder: 'example.com',
       button: 'Run the report',
-      note: 'We read the homepage and up to twenty pages from your sitemap. Nothing to install, no access to anything of yours.',
-      rivalsLabel: 'Rivals, up to three',
+      note: isAudit
+        ? 'We read the homepage and up to a hundred pages from your sitemap. Nothing to install, no access to anything of yours. The report and the finished files arrive within minutes.'
+        : 'We read the homepage and up to thirty pages from your sitemap. Nothing to install, no access to anything of yours.',
+      rivalsLabel: isAudit ? 'Rivals, up to five' : 'Rivals, up to three',
       rivalsNote: 'Who to put beside you. Leave empty and the report covers your site alone.',
       noToken: 'This page opens from the link in your payment email. If it never arrived, write to info@oper-stack.com from the address you paid with.',
       expired: 'This link has expired. Write to info@oper-stack.com from the address you paid with and we will send a fresh one the same day.',
@@ -114,9 +124,18 @@ const t = ru
           {withRivals && (
             <>
               <label for="rival1" style="margin-top:1.2rem">{t.rivalsLabel}</label>
-              <input id="rival1" name="rival1" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="rival-one.com" />
-              <input name="rival2" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="rival-two.com" style="margin-top:.6rem" />
-              <input name="rival3" type="text" inputmode="url" autocapitalize="off" spellcheck="false" placeholder="rival-three.com" style="margin-top:.6rem" />
+              {Array.from({ length: rivalSlots }, (_, i) => (
+                <input
+                  id={i === 0 ? 'rival1' : undefined}
+                  name={`rival${i + 1}`}
+                  type="text"
+                  inputmode="url"
+                  autocapitalize="off"
+                  spellcheck="false"
+                  placeholder={`rival-${['one', 'two', 'three', 'four', 'five'][i]}.com`}
+                  style={i === 0 ? undefined : 'margin-top:.6rem'}
+                />
+              ))}
               <p class="note" style="margin-top:.6rem">{t.rivalsNote}</p>
             </>
           )}

@@ -26,39 +26,6 @@ const env = (key: string, fallback = ''): string =>
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
 
-/**
- * Письмо покупателю аудита. Оно ничего не выдаёт и ничего не генерирует: аудит читает человек.
- * Задача письма одна, чтобы человек не сидел в тишине после оплаты: подтвердить заказ, спросить
- * адрес сайта и назвать срок. Срок ровно тот, что утверждён, и ни слова сверх него.
- */
-function buildAuditOrderEmail(email: string): { subject: string; text: string; html: string } {
-  const subject = 'Your audit is booked. One thing we need from you';
-  const lines = [
-    'Thank you, your SEO, AEO and GEO audit is paid for.',
-    '',
-    'One thing we need: reply to this email with the address of the site to audit. That is all, no access to anything of yours is required.',
-    '',
-    'What happens then: a person reads the measurements of your site and writes what they mean for your business and in what order to close them. Usually one to three working days, never later than five.',
-    '',
-    'If you have context worth knowing, who your buyers are, which pages matter most, which rivals you lose to, put it in the same reply. It changes what the audit looks at first.',
-    '',
-    'OperStack · info@oper-stack.com',
-  ];
-  const html = emailShell({
-    preheader: 'One thing we need: the address of the site to audit',
-    heading: 'Your audit is booked',
-    blocks: [
-      par('Thank you. Your <strong>SEO, AEO and GEO audit</strong> is paid for.'),
-      par('<strong>One thing we need:</strong> reply to this email with the address of the site to audit. That is all. No access to anything of yours is required.'),
-      button('mailto:info@oper-stack.com?subject=My%20site%20for%20the%20audit', 'Reply with your site address →'),
-      par('What happens then: a person reads the measurements of your site and writes what they mean for your business and in what order to close them. Usually one to three working days, never later than five.'),
-      par('If you have context worth knowing, who your buyers are, which pages matter most, which rivals you lose to, put it in the same reply. It changes what the audit looks at first.'),
-      note('This one is read by a person, not a machine. That is the whole point of it.'),
-    ],
-  });
-
-  return { subject, text: lines.join('\n'), html };
-}
 
 async function notifyTelegram(text: string): Promise<void> {
   const token = env('TG_TOKEN');
@@ -215,29 +182,12 @@ export const POST: APIRoute = async ({ request }) => {
     }
   }
 
-  // Аудит за 149: работа человека, ключей и файлов тут нет. Но покупатель не должен остаться
-  // в тишине: до сих пор это событие проваливалось в самый низ и не делало ничего вообще.
-  // Письмо подтверждает заказ, спрашивает адрес сайта и повторяет ровно те сроки, которые
-  // утверждены (один-три рабочих дня, не позже пяти). Ничего сверх этого обещать нельзя.
-  const auditIds = env('WHOP_AUDIT_IDS', 'prod_plySVogSlnVni').split(',').map((x) => x.trim()).filter(Boolean);
-  const auditPaid = readWhopPayment(event, Object.fromEntries(auditIds.map((id) => [id, 'owner' as const])));
-  if (auditPaid.plan && ['payment.succeeded', 'membership.activated', 'membership.went_valid', 'membership_went_valid'].includes(auditPaid.type)) {
-    const buyer = auditPaid.email ?? (auditPaid.userId ? await getBuyerEmail(auditPaid.userId) : null);
-    if (!buyer) {
-      await notifyTelegram(`Аудит за 149 оплачен (${auditPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: написать вручную.`);
-      return json({ ok: true, handled: false, reason: 'buyer email not found' });
-    }
-    try {
-      await sendTransactionalMail({ to: buyer, ...buildAuditOrderEmail(buyer) });
-      await notifyTelegram(`📘 Аудит за 149 оплачен: ${buyer}, платёж ${auditPaid.paymentId}. Ждём от него адрес сайта ответным письмом.`);
-      return json({ ok: true, handled: true, product: 'seo-audit' });
-    } catch (err) {
-      console.error('audit mail failed:', err);
-      await notifyTelegram(`Аудит за 149 оплачен (${auditPaid.paymentId}), но письмо ${buyer} не ушло: ${(err as Error).message}. Написать вручную.`);
-      return json({ ok: true, handled: false, reason: 'audit mail failed' });
-    }
-  }
-
+  /*
+   * Ветка аудита убрана 18.09.2026. Раньше она просила покупателя ответить письмом с адресом
+   * сайта, а дальше отчёт собирался руками на маке владельца: выключенный компьютер означал,
+   * что человек за 149 долларов не получит ничего. Теперь аудит это обычная ступень отчёта и
+   * обслуживается веткой выше: письмо со ссылкой на форму, дальше очередь.
+   */
   try {
     const result = await handleWhopPayment(event, {
       idToPlan: parsePriceMap(env('WHOP_SITE_KIT_IDS')),
