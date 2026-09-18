@@ -508,7 +508,7 @@ export const PRODUCTS: Product[] = [
     name: 'Why nobody shows you, and what to put on the site so they do',
     title: 'Why Nobody Shows You in AI or Search',
     description: 'An audit of your site with the edits already made for you. A hundred pages of your site, five rivals beside it, and three files you only have to put on the site. Plus three re-checks, one a month. 149 USD for the first ten audits, then 249. Usually one to three working days, five at most.',
-    answer: 'The audit reads a hundred pages of your site with the same code as the free check, puts up to five rivals beside it and scores six areas: technical SEO, content and structure, answer-engine readiness, visibility in AI systems, links and trust, and the path to an enquiry. What sets it apart from an ordinary audit is how it ends: the report comes with finished files assembled from your own pages. An llms.txt map for AI, the Organization markup for your homepage, and fixed titles and descriptions. Anything your site does not state is marked "fill this in yourself" rather than invented for you. Every score names how many checks it came from, so you can recompute the report by hand, and no score comes from a paid service.',
+    answer: 'The audit reads a hundred pages of your site with the same code as the free check, puts up to five rivals beside it and scores six areas: technical SEO, content and structure, answer-engine readiness, visibility in AI systems, links and trust, and the path to an enquiry. What sets it apart from an ordinary audit is how it ends: the report comes with finished files assembled from your own pages. An llms.txt map for AI, the Organization markup for your homepage, and fixed titles and descriptions. Anything your site does not state is marked “fill this in yourself” rather than invented for you. Every score names how many checks it came from, so you can recompute the report by hand, and no score comes from a paid service.',
     price: '149 USD',
     priceNote: 'The price of the first ten audits, then 249 USD. With read-only access to your own free Search Console and Bing Webmaster it is 199 USD and adds your real queries and positions. Usually one to three working days, five at most',
     status: 'available',
@@ -517,10 +517,10 @@ export const PRODUCTS: Product[] = [
     order: 11,
     get: [
       'A finished llms.txt: the map of your site for AI, assembled from your own pages. Put it in the root and an answer engine reads it instead of crawling everything',
-      'Finished Organization markup for your homepage. Every value was read from your site, and anything your site does not state is marked "fill this in yourself" rather than invented for you',
-      'Fixed titles and descriptions: what is there now, why it is a problem, and what to put. Assembled from the page\'s own H1 and first paragraph, so length and structure are fixed and the meaning is not rewritten',
+      'Finished Organization markup for your homepage. Every value was read from your site, and anything your site does not state is marked “fill this in yourself” rather than invented for you',
+      'Fixed titles and descriptions: what is there now, why it is a problem, and what to put. Assembled from the page’s own H1 and first paragraph, so length and structure are fixed and the meaning is not rewritten',
       'A hundred pages of your site read one by one, not a sample of twenty. A real browser also measures how much of your text is invisible without JavaScript, because the fetchers that quote you do not run scripts',
-      'Five rivals in one table, scored by the same code. The question stops being "am I bad" and becomes "where exactly am I worse"',
+      'Five rivals in one table, scored by the same code. The question stops being “am I bad” and becomes “where exactly am I worse”',
       'Three re-checks by the same code, at 30, 60 and 90 days: you see whether it moved',
       'A demand map: what people in your niche actually search for and which pages you have nothing for. We pay for the volumes, and the report says how to reproduce them free with your own account',
       'A week-by-week plan: what to fix first and why, not a list of forty items',
@@ -529,7 +529,7 @@ export const PRODUCTS: Product[] = [
     ],
     how: [
       { step: 'Order', text: 'Send the site, how to reach you, and the rivals you have in mind. If you have none, we pick them and show you the list before we start. We confirm scope and the tier within 24 hours.' },
-      { step: 'Read a hundred pages', text: 'Plus robots.txt, the sitemap, llms.txt, the markup, the forms and the path to contact. The same code reads the rivals. The robot goes slowly and obeys your site\'s own rules, so the reading puts nothing under strain.' },
+      { step: 'Read a hundred pages', text: 'Plus robots.txt, the sitemap, llms.txt, the markup, the forms and the path to contact. The same code reads the rivals. The robot goes slowly and obeys your site’s own rules, so the reading puts nothing under strain.' },
       { step: 'Report and files, then re-checks', text: 'The report by email, usually within one to three working days and never later than five, with the finished files attached separately so you do not retype them out of a PDF. Then three re-checks, at 30, 60 and 90 days.' },
     ],
     needs: [
@@ -542,7 +542,7 @@ export const PRODUCTS: Product[] = [
     faq: [
       { question: 'How is this different from the free check?', answer: 'The free check reads ten pages and scores one area, visibility in AI. The audit reads a hundred, scores six areas, puts five rivals beside you, and hands over finished files you only have to put on the site.' },
       { question: 'Will you write my copy for me?', answer: 'No, and we do not promise it. The finished files fix length and structure; the words come from your own pages. We will not invent what your business does: an invented fact in your markup gets read by a search engine and by an AI.' },
-      { question: 'What if a rival blocks robots?', answer: 'Then the table shows a dash and that server\'s status code, not a zero we made up. And that is a finding in itself: protection that turned us away turns ChatGPT and Perplexity away the same way.' },
+      { question: 'What if a rival blocks robots?', answer: 'Then the table shows a dash and that server’s status code, not a zero we made up. And that is a finding in itself: protection that turned us away turns ChatGPT and Perplexity away the same way.' },
       { question: 'What do you need from us?', answer: 'The URL. For the 199 USD tier, read-only access to Search Console and Bing Webmaster, both free and both yours.' },
       { question: 'What happens after the audit?', answer: 'Two packages. Fix at 249 USD closes the checks that do not need your subject knowledge, against a list we agree before you pay. Foundation starts at 500 USD and adds the writing: the opening paragraphs, the named sources and the missing pages, quoted after the audit because the price depends on how many pages earn impressions.' },
     ],

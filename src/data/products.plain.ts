@@ -122,7 +122,7 @@ export const PRODUCTS_PLAIN: Record<string, PlainCopy> = {
       'A marketer who needs a written plan with prices to get a budget approved',
       'An agency that wants a second opinion on a client site',
     ],
-    youDo: ['Send the site address and how to reach you', 'Pay the invoice when we confirm the scope', 'Receive the PDF by email, forward the plan to whoever will do the fixes'],
+    youDo: ['Send the site address and how to reach you', 'Pay the invoice when we confirm the scope', 'Receive the report and the finished files by email: put the files on the site, forward the plan to whoever will do the fixes'],
   },
 };
 
