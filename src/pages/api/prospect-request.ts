@@ -48,6 +48,7 @@ export const POST: APIRoute = async ({ request }) => {
     return page(400, 'This link is not valid any more', '<p>Links last thirty days. Write to support@oper-stack.com and we will send a fresh one.</p>');
   }
 
+  if (check.claims.purpose && check.claims.purpose !== 'prospect') return page(403, 'Use your course link', '<p>This link is for a site report.</p>');
   const { sites, skipped } = parsePasted(String(form.get('sites') || ''));
   if (!sites.length) {
     return page(400, 'No site addresses in that', '<p>Paste one address per line, like <code>example.com</code>. Go back and try again.</p>');

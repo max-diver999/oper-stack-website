@@ -5,7 +5,7 @@ import { commerceDashboardSnapshot } from '../../lib/commerce-ledger';
 export const prerender = false;
 
 const env = (key: string): string =>
-  String((import.meta.env as Record<string, unknown>)[key] ?? process.env[key] ?? '').trim();
+  String(process.env[key] ?? (import.meta.env as Record<string, unknown> | undefined)?.[key] ?? '').trim();
 const esc = (value: unknown) => String(value ?? '').replace(/[&<>"']/g, (char) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
 }[char] || char));

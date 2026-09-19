@@ -78,7 +78,7 @@ export const TIER_SPEC: Record<ReportTier, { pages: number; competitors: number;
 /** Ссылка живёт месяц: покупатель может ввести адрес не сразу. */
 export const TOKEN_DAYS = 30;
 
-export type ReportClaims = { email: string; tier: ReportTier; lang: 'ru' | 'en'; exp: number };
+export type ReportClaims = { orderId?: string; purpose?: 'report' | 'prospect'; email: string; tier: ReportTier; lang: 'ru' | 'en'; exp: number };
 
 export function makeReportToken(claims: ReportClaims, secret: string): string {
   const body = Buffer.from(JSON.stringify(claims)).toString('base64url');
@@ -127,7 +127,7 @@ export function normaliseSiteUrl(raw: string): { ok: true; url: string } | { ok:
 }
 
 export type ReportJob = {
-  url: string; email: string; lang: 'ru' | 'en'; tier: ReportTier; rivals?: string[];
+  jobId?: string; url: string; email: string; lang: 'ru' | 'en'; tier: ReportTier; rivals?: string[];
   /** Балл со страницы проверки, из ста. Остаётся для старых заявок, лежащих в ящике. */
   score?: number;
   /**

@@ -16,7 +16,7 @@ import { button, emailShell, note, p as par } from '../../lib/email-shell';
 import { buildAgencyEmail,
   buildLicenceEmail, issueLicenceKey, makeDownloadToken, parsePriceMap, readWhopPayment, verifyWhopSignature } from '../../lib/licence-fulfilment';
 import { buildReportWelcomeEmail, makeReportToken, readWhopReport, reportTierMap, TOKEN_DAYS } from '../../lib/report-fulfilment';
-import { sendTransactionalMail } from '../../lib/mail-smtp';
+import { sendCommerceMail } from '../../lib/commerce-mail';
 import { finishFulfilment, recordMessage, reserveFulfilment, revokeByProviderReference } from '../../lib/commerce-ledger';
 import type { CommerceProduct } from '../../lib/commerce-policy';
 
@@ -37,10 +37,12 @@ const json = (body: unknown, status = 200) =>
 function oneTimeOrderKey(product: CommerceProduct, email: string, event: any): string {
   const data = event?.data ?? {};
   const type = String(event?.type ?? event?.event ?? event?.action ?? '');
-  const membership = data.membership?.id ?? data.membership_id
+  const membership = (typeof data.membership === 'string' ? data.membership : data.membership?.id) ?? data.membership_id
     ?? (type.startsWith('membership.') || type === 'membership_went_valid' ? data.id : '');
   const reference = String(membership || (type === 'payment.succeeded' ? data.id : '') || '').trim();
-  return `whop:${product}:${reference || email.toLowerCase()}`;
+  if (!reference) throw new Error('missing purchase identity');
+  if (product === 'agency' && data.billing_reason === 'subscription_cycle' && data.id) return `whop:agency:${data.id}`;
+  return `whop:${product}:${reference}`;
 }
 
 function whopMoney(event: any): { amount?: number; currency?: string } {
@@ -126,7 +128,7 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const incomingType = String(event?.type ?? event?.event ?? event?.action ?? '');
-  if (incomingType === 'payment.refunded') {
+  if (incomingType === 'payment.refunded' || (['refund.created', 'refund.updated'].includes(incomingType) && ['succeeded', 'completed'].includes(String(event?.data?.status)))) {
     const reference = String(event?.data?.payment?.id ?? event?.data?.payment_id
       ?? (incomingType.startsWith('payment.') ? event?.data?.id : '') ?? '');
     if (!reference) return json({ ok: true, handled: false, reason: 'refund without payment id' });
@@ -143,7 +145,7 @@ export const POST: APIRoute = async ({ request }) => {
   const downloadSecret = env('KIT_DOWNLOAD_SECRET');
   if (!privatePem.includes('PRIVATE KEY') || !downloadSecret) {
     await notifyTelegram(`Whop payment ${event?.data?.id ?? ''} arrived but the licence signing key or download secret is missing on the server: issue the key by hand.`);
-    return json({ ok: true, handled: false, reason: 'fulfilment not configured' });
+    return json({ ok: false, handled: false, reason: 'fulfilment not configured' }, 503);
   }
 
   // Отчёт за 9 и за 29: другой товар, другая выдача. Письмо со ссылкой на форму, где покупатель
@@ -153,7 +155,7 @@ export const POST: APIRoute = async ({ request }) => {
     const buyer = report.email ?? (report.userId ? await getBuyerEmail(report.userId) : null);
     if (!buyer) {
       await notifyTelegram(`Отчёт за ${report.tier} оплачен на Whop (${report.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать вручную.`);
-      return json({ ok: true, handled: false, reason: 'buyer email not found' });
+      return json({ ok: false, handled: false, reason: 'buyer email not found; retry required' }, 503);
     }
     const product: CommerceProduct = report.tier === '9' ? 'report-9' : report.tier === '29' ? 'report-29' : 'audit-149';
     let reserved;
@@ -170,11 +172,11 @@ export const POST: APIRoute = async ({ request }) => {
     }
     if (!reserved.process) return json({ ok: true, handled: false, reason: 'already delivered or being delivered' });
     const lang = env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en';
-    const token = makeReportToken({ email: buyer, tier: report.tier, lang, exp: Math.floor(Date.now() / 1000) + TOKEN_DAYS * 24 * 3600 }, downloadSecret);
+    const token = makeReportToken({ orderId: reserved.orderId, purpose: 'report', email: buyer, tier: report.tier, lang, exp: Math.floor(Date.now() / 1000) + TOKEN_DAYS * 24 * 3600 }, downloadSecret);
     const link = `${SITE.url}/report/?t=${encodeURIComponent(token)}${lang === 'ru' ? '&lang=ru' : ''}`;
     try {
       const mail = buildReportWelcomeEmail({ tier: report.tier, lang, link });
-      const sent = await sendTransactionalMail({ to: buyer, ...mail }, { idempotencyKey: reserved.jobId });
+      const sent = await sendCommerceMail({ logicalKey: reserved.jobId, jobId: reserved.jobId, kind: 'purchase-delivery', payload: { from: 'OperStack <info@oper-stack.com>', to: [buyer], reply_to: 'info@oper-stack.com', ...mail } });
       await recordMessage({
         jobId: reserved.jobId, logicalKey: reserved.jobId, email: buyer, kind: 'report-welcome',
         subject: mail.subject, provider: sent.provider, providerMessageId: sent.messageId, status: 'accepted',
@@ -205,7 +207,7 @@ export const POST: APIRoute = async ({ request }) => {
     const email = parsed.email ?? (parsed.userId ? await getBuyerEmail(parsed.userId) : null);
     if (!email) {
       await notifyTelegram(`Course paid on Whop (${parsed.paymentId}) but no buyer email was found.`);
-      return json({ ok: true, handled: false, reason: 'buyer email not found' });
+      return json({ ok: false, handled: false, reason: 'buyer email not found; retry required' }, 503);
     }
     try {
       const reserved = await reserveFulfilment({
@@ -214,7 +216,13 @@ export const POST: APIRoute = async ({ request }) => {
         email, product: 'course', kind: 'whop-course-access', metadata: { deliveredBy: 'whop' },
         ...whopMoney(event),
       });
-      if (reserved.process) await finishFulfilment(reserved.jobId, 'accepted');
+      if (reserved.process) {
+        const token = makeReportToken({ orderId: reserved.orderId, purpose: 'prospect', email, tier: '9', lang: 'en', exp: Math.floor(Date.now()/1000)+TOKEN_DAYS*86400 }, downloadSecret);
+        const link = `${SITE.url}/prospects/?t=${encodeURIComponent(token)}`;
+        const text = `Thank you for buying the OperStack course. Open your course in Whop. Your included site prospecting tool: ${link}. Paste up to 20 sites to receive the comparison by email. Need help? Reply to info@oper-stack.com.`;
+        await sendCommerceMail({ logicalKey: reserved.jobId, jobId: reserved.jobId, kind: 'course-bonus', payload: { from: 'OperStack <info@oper-stack.com>', to: [email], reply_to: 'info@oper-stack.com', subject: 'Your OperStack course and site prospecting tool', text, html: `<p>${text}</p>` } });
+        await finishFulfilment(reserved.jobId, 'accepted');
+      }
       return json({ ok: true, handled: reserved.process, product: 'course', deliveredBy: 'whop' });
     } catch (error) {
       console.error('course ledger failed:', error);
@@ -232,16 +240,15 @@ export const POST: APIRoute = async ({ request }) => {
     const buyer = agencyPaid.email ?? (agencyPaid.userId ? await getBuyerEmail(agencyPaid.userId) : null);
     if (!buyer) {
       await notifyTelegram(`Агентский план оплачен (${agencyPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать ключ вручную.`);
-      return json({ ok: true, handled: false, reason: 'buyer email not found' });
+      return json({ ok: false, handled: false, reason: 'buyer email not found; retry required' }, 503);
     }
     let reserved;
     try {
-      const month = new Date().toISOString().slice(0, 7);
       reserved = await reserveFulfilment({
         provider: 'whop', eventId, eventType: agencyPaid.type,
-        orderKey: `whop:agency:${buyer}:${month}`, providerRef: agencyPaid.paymentId,
+        orderKey: oneTimeOrderKey('agency', buyer, event), providerRef: agencyPaid.paymentId,
         email: buyer, product: 'agency', kind: 'agency-key',
-        entitlementEndsAt: new Date(Date.now() + 35 * 24 * 3600_000),
+        entitlementEndsAt: new Date((Date.parse(event?.data?.paid_at || event?.data?.created_at || '') || Date.now()) + 35 * 24 * 3600_000),
         ...whopMoney(event),
       });
     } catch (error) {
@@ -257,7 +264,7 @@ export const POST: APIRoute = async ({ request }) => {
         email: buyer, key, expires,
         supportEmail: 'support@oper-stack.com', siteUrl: SITE.url,
       });
-      const sent = await sendTransactionalMail({ to: buyer, ...mail }, { idempotencyKey: reserved.jobId });
+      const sent = await sendCommerceMail({ logicalKey: reserved.jobId, jobId: reserved.jobId, kind: 'purchase-delivery', payload: { from: 'OperStack <info@oper-stack.com>', to: [buyer], reply_to: 'info@oper-stack.com', ...mail } });
       await recordMessage({ jobId: reserved.jobId, logicalKey: reserved.jobId, email: buyer, kind: 'agency-key', subject: mail.subject, provider: sent.provider, providerMessageId: sent.messageId, status: 'accepted' });
       await finishFulfilment(reserved.jobId, 'accepted');
       await notifyTelegram(`🔑 Агентский план: ключ отправлен на ${buyer}, действует до ${expires}, платёж ${agencyPaid.paymentId}.`);
@@ -277,7 +284,7 @@ export const POST: APIRoute = async ({ request }) => {
     const buyer = painPaid.email ?? (painPaid.userId ? await getBuyerEmail(painPaid.userId) : null);
     if (!buyer) {
       await notifyTelegram(`«Боль в страницы» оплачена (${painPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать ключ вручную.`);
-      return json({ ok: true, handled: false, reason: 'buyer email not found' });
+      return json({ ok: false, handled: false, reason: 'buyer email not found; retry required' }, 503);
     }
     let reserved;
     try {
@@ -299,7 +306,7 @@ export const POST: APIRoute = async ({ request }) => {
         email: buyer, key, plan: 'owner', expires, downloadUrl: link, product: 'pain-to-seo',
         supportEmail: 'support@oper-stack.com', siteUrl: SITE.url, lang: env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en',
       });
-      const sent = await sendTransactionalMail({ to: buyer, ...mail }, { idempotencyKey: reserved.jobId });
+      const sent = await sendCommerceMail({ logicalKey: reserved.jobId, jobId: reserved.jobId, kind: 'purchase-delivery', payload: { from: 'OperStack <info@oper-stack.com>', to: [buyer], reply_to: 'info@oper-stack.com', ...mail } });
       await recordMessage({ jobId: reserved.jobId, logicalKey: reserved.jobId, email: buyer, kind: 'licence', subject: mail.subject, provider: sent.provider, providerMessageId: sent.messageId, status: 'accepted' });
       await finishFulfilment(reserved.jobId, 'accepted');
       await notifyTelegram(`🔑 «Боль в страницы»: ключ отправлен на ${buyer}, обновления до ${expires}, платёж ${painPaid.paymentId}.`);
@@ -326,7 +333,7 @@ export const POST: APIRoute = async ({ request }) => {
   const buyer = siteKit.email ?? (siteKit.userId ? await getBuyerEmail(siteKit.userId) : null);
   if (!buyer) {
     await notifyTelegram(`Site Kit paid on Whop (${siteKit.paymentId}) but no buyer email was found: issue the key by hand.`);
-    return json({ ok: true, handled: false, reason: 'buyer email not found' });
+    return json({ ok: false, handled: false, reason: 'buyer email not found; retry required' }, 503);
   }
   const product: CommerceProduct = siteKit.plan === 'agency' ? 'site-kit-agency' : 'site-kit-owner';
   let reserved;
@@ -346,7 +353,7 @@ export const POST: APIRoute = async ({ request }) => {
   const downloadUrl = `${SITE.url}/api/kit-download/?t=${makeDownloadToken({ email: buyer.toLowerCase(), exp: Math.floor(Date.now() / 1000) + 30 * 24 * 3600 }, downloadSecret)}`;
   const mail = buildLicenceEmail({ email: buyer, key, plan: siteKit.plan, expires, downloadUrl, supportEmail: 'support@oper-stack.com', siteUrl: SITE.url });
   try {
-    const sent = await sendTransactionalMail({ to: buyer, ...mail }, { idempotencyKey: reserved.jobId });
+    const sent = await sendCommerceMail({ logicalKey: reserved.jobId, jobId: reserved.jobId, kind: 'purchase-delivery', payload: { from: 'OperStack <info@oper-stack.com>', to: [buyer], reply_to: 'info@oper-stack.com', ...mail } });
     await recordMessage({ jobId: reserved.jobId, logicalKey: reserved.jobId, email: buyer, kind: 'licence', subject: mail.subject, provider: sent.provider, providerMessageId: sent.messageId, status: 'accepted' });
     await finishFulfilment(reserved.jobId, 'accepted');
     await notifyTelegram(`Site Kit licence issued: ${buyer}, ${siteKit.plan}, payment ${siteKit.paymentId}.`);

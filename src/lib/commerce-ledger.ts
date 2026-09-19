@@ -3,11 +3,11 @@ import { neon } from '@neondatabase/serverless';
 import { entitlementsGranted, type CommerceProduct } from './commerce-policy';
 
 const env = (key: string): string =>
-  String((import.meta.env as Record<string, unknown>)[key] ?? process.env[key] ?? '').trim();
+  String(process.env[key] ?? (import.meta.env as Record<string, unknown> | undefined)?.[key] ?? '').trim();
 
 let schemaReady: Promise<void> | null = null;
 
-function db() {
+export function db() {
   const url = env('DATABASE_URL');
   if (!url) throw new Error('DATABASE_URL is not configured');
   return neon(url);
@@ -85,6 +85,16 @@ export async function ensureCommerceSchema(): Promise<void> {
       reason text NOT NULL DEFAULT '',
       updated_at timestamptz NOT NULL DEFAULT now()
     )`;
+    await sql`CREATE TABLE IF NOT EXISTS commerce_delivery_events (
+      provider text NOT NULL, message_id text NOT NULL, status text NOT NULL, email text NOT NULL,
+      received_at timestamptz NOT NULL DEFAULT now(), PRIMARY KEY(provider,message_id,status,email)
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS commerce_outbox (
+      logical_key text PRIMARY KEY, payload jsonb NOT NULL, kind text NOT NULL, email text NOT NULL,
+      offered jsonb, job_id text, status text NOT NULL DEFAULT 'pending', provider_message_id text,
+      first_attempt_at timestamptz, lease_until timestamptz, attempts integer NOT NULL DEFAULT 0,
+      last_error text NOT NULL DEFAULT '', created_at timestamptz NOT NULL DEFAULT now(), updated_at timestamptz NOT NULL DEFAULT now()
+    )`;
   })().catch((error) => {
     schemaReady = null;
     throw error;
@@ -120,17 +130,18 @@ export async function reserveFulfilment(input: ReserveInput): Promise<{ process:
       (id, order_key, source, provider_ref, email, product, site, status, amount, currency, metadata)
     VALUES (${proposedOrderId}, ${input.orderKey}, ${input.provider}, ${input.providerRef ?? ''}, ${email}, ${input.product}, ${input.site ?? ''}, 'paid', ${input.amount ?? null}, ${input.currency ?? ''}, ${JSON.stringify(input.metadata ?? {})}::jsonb)
     ON CONFLICT (order_key) DO UPDATE SET
-      provider_ref = CASE WHEN excluded.provider_ref <> '' THEN excluded.provider_ref ELSE commerce_orders.provider_ref END,
+      provider_ref = CASE WHEN excluded.provider_ref LIKE 'pay_%' THEN excluded.provider_ref ELSE commerce_orders.provider_ref END,
       amount = COALESCE(commerce_orders.amount, excluded.amount),
       currency = CASE WHEN commerce_orders.currency = '' THEN excluded.currency ELSE commerce_orders.currency END,
       updated_at = now()
-    RETURNING id`;
+    RETURNING id, status`;
   const orderId = String(orders[0].id);
+  if (orders[0].status !== 'paid') return { process: false, orderId, jobId: '' };
   for (const product of entitlementsGranted(input.product)) {
     await sql`INSERT INTO commerce_entitlements
         (id, order_id, email, product, site, status, ends_at)
       VALUES (${randomUUID()}, ${orderId}, ${email}, ${product}, ${input.site ?? ''}, 'active', ${input.entitlementEndsAt?.toISOString() ?? null})
-      ON CONFLICT (order_id, product) DO UPDATE SET status = 'active', ends_at = excluded.ends_at`;
+      ON CONFLICT (order_id, product) DO NOTHING`;
   }
   const proposedJobId = randomUUID();
   const jobs = await sql`INSERT INTO commerce_fulfilment_jobs (id, order_id, kind)
@@ -143,6 +154,10 @@ export async function reserveFulfilment(input: ReserveInput): Promise<{ process:
     WHERE id = ${jobId}
       AND (status IN ('pending', 'failed') OR (status = 'processing' AND lease_until < now()))
     RETURNING id`;
+  if (!claimed.length) {
+    const state = await sql`SELECT status FROM commerce_fulfilment_jobs WHERE id = ${jobId}`;
+    if (state[0]?.status === 'processing') throw new Error('fulfilment in progress; retry later');
+  }
   return { process: claimed.length > 0, orderId, jobId };
 }
 
@@ -186,19 +201,33 @@ export async function recordMessage(input: {
     ON CONFLICT (logical_key) DO UPDATE SET
       provider = excluded.provider,
       provider_message_id = COALESCE(excluded.provider_message_id, commerce_messages.provider_message_id),
-      status = excluded.status,
+      status = CASE WHEN commerce_messages.status IN ('delivered','bounced','complained') THEN commerce_messages.status ELSE excluded.status END,
       metadata = commerce_messages.metadata || excluded.metadata,
       updated_at = now()`;
+  if (input.providerMessageId) await reconcileDelivery(input.provider, input.providerMessageId);
 }
 
 export async function updateProviderMessage(provider: string, providerMessageId: string, status: string, email = ''): Promise<void> {
   await ensureCommerceSchema();
   const sql = db();
-  await sql`UPDATE commerce_messages SET status = ${status}, updated_at = now()
-    WHERE provider = ${provider} AND provider_message_id = ${providerMessageId}`;
-  if (email && ['bounced', 'complained'].includes(status)) {
-    await setMarketingPermission(email, false, status);
-  }
+  await sql`INSERT INTO commerce_delivery_events (provider, message_id, status, email)
+    VALUES (${provider}, ${providerMessageId}, ${status}, ${email.toLowerCase()}) ON CONFLICT DO NOTHING`;
+  await reconcileDelivery(provider, providerMessageId);
+}
+
+export async function reconcileDelivery(provider: string, id: string): Promise<void> {
+  const sql = db();
+  await sql`UPDATE commerce_messages m SET status = e.status, updated_at = now()
+    FROM (SELECT status FROM commerce_delivery_events WHERE provider = ${provider} AND message_id = ${id}
+      ORDER BY CASE status WHEN 'complained' THEN 6 WHEN 'bounced' THEN 5 WHEN 'delivered' THEN 4
+      WHEN 'failed' THEN 3 WHEN 'delayed' THEN 2 ELSE 1 END DESC LIMIT 1) e
+    WHERE m.provider = ${provider} AND m.provider_message_id = ${id}`;
+  await sql`INSERT INTO commerce_contact_preferences (email, marketing_allowed, reason)
+    SELECT DISTINCT lower(m.email), false, 'delivery failure'
+    FROM commerce_messages m JOIN commerce_delivery_events e
+      ON e.provider = m.provider AND e.message_id = m.provider_message_id AND lower(e.email) = lower(m.email)
+    WHERE m.provider = ${provider} AND m.provider_message_id = ${id} AND e.status IN ('bounced','complained')
+    ON CONFLICT (email) DO UPDATE SET marketing_allowed = false, reason = excluded.reason, updated_at = now()`;
 }
 
 export async function setMarketingPermission(email: string, allowed: boolean, reason: string): Promise<void> {
@@ -232,7 +261,7 @@ export async function messageExists(logicalKey: string): Promise<boolean> {
   await ensureCommerceSchema();
   const sql = db();
   const rows = await sql`SELECT 1 FROM commerce_messages
-    WHERE logical_key = ${logicalKey} AND status NOT IN ('failed', 'bounced') LIMIT 1`;
+    WHERE logical_key = ${logicalKey} LIMIT 1`;
   return rows.length > 0;
 }
 
@@ -288,13 +317,15 @@ export function verifyInternalSignature(raw: string, headers: { timestamp: strin
 
 export function verifyStandardWebhook(raw: string, headers: { id: string | null; timestamp: string | null; signature: string | null }, secret: string, now = Math.floor(Date.now() / 1000)): boolean {
   const ts = Number(headers.timestamp);
-  if (!headers.id || !headers.signature || !Number.isFinite(ts) || Math.abs(now - ts) > 300) return false;
+  if (!secret || !headers.id || !headers.signature || !Number.isFinite(ts) || Math.abs(now - ts) > 300) return false;
   const bare = secret.replace(/^whsec_/, '');
   let key: Buffer;
   try { key = Buffer.from(bare, 'base64'); } catch { return false; }
+  if (!key.length) return false;
   const expected = createHmac('sha256', key).update(`${headers.id}.${headers.timestamp}.${raw}`).digest();
   return headers.signature.split(' ').some((part) => {
-    const value = part.trim().replace(/^v1,?/, '');
+    if (!part.startsWith('v1,')) return false;
+    const value = part.slice(3);
     const supplied = Buffer.from(value, 'base64');
     return supplied.length === expected.length && timingSafeEqual(supplied, expected);
   });

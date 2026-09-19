@@ -56,6 +56,7 @@ async function sendViaResend(letter: {
       'Content-Type': 'application/json',
       ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey.slice(0, 256) } : {}),
     },
+    signal: AbortSignal.timeout(20_000),
     body: JSON.stringify({
       from: letter.from,
       to: [letter.to],
@@ -113,7 +114,7 @@ export async function sendTransactionalMail(
       const status = Number((e as Error & { status?: number }).status || 0);
       // A network error or a 5xx response is ambiguous: Resend may have accepted the message before
       // the connection failed. Retrying with the same idempotency key is safe; switching providers is not.
-      if (!status || status >= 500) throw e;
+      if (!status || status >= 500 || status === 409 || options.idempotencyKey) throw e;
       console.error('resend rejected the message, falling back to google:', (e as Error).message);
     }
   }

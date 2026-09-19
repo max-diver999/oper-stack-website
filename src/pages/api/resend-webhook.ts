@@ -5,7 +5,7 @@ import { updateProviderMessage, verifyStandardWebhook } from '../../lib/commerce
 export const prerender = false;
 
 const env = (key: string): string =>
-  String((import.meta.env as Record<string, unknown>)[key] ?? process.env[key] ?? '').trim();
+  String(process.env[key] ?? (import.meta.env as Record<string, unknown> | undefined)?.[key] ?? '').trim();
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status,
   headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
@@ -29,6 +29,7 @@ export const POST: APIRoute = async ({ request }) => {
   }, env('RESEND_WEBHOOK_SECRET'))) return json({ ok: false, error: 'bad signature' }, 401);
   let event: any;
   try { event = JSON.parse(raw); } catch { return json({ ok: false, error: 'bad JSON' }, 400); }
+  if (!/@oper-stack\.(com|ru)>?$/i.test(String(event?.data?.from || ''))) return json({ ok: true, handled: false });
   const status = STATUS[String(event?.type || '')];
   const messageId = String(event?.data?.email_id ?? event?.data?.id ?? '');
   if (!status || !messageId) return json({ ok: true, handled: false });

@@ -1,5 +1,6 @@
 /** Signed internal API used by the RU checkout and the email worker. */
 import type { APIRoute } from 'astro';
+import { sendCommerceMail, retryCommerceMail } from '../../lib/commerce-mail';
 import {
   marketingEligibility,
   messageExists,
@@ -16,7 +17,7 @@ const PRODUCTS = new Set<CommerceProduct>([
   'report-9', 'report-29', 'audit-149', 'agency', 'site-kit-owner', 'site-kit-agency', 'pain-to-seo', 'course',
 ]);
 const env = (key: string): string =>
-  String((import.meta.env as Record<string, unknown>)[key] ?? process.env[key] ?? '').trim();
+  String(process.env[key] ?? (import.meta.env as Record<string, unknown> | undefined)?.[key] ?? '').trim();
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), {
   status,
   headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' },
@@ -33,6 +34,18 @@ export const POST: APIRoute = async ({ request }) => {
   let body: Record<string, any>;
   try { body = JSON.parse(raw); } catch { return json({ ok: false, error: 'bad JSON' }, 400); }
   try {
+    if (body.action === 'retry_mail') return json({ ok: true, ...await retryCommerceMail() });
+    if (body.action === 'send_mail') {
+      if (!body.logicalKey || !body.kind || !body.payload || !Array.isArray(body.payload.to)
+        || body.payload.to.length !== 1 || !String(body.payload.to[0]).includes('@')
+        || !body.payload.subject || !body.payload.text || !/@oper-stack\.(com|ru)>?$/.test(body.payload.from || '')) {
+        return json({ ok: false, error: 'invalid mail' }, 400);
+      }
+      if (body.offered !== undefined && (!Array.isArray(body.offered) || body.offered.some((p: unknown) => !product(p))))
+        return json({ ok: false, error: 'invalid offers' }, 400);
+      return json({ ok: true, ...await sendCommerceMail({ logicalKey: String(body.logicalKey), kind: String(body.kind),
+        payload: body.payload, offered: body.offered }) });
+    }
     if (body.action === 'eligibility') {
       const offered = Array.isArray(body.offered) ? body.offered.map(product).filter(Boolean) as CommerceProduct[] : [];
       const logicalKey = String(body.logicalKey || '');

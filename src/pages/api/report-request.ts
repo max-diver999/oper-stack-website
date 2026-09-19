@@ -16,7 +16,9 @@
  */
 import type { APIRoute } from 'astro';
 import { buildRunBody, buildRunSubject, normaliseSiteUrl, verifyReportToken } from '../../lib/report-fulfilment';
-import { sendTransactionalMail } from '../../lib/mail-smtp';
+import { sendCommerceMail } from '../../lib/commerce-mail';
+import { db, ensureCommerceSchema } from '../../lib/commerce-ledger';
+import { createHash } from 'node:crypto';
 
 export const prerender = false;
 
@@ -80,10 +82,11 @@ export const POST: APIRoute = async ({ request }) => {
   if (!check.ok || !check.claims) {
     return page('Link not valid', `<h1>This link is not valid</h1><p>${escape(check.reason || 'unknown reason')}. Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> from the address you paid with and we will send a fresh one.</p>`, 403);
   }
-  const { email, tier, lang } = check.claims;
+  const { email, tier, lang, orderId, purpose } = check.claims;
+  if (purpose === 'prospect') return page('Wrong form', '<h1>Use the prospecting form from your email</h1>', 403);
 
   const url = normaliseSiteUrl(site);
-  if (!url.ok) {
+  if (url.ok === false) {
     const back = `/report/?t=${encodeURIComponent(token)}&e=${encodeURIComponent(url.reason)}`;
     return page('Check the address', `<h1>${escape(url.reason)}</h1><p><a href="${escape(back)}">Go back and try again</a>.</p>`, 400);
   }
@@ -97,9 +100,16 @@ export const POST: APIRoute = async ({ request }) => {
   const rivals = rivalCap
     ? rivalsRaw.map((r) => normaliseSiteUrl(r)).filter((r): r is { ok: true; url: string } => r.ok).map((r) => r.url).slice(0, rivalCap)
     : [];
-  const job = { url: url.url, email, lang, tier, rivals };
+  const jobId = orderId || createHash('sha256').update(token + url.url).digest('hex');
+  const job = { jobId, url: url.url, email, lang, tier, rivals };
   try {
-    await sendTransactionalMail({ to: QUEUE_TO, subject: buildRunSubject(job), ...buildRunBody(job, secret) });
+    if (orderId) {
+      await ensureCommerceSchema();
+      const sql = db();
+      const rows = await sql`UPDATE commerce_orders SET site=${url.url},updated_at=now() WHERE id=${orderId} AND email=${email.toLowerCase()} AND status='paid' AND (site='' OR site=${url.url}) RETURNING id`;
+      if (!rows.length) return page('Order unavailable', '<h1>This purchase is unavailable or already assigned to another site</h1>', 409);
+    }
+    await sendCommerceMail({ logicalKey: `report-queue:${jobId}`, kind: 'report-queue', payload: { from: 'OperStack <info@oper-stack.com>', to: [QUEUE_TO], subject: buildRunSubject(job), ...buildRunBody(job, secret) } });
   } catch {
     return page('Could not queue', '<h1>We could not put the request through</h1><p>Nothing is lost. Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> with the address of your site and we will run it by hand.</p>', 502);
   }
