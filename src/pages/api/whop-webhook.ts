@@ -14,10 +14,11 @@ import type { APIRoute } from 'astro';
 import { SITE } from '../../data/site';
 import { button, emailShell, note, p as par } from '../../lib/email-shell';
 import { buildAgencyEmail,
-  buildLicenceEmail, handleWhopPayment, issueLicenceKey, makeDownloadToken, parsePriceMap, readWhopPayment, verifyWhopSignature } from '../../lib/licence-fulfilment';
+  buildLicenceEmail, issueLicenceKey, makeDownloadToken, parsePriceMap, readWhopPayment, verifyWhopSignature } from '../../lib/licence-fulfilment';
 import { buildReportWelcomeEmail, makeReportToken, readWhopReport, reportTierMap, TOKEN_DAYS } from '../../lib/report-fulfilment';
 import { sendTransactionalMail } from '../../lib/mail-smtp';
-import { claimOnce, purchaseKey } from '../../lib/webhook-once';
+import { finishFulfilment, recordMessage, reserveFulfilment, revokeByProviderReference } from '../../lib/commerce-ledger';
+import type { CommerceProduct } from '../../lib/commerce-policy';
 
 export const prerender = false;
 
@@ -26,6 +27,30 @@ const env = (key: string, fallback = ''): string =>
 
 const json = (body: unknown, status = 200) =>
   new Response(JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': 'no-store' } });
+
+/**
+ * A paid Whop event contains both pay_... and membership mem_.... The matching membership event
+ * uses that same mem_... as data.id. Basing one-time fulfilment on the membership therefore joins
+ * the two webhook types, while a second legitimate purchase creates a new membership and remains
+ * deliverable. The final email fallback is only for old/malformed payloads with neither id.
+ */
+function oneTimeOrderKey(product: CommerceProduct, email: string, event: any): string {
+  const data = event?.data ?? {};
+  const type = String(event?.type ?? event?.event ?? event?.action ?? '');
+  const membership = data.membership?.id ?? data.membership_id
+    ?? (type.startsWith('membership.') || type === 'membership_went_valid' ? data.id : '');
+  const reference = String(membership || (type === 'payment.succeeded' ? data.id : '') || '').trim();
+  return `whop:${product}:${reference || email.toLowerCase()}`;
+}
+
+function whopMoney(event: any): { amount?: number; currency?: string } {
+  const data = event?.data ?? {};
+  const amount = Number(data.total ?? data.final_amount ?? data.subtotal);
+  return {
+    ...(Number.isFinite(amount) ? { amount } : {}),
+    ...(typeof data.currency === 'string' ? { currency: data.currency.toUpperCase() } : {}),
+  };
+}
 
 
 async function notifyTelegram(text: string): Promise<void> {
@@ -91,12 +116,27 @@ export const POST: APIRoute = async ({ request }) => {
     signature: request.headers.get('webhook-signature'),
   }, secret);
   if (!check.ok) return json({ error: check.reason }, 401);
+  const eventId = request.headers.get('webhook-id') || 'missing-event-id';
 
   let event: any;
   try {
     event = JSON.parse(raw);
   } catch {
     return json({ error: 'body is not JSON' }, 400);
+  }
+
+  const incomingType = String(event?.type ?? event?.event ?? event?.action ?? '');
+  if (incomingType === 'payment.refunded') {
+    const reference = String(event?.data?.payment?.id ?? event?.data?.payment_id
+      ?? (incomingType.startsWith('payment.') ? event?.data?.id : '') ?? '');
+    if (!reference) return json({ ok: true, handled: false, reason: 'refund without payment id' });
+    try {
+      const revoked = await revokeByProviderReference('whop', reference, 'refunded');
+      return json({ ok: true, handled: revoked > 0, revoked });
+    } catch (error) {
+      console.error('refund ledger failed:', error);
+      return json({ ok: false, error: 'ledger unavailable; retry this webhook' }, 503);
+    }
   }
 
   const privatePem = Buffer.from(env('OPERSTACK_LICENCE_PRIVATE_KEY_B64'), 'base64').toString('utf8');
@@ -115,25 +155,70 @@ export const POST: APIRoute = async ({ request }) => {
       await notifyTelegram(`Отчёт за ${report.tier} оплачен на Whop (${report.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать вручную.`);
       return json({ ok: true, handled: false, reason: 'buyer email not found' });
     }
-    /*
-     * С 18.09.2026 вебхук слушает и платёж, и появление членства: без второго не работает выдача
-     * по промокоду на сто процентов, потому что платежа там нет вовсе. Обычная покупка при этом
-     * порождает оба события подряд, поэтому первое берёт замок, а второе молчит.
-     */
-    if (!(await claimOnce(purchaseKey(`report:${report.tier}`, buyer)))) {
-      return json({ ok: true, handled: false, reason: 'already delivered' });
+    const product: CommerceProduct = report.tier === '9' ? 'report-9' : report.tier === '29' ? 'report-29' : 'audit-149';
+    let reserved;
+    try {
+      reserved = await reserveFulfilment({
+        provider: 'whop', eventId, eventType: report.type,
+        orderKey: oneTimeOrderKey(product, buyer, event), providerRef: report.paymentId,
+        email: buyer, product, kind: 'report-welcome', metadata: { matchedId: report.matchedId },
+        ...whopMoney(event),
+      });
+    } catch (error) {
+      console.error('report ledger reservation failed:', error);
+      return json({ ok: false, error: 'ledger unavailable; retry this webhook' }, 503);
     }
+    if (!reserved.process) return json({ ok: true, handled: false, reason: 'already delivered or being delivered' });
     const lang = env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en';
     const token = makeReportToken({ email: buyer, tier: report.tier, lang, exp: Math.floor(Date.now() / 1000) + TOKEN_DAYS * 24 * 3600 }, downloadSecret);
     const link = `${SITE.url}/report/?t=${encodeURIComponent(token)}${lang === 'ru' ? '&lang=ru' : ''}`;
     try {
-      await sendTransactionalMail({ to: buyer, ...buildReportWelcomeEmail({ tier: report.tier, lang, link }) });
+      const mail = buildReportWelcomeEmail({ tier: report.tier, lang, link });
+      const sent = await sendTransactionalMail({ to: buyer, ...mail }, { idempotencyKey: reserved.jobId });
+      await recordMessage({
+        jobId: reserved.jobId, logicalKey: reserved.jobId, email: buyer, kind: 'report-welcome',
+        subject: mail.subject, provider: sent.provider, providerMessageId: sent.messageId, status: 'accepted',
+      });
+      await finishFulfilment(reserved.jobId, 'accepted');
       await notifyTelegram(`📄 Отчёт за ${report.tier}: ${buyer} получил ссылку на форму.`);
       return json({ ok: true, handled: true, product: 'report', tier: report.tier });
     } catch (err) {
       console.error('report welcome mail failed:', err);
+      await finishFulfilment(reserved.jobId, 'failed', (err as Error).message).catch(console.error);
       await notifyTelegram(`Отчёт за ${report.tier} оплачен (${report.paymentId}), но письмо ${buyer} не ушло: ${(err as Error).message}. Отправить ссылку вручную.`);
-      return json({ ok: true, handled: false, reason: 'welcome mail failed' });
+      return json({ ok: false, handled: false, reason: 'welcome mail failed; retry this webhook' }, 503);
+    }
+  }
+
+  // The course itself lives in Whop Courses, so Whop performs the delivery. We still record the
+  // entitlement here: otherwise the central dashboard misses the sale and the sequence can keep
+  // offering products without knowing this buyer exists.
+  const data = event?.data ?? {};
+  const courseIds = env('WHOP_COURSE_IDS').split(',').map((value) => value.trim()).filter(Boolean);
+  const candidateIds = [data.product_id, data.plan_id, data.access_pass_id, data.product?.id, data.plan?.id, data.access_pass?.id]
+    .filter((value): value is string => typeof value === 'string');
+  const productName = String(data.product_name ?? data.product?.title ?? data.product?.name ?? data.plan?.name ?? data.access_pass?.title ?? '');
+  const coursePaid = courseIds.some((id) => candidateIds.includes(id)) || /invisible\s+to\s+chatgpt/i.test(productName);
+  const paidType = String(event?.type ?? event?.event ?? event?.action ?? '');
+  if (coursePaid && ['payment.succeeded', 'membership.activated', 'membership.went_valid', 'membership_went_valid'].includes(paidType)) {
+    const parsed = readWhopPayment(event, Object.fromEntries(courseIds.map((id) => [id, 'owner' as const])));
+    const email = parsed.email ?? (parsed.userId ? await getBuyerEmail(parsed.userId) : null);
+    if (!email) {
+      await notifyTelegram(`Course paid on Whop (${parsed.paymentId}) but no buyer email was found.`);
+      return json({ ok: true, handled: false, reason: 'buyer email not found' });
+    }
+    try {
+      const reserved = await reserveFulfilment({
+        provider: 'whop', eventId, eventType: paidType,
+        orderKey: oneTimeOrderKey('course', email, event), providerRef: parsed.paymentId,
+        email, product: 'course', kind: 'whop-course-access', metadata: { deliveredBy: 'whop' },
+        ...whopMoney(event),
+      });
+      if (reserved.process) await finishFulfilment(reserved.jobId, 'accepted');
+      return json({ ok: true, handled: reserved.process, product: 'course', deliveredBy: 'whop' });
+    } catch (error) {
+      console.error('course ledger failed:', error);
+      return json({ ok: false, error: 'ledger unavailable; retry this webhook' }, 503);
     }
   }
 
@@ -149,20 +234,39 @@ export const POST: APIRoute = async ({ request }) => {
       await notifyTelegram(`Агентский план оплачен (${agencyPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать ключ вручную.`);
       return json({ ok: true, handled: false, reason: 'buyer email not found' });
     }
+    let reserved;
+    try {
+      const month = new Date().toISOString().slice(0, 7);
+      reserved = await reserveFulfilment({
+        provider: 'whop', eventId, eventType: agencyPaid.type,
+        orderKey: `whop:agency:${buyer}:${month}`, providerRef: agencyPaid.paymentId,
+        email: buyer, product: 'agency', kind: 'agency-key',
+        entitlementEndsAt: new Date(Date.now() + 35 * 24 * 3600_000),
+        ...whopMoney(event),
+      });
+    } catch (error) {
+      console.error('agency ledger reservation failed:', error);
+      return json({ ok: false, error: 'ledger unavailable; retry this webhook' }, 503);
+    }
+    if (!reserved.process) return json({ ok: true, handled: false, reason: 'already delivered or being delivered' });
     // 35 дней, а не 30: платёж может задержаться на сутки, и оформление не должно отваливаться
     // у того, кто заплатил вовремя.
     const { key, expires } = issueLicenceKey({ email: buyer, plan: 'agency', days: 35 }, privatePem);
     try {
-      await sendTransactionalMail({ to: buyer, ...buildAgencyEmail({
+      const mail = buildAgencyEmail({
         email: buyer, key, expires,
         supportEmail: 'support@oper-stack.com', siteUrl: SITE.url,
-      }) });
+      });
+      const sent = await sendTransactionalMail({ to: buyer, ...mail }, { idempotencyKey: reserved.jobId });
+      await recordMessage({ jobId: reserved.jobId, logicalKey: reserved.jobId, email: buyer, kind: 'agency-key', subject: mail.subject, provider: sent.provider, providerMessageId: sent.messageId, status: 'accepted' });
+      await finishFulfilment(reserved.jobId, 'accepted');
       await notifyTelegram(`🔑 Агентский план: ключ отправлен на ${buyer}, действует до ${expires}, платёж ${agencyPaid.paymentId}.`);
       return json({ ok: true, handled: true, product: 'agency' });
     } catch (err) {
       console.error('agency mail failed:', err);
+      await finishFulfilment(reserved.jobId, 'failed', (err as Error).message).catch(console.error);
       await notifyTelegram(`Агентский план оплачен (${agencyPaid.paymentId}), но письмо ${buyer} не ушло: ${(err as Error).message}. Отправить ключ вручную.`);
-      return json({ ok: true, handled: false, reason: 'agency mail failed' });
+      return json({ ok: false, handled: false, reason: 'agency mail failed; retry this webhook' }, 503);
     }
   }
 
@@ -175,22 +279,36 @@ export const POST: APIRoute = async ({ request }) => {
       await notifyTelegram(`«Боль в страницы» оплачена (${painPaid.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать ключ вручную.`);
       return json({ ok: true, handled: false, reason: 'buyer email not found' });
     }
-    if (!(await claimOnce(purchaseKey('pain-to-seo', buyer)))) {
-      return json({ ok: true, handled: false, reason: 'already delivered' });
+    let reserved;
+    try {
+      reserved = await reserveFulfilment({
+        provider: 'whop', eventId, eventType: painPaid.type,
+        orderKey: oneTimeOrderKey('pain-to-seo', buyer, event), providerRef: painPaid.paymentId,
+        email: buyer, product: 'pain-to-seo', kind: 'licence',
+        ...whopMoney(event),
+      });
+    } catch (error) {
+      console.error('pain-to-seo ledger reservation failed:', error);
+      return json({ ok: false, error: 'ledger unavailable; retry this webhook' }, 503);
     }
+    if (!reserved.process) return json({ ok: true, handled: false, reason: 'already delivered or being delivered' });
     const { key, expires } = issueLicenceKey({ email: buyer, plan: 'owner' }, privatePem);
     const link = `${SITE.url}/api/kit-download/?t=${makeDownloadToken({ email: buyer.toLowerCase(), product: 'pain-to-seo', exp: Math.floor(Date.now() / 1000) + 30 * 24 * 3600 }, downloadSecret)}`;
     try {
-      await sendTransactionalMail({ to: buyer, ...buildLicenceEmail({
+      const mail = buildLicenceEmail({
         email: buyer, key, plan: 'owner', expires, downloadUrl: link, product: 'pain-to-seo',
         supportEmail: 'support@oper-stack.com', siteUrl: SITE.url, lang: env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en',
-      }) });
+      });
+      const sent = await sendTransactionalMail({ to: buyer, ...mail }, { idempotencyKey: reserved.jobId });
+      await recordMessage({ jobId: reserved.jobId, logicalKey: reserved.jobId, email: buyer, kind: 'licence', subject: mail.subject, provider: sent.provider, providerMessageId: sent.messageId, status: 'accepted' });
+      await finishFulfilment(reserved.jobId, 'accepted');
       await notifyTelegram(`🔑 «Боль в страницы»: ключ отправлен на ${buyer}, обновления до ${expires}, платёж ${painPaid.paymentId}.`);
       return json({ ok: true, handled: true, product: 'pain-to-seo' });
     } catch (err) {
       console.error('pain-to-seo mail failed:', err);
+      await finishFulfilment(reserved.jobId, 'failed', (err as Error).message).catch(console.error);
       await notifyTelegram(`«Боль в страницы» оплачена (${painPaid.paymentId}), но письмо ${buyer} не ушло: ${(err as Error).message}. Отправить ключ вручную.`);
-      return json({ ok: true, handled: false, reason: 'licence mail failed' });
+      return json({ ok: false, handled: false, reason: 'licence mail failed; retry this webhook' }, 503);
     }
   }
 
@@ -200,22 +318,44 @@ export const POST: APIRoute = async ({ request }) => {
    * что человек за 149 долларов не получит ничего. Теперь аудит это обычная ступень отчёта и
    * обслуживается веткой выше: письмо со ссылкой на форму, дальше очередь.
    */
+  const siteKit = readWhopPayment(event, parsePriceMap(env('WHOP_SITE_KIT_IDS')));
+  if (!['payment.succeeded', 'membership.activated', 'membership.went_valid', 'membership_went_valid'].includes(siteKit.type)) {
+    return json({ ok: true, handled: false, reason: `ignored event ${siteKit.type || 'unknown'}` });
+  }
+  if (!siteKit.plan) return json({ ok: true, handled: false, reason: 'no known product in this payment' });
+  const buyer = siteKit.email ?? (siteKit.userId ? await getBuyerEmail(siteKit.userId) : null);
+  if (!buyer) {
+    await notifyTelegram(`Site Kit paid on Whop (${siteKit.paymentId}) but no buyer email was found: issue the key by hand.`);
+    return json({ ok: true, handled: false, reason: 'buyer email not found' });
+  }
+  const product: CommerceProduct = siteKit.plan === 'agency' ? 'site-kit-agency' : 'site-kit-owner';
+  let reserved;
   try {
-    const result = await handleWhopPayment(event, {
-      idToPlan: parsePriceMap(env('WHOP_SITE_KIT_IDS')),
-      getBuyerEmail,
-      issue: (email, plan) => issueLicenceKey({ email, plan }, privatePem),
-      downloadUrl: (email) => `${SITE.url}/api/kit-download/?t=${makeDownloadToken({ email: email.toLowerCase(), exp: Math.floor(Date.now() / 1000) + 30 * 24 * 3600 }, downloadSecret)}`,
-      sendMail: sendTransactionalMail,
-      notify: notifyTelegram,
-      supportEmail: 'support@oper-stack.com',
-      siteUrl: SITE.url,
+    reserved = await reserveFulfilment({
+      provider: 'whop', eventId, eventType: siteKit.type,
+      orderKey: oneTimeOrderKey(product, buyer, event), providerRef: siteKit.paymentId,
+      email: buyer, product, kind: 'licence',
+      ...whopMoney(event),
     });
-    return json({ ok: true, ...result });
+  } catch (error) {
+    console.error('site-kit ledger reservation failed:', error);
+    return json({ ok: false, error: 'ledger unavailable; retry this webhook' }, 503);
+  }
+  if (!reserved.process) return json({ ok: true, handled: false, reason: 'already delivered or being delivered' });
+  const { key, expires } = issueLicenceKey({ email: buyer, plan: siteKit.plan }, privatePem);
+  const downloadUrl = `${SITE.url}/api/kit-download/?t=${makeDownloadToken({ email: buyer.toLowerCase(), exp: Math.floor(Date.now() / 1000) + 30 * 24 * 3600 }, downloadSecret)}`;
+  const mail = buildLicenceEmail({ email: buyer, key, plan: siteKit.plan, expires, downloadUrl, supportEmail: 'support@oper-stack.com', siteUrl: SITE.url });
+  try {
+    const sent = await sendTransactionalMail({ to: buyer, ...mail }, { idempotencyKey: reserved.jobId });
+    await recordMessage({ jobId: reserved.jobId, logicalKey: reserved.jobId, email: buyer, kind: 'licence', subject: mail.subject, provider: sent.provider, providerMessageId: sent.messageId, status: 'accepted' });
+    await finishFulfilment(reserved.jobId, 'accepted');
+    await notifyTelegram(`Site Kit licence issued: ${buyer}, ${siteKit.plan}, payment ${siteKit.paymentId}.`);
+    return json({ ok: true, handled: true, product: 'site-kit', plan: siteKit.plan });
   } catch (err) {
-    console.error('fulfilment failed:', err);
-    await notifyTelegram(`Site Kit fulfilment failed for Whop payment ${event?.data?.id ?? ''}: ${(err as Error).message}. Issue the key by hand.`);
-    return json({ ok: true, handled: false, reason: 'fulfilment error, owner notified' });
+    console.error('site-kit fulfilment failed:', err);
+    await finishFulfilment(reserved.jobId, 'failed', (err as Error).message).catch(console.error);
+    await notifyTelegram(`Site Kit fulfilment failed for Whop payment ${siteKit.paymentId}: ${(err as Error).message}.`);
+    return json({ ok: false, handled: false, reason: 'licence mail failed; retry this webhook' }, 503);
   }
 };
 

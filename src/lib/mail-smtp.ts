@@ -48,10 +48,14 @@ const RESEND_API_KEY = (
  */
 async function sendViaResend(letter: {
   from: string; to: string; cc?: string; replyTo: string; subject: string; text: string; html: string;
-}): Promise<void> {
+}, idempotencyKey?: string): Promise<{ provider: 'resend'; messageId: string }> {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
-    headers: { Authorization: `Bearer ${RESEND_API_KEY}`, 'Content-Type': 'application/json' },
+    headers: {
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+      'Content-Type': 'application/json',
+      ...(idempotencyKey ? { 'Idempotency-Key': idempotencyKey.slice(0, 256) } : {}),
+    },
     body: JSON.stringify({
       from: letter.from,
       to: [letter.to],
@@ -62,12 +66,24 @@ async function sendViaResend(letter: {
       html: letter.html,
     }),
   });
-  if (!res.ok) throw new Error(`resend ${res.status}: ${(await res.text()).slice(0, 200)}`);
+  if (!res.ok) {
+    const error = new Error(`resend ${res.status}: ${(await res.text()).slice(0, 200)}`) as Error & { status?: number };
+    error.status = res.status;
+    throw error;
+  }
+  const data = await res.json() as { id?: string };
+  if (!data.id) throw new Error('resend accepted the request without a message id');
+  return { provider: 'resend', messageId: data.id };
 }
 
 const timeouts = { connectionTimeout: 10_000, greetingTimeout: 10_000, socketTimeout: 15_000 };
 
-export async function sendTransactionalMail(msg: { to: string; subject: string; text: string; html: string }): Promise<void> {
+export type MailResult = { provider: 'resend' | 'google'; messageId: string };
+
+export async function sendTransactionalMail(
+  msg: { to: string; subject: string; text: string; html: string },
+  options: { idempotencyKey?: string } = {},
+): Promise<MailResult> {
   const user = env('SMTP_USER');
   const pass = env('SMTP_PASS');
   if (!user || !pass) throw new Error('SMTP_USER or SMTP_PASS is not set');
@@ -92,11 +108,13 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
   // function alive until the platform kills it, which is what a 504 after a delivered email looks like.
   if (RESEND_API_KEY && goesOutside(msg.to, cc)) {
     try {
-      await sendViaResend(letter);
-      return;
+      return await sendViaResend(letter, options.idempotencyKey);
     } catch (e) {
-      // Домен не подтверждён, лимит выбран, служба недоступна: причина неважна, человек ждёт письмо.
-      console.error('resend refused, falling back to google:', (e as Error).message);
+      const status = Number((e as Error & { status?: number }).status || 0);
+      // A network error or a 5xx response is ambiguous: Resend may have accepted the message before
+      // the connection failed. Retrying with the same idempotency key is safe; switching providers is not.
+      if (!status || status >= 500) throw e;
+      console.error('resend rejected the message, falling back to google:', (e as Error).message);
     }
   }
 
@@ -104,7 +122,8 @@ export async function sendTransactionalMail(msg: { to: string; subject: string; 
     host: 'smtp.gmail.com', port: 465, secure: true, auth: { user, pass }, pool: false, ...timeouts,
   });
   try {
-    await google.sendMail(letter);
+    const info = await google.sendMail(letter);
+    return { provider: 'google', messageId: String(info.messageId || '') };
   } finally {
     google.close();
   }

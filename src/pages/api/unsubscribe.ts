@@ -17,6 +17,7 @@
  */
 import type { APIRoute } from 'astro';
 import { createHmac, timingSafeEqual } from 'node:crypto';
+import { setMarketingPermission } from '../../lib/commerce-ledger';
 import { markUnsubscribed } from '../../lib/sheets-log';
 
 export const prerender = false;
@@ -61,6 +62,9 @@ export const GET: APIRoute = async ({ url }) => {
   // «Нет в списке» это тоже успех: писать этому человеку мы не будем, а значит он получил
   // то, за чем пришёл. Ошибку показываем только при настоящей поломке.
   const outcome = await markUnsubscribed(email);
+  // The sheet remains the visible operational log; the ledger is the gate checked immediately
+  // before every future marketing send. Either copy is enough to stop mail while rollout completes.
+  await setMarketingPermission(email, false, 'unsubscribed').catch((error) => console.error('unsubscribe ledger failed', error));
   const done = outcome !== 'failed';
   return page(
     done ? 'Unsubscribed' : 'Almost',
@@ -87,6 +91,7 @@ export const POST: APIRoute = async ({ url }) => {
   // «Нет в списке» это тоже успех: писать этому человеку мы не будем, а значит он получил
   // то, за чем пришёл. Ошибку показываем только при настоящей поломке.
   const outcome = await markUnsubscribed(email);
+  await setMarketingPermission(email, false, 'unsubscribed').catch((error) => console.error('unsubscribe ledger failed', error));
   const done = outcome !== 'failed';
   return new Response(done ? 'unsubscribed' : 'queued', {
     status: done ? 200 : 202,
