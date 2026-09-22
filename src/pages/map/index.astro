@@ -1257,7 +1257,8 @@ const homeSchemas = [
   /* ── Below the map: real, crawlable, scrollable content ── */
   .hud-lede {
     margin-top: 10px;
-    max-width: 46ch;
+    /* Уже, чем заголовок: абзац в три строки, и на обычных экранах он не заходит на узлы карты. */
+    max-width: 34ch;
     font-size: 15px;
     line-height: 1.55;
     color: var(--muted);
@@ -1393,7 +1394,7 @@ const homeSchemas = [
     <div class="brand">OperStack</div>
     <div class="eyebrow"><span class="pip"></span> Lead Ops System</div>
     <h1>AI automation for teams that run on <em>inbound leads</em></h1>
-    <p class="hud-lede">While you sleep, requests get captured, qualified, routed and answered.</p>
+    <p class="hud-lede">While you sleep, nine modules around one Lead Hub capture every request, qualify it, route it to the right person and answer it.</p>
   </div>
   <div class="meta">
     <div><b>9</b> modules</div>

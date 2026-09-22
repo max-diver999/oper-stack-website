@@ -48,7 +48,7 @@ export const NETWORK_HERO = {
     'Global luxury vertical',
   ],
   proofLine:
-    'Organic SEO clicks up +279% month over month across 13 inbound brands in 10+ countries and verticals.',
+    'Organic SEO clicks up +279% month over month across 13 inbound brands in 10+ countries and verticals, according to Google Search Console.',
   proofSubline:
     'Same OperStack playbook: content engine, Lead Hub, CRM automation, and reporting. Metrics verified on audit.',
 };
@@ -95,7 +95,7 @@ export const CASES: OperStackCase[] = [
     launched: 'Apr 2026',
     status: 'traction',
     stack: ['SEO + AEO site', 'Content engine', 'CRM automation', 'Reporting'],
-    headline: 'Fastest organic growth in the portfolio: +170% clicks and +269% search visibility month over month.',
+    headline: 'Fastest organic growth in the portfolio: +170% clicks and +269% search visibility month over month, according to Google Search Console.',
     metrics: [
       { label: 'Organic SEO clicks', value: '+170%', tone: 'up' },
       { label: 'Search visibility', value: '+269%', tone: 'up' },

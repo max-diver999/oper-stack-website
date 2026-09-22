@@ -18,14 +18,15 @@ const canonical = `${SITE.url}/guides/`;
   <div class="wrap">
     <h1>Guides</h1>
     <p class="lede">
-      Practical playbooks for inbound lead operations. Written for teams that run on SEO, chat, and CRM, not slide decks.
+      {guides.length} practical playbooks for inbound lead operations, newest first. Written for teams that run on SEO,
+      chat, and CRM, not slide decks.
     </p>
 
     <ul class="guide-list">
       {guides.map((guide) => (
         <li>
           <a href={`/guides/${guide.id}/`}>
-            <span class="title">{guide.data.title}</span>
+            <h2 class="title">{guide.data.title}</h2>
             <span class="desc">{guide.data.description}</span>
           </a>
         </li>
@@ -60,6 +61,9 @@ const canonical = `${SITE.url}/guides/`;
   }
   .title {
     display: block;
+    margin: 0;
+    font-weight: inherit;
+    line-height: inherit;
     font-family: var(--fd);
     font-size: 18px;
     color: var(--paper);
