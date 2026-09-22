@@ -101,13 +101,14 @@ async function queueFreeReport(url: string, email: string, visibility: unknown):
  * Не вышло, значит ничего страшного: заявка уже лежит в ящике, и очередь возьмёт её на
  * ближайшем круге. Поэтому ошибку глотаем и ответ человеку не портим.
  *
- * Env: OPS_DISPATCH_TOKEN, токен GitHub с правом запускать задачи в oper-stack/ops-notify.
+ * Env: OPS_DISPATCH_TOKEN, токен GitHub с правом запускать задачи в oper-stack/ops-runner.
+ * С 22.09.2026 очередь живёт в открытом ops-runner: закрытый ops-notify съел все бесплатные минуты Actions.
  */
 async function wakeQueue(): Promise<boolean> {
   const token = env('OPS_DISPATCH_TOKEN');
   if (!token) return false;
   try {
-    const res = await fetch('https://api.github.com/repos/oper-stack/ops-notify/actions/workflows/notify.yml/dispatches', {
+    const res = await fetch('https://api.github.com/repos/oper-stack/ops-runner/actions/workflows/notify.yml/dispatches', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
