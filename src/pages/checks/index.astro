@@ -12,12 +12,16 @@
 import CommercialLayout from '../../components/CommercialLayout.astro';
 import { recentChecks, checkStoreConfigured } from '../../lib/check-store';
 import { SITE } from '../../data/site';
+import ownScore from '../../data/own-score.json';
 
 export const prerender = false;
 
 const rows = await recentChecks(30);
 const configured = checkStoreConfigured();
 const grade = (n: number) => (n >= 80 ? 'A' : n >= 65 ? 'B' : n >= 45 ? 'C' : 'D');
+/* Области и их максимумы берутся из последнего замера своего сайта, а не вписываются руками:
+   появится шестая область, и список здесь вырастет сам. */
+const areas: { label: string; max: number }[] = Array.isArray(ownScore?.areas) ? ownScore.areas : [];
 ---
 
 <CommercialLayout
@@ -33,6 +37,7 @@ const grade = (n: number) => (n >= 80 ? 'A' : n >= 65 ? 'B' : n >= 45 ? 'C' : 'D
       measured from public signals on ten pages. Other tools check one page.
     </p>
 
+    <h2>Latest checks</h2>
     {!configured && <p class="empty">The store is not configured on this deployment.</p>}
     {configured && rows.length === 0 && <p class="empty">Nothing checked yet. <a href="/ai-visibility/">Be the first</a>.</p>}
 
@@ -51,6 +56,26 @@ const grade = (n: number) => (n >= 80 ? 'A' : n >= 65 ? 'B' : n >= 45 ? 'C' : 'D
       </table>
     )}
 
+    {areas.length > 0 && (
+      <>
+        <h2>What the score adds up</h2>
+        <p>
+          Every score is out of 100 and is the sum of {areas.length} areas. The same code gives the number on this
+          page, in the email and in the full report, so a site has one score everywhere.
+        </p>
+        <ul class="areas">
+          {areas.map((a) => <li>{a.label}: up to {a.max} points</li>)}
+        </ul>
+      </>
+    )}
+
+    <h2>Why a score can move</h2>
+    <p>
+      A live site does not answer the same way every time. When a page or the sitemap is too slow to read, it is
+      left out rather than counted against the site, so a second check can come out a point or two apart. Each
+      row above opens the full result for that site.
+    </p>
+
     <p class="cta"><a class="btn" href="/ai-visibility/">Check your own site</a></p>
   </div>
 </CommercialLayout>
@@ -59,7 +84,7 @@ const grade = (n: number) => (n >= 80 ? 'A' : n >= 65 ? 'B' : n >= 45 ? 'C' : 'D
   .wrap { max-width: 760px; margin: 0 auto; padding: 2.5rem 1.25rem 4rem; }
   .eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; opacity: 0.6; margin: 0 0 0.5rem; }
   .lede { font-size: 1.02rem; line-height: 1.55; max-width: 62ch; }
-  table { width: 100%; border-collapse: collapse; margin-top: 1.75rem; }
+  table { width: 100%; border-collapse: collapse; margin-top: 0.75rem; }
   /* Заголовок и значение в одном столбце выравниваются одинаково, иначе дата уезжает вбок от
      слова «когда». Поймано Максимом 17.09.2026 на живой странице. */
   th { text-align: left; font-size: 0.75rem; letter-spacing: 0.08em; text-transform: uppercase; opacity: 0.55; padding-bottom: 0.5rem; }
@@ -69,6 +94,8 @@ const grade = (n: number) => (n >= 80 ? 'A' : n >= 65 ? 'B' : n >= 45 ? 'C' : 'D
   .when { opacity: 0.6; white-space: nowrap; }
   .g { display: inline-block; min-width: 1.35rem; text-align: center; border-radius: 5px; padding: 0.05rem 0.3rem; font-weight: 700; font-size: 0.8rem; color: #fff; }
   .g-a { background: #2f9e6f; } .g-b { background: #4a8f5e; } .g-c { background: #c08a2e; } .g-d { background: #b8483c; }
+  h2 { font-size: 1.15rem; margin: 2.25rem 0 0.6rem; }
+  .areas { margin: 0.75rem 0 0; padding-left: 1.2rem; line-height: 1.6; }
   .empty { margin-top: 1.5rem; opacity: 0.75; }
   .cta { margin-top: 2.5rem; }
   .btn { display: inline-block; padding: 0.6rem 1.1rem; border-radius: 8px; border: 1px solid var(--color-border, rgba(255,255,255,0.2)); text-decoration: none; }
