@@ -140,6 +140,8 @@ function finish(html: string): string {
     .join('');
 }
 
+// После прехедера невидимый заполнитель: иначе почта дописывает к нему заголовок письма (25.09.2026).
+const PREHEADER_FILL = '&#847;&zwnj;&nbsp;'.repeat(90);
 export function emailShell({ preheader, heading, blocks, unsubUrl }: Shell): string {
   return `<!doctype html>
 <html lang="en"><head>
@@ -149,7 +151,7 @@ export function emailShell({ preheader, heading, blocks, unsubUrl }: Shell): str
 <meta name="supported-color-schemes" content="light">
 </head>
 <body style="margin:0;padding:0;background:${C.outer};-webkit-font-smoothing:antialiased">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:${C.outer}">${esc(preheader)}</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:${C.outer}">${esc(preheader)}${PREHEADER_FILL}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.outer}" style="background:${C.outer}">
   <tr><td align="center" style="padding:24px 12px 36px">
     <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
