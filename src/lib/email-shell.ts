@@ -90,14 +90,14 @@ export const findings = (items: { level: string; area: string; text: string }[])
 
 /** Задача целиком: «сейчас», «что сделать», «как проверить». */
 export const taskBlock = (task: { now?: string; task?: string; verify?: string; rule?: string }) =>
-  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px">
+  `<!--copy--><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px">
     <tr><td bgcolor="#FFFFFF" style="padding:20px 22px;border-left:4px solid ${C.teal};border-radius:0 10px 10px 0">
       ${[['Now', task.now], ['What to do', task.task], ['How to check', task.verify]]
         .filter(([, v]) => v)
         .map(([k, v]) => `<p style="margin:0 0 12px;font-family:${FONT};font-size:15px;line-height:1.5;color:${C.text}"><strong style="color:${C.teal}">${k}:</strong> ${esc(v)}</p>`).join('')}
       ${task.rule ? `<p style="margin:0;font-family:${FONT};font-size:13px;line-height:1.45;color:${C.dim}">${esc(task.rule)}</p>` : ''}
     </td></tr>
-  </table>`;
+  </table><!--/copy-->`;
 
 /* ---------------------------- само письмо ---------------------------- */
 
@@ -118,19 +118,24 @@ export type Shell = {
 const NB = '&nbsp;';
 export function keepTogether(text: string): string {
   return String(text)
-    .replace(/(\d[\d,.]*) out of (\d)/g, `$1${NB}out${NB}of${NB}$2`)
-    .replace(/(\$?\d[\d,.]*%?) (?=[a-z$])/g, `$1${NB}`)
+    .replace(/(\d+(?:[.,]\d+)*) out of (\d)/g, `$1${NB}out${NB}of${NB}$2`)
+    .replace(/(\$?\d+(?:[.,]\d+)*%?) (?=[a-z$])/g, `$1${NB}`)
     .replace(/\b(of|to) (?=\$?\d)/g, `$1${NB}`)
     .replace(/(\d)(&nbsp;)?a (month|year)\b/g, (m, d) => `${d}${NB}a${NB}${m.endsWith('month') ? 'month' : 'year'}`);
 }
+// Текст, который человек копирует себе на сайт (задача), идёт между <!--copy--> и <!--/copy-->:
+// неразрывные пробелы в нём уехали бы на его страницу.
 function finish(html: string): string {
+  let copying = false;
   return String(html)
-    .split(/(<[^>]*>)/)
+    .split(/(<!--(?:\/)?copy-->|<[^>]*>)/)
     .map((part) => {
-      if (!part.startsWith('<')) return keepTogether(part);
+      if (part === '<!--copy-->') { copying = true; return part; }
+      if (part === '<!--/copy-->') { copying = false; return part; }
+      if (!part.startsWith('<')) return copying ? part : keepTogether(part);
       return part
-        .replace(/^<(ul|ol|li|td)>$/, `<$1 style="font-family:${FONT}">`)
-        .replace(/^<(ul|ol|li|td)( [^>]*?)?style="(?![^"]*font-family)([^"]*)"/, (m, tag, rest = '') => `<${tag}${rest || ' '}style="font-family:${FONT};${m.split('style="')[1]}`);
+        .replace(/^<(ul|ol|li|td|th)>$/, `<$1 style="font-family:${FONT}">`)
+        .replace(/^<(ul|ol|li|td|th)( [^>]*?)?style="(?![^"]*font-family)([^"]*)"/, (m, tag, rest = '') => `<${tag}${rest || ' '}style="font-family:${FONT};${m.split('style="')[1]}`);
     })
     .join('');
 }
