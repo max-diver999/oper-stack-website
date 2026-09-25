@@ -244,3 +244,38 @@ export async function markUnsubscribed(email: string): Promise<'marked' | 'absen
     return 'failed';
   }
 }
+
+/**
+ * Остановить недельные письма OperStack Watch для этой почты (страница «Email settings»).
+ *
+ * Простым языком. Письма подписки служебные, рекламной отписки в них нет, но выключить их человек
+ * должен мочь сам. Отметка ставится в лист «Наблюдение», столбец I «Отписан»: недельный прогон
+ * такие строки пропускает. Сама подписка в Whop этим не отменяется, и страница так и говорит.
+ */
+export async function stopWatchLetters(email: string): Promise<'stopped' | 'absent' | 'failed'> {
+  if (!sheetsConfigured()) return 'failed';
+  const wanted = email.trim().toLowerCase();
+  try {
+    const token = await accessToken();
+    if (!token) return 'failed';
+    const id = env('FREE_CHECKS_SHEET_ID');
+    const head = { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' };
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/${encodeURIComponent('Наблюдение!A2:J')}`, {
+      headers: head, signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    if (!res.ok) return 'failed';
+    const rows = ((await res.json()) as { values?: string[][] }).values ?? [];
+    const hits = rows
+      .map((row, i) => ({ row: i + 2, kind: String(row[1] ?? ''), email: String(row[2] ?? '').trim().toLowerCase() }))
+      .filter((r) => r.email === wanted && r.kind === 'watch-weekly');
+    if (!hits.length) return 'absent';
+    const put = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values:batchUpdate`, {
+      method: 'POST', headers: head,
+      body: JSON.stringify({ valueInputOption: 'RAW', data: hits.map((h) => ({ range: `Наблюдение!I${h.row}`, values: [['да']] })) }),
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    return put.ok ? 'stopped' : 'failed';
+  } catch {
+    return 'failed';
+  }
+}

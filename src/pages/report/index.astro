@@ -150,5 +150,9 @@ const t = ru
     )}
     <p class="note"><a href="/">{t.back}</a></p>
   </main>
+<script is:inline>
+  /* Если человек перед оплатой проверял сайт у нас, подставляем его адрес: остаётся нажать кнопку. */
+  try { var el = document.getElementById('site'); var d = localStorage.getItem('os-last-site'); if (el && !el.value && d && /^[a-z0-9.-]+\.[a-z]{2,}$/i.test(d)) el.value = d; } catch (e) { /* приватный режим */ }
+</script>
 </body>
 </html>

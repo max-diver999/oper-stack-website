@@ -80,6 +80,10 @@ export const TIER_SPEC: Record<ReportTier, { pages: number; competitors: number;
   watch: { pages: 30, competitors: 3, weeks: 0 },
 };
 
+/** Сколько вопросов ChatGPT у подписки Watch в неделю. Та же цифра в очереди (QUESTIONS_PER_WEEK). */
+export const WATCH_QUESTIONS = 10;
+const WORD = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine', 'ten', 'eleven', 'twelve'];
+
 /** Ссылка живёт месяц: покупатель может ввести адрес не сразу. */
 export const TOKEN_DAYS = 30;
 
@@ -172,12 +176,12 @@ export function buildRunBody(job: ReportJob, secret: string): { text: string; ht
 
 const COPY = {
   en: {
-    subject: (tier: ReportTier) => (tier === 'watch' ? 'Your OperStack Watch: one step left' : tier === 'audit' ? 'Your OperStack audit: one step left' : tier === '29' ? 'Your OperStack rival comparison: one step left' : 'Your OperStack fix list: one step left'),
+    subject: (tier: ReportTier) => (tier === 'watch' ? 'Your OperStack report: one step left' : tier === 'audit' ? 'Your OperStack audit: one step left' : tier === '29' ? 'Your OperStack rival comparison: one step left' : 'Your OperStack fix list: one step left'),
     hello: 'Thank you. One thing left: tell us which site to read.',
     action: 'Open this link and enter your address:',
     what: (tier: ReportTier) =>
       tier === 'watch'
-        ? 'Within the hour you get your first report: your site read page by page, up to three rivals beside you, and every fix written out. Right after it, a second letter: ten questions your buyers ask ChatGPT, whether it named you, and who it named instead. Then one letter every week while your subscription runs. Your first 7 days are free; cancel in your Whop account any time.'
+        ? `Within the hour you get your first report: your site read page by page, up to three rivals beside you, and every fix written out. Right after it, a second letter: ${WORD[WATCH_QUESTIONS]} questions your buyers ask ChatGPT, whether it named you, who it named instead, and the fix of the week. Then one letter every week while your subscription runs.`
         : tier === 'audit'
         ? 'You will get the full audit: a hundred pages of your site read one by one, five rivals measured beside you in one table, and three finished files you only have to put on the site, attached to the email. It usually arrives within minutes. A person then goes over the same report by hand and writes separately within three working days. After that, three re-checks by the same code, at 30, 60 and 90 days.'
         : tier === '29'
@@ -192,7 +196,7 @@ const COPY = {
     action: 'Откройте ссылку и введите адрес:',
     what: (tier: ReportTier) =>
       tier === 'watch'
-        ? 'В течение часа придёт первый отчёт: ваш сайт по страницам, до трёх конкурентов рядом и все правки словами. Сразу за ним второе письмо: десять вопросов, которые ваши покупатели задают ChatGPT, назвал ли он вас и кого назвал вместо. Дальше одно письмо в неделю, пока идёт подписка. Первые 7 дней бесплатно, отменить можно в любой момент в аккаунте Whop.'
+        ? `В течение часа придёт первый отчёт: ваш сайт по страницам, до трёх конкурентов рядом и все правки словами. Сразу за ним второе письмо: ${WATCH_QUESTIONS} вопросов, которые ваши покупатели задают ChatGPT, назвал ли он вас, кого назвал вместо, и правка недели. Дальше одно письмо в неделю, пока идёт подписка.`
         : tier === 'audit'
         ? 'Вы получите полный аудит: сто страниц вашего сайта, прочитанных по одной, пять конкурентов рядом в одной таблице и три готовых файла, которые остаётся положить на сайт, приложенных к письму. Обычно приходит за несколько минут. Дальше тот же отчёт руками пересматривает человек и в течение трёх рабочих дней пишет отдельно. Затем три перепроверки тем же кодом, через 30, 60 и 90 дней.'
         : tier === '29'
@@ -205,8 +209,12 @@ const COPY = {
 
 export function buildReportWelcomeEmail(opts: { tier: ReportTier; lang: 'ru' | 'en'; link: string }): { subject: string; text: string; html: string } {
   const t = COPY[opts.lang];
-  const text = [t.hello, '', t.action, opts.link, '', t.what(opts.tier), '', t.validity, '', t.sign].join('\n');
   const ru = opts.lang === 'ru';
+  // Отмена упоминается одной строкой в конце и только в этом письме (задание 25.09.2026, пункт 3.1).
+  const manage = opts.tier === 'watch'
+    ? (ru ? 'Первые 7 дней бесплатно. Управлять подпиской или отменить её можно в аккаунте Whop: https://whop.com/@me/settings/orders/' : 'Your first 7 days are free. Manage or cancel in your Whop account: https://whop.com/@me/settings/orders/')
+    : '';
+  const text = [t.hello, '', t.action, opts.link, '', t.what(opts.tier), '', t.validity, ...(manage ? ['', manage] : []), '', t.sign].join('\n');
   const html = emailShell({
     preheader: ru ? 'Остался один шаг: скажите, какой сайт читать' : 'One step left: tell us which site to read',
     heading: ru ? 'Отчёт: остался один шаг' : 'Your report: one step left',
@@ -216,6 +224,7 @@ export function buildReportWelcomeEmail(opts: { tier: ReportTier; lang: 'ru' | '
       button(opts.link, ru ? 'Ввести адрес сайта →' : 'Tell us your site address →'),
       par(t.what(opts.tier)),
       note(t.validity),
+      ...(manage ? [note(ru ? 'Первые 7 дней бесплатно. Управлять подпиской или отменить её можно в <a href="https://whop.com/@me/settings/orders/">аккаунте Whop</a>.' : 'Your first 7 days are free. Manage or cancel in your <a href="https://whop.com/@me/settings/orders/">Whop account</a>.')] : []),
     ],
   });
   return { subject: t.subject(opts.tier), text, html };

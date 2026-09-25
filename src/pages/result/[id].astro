@@ -342,6 +342,8 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
 </CommercialLayout>
 
 <script>
+  /* Последний проверенный сайт: форма после оплаты подписки подставит его сама (задание 25.09.2026, 3.1). */
+  try { const d = document.getElementById('share')?.getAttribute('data-title')?.split(' scored ')[0]; if (d) localStorage.setItem('os-last-site', d); } catch { /* приватный режим */ }
   const track = (name: string, params: Record<string, unknown>) => { const w = window as any; if (typeof w.operStackTrack === 'function') w.operStackTrack(name, params); };
   function origin(): { from: string; campaign: string } {
     const KEY = 'os-origin';

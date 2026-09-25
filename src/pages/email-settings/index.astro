@@ -1,0 +1,48 @@
+---
+/**
+ * Настройки писем OperStack Watch. Ссылка «Email settings» из подвала каждого письма подписки.
+ * Выключает недельные письма; сама подписка отменяется в Whop, и страница так и говорит.
+ * Выключение только по нажатию кнопки: почтовые программы сами открывают ссылки из писем.
+ */
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { SITE } from '../../data/site';
+import { readUnsubToken } from '../api/unsubscribe';
+import { stopWatchLetters } from '../../lib/sheets-log';
+export const prerender = false;
+const env = (k: string) => String((import.meta.env as Record<string, unknown>)[k] ?? process.env[k] ?? '').trim();
+const token = Astro.url.searchParams.get('t') || '';
+const email = readUnsubToken(token, env('KIT_DOWNLOAD_SECRET'));
+let result: 'stopped' | 'absent' | 'failed' | null = null;
+if (Astro.request.method === 'POST' && email) result = await stopWatchLetters(email);
+if (!email) Astro.response.status = 400;
+---
+<CommercialLayout title="Email settings · OperStack Watch" description="Turn the weekly OperStack Watch letters off." canonical={`${SITE.url}/email-settings/`} noindex={true} theme="light">
+  <main class="es">
+    <h1>Email settings</h1>
+    {!email ? (
+      <p>This link does not open. Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> and we will change it by hand.</p>
+    ) : result === 'stopped' || result === 'absent' ? (
+      <>
+        <p>Done. We will not send weekly OperStack Watch letters to <b>{email}</b>.</p>
+        <p>Your subscription itself is separate: manage or cancel it in your <a href="https://whop.com/@me/settings/orders/">Whop account</a>.</p>
+      </>
+    ) : result === 'failed' ? (
+      <p>We could not change it just now. Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> and we will do it by hand today.</p>
+    ) : (
+      <>
+        <p>Weekly OperStack Watch letters go to <b>{email}</b>: whether ChatGPT names you, who it names instead, and the fix of the week.</p>
+        <form method="post">
+          <button type="submit">Stop the weekly letters</button>
+        </form>
+        <p class="note">This does not cancel your subscription. To cancel it, go to your <a href="https://whop.com/@me/settings/orders/">Whop account</a>.</p>
+      </>
+    )}
+  </main>
+</CommercialLayout>
+<style>
+  .es { max-width: 640px; margin: 0 auto; padding: 56px 20px 72px; }
+  .es h1 { font-family: var(--fd); font-size: 38px; letter-spacing: -.02em; margin: 0 0 18px; }
+  .es p { font-size: 17px; color: #3F4854; margin: 0 0 14px; }
+  .es button { height: 50px; padding: 0 22px; border-radius: 12px; border: 1px solid rgba(11,16,23,.18); background: #fff; font: inherit; font-weight: 600; cursor: pointer; }
+  .note { font-size: 14px !important; color: #6B7480 !important; margin-top: 16px !important; }
+</style>

@@ -1,0 +1,62 @@
+---
+/**
+ * Правка недели из письма OperStack Watch: текст, который остаётся вставить на сайт, и кнопка
+ * «скопировать». Страница открывается только по подписанной ссылке из письма и не индексируется.
+ */
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { SITE } from '../../data/site';
+import { readSigned, type WatchFix } from '../../lib/watch-links';
+export const prerender = false;
+const env = (k: string) => String((import.meta.env as Record<string, unknown>)[k] ?? process.env[k] ?? '').trim();
+const fix = readSigned<WatchFix>(Astro.url.searchParams.get('t') || '', env('KIT_DOWNLOAD_SECRET'));
+if (!fix) Astro.response.status = 404;
+---
+<CommercialLayout title={fix ? `This week's fix for ${fix.h} · OperStack Watch` : 'Fix not found · OperStack'} description="Your OperStack Watch fix of the week." canonical={`${SITE.url}/fix/`} noindex={true} theme="light">
+  <main class="fx">
+    {fix ? (
+      <>
+        <p class="eyebrow">Fix of the week{fix.w ? `, week ${fix.w}` : ''} · {fix.h}</p>
+        <h1>{fix.a}</h1>
+        <p class="q"><span>For the question</span>"{fix.q}"</p>
+        <p class="where">Where: {fix.p}</p>
+        {fix.x ? (
+          <>
+            <div class="box" id="fix-text">{fix.x}</div>
+            <p class="note">Words in [square brackets] are facts we could not find on your site. Fill them in or delete them before it goes live.</p>
+            <button type="button" class="copy" id="copy">Copy the text</button>
+          </>
+        ) : (
+          <p class="note">Your site does not yet say enough for us to write this paragraph without guessing. Write two or three sentences that answer the question above directly, with one concrete fact, and put them near the top of the page.</p>
+        )}
+        <p class="after">Put it live, and next week we'll check if ChatGPT picks it up.</p>
+      </>
+    ) : (
+      <>
+        <h1>This link does not open</h1>
+        <p>Open it straight from your OperStack Watch email. If that fails, write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a>.</p>
+      </>
+    )}
+  </main>
+</CommercialLayout>
+<script>
+  const b = document.getElementById('copy');
+  const box = document.getElementById('fix-text');
+  b?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(box?.textContent || ''); b.textContent = 'Copied'; }
+    catch { const r = document.createRange(); if (box) { r.selectNodeContents(box); const s = getSelection(); s?.removeAllRanges(); s?.addRange(r); } b.textContent = 'Selected: press Cmd+C'; }
+    setTimeout(() => { b.textContent = 'Copy the text'; }, 2500);
+  });
+</script>
+<style>
+  .fx { max-width: 760px; margin: 0 auto; padding: 48px 20px 64px; }
+  .eyebrow { font-family: var(--fm); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #1A8A7D; margin: 0 0 14px; }
+  .fx h1 { font-family: var(--fd); font-size: clamp(28px, 4.6vw, 40px); line-height: 1.12; letter-spacing: -.02em; margin: 0 0 18px; }
+  .q { font-size: 18px; margin: 0 0 6px; }
+  .q span { display: block; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #6B7480; margin-bottom: 4px; }
+  .where { color: #3F4854; margin: 0 0 18px; }
+  .box { white-space: pre-wrap; background: #fff; border: 1px solid rgba(11,16,23,.12); border-radius: 16px; padding: 22px 24px; font-size: 17px; line-height: 1.6; box-shadow: 0 12px 32px -22px rgba(11,16,23,.3); }
+  .note { color: #6B7480; font-size: 14px; margin: 12px 0 0; }
+  .copy { margin-top: 18px; height: 52px; padding: 0 26px; background: #1A8A7D; color: #fff; border: 0; border-radius: 12px; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; }
+  .copy:hover { background: #157468; }
+  .after { margin-top: 26px; font-size: 17px; font-weight: 500; }
+</style>
