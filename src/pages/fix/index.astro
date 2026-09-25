@@ -22,7 +22,8 @@ if (!fix) Astro.response.status = 404;
         {fix.x ? (
           <>
             <div class="box" id="fix-text">{fix.x}</div>
-            <p class="note">Words in [square brackets] are facts we could not find on your site. Fill them in or delete them before you publish. A [confirm: …] note holds a sentence we could not match to your site: keep that sentence only if it is true for you.</p>
+            {/* Пометки владельцу под текстом, обычным абзацем: кнопка копирует только текст (раунд 5, пункт 1). */}
+            {(fix.n || []).map((t) => <p class="note">{t}</p>)}
             <button type="button" class="copy" id="copy">Copy the text</button>
           </>
         ) : (

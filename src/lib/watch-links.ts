@@ -7,7 +7,7 @@
  */
 import { createHmac, timingSafeEqual } from 'node:crypto';
 
-export type WatchFix = { h: string; q: string; a: string; x: string | null; p: string; w: number };
+export type WatchFix = { h: string; q: string; a: string; x: string | null; p: string; w: number; n?: string[] };
 
 export function readSigned<T>(token: string, secret: string): T | null {
   const [body, mac] = String(token || '').split('.');
