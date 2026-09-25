@@ -42,7 +42,8 @@ export default defineConfig({
         // сайта страницу товара /products/site-report/, то есть ровно ту, которую надо продавать, а
         // форму /report/, закрытую от индексации, оставляло внутри.
         // /visits/numbers/ открывается только по личной ссылке и стоит под noindex.
-        const excludedExact = ['/report/', '/visits/numbers/', '/visits/stop/'];
+        // /fix/ и /email-settings/ (25.09.2026) открываются только по подписанной ссылке из письма Watch.
+        const excludedExact = ['/report/', '/visits/numbers/', '/visits/stop/', '/fix/', '/email-settings/'];
         const excludedPrefix = ['/thanks/'];
         const path = new URL(page).pathname;
         return !excludedExact.includes(path) && !excludedPrefix.some((p) => path.startsWith(p));
