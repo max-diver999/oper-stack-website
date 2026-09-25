@@ -15,8 +15,11 @@ const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'e
 const freeCount = products.filter((p) => p.price === 'Free').length;
 const paidCount = products.length - freeCount;
 const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1);
-const freeNames = products.filter((p) => p.price === 'Free').map((p) => p.name);
-const paidNames = products.filter((p) => p.price !== 'Free').map((p) => `${p.name} at ${p.price}`);
+/* Короткие имена для одной фразы: полные заголовки карточек в перечислении читаются тяжело. */
+const SHORT: Record<string, string> = { visits: 'the AI visit counter', 'ai-visibility': 'the AI visibility check', gates: 'sixteen quality gates', starter: 'an Astro starter', plugin: 'a Claude Code plugin', mcp: 'an MCP server', course: 'the Invisible to ChatGPT course', 'pain-to-seo': 'Pain to SEO', 'site-kit': 'Site Kit', 'seo-audit': 'a one-off audit' };
+const short = (p: { slug: string; name: string }) => SHORT[p.slug] ?? p.name;
+const freeNames = products.filter((p) => p.price === 'Free').map(short);
+const paidNames = products.filter((p) => p.price !== 'Free').map((p) => `${short(p)} at ${p.price}`);
 const oneSentence = `OperStack sells one subscription, OperStack Watch at 35 USD a month with 7 days free, and ${WORDS[products.length]} more products for content sites: ${WORDS[freeCount]} free (${freeNames.join(', ')}) and ${WORDS[paidCount]} paid (${paidNames.join(', ')}).`;
 const itemList = {
   '@context': 'https://schema.org',
