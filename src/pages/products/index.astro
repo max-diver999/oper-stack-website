@@ -20,7 +20,7 @@ const SHORT: Record<string, string> = { visits: 'the AI visit counter', 'ai-visi
 const short = (p: { slug: string; name: string }) => SHORT[p.slug] ?? p.name;
 const freeNames = products.filter((p) => p.price === 'Free').map(short);
 const paidNames = products.filter((p) => p.price !== 'Free').map((p) => `${short(p)} at ${p.price}`);
-const oneSentence = `OperStack sells one subscription, OperStack Watch at 35 USD a month with 7 days free, and ${WORDS[products.length]} more products for content sites: ${WORDS[freeCount]} free (${freeNames.join(', ')}) and ${WORDS[paidCount]} paid (${paidNames.join(', ')}).`;
+const oneSentence = `OperStack sells one subscription, OperStack Watch at $35 a month with 7 days free, and ${WORDS[products.length]} more products for content sites: ${WORDS[freeCount]} free (${freeNames.join(', ')}) and ${WORDS[paidCount]} paid (${paidNames.join(', ')}).`;
 const itemList = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
@@ -33,7 +33,7 @@ const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
   <div class="wrap wide">
     <h1>Tools for content sites that have to rank, be cited and convert</h1>
     <p class="lede">Every product on this page came out of one pipeline, the one behind the <a href="/cases/">thirteen brands on the cases page</a>. {cap(WORDS[freeCount])} are free and stay free. The other {WORDS[paidCount]} have a price on the page, not in a call.</p>
-    <a class="watch-banner" href="/pricing/"><span class="wb-l">The main product</span><span class="wb-n">OperStack Watch</span><span class="wb-d">Every week: whether ChatGPT names you, who it names instead, and what to fix. 7 days free, then 35 USD a month.</span><span class="wb-go">See the plan →</span></a>
+    <a class="watch-banner" href="/pricing/"><span class="wb-l">The main product</span><span class="wb-n">OperStack Watch</span><span class="wb-d">Every week: whether ChatGPT names you, who it names instead, and what to fix. 7 days free, then $35 a month.</span><span class="wb-go">See the plan →</span></a>
     <p class="lede plain-lede">Not a developer? Start with the <a href="/">free AI visibility check</a> (half a minute, nothing to install), then <a href="/pricing/">Watch</a> or the one-off <a href="/products/seo-audit/">audit</a>. Developers usually start with the <a href="/products/gates/">gates</a> and the <a href="/products/starter/">starter</a>. Fixes done for you are <a href="/services/">quoted on request</a>.</p>
     <CitabilityBlock text={oneSentence} />
     <div class="grid">

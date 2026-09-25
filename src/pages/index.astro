@@ -25,7 +25,7 @@ const score = typeof ownScore?.score === 'number' ? ownScore.score : null;
 const areas = Array.isArray(ownScore?.areas) ? ownScore.areas : [];
 const measuredRaw = ownScore?.measured || '';
 const measured = measuredRaw ? new Date(`${measuredRaw}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : '';
-const WATCH_PRICE = '35 USD';
+const WATCH_PRICE = '$35';
 /* Нейтральный пример по решению Максима: настоящие ответы ChatGPT с поиском, 25.09.2026, три
    формулировки про стоматологов Бристоля. Названы клиники, которые встречались в ответах. */
 const WATCH_SAMPLE = {
@@ -190,12 +190,12 @@ const description = 'AI visibility software. A free check of what ChatGPT, Claud
       <p class="eyebrow">What it costs to find out</p>
       <h2>What it costs to learn whether AI recommends you</h2>
       <div class="vs">
-        <div class="card"><p class="tag">An agency</p><p class="price">From 1,500 USD a month</p><p>Reports and calls. You still do not learn whether ChatGPT names you, or who it names instead.</p></div>
-        <div class="card"><p class="tag">Semrush</p><p class="price">139 USD a month, 199 with AI search</p><p>A large dashboard of data. What to change on your site is left to you.</p></div>
+        <div class="card"><p class="tag">An agency</p><p class="price">From $1,500 a month</p><p>Reports and calls. You still do not learn whether ChatGPT names you, or who it names instead.</p></div>
+        <div class="card"><p class="tag">Semrush</p><p class="price">$139 a month, $199 with AI search</p><p>A large dashboard of data. What to change on your site is left to you.</p></div>
         <div class="card"><p class="tag">Asking ChatGPT yourself</p><p class="price">Free, once</p><p>One answer, one day. It will not tell you what it said last week, why it picked them, or what to change.</p></div>
         <div class="card us"><p class="tag">OperStack Watch</p><p class="price">{WATCH_PRICE} a month, 7 days free</p><p>Who ChatGPT names instead of you, every week, and the fixes that change it.</p></div>
       </div>
-      <p class="src">Semrush prices from semrush.com/prices, monthly billing, checked on 25 September 2026. Agency retainers for AI search work run from 1,000 to 2,500 USD a month at entry level and 2,000 to 10,000 for most businesses, per the <a href="https://thedigitalelevator.com/blog/aeo-and-geo-pricing-guide/" target="_blank" rel="noopener">Digital Elevator pricing guide</a>, July 2026.</p>
+      <p class="src">Semrush prices from semrush.com/prices, monthly billing, checked on 25 September 2026. Agency retainers for AI search work run from $1,000 to $2,500 a month at entry level and $2,000 to $10,000 for most businesses, per the <a href="https://thedigitalelevator.com/blog/aeo-and-geo-pricing-guide/" target="_blank" rel="noopener">Digital Elevator pricing guide</a>, July 2026.</p>
     </section>
 
     <section class="block">
@@ -206,7 +206,7 @@ const description = 'AI visibility software. A free check of what ChatGPT, Claud
         <div class="card"><b>Nothing to connect</b><p>The report is on the site and in your inbox every week. No developer needed.</p></div>
         <div class="card"><b>The text to paste</b><p>Not "improve your content", but this page, this line, this replacement.</p></div>
         <div class="card"><b>Every score adds up by hand</b><p>If we could not measure something, we say so instead of counting it as zero.</p></div>
-        <div class="card"><b>Pay once if you prefer</b><p>A full audit of your site for 149 USD, no subscription.</p></div>
+        <div class="card"><b>Pay once if you prefer</b><p>A full audit of your site for $149, no subscription.</p></div>
       </div>
     </section>
 
@@ -247,7 +247,7 @@ const description = 'AI visibility software. A free check of what ChatGPT, Claud
       <div class="faq">
         <details><summary>How is this different from Semrush?</summary><p>Semrush gives you keyword and ranking data and leaves the conclusions to you. OperStack answers one question every week: does ChatGPT name you, who does it name instead, and what on your site to change. It costs {WATCH_PRICE} a month instead of 139 or more.</p></details>
         <details><summary>What happens after the 7 days?</summary><p>If you do nothing, the subscription continues at {WATCH_PRICE} a month. Cancel before day 7 and you pay nothing.</p></details>
-        <details><summary>How do I cancel?</summary><p>In one click, any time. Every Watch letter carries the link.</p></details>
+        <details><summary>How do I cancel?</summary><p>Cancel any time. Every Watch email carries the link.</p></details>
         <details><summary>What do you do with my data?</summary><p>We read the public pages of your site, the way a search engine does, and keep your email to send the weekly letter. <a href="/privacy/">Privacy</a></p></details>
         <details><summary>Do I need a developer?</summary><p>No. Most fixes are text you paste into your site. The few that need a developer are marked, written so you can forward them.</p></details>
       </div>
@@ -262,7 +262,7 @@ const description = 'AI visibility software. A free check of what ChatGPT, Claud
         <input id="u2" name="url" type="text" inputmode="url" placeholder="your-site.com" autocomplete="url" required />
         <button type="submit">Check my site free →</button>
       </form>
-      <p class="oneoff">Prefer a one-off? <a href="/products/seo-audit/">Full audit, 149 USD</a></p>
+      <p class="oneoff">Prefer a one-off? <a href="/products/seo-audit/">Full audit, $149</a></p>
     </section>
   </main>
   <script>
