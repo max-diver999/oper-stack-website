@@ -304,7 +304,7 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
     }
 
     /* Светлая тема (вариант 25.09.2026). Включается пропом theme="light". */
-    body[data-theme="light"] { background: #FAF8F4; color: #0B1017; }
+    body[data-theme="light"] { background: #FAF8F4; color: #0B1017; overflow-x: clip; }
     body[data-theme="light"] a { color: #1A8A7D; }
     body[data-theme="light"] .lede { color: #3F4854; }
     body[data-theme="light"] .site-foot { color: #6B7480; border-top: 1px solid rgba(11,16,23,.08); padding-top: 28px; max-width: 1080px; }
