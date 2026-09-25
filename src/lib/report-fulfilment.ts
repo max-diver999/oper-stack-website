@@ -19,7 +19,7 @@ import { button, emailShell, note, p as par } from './email-shell.ts';
  * Ступени отчёта. 'free' не продаётся и не имеет товара на Whop: это то, что человек получает
  * за почту после бесплатной проверки. Пять страниц, только замер, без списка задач.
  */
-export type ReportTier = 'free' | '9' | '29' | 'audit';
+export type ReportTier = 'free' | '9' | '29' | 'audit' | 'watch';
 
 /** Товары Whop, которые означают отчёт. Пустое значение означает «товар ещё не заведён». */
 const TIER_BY_PRODUCT: Record<string, ReportTier> = {
@@ -33,6 +33,8 @@ const TIER_BY_PRODUCT: Record<string, ReportTier> = {
   // Аудит за 149. С 18.09.2026 он идёт той же дорогой, что и остальные отчёты: письмо со
   // ссылкой на форму, дальше очередь. До этого он просил ответить письмом и собирался руками.
   prod_plySVogSlnVni: 'audit',
+  // Подписка OperStack Watch, 25.09.2026: 35 USD в месяц или 299 в год, 7 дней бесплатно.
+  prod_ChlWgtKvRLYZh: 'watch',
 };
 
 /**
@@ -52,6 +54,7 @@ const TIER_BY_NAME: [RegExp, ReportTier][] = [
   [/what\s+to\s+put\s+on\s+the\s+site/i, 'audit'],
   [/brings\s+no\s+leads/i, 'audit'],
   [/seo,?\s*aeo\s+and\s+geo\s+audit/i, 'audit'],
+  [/operstack\s+watch/i, 'watch'],
 ];
 
 /** Переопределение через окружение: WHOP_REPORT_IDS="prod_a:9,prod_b:29". */
@@ -59,7 +62,7 @@ export function reportTierMap(spec = ''): Record<string, ReportTier> {
   const extra: Record<string, ReportTier> = {};
   for (const entry of String(spec).split(',')) {
     const [id, tier] = entry.trim().split(':');
-    if (id && (tier === '9' || tier === '29' || tier === 'audit')) extra[id] = tier;
+    if (id && (tier === '9' || tier === '29' || tier === 'audit' || tier === 'watch')) extra[id] = tier;
   }
   return { ...TIER_BY_PRODUCT, ...extra };
 }
@@ -73,12 +76,16 @@ export const TIER_SPEC: Record<ReportTier, { pages: number; competitors: number;
   // Флагман. Перепроверки у него не еженедельные, а раз в месяц три раза, поэтому weeks здесь 0:
   // это поле про еженедельные срезы товара за 29 и врать им не надо.
   audit: { pages: 100, competitors: 5, weeks: 0 },
+  // Первый отчёт подписки как у 29; дальше письма каждую неделю, пока подписка жива.
+  watch: { pages: 30, competitors: 3, weeks: 0 },
 };
 
 /** Ссылка живёт месяц: покупатель может ввести адрес не сразу. */
 export const TOKEN_DAYS = 30;
 
-export type ReportClaims = { orderId?: string; purpose?: 'report' | 'prospect'; email: string; tier: ReportTier; lang: 'ru' | 'en'; exp: number };
+export type ReportClaims = { orderId?: string; purpose?: 'report' | 'prospect'; email: string; tier: ReportTier; lang: 'ru' | 'en'; exp: number;
+  /** Членство Whop подписчика Watch: по нему очередь каждую неделю проверяет, жива ли подписка. */
+  membership?: string };
 
 export function makeReportToken(claims: ReportClaims, secret: string): string {
   const body = Buffer.from(JSON.stringify(claims)).toString('base64url');
@@ -127,7 +134,7 @@ export function normaliseSiteUrl(raw: string): { ok: true; url: string } | { ok:
 }
 
 export type ReportJob = {
-  jobId?: string; url: string; email: string; lang: 'ru' | 'en'; tier: ReportTier; rivals?: string[];
+  jobId?: string; url: string; email: string; lang: 'ru' | 'en'; tier: ReportTier; rivals?: string[]; membership?: string;
   /** Балл со страницы проверки, из ста. Остаётся для старых заявок, лежащих в ящике. */
   score?: number;
   /**
@@ -148,7 +155,7 @@ export type ReportJob = {
 export function buildRunSubject(job: ReportJob): string {
   let host = job.url;
   try { host = new URL(job.url).host; } catch { /* оставляем как есть */ }
-  return `Report request: ${host} (${job.tier === 'free' ? 'free' : `${job.tier} USD`})`;
+  return `Report request: ${host} (${job.tier === 'free' ? 'free' : job.tier === 'watch' ? 'Watch' : `${job.tier} USD`})`;
 }
 
 /** Первая строка тела: REPORT-RUN v1 <payload> <подпись>. Её и читает очередь. */
@@ -165,11 +172,13 @@ export function buildRunBody(job: ReportJob, secret: string): { text: string; ht
 
 const COPY = {
   en: {
-    subject: (tier: ReportTier) => (tier === 'audit' ? 'Your OperStack audit: one step left' : tier === '29' ? 'Your OperStack rival comparison: one step left' : 'Your OperStack fix list: one step left'),
+    subject: (tier: ReportTier) => (tier === 'watch' ? 'Your OperStack Watch: one step left' : tier === 'audit' ? 'Your OperStack audit: one step left' : tier === '29' ? 'Your OperStack rival comparison: one step left' : 'Your OperStack fix list: one step left'),
     hello: 'Thank you. One thing left: tell us which site to read.',
     action: 'Open this link and enter your address:',
     what: (tier: ReportTier) =>
-      tier === 'audit'
+      tier === 'watch'
+        ? 'Within the hour you get your first report: your site read page by page, up to three rivals beside you, and every fix written out. Right after it, a second letter: ten questions your buyers ask ChatGPT, whether it named you, and who it named instead. Then one letter every week while your subscription runs. Your first 7 days are free; cancel in your Whop account any time.'
+        : tier === 'audit'
         ? 'You will get the full audit: a hundred pages of your site read one by one, five rivals measured beside you in one table, and three finished files you only have to put on the site, attached to the email. It usually arrives within minutes. A person then goes over the same report by hand and writes separately within three working days. After that, three re-checks by the same code, at 30, 60 and 90 days.'
         : tier === '29'
         ? 'You will get every fix for your own site and, beside it, the same measurement on up to three competitors in one table, so you can see where they are ahead. It usually arrives within the hour, and once a week for four weeks a snapshot follows: what your fixes moved and how the gap changed.'
@@ -178,11 +187,13 @@ const COPY = {
     sign: 'OperStack · info@oper-stack.com',
   },
   ru: {
-    subject: (tier: ReportTier) => (tier === 'audit' ? 'Аудит OperStack: остался один шаг' : tier === '29' ? 'Сравнение с конкурентами от OperStack: остался один шаг' : 'Список правок OperStack: остался один шаг'),
+    subject: (tier: ReportTier) => (tier === 'watch' ? 'OperStack Watch: остался один шаг' : tier === 'audit' ? 'Аудит OperStack: остался один шаг' : tier === '29' ? 'Сравнение с конкурентами от OperStack: остался один шаг' : 'Список правок OperStack: остался один шаг'),
     hello: 'Спасибо. Остался один шаг: сказать, какой сайт читать.',
     action: 'Откройте ссылку и введите адрес:',
     what: (tier: ReportTier) =>
-      tier === 'audit'
+      tier === 'watch'
+        ? 'В течение часа придёт первый отчёт: ваш сайт по страницам, до трёх конкурентов рядом и все правки словами. Сразу за ним второе письмо: десять вопросов, которые ваши покупатели задают ChatGPT, назвал ли он вас и кого назвал вместо. Дальше одно письмо в неделю, пока идёт подписка. Первые 7 дней бесплатно, отменить можно в любой момент в аккаунте Whop.'
+        : tier === 'audit'
         ? 'Вы получите полный аудит: сто страниц вашего сайта, прочитанных по одной, пять конкурентов рядом в одной таблице и три готовых файла, которые остаётся положить на сайт, приложенных к письму. Обычно приходит за несколько минут. Дальше тот же отчёт руками пересматривает человек и в течение трёх рабочих дней пишет отдельно. Затем три перепроверки тем же кодом, через 30, 60 и 90 дней.'
         : tier === '29'
         ? 'Вы получите все правки по своему сайту и рядом те же замеры по трём конкурентам в одной таблице: видно, в чём именно они вас обходят. Обычно приходит в течение часа, а дальше четыре недели подряд, раз в неделю, приходит срез: что сдвинулось от ваших правок и как изменился разрыв.'
@@ -215,7 +226,7 @@ export function buildReportWelcomeEmail(opts: { tier: ReportTier; lang: 'ru' | '
  * вида у них несколько, и поля в них называются по-разному.
  */
 export function readWhopReport(event: any, tiers: Record<string, ReportTier>): {
-  type: string; paymentId: string; email: string | null; userId: string | null; tier: ReportTier | null; matchedId: string | null;
+  type: string; paymentId: string; email: string | null; userId: string | null; tier: ReportTier | null; matchedId: string | null; membership: string | null;
 } {
   const d = event?.data ?? {};
   const first = (...values: unknown[]) => values.find((v) => typeof v === 'string' && v.trim().length > 0) as string | undefined;
@@ -238,5 +249,10 @@ export function readWhopReport(event: any, tiers: Record<string, ReportTier>): {
     userId,
     tier: matchedId ? tiers[matchedId] : byName,
     matchedId: matchedId ?? (byName ? `по названию: ${name}` : null),
+    membership: (() => {
+      const type = String(event?.type ?? event?.event ?? event?.action ?? '');
+      const m = first(typeof d.membership === 'string' ? d.membership : undefined, d.membership?.id, d.membership_id, type.startsWith('membership') && String(d.id || '').startsWith('mem_') ? d.id : undefined);
+      return m && /^mem_[A-Za-z0-9]+$/.test(m) ? m : null;
+    })(),
   };
 }

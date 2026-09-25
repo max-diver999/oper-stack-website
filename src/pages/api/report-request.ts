@@ -82,7 +82,7 @@ export const POST: APIRoute = async ({ request }) => {
   if (!check.ok || !check.claims) {
     return page('Link not valid', `<h1>This link is not valid</h1><p>${escape(check.reason || 'unknown reason')}. Write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a> from the address you paid with and we will send a fresh one.</p>`, 403);
   }
-  const { email, tier, lang, orderId, purpose } = check.claims;
+  const { email, tier, lang, orderId, purpose, membership } = check.claims;
   if (purpose === 'prospect') return page('Wrong form', '<h1>Use the prospecting form from your email</h1>', 403);
 
   const url = normaliseSiteUrl(site);
@@ -96,12 +96,12 @@ export const POST: APIRoute = async ({ request }) => {
   // Конкуренты есть у двух ступеней: трое за 29, пятеро в аудите. Потолок берётся по ступени,
   // чтобы через форму нельзя было попросить больше, чем куплено.
   // Кривой адрес конкурента не должен ронять заявку: покупатель платил за свой сайт.
-  const rivalCap = tier === 'audit' ? 5 : tier === '29' ? 3 : 0;
+  const rivalCap = tier === 'audit' ? 5 : tier === '29' || tier === 'watch' ? 3 : 0;
   const rivals = rivalCap
     ? rivalsRaw.map((r) => normaliseSiteUrl(r)).filter((r): r is { ok: true; url: string } => r.ok).map((r) => r.url).slice(0, rivalCap)
     : [];
   const jobId = orderId || createHash('sha256').update(token + url.url).digest('hex');
-  const job = { jobId, url: url.url, email, lang, tier, rivals };
+  const job = { jobId, url: url.url, email, lang, tier, rivals, ...(membership ? { membership } : {}) };
   try {
     if (orderId) {
       await ensureCommerceSchema();
@@ -115,6 +115,21 @@ export const POST: APIRoute = async ({ request }) => {
   }
 
   const ru = RU(lang);
+  // Подписка Watch: адрес сайта мы храним, пока идут недельные письма, и так и говорим.
+  if (tier === 'watch') {
+    return page(
+      ru ? 'Подписка запущена' : 'Your Watch has started',
+      ru
+        ? `<h1>Принято: ${escape(url.url)}</h1>
+<p>В течение часа на ${escape(email)} придут два письма: первый отчёт по сайту и первые ответы ChatGPT на вопросы ваших покупателей. Дальше одно письмо в неделю.</p>
+<p>Если через час писем нет, посмотрите в спаме и напишите на <a href="mailto:info@oper-stack.com">info@oper-stack.com</a>.</p>
+<p class="muted">Адрес сайта мы храним, пока идёт подписка: без него не собрать недельное письмо. Отменить подписку можно в аккаунте Whop в любой момент.</p>`
+        : `<h1>Got it: ${escape(url.url)}</h1>
+<p>Within the hour two letters go to ${escape(email)}: your first site report and the first ChatGPT answers to your buyers' questions. Then one letter every week.</p>
+<p>If an hour passes and they have not arrived, check your spam folder and write to <a href="mailto:info@oper-stack.com">info@oper-stack.com</a>.</p>
+<p class="muted">We keep the address of your site while your subscription runs: the weekly letter needs it. Cancel any time in your Whop account.</p>`,
+    );
+  }
   return page(
     ru ? 'Заявка принята' : 'Request accepted',
     ru
