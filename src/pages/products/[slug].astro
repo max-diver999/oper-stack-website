@@ -25,7 +25,10 @@ const canonical = `${SITE.url}/products/${p.slug}/`;
 const offer = p.price === 'Free' ? { '@type': 'Offer', price: '0', priceCurrency: 'USD' } : { '@type': 'Offer', price: p.price.replace(/[^\d.]/g, ''), priceCurrency: 'USD', availability: status === 'soon' ? 'https://schema.org/PreOrder' : 'https://schema.org/InStock' };
 const productSchema = { '@context': 'https://schema.org', '@type': p.slug === 'seo-audit' ? 'Service' : 'SoftwareApplication', name: `OperStack ${p.name}`, description: p.description, url: canonical, offers: offer, ...(p.slug !== 'seo-audit' ? { applicationCategory: 'DeveloperApplication', operatingSystem: 'Node.js 20+' } : { provider: { '@type': 'Organization', name: SITE.name } }) };
 const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: p.faq.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
-const others = PRODUCTS.filter((x) => x.slug !== p.slug).sort((a, b) => a.order - b.order);
+// Слитых в подписку товаров нет и в списке «другие товары»: иначе цены 9, 29 и 39 оставались на
+// каждой странице товара (задание 25.09.2026, пункт 1). getStaticPaths свой набор видит отдельно.
+const MERGED_INTO_WATCH = new Set(['site-report', 'rival-watch', 'agency']);
+const others = PRODUCTS.filter((x) => x.slug !== p.slug && !MERGED_INTO_WATCH.has(x.slug)).sort((a, b) => a.order - b.order);
 ---
 <CommercialLayout title={`${p.title} · ${SITE.name}`} description={p.description} canonical={canonical} ogImage={p.og} jsonLd={[productSchema, faqSchema]}>
   <div class="wrap">

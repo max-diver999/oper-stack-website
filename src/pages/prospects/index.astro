@@ -45,9 +45,9 @@ const t = ru
       hint: 'Addresses alone are fine, or an address and the client name after a comma. Lines starting with a hash are skipped.',
       button: 'Check the list',
       after: 'The table arrives by email at the same address, usually in fifteen to thirty minutes. Every site is read properly, which is why it is not instant.',
-      brandTitle: 'Your own branding (agency plan)',
+      brandTitle: 'Your own branding',
       brandLogo: 'Link to your logo',
-      brandHint: 'On the agency plan the reports come out under your name. Without the plan, leave these empty.',
+      brandHint: '',
       brandName: 'Your agency name',
       brandColor: 'Your colour',
       bad: 'This link is not valid',
@@ -80,7 +80,9 @@ const placeholder = ru
           <textarea id="sites" name="sites" rows="12" required placeholder={placeholder}></textarea>
           <p class="hint">{t.hint}</p>
 
-          <details class="brand">
+          {/* Поля оформления английской форме не показываем: таблица по списку сайтов их не читает,
+              а обещать то, чего код не делает, нельзя (ревизия 25.09.2026). Русская форма как была. */}
+          {ru && <details class="brand">
             <summary>{t.brandTitle}</summary>
             <p class="hint">{t.brandHint}</p>
             <label for="by">{t.brandName}</label>
@@ -89,7 +91,7 @@ const placeholder = ru
             <input id="logo" name="logo" type="url" placeholder="https://your-site.com/logo.svg" />
             <label for="color">{t.brandColor}</label>
             <input id="color" name="color" type="text" maxlength="7" placeholder="#7b3fa0" />
-          </details>
+          </details>}
 
           <button type="submit">{t.button}</button>
         </form>

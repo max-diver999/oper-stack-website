@@ -382,7 +382,8 @@ export function buildAgencyEmail(input: {
     'clients.txt holds one site per line, either "example.com" or "example.com, Client Name".',
     'Reports land in reports/ as HTML and PDF, carrying your logo, your colour and your name.',
     '',
-    `Docs: ${input.siteUrl}/products/agency/`,
+    // /products/agency/ с 25.09.2026 уводит на /pricing/; описание брендированных отчётов живёт в README пакета.
+    'Docs: https://www.npmjs.com/package/@operstack/audit',
     `Questions: ${input.supportEmail}`,
   ];
   const text = lines.join('\n');
@@ -405,7 +406,7 @@ export function buildAgencyEmail(input: {
         </table>`,
         par('<strong>clients.txt</strong> holds one site per line, either <em>example.com</em> or <em>example.com, Client Name</em>.'),
         par('Reports land in <strong>reports/</strong> as HTML and PDF, carrying your logo, your colour and your name.'),
-        button(`${input.siteUrl}/products/agency/`, 'Docs and examples →', 'quiet'),
+        button('https://www.npmjs.com/package/@operstack/audit', 'Docs and examples →', 'quiet'),
         note(`Questions: ${esc(input.supportEmail)}`),
       ],
     }),

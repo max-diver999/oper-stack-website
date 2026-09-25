@@ -21,9 +21,9 @@ const INCLUDED = [
   'One email a week: what changed since last week',
 ];
 const FAQ = [
-  { question: 'What happens after the 7 days?', answer: 'If you do nothing, the subscription continues at 35 USD a month, or 299 USD a year if you chose yearly. Cancel before day 7 and you pay nothing.' },
-  { question: 'How do I cancel?', answer: 'In your Whop account, in one click, at any time. Cancel within the first 7 days and you pay nothing. Cancel later and you are not charged again; the weekly letters run to the end of the period you paid for.' },
-  { question: 'Where do the ChatGPT answers come from?', answer: 'We ask ChatGPT with web search switched on, the same way each week, in three wordings for each question. An answer can differ from one run to the next, so we show the date and the trend rather than a single verdict.' },
+  { question: 'What happens after the 7 days?', answer: 'If you do nothing, the subscription continues at $35 a month, or $299 a year if you chose yearly. Cancel before day 7 and you pay nothing.' },
+  { question: 'How do I cancel?', answer: 'Cancel any time: every Watch email carries the link. Cancel within the first 7 days and you pay nothing. Cancel later and you are not charged again; the weekly letters run to the end of the period you paid for.' },
+  { question: 'Where do the ChatGPT answers come from?', answer: 'We ask ChatGPT with web search switched on, the same ten questions each week. An answer can differ from one run to the next, so we show the date and the trend rather than a single verdict.' },
   { question: 'Do I need Claude, Cursor or a developer?', answer: 'No. The report is on the site and in your inbox. Most fixes are text you paste into your site; the few that need a developer are marked so you can forward them.' },
 ];
 const faqSchema = {
@@ -36,7 +36,7 @@ const faqSchema = {
 <CommercialLayout
   theme="light"
   title={`Pricing · ${SITE.name}`}
-  description="OperStack Watch: 35 USD a month or 299 USD a year, 7 days free. Every week, whether ChatGPT names you, who it names instead, and what to fix. One-off audit 149 USD."
+  description="OperStack Watch: $35 a month or $299 a year, 7 days free. Every week, whether ChatGPT names you, who it names instead, and what to fix. One-off audit $149."
   canonical={canonical}
   jsonLd={faqSchema}
 >
@@ -45,7 +45,7 @@ const faqSchema = {
     <p class="lede">The free check tells you what AI sees on your site today. Watch tells you every week whether ChatGPT names you, who it names instead, and what to change.</p>
 
     <CitabilityBlock
-      text="OperStack Watch costs 35 USD a month or 299 USD a year, with the first 7 days free. It asks ChatGPT ten of your buyers' questions every week, shows who it names instead of you, measures three rivals beside you, and sends the fixes for your site by email. A one-off audit is 149 USD."
+      text="OperStack Watch costs $35 a month or $299 a year, with the first 7 days free. It asks ChatGPT ten of your buyers' questions every week, shows who it names instead of you, measures three rivals beside you, and sends the fixes for your site by email. A one-off audit is $149."
     />
 
     <article class="watch">
@@ -56,7 +56,7 @@ const faqSchema = {
           <button type="button" data-p="y">Yearly</button>
         </div>
       </div>
-      <p class="price"><span data-show="m">35 USD <small>a month</small></span><span data-show="y" hidden>299 USD <small>a year, about 25 a month</small></span></p>
+      <p class="price"><span data-show="m">$35 <small>a month</small></span><span data-show="y" hidden>$299 <small>a year, about $25 a month</small></span></p>
       <p class="price-note">7 days free, then billed unless you cancel. Cancel any time.</p>
       <ul>{INCLUDED.map((f) => <li>{f}</li>)}</ul>
       <a class="btn" href={WATCH_CHECKOUT} target="_blank" rel="noopener">Start 7 days free →</a>
@@ -67,7 +67,7 @@ const faqSchema = {
       <div>
         <h2>Prefer to pay once?</h2>
         <p>A full audit of your site: a hundred pages, five rivals, ready files to put on the site, reviewed by a person. No subscription.</p>
-        <p><a href="/products/seo-audit/">Full audit, 149 USD →</a></p>
+        <p><a href="/products/seo-audit/">Full audit, $149 →</a></p>
       </div>
       <div>
         <h2>Need it done for you?</h2>
@@ -78,7 +78,7 @@ const faqSchema = {
 
     <section class="rules">
       <h2>Cancelling and contact</h2>
-      <p>Cancel in your Whop account at any time. Within the first 7 days you pay nothing; after that you are not charged again. <a href="/refunds/">Refund policy</a> · <a href="/terms/">Terms of service</a> · <a href="/privacy/">Privacy policy</a>. Questions: <a href="mailto:info@oper-stack.com">info@oper-stack.com</a>, Maksim Shchegolev.</p>
+      <p>Cancel any time. Within the first 7 days you pay nothing; after that you are not charged again. <a href="/refunds/">Refund policy</a> · <a href="/terms/">Terms of service</a> · <a href="/privacy/">Privacy policy</a>. Questions: <a href="mailto:info@oper-stack.com">info@oper-stack.com</a>, Maksim Shchegolev.</p>
       <p class="muted-line">Free tools and one-off products: <a href="/products/">all products</a>.</p>
     </section>
 

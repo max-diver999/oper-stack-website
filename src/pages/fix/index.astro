@@ -15,20 +15,21 @@ if (!fix) Astro.response.status = 404;
   <main class="fx">
     {fix ? (
       <>
-        <p class="eyebrow">Fix of the week{fix.w ? `, week ${fix.w}` : ''} · {fix.h}</p>
+        <p class="eyebrow">Fix of the week · {fix.h}</p>
         <h1>{fix.a}</h1>
         <p class="q"><span>For the question</span>"{fix.q}"</p>
         <p class="where">Where: {fix.p}</p>
         {fix.x ? (
           <>
             <div class="box" id="fix-text">{fix.x}</div>
-            <p class="note">Words in [square brackets] are facts we could not find on your site. Fill them in or delete them before it goes live.</p>
+            {/* Пометки владельцу под текстом, обычным абзацем: кнопка копирует только текст (раунд 5, пункт 1). */}
+            {(fix.n || []).map((t) => <p class="note">{t}</p>)}
             <button type="button" class="copy" id="copy">Copy the text</button>
           </>
         ) : (
           <p class="note">Your site does not yet say enough for us to write this paragraph without guessing. Write two or three sentences that answer the question above directly, with one concrete fact, and put them near the top of the page.</p>
         )}
-        <p class="after">Put it live, and next week we'll check if ChatGPT picks it up.</p>
+        <p class="after">Publish it, and next week we'll check if ChatGPT picks it up.</p>
       </>
     ) : (
       <>

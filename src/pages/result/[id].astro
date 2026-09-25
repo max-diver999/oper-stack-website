@@ -218,7 +218,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
 
       {rest.length > 0 && (
         <section class="card locked">
-          <div class="card-head"><h2>{rest.length === 1 ? 'One more finding' : `${rest.length} more findings`}</h2><span class="card-meta">in the fix list</span></div>
+          <div class="card-head"><h2>{rest.length === 1 ? 'One more finding' : `${rest.length} more findings`}</h2><span class="card-meta">written out in Watch</span></div>
           <ul class="fl">
             {rest.map((x: any) => (
               <li class={`r-${x.level}`}>
@@ -230,7 +230,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
           </ul>
           <p class="note">The list is real and this is its length. Watch writes out every line the same way as the fix above, with the text to paste, and checks every week whether ChatGPT names you.</p>
           <a class="btn btn-main" href="/pricing/">Watch this weekly, 7 days free</a>
-          <p class="note">Or the <a href="/products/seo-audit/">full one-off audit, 149 USD</a>.</p>
+          <p class="note">Or the <a href="/products/seo-audit/">full one-off audit, $149</a>.</p>
         </section>
       )}
 
@@ -327,12 +327,12 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
   </div>
 
   {total > 0 && SITE_REPORT && (
-    <div id="bar" class="scorebar" hidden aria-label="Buy the fix list">
+    <div id="bar" class="scorebar" hidden aria-label="Start OperStack Watch">
       <div class="sb-in">
         <span class={`sb-tile tile-${tone(score)}`}>{score}</span>
         <span class="sb-two">
           <b>{`Who does ChatGPT name instead of ${stored.domain}?`}</b>
-          <span>Watch asks every week and sends the fixes. 7 days free, then 35 USD a month.</span>
+          <span>Watch asks every week and sends the fixes. 7 days free, then $35 a month.</span>
         </span>
         <a class="btn btn-buy" href="/pricing/"><span class="buy-long">Start 7 days free →</span><span class="buy-short">Try free →</span></a>
       </div>

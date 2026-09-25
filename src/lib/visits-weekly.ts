@@ -112,7 +112,7 @@ export function composeWeekly(
       return `Оценка «могут ли вас процитировать»: ${score.score} из 100${move}.`;
     }
     const move = !scoreBefore ? '' : diff === 0 ? ', unchanged' : `, ${diff > 0 ? 'up ' : 'down '}${Math.abs(diff)}`;
-    return `Whether you can be quoted at all: ${score.score} of 100${move}.`;
+    return `Whether you can be quoted at all: ${score.score} out of 100${move}.`;
   })();
 
   if (n.everCounted === 0) {

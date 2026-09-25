@@ -104,8 +104,8 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       <h2>Prefer to do this inside Claude or ChatGPT?</h2>
       <p>If you already work with Claude, ChatGPT or Cursor, they can run this check for you, in the window you are already in. You write in plain words: <em>look at my site</em>, <em>compare me with these three</em>, <em>how many AI visits did I get this month</em>.</p>
       <p class="addr"><code id="mcp-url">https://oper-stack.com/api/mcp/</code><button type="button" id="mcp-copy" class="copy">Copy</button></p>
-      <p class="note">Paste it into your program's settings once. Nothing to install, no account, no payment. The slash at the end matters: without it some programs do not follow the redirect.</p>
-      <p class="note"><a href="/mcp/">Step-by-step setup for each program →</a></p>
+      <p class="note">Paste it into your app's settings once. Nothing to install, no OperStack account, no payment. The slash at the end matters: without it some apps do not follow the redirect. In ChatGPT this needs a paid plan with developer mode on.</p>
+      <p class="note"><a href="/mcp/">Step-by-step setup for each app →</a></p>
     </section>
 
     <section class="rules-why">
@@ -163,8 +163,8 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       barArc.setAttribute('stroke', score >= 80 ? 'var(--teal-soft)' : score >= 45 ? 'var(--amber-soft)' : '#e07a5f');
       const cta = document.getElementById('sb-cta') as HTMLAnchorElement;
       // Чинить нечего, значит и письма не будет: ведём туда, где есть что предложить.
-      cta.href = hasFix ? '#vis-capture' : '/products/site-report/';
-      cta.textContent = hasFix ? 'Email me the first fix' : 'Every fix for your site';
+      cta.href = hasFix ? '#vis-capture' : '/pricing/';
+      cta.textContent = hasFix ? 'Email me the first fix' : 'Watch it weekly, 7 days free';
       syncBar();
     }
     function syncBar() {
@@ -319,8 +319,9 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         ? `<div class="rest">
             <h3>${hidden} more ${hidden === 1 ? 'fix' : 'fixes'} on ${esc(r.host)}</h3>
             <ul class="rest-list">${rest.map((x) => `<li class="r-${esc(x.level)}"><span class="chip">${x.level === 'warn' ? 'Partial' : 'Problem'}</span><span class="r-area">${esc(x.area)}:</span> <span class="smudge">${esc(x.teaser)}</span></li>`).join('')}</ul>
-            <p class="note">These are the findings of this very run on ${esc(r.host)}, and the count is exactly how many there are. What to change and how to check it belongs to the fix list.</p>
-            <a class="btn" href="/products/site-report/">Every fix for your site, as a list you can hand over</a>
+            <p class="note">These are the findings of this very run on ${esc(r.host)}, and the count is exactly how many there are. OperStack Watch writes out each of them, one a week, with the text to paste, and asks ChatGPT every week whether it names you. 7 days free, then $35 a month.</p>
+            <a class="btn" href="/pricing/">Watch this weekly, 7 days free</a>
+            <p class="note">Or the <a href="/products/seo-audit/">full one-off audit, $149</a>.</p>
           </div>`
         : r.fixes.length
           ? `<p class="clean">Nothing else was found: apart from the fix above, there is nothing to repair on ${esc(r.host)}.</p>`
@@ -413,7 +414,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
           <p class="cmp-msg note" hidden></p>
           <div class="cmp-out" hidden></div>
         </div>
-        <p class="next">This check reads ten pages and writes out the first fix in full. The <a href="/products/site-report/">site fix list</a> turns every other failure into a task written the same way: what your site does now, what to change, how to check it worked. Hand a task to your developer or paste it into ChatGPT, Claude or Cursor. 9 USD, no code, nothing to install.</p>`;
+        <p class="next">This check reads ten pages and writes out the first fix in full. <a href="/pricing/">OperStack Watch</a> writes out every other failure the same way, one a week, and asks ChatGPT ten questions your buyers ask to see whether it names you. 7 days free, then $35 a month. Prefer one deep look? The <a href="/products/seo-audit/">full audit</a> is $149.</p>`;
       more.hidden = false;
       wireCompare(r);
       out.hidden = false;

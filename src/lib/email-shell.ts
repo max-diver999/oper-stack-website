@@ -23,7 +23,8 @@
  */
 
 const SITE = 'https://oper-stack.com';
-const LOGO = `${SITE}/email/logo.png`;
+/* С 25.09.2026 у логотипа тот же фон, что у шапки письма (#E7E2D8): старый стоял светлым прямоугольником. */
+const LOGO = `${SITE}/email/logo-v2.png`;
 
 /** Цвета те же, что на сайте и на схемах: письмо должно узнаваться. */
 const C = {
@@ -31,6 +32,8 @@ const C = {
   outer: '#E7E2D8',
   text: '#14181C',
   dim: '#5A6470',
+  // Подвал: серый #5A6470 при 13px читался бледно (задание 25.09.2026, 13.4).
+  foot: '#3E4751',
   line: '#CFC8BA',
   teal: '#1A8A7D',
   amber: '#C9922A',
@@ -87,14 +90,14 @@ export const findings = (items: { level: string; area: string; text: string }[])
 
 /** Задача целиком: «сейчас», «что сделать», «как проверить». */
 export const taskBlock = (task: { now?: string; task?: string; verify?: string; rule?: string }) =>
-  `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px">
+  `<!--copy--><table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 22px">
     <tr><td bgcolor="#FFFFFF" style="padding:20px 22px;border-left:4px solid ${C.teal};border-radius:0 10px 10px 0">
       ${[['Now', task.now], ['What to do', task.task], ['How to check', task.verify]]
         .filter(([, v]) => v)
         .map(([k, v]) => `<p style="margin:0 0 12px;font-family:${FONT};font-size:15px;line-height:1.5;color:${C.text}"><strong style="color:${C.teal}">${k}:</strong> ${esc(v)}</p>`).join('')}
       ${task.rule ? `<p style="margin:0;font-family:${FONT};font-size:13px;line-height:1.45;color:${C.dim}">${esc(task.rule)}</p>` : ''}
     </td></tr>
-  </table>`;
+  </table><!--/copy-->`;
 
 /* ---------------------------- само письмо ---------------------------- */
 
@@ -107,6 +110,38 @@ export type Shell = {
   unsubUrl?: string;
 };
 
+/**
+ * Отделка письма (задание Максима 25.09.2026, раздел 13): у списков и ячеек шрифт задан явно,
+ * иначе почта рисует их с засечками, и число не отрывается от своей единицы переносом строки
+ * («7 days», «$35 a month», «89 out of 100»). Меняется только текст между тегами.
+ */
+const NB = '&nbsp;';
+export function keepTogether(text: string): string {
+  return String(text)
+    .replace(/(\d+(?:[.,]\d+)*) out of (\d)/g, `$1${NB}out${NB}of${NB}$2`)
+    .replace(/(\$?\d+(?:[.,]\d+)*%?) (?=[a-z$])/g, `$1${NB}`)
+    .replace(/\b(of|to) (?=\$?\d)/g, `$1${NB}`)
+    .replace(/(\d)(&nbsp;)?a (month|year)\b/g, (m, d) => `${d}${NB}a${NB}${m.endsWith('month') ? 'month' : 'year'}`);
+}
+// Текст, который человек копирует себе на сайт (задача), идёт между <!--copy--> и <!--/copy-->:
+// неразрывные пробелы в нём уехали бы на его страницу.
+function finish(html: string): string {
+  let copying = false;
+  return String(html)
+    .split(/(<!--(?:\/)?copy-->|<[^>]*>)/)
+    .map((part) => {
+      if (part === '<!--copy-->') { copying = true; return part; }
+      if (part === '<!--/copy-->') { copying = false; return part; }
+      if (!part.startsWith('<')) return copying ? part : keepTogether(part);
+      return part
+        .replace(/^<(ul|ol|li|td|th)>$/, `<$1 style="font-family:${FONT}">`)
+        .replace(/^<(ul|ol|li|td|th)( [^>]*?)?style="(?![^"]*font-family)([^"]*)"/, (m, tag, rest = '') => `<${tag}${rest || ' '}style="font-family:${FONT};${m.split('style="')[1]}`);
+    })
+    .join('');
+}
+
+// После прехедера невидимый заполнитель: иначе почта дописывает к нему заголовок письма (25.09.2026).
+const PREHEADER_FILL = '&#847;&zwnj;&nbsp;'.repeat(90);
 export function emailShell({ preheader, heading, blocks, unsubUrl }: Shell): string {
   return `<!doctype html>
 <html lang="en"><head>
@@ -116,7 +151,7 @@ export function emailShell({ preheader, heading, blocks, unsubUrl }: Shell): str
 <meta name="supported-color-schemes" content="light">
 </head>
 <body style="margin:0;padding:0;background:${C.outer};-webkit-font-smoothing:antialiased">
-<div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:${C.outer}">${esc(preheader)}</div>
+<div style="display:none;max-height:0;overflow:hidden;opacity:0;font-size:1px;line-height:1px;color:${C.outer}">${esc(preheader)}${PREHEADER_FILL}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="${C.outer}" style="background:${C.outer}">
   <tr><td align="center" style="padding:24px 12px 36px">
     <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
@@ -125,14 +160,14 @@ export function emailShell({ preheader, heading, blocks, unsubUrl }: Shell): str
         <img src="${LOGO}" width="200" alt="OperStack" style="display:block;border:0;width:200px;max-width:60%;height:auto">
       </td></tr>
       <tr><td bgcolor="${C.paper}" style="padding:26px 22px 20px;border-radius:14px">
-        <h1 style="margin:0 0 18px;font-family:${FONT};font-size:24px;line-height:1.25;font-weight:700;color:${C.text}">${(Array.isArray(heading) ? heading : [heading]).map(esc).join('<br>')}</h1>
-        ${blocks.join('\n        ')}
+        <h1 style="margin:0 0 18px;font-family:${FONT};font-size:24px;line-height:1.25;font-weight:700;color:${C.text}">${keepTogether((Array.isArray(heading) ? heading : [heading]).map(esc).join('<br>'))}</h1>
+        ${finish(blocks.join('\n        '))}
       </td></tr>
-      <tr><td style="padding:18px 4px 0;font-family:${FONT};font-size:13px;line-height:1.6;color:${C.dim}">
-        <a href="${SITE}" style="color:${C.dim};text-decoration:none">oper-stack.com</a>
+      <tr><td style="padding:18px 4px 0;font-family:${FONT};font-size:14px;line-height:1.6;color:${C.foot}">
+        <a href="${SITE}" style="color:${C.foot};text-decoration:none">oper-stack.com</a>
         &nbsp;·&nbsp;
-        <a href="mailto:info@oper-stack.com" style="color:${C.dim};text-decoration:none">info@oper-stack.com</a>
-        ${unsubUrl ? `<br><a href="${unsubUrl}" style="color:${C.dim};text-decoration:underline">Not interested? One click and we stop.</a>` : ''}
+        <a href="mailto:info@oper-stack.com" style="color:${C.foot};text-decoration:none">info@oper-stack.com</a>
+        ${unsubUrl ? `<br><a href="${unsubUrl}" style="color:${C.foot};text-decoration:underline">Not interested? One click and we stop.</a>` : ''}
       </td></tr>
     </table>
     <!--[if mso]></td></tr></table><![endif]-->

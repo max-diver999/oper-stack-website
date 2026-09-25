@@ -47,7 +47,7 @@ const RESEND_API_KEY = (
  * проверенный способ, а не тот, который кажется правильнее.
  */
 async function sendViaResend(letter: {
-  from: string; to: string; cc?: string; replyTo: string; subject: string; text: string; html: string;
+  from: string; to: string; cc?: string; replyTo: string; subject: string; text: string; html: string; headers?: Record<string, string>;
 }, idempotencyKey?: string): Promise<{ provider: 'resend'; messageId: string }> {
   const res = await fetch('https://api.resend.com/emails', {
     method: 'POST',
@@ -65,6 +65,7 @@ async function sendViaResend(letter: {
       subject: letter.subject,
       text: letter.text,
       html: letter.html,
+      ...(letter.headers ? { headers: letter.headers } : {}),
     }),
   });
   if (!res.ok) {
@@ -95,6 +96,8 @@ export async function sendTransactionalMail(
 
   const ccRaw = env('LICENCE_NOTIFY_EMAIL', 'accounts@oper-stack.com');
   const cc = ccRaw && ccRaw !== msg.to ? ccRaw : undefined;
+  // Уникальный X-Entity-Ref-ID: по нему Gmail не склеивает письма с одинаковой темой (25.09.2026).
+  const refId = globalThis.crypto.randomUUID();
   const letter = {
     from: env('LICENCE_FROM', `OperStack <${user}>`),
     to: msg.to,
@@ -103,6 +106,7 @@ export async function sendTransactionalMail(
     subject: msg.subject,
     text: msg.text,
     html: msg.html,
+    headers: { 'X-Entity-Ref-ID': refId },
   };
 
   // No pool, explicit timeouts, and close() after the send: an open SMTP socket keeps a serverless

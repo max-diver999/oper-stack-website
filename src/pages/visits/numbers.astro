@@ -67,9 +67,9 @@ const T = ru
       failP: 'Either it was mistyped, or it is not one of ours. The link was emailed to you when you set the counter up. If you cannot find it, write to us from the same address and we will send it again.',
       keepH: 'Keep this link',
       keepP: 'It is the only way to your numbers, and anyone who has it can see them. There is no password because there is nothing here worth a password: no visitor is identified, no address is stored, and no page is recorded. Only which assistant, which day, and how many.',
-      nextP: 'Once you know the number, the free visibility check says whether an answer engine can quote you in the first place, and the 9 USD fix list turns every gap into a task you can hand to anyone.',
+      nextP: 'Once you know the number, the free visibility check says whether an answer engine can quote you in the first place, and OperStack Watch asks ChatGPT every week whether it names you and writes out the fix of the week.',
       nextCheck: 'free visibility check',
-      nextFix: '9 USD fix list',
+      nextFix: 'OperStack Watch',
     };
 
 /** Everything the browser renders after the numbers arrive. */
@@ -183,7 +183,7 @@ const JS_STRINGS = ru
       <p>{T.keepP}</p>
       <p class="next" set:html={T.nextP
         .replace(T.nextCheck, `<a href="/ai-visibility/">${T.nextCheck}</a>`)
-        .replace(T.nextFix, `<a href="/products/site-report/">${T.nextFix}</a>`)} />
+        .replace(T.nextFix, `<a href="/pricing/">${T.nextFix}</a>`)} />
     </section>
   </div>
 </CommercialLayout>
