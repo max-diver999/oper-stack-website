@@ -32,6 +32,12 @@ export type Product = {
   relatedGuides: { title: string; href: string }[];
   /** Renders an order form that posts to /api/lead/ with this source. */
   orderForm?: { source: string; heading: string; placeholder: string };
+  /**
+   * false: снят с витрины при переупаковке 25.09.2026. Список за 9, сравнение за 29 и агентский
+   * план слились в подписку OperStack Watch (их адреса перенаправлены на /pricing/), а Fix и
+   * Foundation ушли в услуги по запросу: страницы живут, в каталоге и в счёте их нет.
+   */
+  listed?: boolean;
 };
 
 export const PRODUCTS: Product[] = [
@@ -129,7 +135,7 @@ export const PRODUCTS: Product[] = [
       { item: 'A content site whose text lives in files', cost: 'Free', why: 'The gates read Markdown or MDX files. If your text lives inside WordPress or Tilda, they have nothing to read.' },
     ],
     notFor: ['Rankings, traffic or citations: it measures the corpus, not the results', 'Rewriting prose: the only automatic fix is characters', 'Sites without a content folder of Markdown or MDX'],
-    faq: [{ question: 'Does it work outside Astro?', answer: 'Any folder of MDX or Markdown files with frontmatter. Gate 08 needs a static build for the exact link check and otherwise checks source links.' }, { question: 'Why are the thresholds what they are?', answer: 'They are the values one pipeline settled on across the thirteen brands on the cases page. Every one lives in gates.config.json; change them for your corpus and tell us which were wrong.' }, { question: 'Is the demo data real?', answer: 'No. The fixture market, Isla Verde, is fictional. Every number was invented for the tests.' }, { question: 'What does it cost?', answer: 'Nothing. It is MIT. Eight of the fifteen products are paid, from a 9 USD fix list to work quoted per site; the gates stay free.' }],
+    faq: [{ question: 'Does it work outside Astro?', answer: 'Any folder of MDX or Markdown files with frontmatter. Gate 08 needs a static build for the exact link check and otherwise checks source links.' }, { question: 'Why are the thresholds what they are?', answer: 'They are the values one pipeline settled on across the thirteen brands on the cases page. Every one lives in gates.config.json; change them for your corpus and tell us which were wrong.' }, { question: 'Is the demo data real?', answer: 'No. The fixture market, Isla Verde, is fictional. Every number was invented for the tests.' }, { question: 'What does it cost?', answer: 'Nothing. It is MIT. The paid products and the weekly subscription are on the pricing page; the gates stay free.' }],
     relatedGuides: [{ title: 'Programmatic SEO for lead generation', href: '/guides/programmatic-seo-lead-gen/' }, { title: 'AEO and GEO for inbound marketing', href: '/guides/aeo-geo-inbound-marketing/' }],
   },
   {
@@ -230,6 +236,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     slug: 'site-report',
+    listed: false,
     label: 'Paid, per site',
     name: 'Every fix for your site, as a list you can hand over',
     title: 'Every Fix for Your Site, as a Hand-Over List',
@@ -328,6 +335,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     slug: 'rival-watch',
+    listed: false,
     label: 'Paid, per site',
     name: 'You and three rivals, watched for a month',
     title: 'You and Three Rivals, Watched for a Month',
@@ -455,6 +463,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     slug: 'agency',
+    listed: false,
     label: 'Subscription, unlimited client sites',
     name: 'Agency plan: reports under your own brand',
     title: 'Reports Under Your Own Name',
@@ -552,6 +561,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     slug: 'fix',
+    listed: false,
     label: 'Paid, per site',
     name: 'Fix',
     heading: 'We fix what breaks your site for search and AI',
@@ -601,6 +611,7 @@ export const PRODUCTS: Product[] = [
   },
   {
     slug: 'foundation',
+    listed: false,
     label: 'Paid, quoted per site',
     name: 'Foundation',
     heading: 'The whole site put right: the machine part and the human part',
@@ -648,8 +659,11 @@ export const PRODUCTS: Product[] = [
   },
 ];
 
+/** Товары, которые стоят в каталоге и в счёте. */
+export const LISTED_PRODUCTS: Product[] = PRODUCTS.filter((p) => p.listed !== false);
+
 export const PRODUCTS_FAQ = [
   { question: 'Which product first?', answer: 'The free AI visibility check: ten seconds, nothing to install, and it tells you whether there is a problem at all. If your pages live in Markdown files, run the free gates next, because they read every page rather than a sample. Everything paid on this page answers a question one of those two has already raised.' },
-  { question: 'Are the free tools really free?', answer: 'Yes. Six of the fifteen products are free, four of them MIT licensed with the source public: the gates, the Astro starter, the Claude Code plugin, the MCP server and the AI visibility check. They came out of the pipeline behind the brands on the cases page and they stay free. The other eight are paid, from 9 USD.' },
+  { question: 'Are the free tools really free?', answer: 'Yes. Six of the ten products are free, and four of them are MIT licensed with the source public: the gates, the Astro starter, the Claude Code plugin and the MCP server. They came out of the pipeline behind the brands on the cases page and they stay free. The paid ones start at 25 USD, and the weekly subscription is on the pricing page.' },
   { question: 'Do the tools send data anywhere?', answer: 'No. The gates, the starter, the MCP server and Pain to SEO run on your own machine, and Pain to SEO never uploads your conversations. The checks that read a site fetch its public pages the way a browser or a search engine would, and the paid reports keep your address only until the email has been sent.' },
 ];

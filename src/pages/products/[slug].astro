@@ -10,7 +10,9 @@ import ProofCard from '../../components/ProofCard.astro';
 import { PRODUCT_PROOF } from '../../data/proof.ts';
 
 export function getStaticPaths() {
-  return PRODUCTS.map((p) => ({ params: { slug: p.slug }, props: { product: p } }));
+  // Три товара слились в подписку 25.09.2026 и перенаправляются на /pricing/ (vercel.json).
+  const MERGED = new Set(['site-report', 'rival-watch', 'agency']);
+  return PRODUCTS.filter((p) => !MERGED.has(p.slug)).map((p) => ({ params: { slug: p.slug }, props: { product: p } }));
 }
 const { product: p } = Astro.props;
 const plain = PRODUCTS_PLAIN[p.slug];

@@ -95,6 +95,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
   canonical={pageUrl}
   ogImage={`${cardUrl}?png=1`}
   noindex={true}
+  theme="light"
 >
   <div class="doc">
     <article class={`report t-${tone(score)}`}>
@@ -445,7 +446,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
          --card: #fff; --line: rgba(11,16,23,.09); --ink-2: #4A5362; --muted: #6B7480;
          --good: #1A8A7D; --good-bg: #E1F2EE; --fair: #A66F12; --fair-fill: #E8B84A; --fair-bg: #FBF0D5; --poor: #B5412D; --poor-fill: #D2694F; --poor-bg: #F9E1DB; --none: #9AA3AE; }
   html body .site-nav { background: #0B1017; border-bottom-color: rgba(255,255,255,.06); }
-  html body .site-foot { background: #0B1017; color: #F5F2EC; margin-top: 3rem; padding-bottom: 5rem; }
+  html body .site-foot { margin-top: 3rem; padding-bottom: 5rem; }
 </style>
 
 <style>
