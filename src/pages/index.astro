@@ -34,11 +34,13 @@ const WATCH_SAMPLE = {
   you: 'Your clinic',
   when: '25 September 2026',
 };
+/* Названия в заголовке своими фирменными цветами и логотипами (просьба Максима 25.09.2026):
+   ChatGPT чёрный, Claude терракотовый, Perplexity бирюзовый, Gemini в своём градиенте. */
 const ENGINES = [
-  { name: 'ChatGPT', icon: 'openai' },
-  { name: 'Claude', icon: 'claude' },
-  { name: 'Perplexity', icon: 'perplexity' },
-  { name: 'Gemini', icon: 'googlegemini' },
+  { name: 'ChatGPT', icon: 'openai', paint: '#0D0D0D' },
+  { name: 'Claude', icon: 'claude', paint: '#D97757' },
+  { name: 'Perplexity', icon: 'perplexity', paint: '#20808D' },
+  { name: 'Gemini', icon: 'googlegemini', paint: 'linear-gradient(90deg, #4285F4 0%, #9B72CB 55%, #D96570 100%)' },
 ];
 /* Цифры рынка: только с источником и датой, каждая сверена 25.09.2026 по первоисточнику или
    его пересказу в отраслевом издании. Прогноз Gartner про минус 25% к 2026 году сюда не взят:
@@ -81,7 +83,7 @@ const description = 'AI visibility software. A free check of what ChatGPT, Claud
       <p class="pill">AI visibility software</p>
       <h1>
         <span class="sr">Get named by ChatGPT, Claude, Perplexity and Gemini, not just found on Google</span>
-        <span aria-hidden="true">Get named by <span class="rot" id="rot">{ENGINES.map((e, i) => <span class:list={['eng', { on: i === 0 }]}><img src={`https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${e.icon}.svg`} alt="" width="44" height="44" />{e.name},</span>)}</span><br />not just found on Google</span>
+        <span aria-hidden="true">Get named by <span class="rot" id="rot">{ENGINES.map((e, i) => <span class:list={['eng', { on: i === 0 }]} style={`--paint:${e.paint};--logo:url(https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${e.icon}.svg)`}><i class="logo"></i><span class="word">{e.name}</span>,</span>)}</span><br />not just found on Google</span>
       </h1>
       <p class="sub">More buyers now ask an assistant instead of a search engine. It reads a few sites and names two or three businesses. See what it sees on yours, free.</p>
       <form class="check" action="/ai-visibility/" method="get">
@@ -405,7 +407,9 @@ const description = 'AI visibility software. A free check of what ChatGPT, Claud
   .eng { position: absolute; left: 0; bottom: 0; display: inline-flex; align-items: center; gap: .18em; color: var(--c-teal); font-style: italic; opacity: 0; transform: translateY(.3em); transition: opacity .18s ease, transform .18s ease; white-space: nowrap; }
   .eng.on { opacity: 1; transform: none; transition: opacity .4s ease .16s, transform .4s ease .16s; }
   .rot:not(.js) .eng.on { position: relative; }
-  .eng img { width: .72em; height: .72em; opacity: .9; filter: invert(38%) sepia(62%) saturate(520%) hue-rotate(125deg) brightness(88%); }
+  .eng { color: #0B1017; gap: 0; }
+  .eng .logo { display: inline-block; width: .74em; height: .74em; margin-right: .2em; background: var(--paint); -webkit-mask: var(--logo) center / contain no-repeat; mask: var(--logo) center / contain no-repeat; }
+  .eng .word { background: var(--paint); -webkit-background-clip: text; background-clip: text; color: transparent; -webkit-text-fill-color: transparent; padding-right: .04em; }
   .hero h1 > span[aria-hidden] { display: block; }
   @media (prefers-reduced-motion: reduce) { .eng { transition: none; } }
   .market { padding-top: 40px; }
