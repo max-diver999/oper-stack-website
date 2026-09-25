@@ -23,7 +23,8 @@
  */
 
 const SITE = 'https://oper-stack.com';
-const LOGO = `${SITE}/email/logo.png`;
+/* С 25.09.2026 у логотипа тот же фон, что у шапки письма (#E7E2D8): старый стоял светлым прямоугольником. */
+const LOGO = `${SITE}/email/logo-v2.png`;
 
 /** Цвета те же, что на сайте и на схемах: письмо должно узнаваться. */
 const C = {
@@ -31,6 +32,8 @@ const C = {
   outer: '#E7E2D8',
   text: '#14181C',
   dim: '#5A6470',
+  // Подвал: серый #5A6470 при 13px читался бледно (задание 25.09.2026, 13.4).
+  foot: '#3E4751',
   line: '#CFC8BA',
   teal: '#1A8A7D',
   amber: '#C9922A',
@@ -107,6 +110,31 @@ export type Shell = {
   unsubUrl?: string;
 };
 
+/**
+ * Отделка письма (задание Максима 25.09.2026, раздел 13): у списков и ячеек шрифт задан явно,
+ * иначе почта рисует их с засечками, и число не отрывается от своей единицы переносом строки
+ * («7 days», «$35 a month», «89 out of 100»). Меняется только текст между тегами.
+ */
+const NB = '&nbsp;';
+export function keepTogether(text: string): string {
+  return String(text)
+    .replace(/(\d[\d,.]*) out of (\d)/g, `$1${NB}out${NB}of${NB}$2`)
+    .replace(/(\$?\d[\d,.]*%?) (?=[a-z$])/g, `$1${NB}`)
+    .replace(/\b(of|to) (?=\$?\d)/g, `$1${NB}`)
+    .replace(/(\d)(&nbsp;)?a (month|year)\b/g, (m, d) => `${d}${NB}a${NB}${m.endsWith('month') ? 'month' : 'year'}`);
+}
+function finish(html: string): string {
+  return String(html)
+    .split(/(<[^>]*>)/)
+    .map((part) => {
+      if (!part.startsWith('<')) return keepTogether(part);
+      return part
+        .replace(/^<(ul|ol|li|td)>$/, `<$1 style="font-family:${FONT}">`)
+        .replace(/^<(ul|ol|li|td)( [^>]*?)?style="(?![^"]*font-family)([^"]*)"/, (m, tag, rest = '') => `<${tag}${rest || ' '}style="font-family:${FONT};${m.split('style="')[1]}`);
+    })
+    .join('');
+}
+
 export function emailShell({ preheader, heading, blocks, unsubUrl }: Shell): string {
   return `<!doctype html>
 <html lang="en"><head>
@@ -125,14 +153,14 @@ export function emailShell({ preheader, heading, blocks, unsubUrl }: Shell): str
         <img src="${LOGO}" width="200" alt="OperStack" style="display:block;border:0;width:200px;max-width:60%;height:auto">
       </td></tr>
       <tr><td bgcolor="${C.paper}" style="padding:26px 22px 20px;border-radius:14px">
-        <h1 style="margin:0 0 18px;font-family:${FONT};font-size:24px;line-height:1.25;font-weight:700;color:${C.text}">${(Array.isArray(heading) ? heading : [heading]).map(esc).join('<br>')}</h1>
-        ${blocks.join('\n        ')}
+        <h1 style="margin:0 0 18px;font-family:${FONT};font-size:24px;line-height:1.25;font-weight:700;color:${C.text}">${keepTogether((Array.isArray(heading) ? heading : [heading]).map(esc).join('<br>'))}</h1>
+        ${finish(blocks.join('\n        '))}
       </td></tr>
-      <tr><td style="padding:18px 4px 0;font-family:${FONT};font-size:13px;line-height:1.6;color:${C.dim}">
-        <a href="${SITE}" style="color:${C.dim};text-decoration:none">oper-stack.com</a>
+      <tr><td style="padding:18px 4px 0;font-family:${FONT};font-size:14px;line-height:1.6;color:${C.foot}">
+        <a href="${SITE}" style="color:${C.foot};text-decoration:none">oper-stack.com</a>
         &nbsp;·&nbsp;
-        <a href="mailto:info@oper-stack.com" style="color:${C.dim};text-decoration:none">info@oper-stack.com</a>
-        ${unsubUrl ? `<br><a href="${unsubUrl}" style="color:${C.dim};text-decoration:underline">Not interested? One click and we stop.</a>` : ''}
+        <a href="mailto:info@oper-stack.com" style="color:${C.foot};text-decoration:none">info@oper-stack.com</a>
+        ${unsubUrl ? `<br><a href="${unsubUrl}" style="color:${C.foot};text-decoration:underline">Not interested? One click and we stop.</a>` : ''}
       </td></tr>
     </table>
     <!--[if mso]></td></tr></table><![endif]-->

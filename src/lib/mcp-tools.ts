@@ -62,7 +62,7 @@ const FOOTER: Record<'en' | 'ru', string[]> = {
   en: [
     'This says what is wrong. How to fix each finding, with a way to check the result and a list',
     'your developer can work from: https://oper-stack.com/products/fix/',
-    'To measure again later and see what actually changed: https://oper-stack.com/products/rival-watch/',
+    'To have ChatGPT asked about you every week, with the fix of the week written out: https://oper-stack.com/pricing/',
   ],
   ru: [
     'Здесь сказано, что не так. Как чинить каждую находку, с проверкой результата и списком,',

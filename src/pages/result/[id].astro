@@ -218,7 +218,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
 
       {rest.length > 0 && (
         <section class="card locked">
-          <div class="card-head"><h2>{rest.length === 1 ? 'One more finding' : `${rest.length} more findings`}</h2><span class="card-meta">in the fix list</span></div>
+          <div class="card-head"><h2>{rest.length === 1 ? 'One more finding' : `${rest.length} more findings`}</h2><span class="card-meta">written out in Watch</span></div>
           <ul class="fl">
             {rest.map((x: any) => (
               <li class={`r-${x.level}`}>

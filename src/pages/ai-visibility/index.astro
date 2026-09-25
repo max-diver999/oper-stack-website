@@ -163,8 +163,8 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       barArc.setAttribute('stroke', score >= 80 ? 'var(--teal-soft)' : score >= 45 ? 'var(--amber-soft)' : '#e07a5f');
       const cta = document.getElementById('sb-cta') as HTMLAnchorElement;
       // Чинить нечего, значит и письма не будет: ведём туда, где есть что предложить.
-      cta.href = hasFix ? '#vis-capture' : '/products/site-report/';
-      cta.textContent = hasFix ? 'Email me the first fix' : 'Every fix for your site';
+      cta.href = hasFix ? '#vis-capture' : '/pricing/';
+      cta.textContent = hasFix ? 'Email me the first fix' : 'Watch it weekly, 7 days free';
       syncBar();
     }
     function syncBar() {
@@ -319,8 +319,9 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
         ? `<div class="rest">
             <h3>${hidden} more ${hidden === 1 ? 'fix' : 'fixes'} on ${esc(r.host)}</h3>
             <ul class="rest-list">${rest.map((x) => `<li class="r-${esc(x.level)}"><span class="chip">${x.level === 'warn' ? 'Partial' : 'Problem'}</span><span class="r-area">${esc(x.area)}:</span> <span class="smudge">${esc(x.teaser)}</span></li>`).join('')}</ul>
-            <p class="note">These are the findings of this very run on ${esc(r.host)}, and the count is exactly how many there are. What to change and how to check it belongs to the fix list.</p>
-            <a class="btn" href="/products/site-report/">Every fix for your site, as a list you can hand over</a>
+            <p class="note">These are the findings of this very run on ${esc(r.host)}, and the count is exactly how many there are. OperStack Watch writes out each of them, one a week, with the text to paste, and asks ChatGPT every week whether it names you. 7 days free, then 35 USD a month.</p>
+            <a class="btn" href="/pricing/">Watch this weekly, 7 days free</a>
+            <p class="note">Or the <a href="/products/seo-audit/">full one-off audit, 149 USD</a>.</p>
           </div>`
         : r.fixes.length
           ? `<p class="clean">Nothing else was found: apart from the fix above, there is nothing to repair on ${esc(r.host)}.</p>`
@@ -413,7 +414,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
           <p class="cmp-msg note" hidden></p>
           <div class="cmp-out" hidden></div>
         </div>
-        <p class="next">This check reads ten pages and writes out the first fix in full. The <a href="/products/site-report/">site fix list</a> turns every other failure into a task written the same way: what your site does now, what to change, how to check it worked. Hand a task to your developer or paste it into ChatGPT, Claude or Cursor. 9 USD, no code, nothing to install.</p>`;
+        <p class="next">This check reads ten pages and writes out the first fix in full. <a href="/pricing/">OperStack Watch</a> writes out every other failure the same way, one a week, and asks ChatGPT ten questions your buyers ask to see whether it names you. 7 days free, then 35 USD a month. Prefer one deep look? The <a href="/products/seo-audit/">full audit</a> is 149 USD.</p>`;
       more.hidden = false;
       wireCompare(r);
       out.hidden = false;
