@@ -15,6 +15,8 @@ export const prerender = false;
 
 const PRODUCTS = new Set<CommerceProduct>([
   'report-9', 'report-29', 'audit-149', 'agency', 'site-kit-owner', 'site-kit-agency', 'pain-to-seo', 'course',
+  // Подписка OperStack Watch (25.09.2026): её предлагают письма после бесплатной проверки.
+  'watch',
 ]);
 const env = (key: string): string =>
   String(process.env[key] ?? (import.meta.env as Record<string, unknown> | undefined)?.[key] ?? '').trim();
