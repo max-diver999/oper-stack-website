@@ -136,9 +136,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
             on a phone and copies the link on a desktop.
           */}
           <div class="btn-row">
-            {mailCta
-              ? <a class="btn btn-main" href="#capture">{mailCta}</a>
-              : <a class="btn btn-main" href="/products/site-report/">Every fix for your site</a>}
+            <a class="btn btn-main" href="/pricing/">Watch this weekly, 7 days free</a>
             <button type="button" class="btn" id="share" data-url={pageUrl} data-title={`${stored.domain} scored ${score}/100 on AI visibility`}>Share</button>
           </div>
           {moved && (
@@ -229,8 +227,9 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
               </li>
             ))}
           </ul>
-          <p class="note">The list is real and this is its length. The wording of each line comes with the full fix list, written the same way as the fix above.</p>
-          <a class="btn btn-main" href="/products/site-report/">Every fix for your site, as a list you can hand over</a>
+          <p class="note">The list is real and this is its length. Watch writes out every line the same way as the fix above, with the text to paste, and checks every week whether ChatGPT names you.</p>
+          <a class="btn btn-main" href="/pricing/">Watch this weekly, 7 days free</a>
+          <p class="note">Or the <a href="/products/seo-audit/">full one-off audit, 149 USD</a>.</p>
         </section>
       )}
 
@@ -331,11 +330,10 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
       <div class="sb-in">
         <span class={`sb-tile tile-${tone(score)}`}>{score}</span>
         <span class="sb-two">
-          <b>{total > 1 ? `All ${total} fixes as tasks you can hand over` : 'Every fix as a task you can hand over'}</b>
-          <span>A full detailed report, the findings explained, and concrete tasks to fix them</span>
+          <b>{`Who does ChatGPT name instead of ${stored.domain}?`}</b>
+          <span>Watch asks every week and sends the fixes. 7 days free, then 35 USD a month.</span>
         </span>
-        <a class="btn btn-buy" href={SITE_REPORT.cta.href}
-           {...(SITE_REPORT.cta.external ? { target: '_blank', rel: 'noopener' } : {})}><span class="buy-long">{`Get it for ${SITE_REPORT?.price ?? '9 USD'} →`}</span><span class="buy-short">{`${SITE_REPORT?.price ?? '9 USD'} →`}</span></a>
+        <a class="btn btn-buy" href="/pricing/"><span class="buy-long">Start 7 days free →</span><span class="buy-short">Try free →</span></a>
       </div>
     </div>
   )}

@@ -2,114 +2,98 @@
 import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import FaqSection from '../../components/FaqSection.astro';
-import { PRICING_TIERS, PRICING_FAQ, PRICING_INCLUDES } from '../../data/pricing';
-import { NETWORK_HERO } from '../../data/cases';
 import { SITE } from '../../data/site';
-import { PRODUCTS } from '../../data/products';
 
+/*
+ * Переупаковка 25.09.2026: одна подписка вместо лестницы из пятнадцати продуктов. Разовый аудит
+ * за 149 остаётся второй строкой, услуги руками уходят в «по запросу» без кнопок оплаты.
+ * На странице обязательно: как отменить, возврат, контакты (нужно и клиенту, и проверке
+ * платёжного сервиса).
+ */
 const canonical = `${SITE.url}/pricing/`;
-
+const WATCH_CHECKOUT = 'https://whop.com/oper-stack/operstack-watch/';
+const INCLUDED = [
+  'Every week: whether ChatGPT names you for ten questions your buyers ask',
+  'Who it names instead of you, by name',
+  'Three rivals measured beside you',
+  'Your score out of 100 across ten pages, measured again every week',
+  'The fix list for your whole site: the page address and the text ready to paste',
+  'One email a week: what changed since last week',
+];
+const FAQ = [
+  { question: 'What happens after the 7 days?', answer: 'If you do nothing, the subscription continues at 35 USD a month, or 299 USD a year if you chose yearly. Cancel before day 7 and you pay nothing.' },
+  { question: 'How do I cancel?', answer: 'In your Whop account, in one click, at any time. You keep access until the end of the period you paid for, and the weekly letters stop after that.' },
+  { question: 'Can I get a refund?', answer: 'The 7 free days are there so you can decide before paying. After a charge, write to info@oper-stack.com within 7 days and we refund it. The full rules are on the refunds page.' },
+  { question: 'Where do the ChatGPT answers come from?', answer: 'We ask ChatGPT with web search switched on, the same way each week, in three wordings for each question. An answer can differ from one run to the next, so we show the date and the trend rather than a single verdict.' },
+  { question: 'Do I need Claude, Cursor or a developer?', answer: 'No. The report is on the site and in your inbox. Most fixes are text you paste into your site; the few that need a developer are marked so you can forward them.' },
+];
 const faqSchema = {
   '@context': 'https://schema.org',
   '@type': 'FAQPage',
-  mainEntity: PRICING_FAQ.map((item) => ({
-    '@type': 'Question',
-    name: item.question,
-    acceptedAnswer: {
-      '@type': 'Answer',
-      text: item.answer,
-    },
-  })),
+  mainEntity: FAQ.map((item) => ({ '@type': 'Question', name: item.question, acceptedAnswer: { '@type': 'Answer', text: item.answer } })),
 };
 ---
 
 <CommercialLayout
   title={`Pricing · ${SITE.name}`}
-  description="OperStack pricing: fifteen products with the price on the page, from free to 500 USD, plus quoted setup and retainer work for inbound lead operations."
+  description="OperStack Watch: 35 USD a month or 299 USD a year, 7 days free. Every week, whether ChatGPT names you, who it names instead, and what to fix. One-off audit 149 USD."
   canonical={canonical}
   jsonLd={faqSchema}
 >
   <div class="wrap wide">
-    <h1>Pick your entry point</h1>
-    <p class="lede">
-      Two ways in. Buy a product outright, with the price on the page and nothing agreed first: five are free and eight
-      are paid, from 9 USD. Or have the stack built for you, which starts with a free written assessment and is quoted
-      per project.
-    </p>
+    <h1>One plan. Seven days free.</h1>
+    <p class="lede">The free check tells you what AI sees on your site today. Watch tells you every week whether ChatGPT names you, who it names instead, and what to change.</p>
 
     <CitabilityBlock
-      text="OperStack prices two things separately. Fifteen products are sold off the shelf with the price on the page: six free, then 9, 29, 39 a month, 69, 79, 149, 249 and from 500 USD. Setup and retainer work on an inbound lead stack is quoted per project, and starts with a free written assessment."
+      text="OperStack Watch costs 35 USD a month or 299 USD a year, with the first 7 days free. It asks ChatGPT ten of your buyers' questions every week, shows who it names instead of you, measures three rivals beside you, and sends the fixes for your site by email. A one-off audit is 149 USD."
     />
 
-    <div class="tiers">
-      {PRICING_TIERS.map((tier) => (
-        <article class:list={['tier', { featured: tier.featured }]}>
-          {tier.featured && <span class="badge">Most teams start here</span>}
-          <h2>{tier.name}</h2>
-          <p class="tagline">{tier.tagline}</p>
-          <p class="price">{tier.price}</p>
-          {tier.priceNote && <p class="price-note">{tier.priceNote}</p>}
-          <ul>
-            {tier.features.map((f) => (
-              <li>{f}</li>
-            ))}
-          </ul>
-          <a class="btn" href={tier.href}>{tier.cta} →</a>
-        </article>
-      ))}
-    </div>
-
-    <aside class="proof-cta" aria-label="Client outcomes">
-      <div class="proof-copy">
-        <p class="proof-eyebrow">Verified portfolio outcomes</p>
-        <p class="proof-stat">{NETWORK_HERO.proofLine}</p>
-        <p class="proof-note">{NETWORK_HERO.proofSubline}</p>
+    <article class="watch">
+      <div class="watch-head">
+        <h2>OperStack Watch</h2>
+        <div class="period" role="group" aria-label="Billing period">
+          <button type="button" class="on" data-p="m">Monthly</button>
+          <button type="button" data-p="y">Yearly</button>
+        </div>
       </div>
-      <a class="btn proof-btn" href="/cases/?utm=pricing-proof">See proof → Cases</a>
-    </aside>
+      <p class="price"><span data-show="m">35 USD <small>a month</small></span><span data-show="y" hidden>299 USD <small>a year, about 25 a month</small></span></p>
+      <p class="price-note">7 days free, then billed unless you cancel. Cancel any time.</p>
+      <ul>{INCLUDED.map((f) => <li>{f}</li>)}</ul>
+      <a class="btn" href={WATCH_CHECKOUT} target="_blank" rel="noopener">Start 7 days free →</a>
+      <p class="fine">Card required at checkout. Secure checkout by Whop.</p>
+    </article>
 
-    {/* До этой правки страница цен не упоминала продукты вовсе и не вела на них ни одной ссылкой:
-        человек, пришедший узнать, сколько стоит, видел только сметы под проект. */}
-    <section class="shelf">
-      <h2>Buy a product outright</h2>
-      <p class="shelf-lede">
-        Six of the fifteen are free, four of those with the source public. Eight more are bought in one
-        click, from 9 USD, with nothing agreed first. Fix and Foundation are the exception: the list of
-        work is agreed in writing before any money moves, which is why they carry a quote rather than a
-        button.
-      </p>
-      <ul class="shelf-list">
-        {PRODUCTS.filter((p) => p.status === 'available').sort((a, b) => a.order - b.order).map((p) => (
-          <li>
-            <a href={`/products/${p.slug}/`}>{p.name}</a>
-            <span class="shelf-price">{p.price}</span>
-            <span class="shelf-note">{p.label}</span>
-          </li>
-        ))}
-      </ul>
-      <p><a class="btn btn-ghost" href="/products/">All fifteen products →</a></p>
+    <section class="alt">
+      <div>
+        <h2>Prefer to pay once?</h2>
+        <p>A full audit of your site: a hundred pages, five rivals, ready files to put on the site, reviewed by a person. No subscription.</p>
+        <p><a href="/products/seo-audit/">Full audit, 149 USD →</a></p>
+      </div>
+      <div>
+        <h2>Need it done for you?</h2>
+        <p>Fixes on your site and setup work are quoted on request, after we agree the list in writing.</p>
+        <p><a href="/services/">Services on request →</a></p>
+      </div>
     </section>
 
-    <section class="includes">
-      <h2>What every quoted project includes</h2>
-      <ul>
-        {PRICING_INCLUDES.map((item) => (
-          <li>{item}</li>
-        ))}
-      </ul>
+    <section class="rules">
+      <h2>Cancelling, refunds, contact</h2>
+      <p>Cancel in your Whop account at any time. Refunds within 7 days of a charge: <a href="/refunds/">refund policy</a>. Terms: <a href="/terms/">terms of service</a>. Privacy: <a href="/privacy/">privacy policy</a>. Questions: <a href="mailto:info@oper-stack.com">info@oper-stack.com</a>, Maksim Shchegolev.</p>
+      <p class="muted-line">Free tools and one-off products: <a href="/products/">all products</a>.</p>
     </section>
 
-    <section class="guides-cta">
-      <h2>Not sure which module you need?</h2>
-      <p>Read the system map on the homepage or start with our lead ops guides.</p>
-      <p style="margin-top:16px">
-        <a class="btn btn-ghost" href="/guides/">Browse guides</a>
-      </p>
-    </section>
-
-    <FaqSection items={PRICING_FAQ} />
+    <FaqSection items={FAQ} />
   </div>
 </CommercialLayout>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('.period button').forEach((b) => {
+    b.addEventListener('click', () => {
+      document.querySelectorAll('.period button').forEach((x) => x.classList.toggle('on', x === b));
+      document.querySelectorAll<HTMLElement>('[data-show]').forEach((el) => { el.hidden = el.dataset.show !== b.dataset.p; });
+    });
+  });
+</script>
 
 <style>
   .tiers {
@@ -290,4 +274,27 @@ const faqSchema = {
     .price-note, .proof-note { font-size: 14px; line-height: 1.5; }
     .proof-eyebrow { font-size: 11px; }
   }
+  /* Переупаковка 25.09.2026 */
+  .watch { max-width: 560px; margin: 32px 0 40px; padding: 28px 26px; border-radius: 18px; border: 1px solid rgba(61,184,169,.45); background: rgba(61,184,169,.06); box-shadow: 0 20px 50px -30px rgba(61,184,169,.35); display: flex; flex-direction: column; gap: 10px; }
+  .watch-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+  .watch h2 { margin: 0; font-size: 24px; }
+  .period { display: inline-flex; border: 1px solid rgba(255,255,255,.12); border-radius: 999px; padding: 3px; }
+  .period button { background: none; border: 0; color: var(--muted); font: inherit; font-size: 13px; padding: 6px 14px; border-radius: 999px; cursor: pointer; }
+  .period button.on { background: rgba(61,184,169,.18); color: var(--paper); }
+  .watch .price { font-size: 38px; margin: 6px 0 0; }
+  .watch .price small { font-size: 15px; color: var(--muted); font-weight: 400; }
+  .watch ul { list-style: none; padding: 0; margin: 10px 0 8px; display: grid; gap: 8px; }
+  .watch li { padding-left: 22px; position: relative; font-size: 15px; }
+  .watch li::before { content: '✓'; position: absolute; left: 0; color: var(--teal-soft); }
+  .watch .btn { align-self: flex-start; margin-top: 6px; }
+  .fine { font-size: 13px; color: var(--muted); margin: 4px 0 0; }
+  .alt { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin: 8px 0 36px; }
+  .alt > div { padding: 20px; border-radius: 14px; border: 1px solid rgba(255,255,255,.08); background: rgba(255,255,255,.02); }
+  .alt h2 { font-size: 18px; margin: 0 0 6px; }
+  .alt p { margin: 0 0 8px; color: var(--muted); font-size: 15px; }
+  .rules { margin: 0 0 36px; max-width: 70ch; }
+  .rules h2 { font-size: 18px; margin: 0 0 8px; }
+  .rules p { color: var(--muted); font-size: 15px; }
+  .muted-line { margin-top: 10px; }
+  @media (max-width: 680px) { .alt { grid-template-columns: 1fr; } .watch { padding: 22px 18px; } }
 </style>

@@ -1,10 +1,10 @@
 /** OperStack — standalone B2B brand (not real estate). */
 export const SITE = {
   name: 'OperStack',
-  tagline: 'The operating stack for inbound leads',
+  tagline: 'AI visibility software',
   url: 'https://oper-stack.com',
   description:
-    'OperStack is the operating stack for businesses that live on inbound leads: SEO and AEO site factory, AI qualification, CRM automation, team training, and reporting. One Lead Hub.',
+    'OperStack is AI visibility software: a free check of what ChatGPT and other assistants see on a site, and a weekly subscription that shows whether ChatGPT names you, who it names instead, and what to fix.',
   email: 'info@oper-stack.com',
   /** No phone is published: we answer by email and on Telegram. */
   telegram: 'operstack',

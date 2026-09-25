@@ -1,21 +1,30 @@
 ---
 import CommercialLayout from '../components/CommercialLayout.astro';
 import { SITE } from '../data/site';
-import { MAP_CORE, MAP_MODULES } from '../data/map-copy';
+import { NETWORK_HERO } from '../data/cases';
 import ownScore from '../data/own-score.json';
 /* Разбивка «сколько замеров за запуск» считается при сборке настоящим прогоном, см. scripts/measure-own-score.mjs. */
 const counts = (ownScore as { counts?: { pages: number; seoRules: number; seo: number; contentFields: number; content: number; robots: number; site: number; engines: number; total: number; robotNames: string[] } }).counts ?? null;
 
 /*
- * The homepage is the free check. Variant A, approved by Maxim on 15 Sep 2026: the first screen
- * asks the question and offers the form; below it three reasons to run it, how it works, what
- * makes it different, what happens after the check (no prices here: they live in the email),
- * and the modules as text instead of the interactive map. Not one number typed by hand: our own
- * score comes from own-score.json, which the build measures with the same code as the check.
+ * Переупаковка 25.09.2026 (план Максима «OperStack: переупаковка», версия 2). Одно обещание,
+ * одна подписка, один главный призыв на экране. Бесплатная проверка остаётся прежней: балл,
+ * пять областей, первая правка. Вопросы к ChatGPT задаются только подписчикам, в бесплатной
+ * проверке их нет. Сравнений с похожими сервисами на сайте нет, только с дорогими
+ * инструментами и агентствами. Число +279% стоит по решению Максима, подписано как наши кейсы
+ * с источником. Пример ответа ChatGPT настоящий: прогон 25.09.2026, модель через API с поиском.
  */
 const score = typeof ownScore?.score === 'number' ? ownScore.score : null;
 const areas = Array.isArray(ownScore?.areas) ? ownScore.areas : [];
 const measured = ownScore?.measured || '';
+const WATCH_PRICE = '35 USD';
+const WATCH_SAMPLE = {
+  question: 'Best real estate agency in Phuket for international buyers?',
+  named: ['Siam Expat Property', 'Twins Real Estate', 'Butler Estates', 'ZODIAC', 'NOVA Estate', 'Phuket Realtor'],
+  you: 'MORE Group, our own property business',
+  when: '25 September 2026',
+};
+const askChatGpt = `https://chatgpt.com/?q=${encodeURIComponent('What is OperStack (oper-stack.com), and is it a good way to check whether ChatGPT recommends my business?')}`;
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -25,43 +34,89 @@ const websiteSchema = {
   publisher: { '@id': `${SITE.url}/#organization` },
   inLanguage: 'en',
 };
-const title = 'Free AI Visibility Check: Your Site Through the Eyes of AI · OperStack';
-const description = 'Generative engine optimization starts with a measurement. What ChatGPT, Claude, Perplexity, Gemini, Copilot and the rest see on your site: which of the 14 AI crawlers it lets in, whether it has a map for agents, whether there is anything to quote. A score out of 100 and the first fix on screen, no signup.';
+const title = 'Get Named by ChatGPT, Not Just Found on Google · OperStack';
+const description = 'AI visibility software. A free check of what ChatGPT, Claude, Perplexity and Gemini see on your site, then OperStack Watch: every week, whether ChatGPT names you, who it names instead, and what to fix. 7 days free, then 35 USD a month.';
 ---
+
 <CommercialLayout title={title} description={description} canonical={`${SITE.url}/`} jsonLd={websiteSchema}>
   <main class="hm">
-
     <section class="hero">
-      <h1>Your site through the eyes of <em>AI</em></h1>
-      <p class="lede">People increasingly ask an assistant instead of a search engine: ChatGPT, Claude, Perplexity, Gemini, Copilot and the rest. The assistant reads a few sites and names two or three. This check shows what it sees on yours, whether you make that list, and what stands in the way.</p>
+      <p class="eyebrow">AI visibility software</p>
+      <h1>Get named by <em>ChatGPT</em>, not just found on Google</h1>
+      <p class="lede">More buyers now ask an assistant instead of a search engine. It reads a few sites and names two or three businesses. Start with a free check of what AI sees on your site and what to fix first.</p>
       <form class="check" action="/ai-visibility/" method="get">
         <label class="sr" for="home-url">Site address</label>
         <input id="home-url" name="url" type="text" inputmode="url" placeholder="your-site.com" autocomplete="url" required />
-        <button type="submit">Check for free</button>
+        <button type="submit">Check my site free</button>
       </form>
       <p class="under">Half a minute · no signup · nothing to install · <b>result on screen</b></p>
-      {/*
-       * Три отличия прямо под кнопкой.
-       *
-       * Простым языком. Отличия у нас были в самом продукте, а на витрине о них не говорилось.
-       * 17.09.2026 проверено на боевом: строка про десять страниц лежала только на внутренней
-       * странице, куда пункт меню «Проверка» даже не ведёт, а про адреса страниц и про границы
-       * замера не было сказано нигде вовсе. Человек выбирает, проверяться у нас или у них, и
-       * решает это здесь, на первом экране.
-       *
-       * Каждая строка это то, что проверка действительно делает, а не обещание.
-       */}
       <ul class="edge">
         <li><b>Ten pages, not one.</b> Other tools read a single page and call it a site check.</li>
         <li><b>We name the pages to fix.</b> Not "your content is hard to quote", but a list of addresses.</li>
       </ul>
+    </section>
 
+    <section>
+      <p class="eyebrow">What Watch shows you every week</p>
+      <h2>Who ChatGPT names instead of you</h2>
+      <p class="lede">We asked ChatGPT the question a buyer of our own property business would ask. This is the real answer.</p>
+      <div class="ask">
+        <p class="ask-q"><span>Question</span>{WATCH_SAMPLE.question}</p>
+        <p class="ask-l">ChatGPT names</p>
+        <ul class="ask-names">{WATCH_SAMPLE.named.map((n) => <li>{n}</li>)}</ul>
+        <p class="ask-you"><b>{WATCH_SAMPLE.you}:</b> not named</p>
+        <p class="ask-foot">Asked through ChatGPT with web search on {WATCH_SAMPLE.when}, in three wordings; not named in any of them. Answers change from run to run, which is why Watch asks every week and shows the trend.</p>
+      </div>
+    </section>
 
+    <section>
+      <p class="eyebrow">How it works</p>
+      <h2>Check free. Watch every week. Fix with the list.</h2>
+      <ol class="steps">
+        <li><div><b>Check your site, free</b><p>A score out of 100, five areas and the first fix, on screen. No email, no signup.</p></div></li>
+        <li><div><b>Watch it every week: 7 days free, then {WATCH_PRICE} a month</b><p>Whether ChatGPT names you for ten questions your buyers ask, who it names instead, three rivals beside you, and what changed since last week. By email, nothing to connect.</p></div></li>
+        <li><div><b>Fix with the list</b><p>Every fix across the site, with the page address and the text ready to paste. Hand it to whoever runs the site.</p></div></li>
+      </ol>
+      <p class="cta-row"><a class="btn-main" href="/pricing/">Start 7 days free</a><a class="btn-ghost" href="/ai-visibility/">Or run the free check first</a></p>
+    </section>
+
+    <section>
+      <p class="eyebrow">What it costs to find out</p>
+      <h2>Three ways to learn whether AI recommends you</h2>
+      <div class="vs">
+        <div class="vs-card"><span class="tag">An SEO agency</span><p class="vs-price">A monthly retainer</p><p>Reports and calls. You still do not learn whether ChatGPT names you, or who it names instead.</p></div>
+        <div class="vs-card"><span class="tag">Semrush</span><p class="vs-price">139 USD a month, 199 with AI search</p><p>A large dashboard of data. What to change on your site is left to you.</p></div>
+        <div class="vs-card"><span class="tag">Asking ChatGPT yourself</span><p class="vs-price">Free, once</p><p>One answer, one day. It will not tell you what it said last week, why it picked them, or what to change.</p></div>
+        <div class="vs-card us"><span class="tag">OperStack Watch</span><p class="vs-price">{WATCH_PRICE} a month, 7 days free</p><p>Who ChatGPT names instead of you, every week, and the fixes that change it.</p></div>
+      </div>
+      <p class="src">Semrush prices from semrush.com/prices, monthly billing, checked on 25 September 2026.</p>
+    </section>
+
+    <section>
+      <p class="eyebrow">Why OperStack</p>
+      <h2>Built for the owner, not the SEO team</h2>
+      <div class="honest">
+        <p><b>Ten pages read, not one.</b> Most checks read your homepage and call it a site.</p>
+        <p><b>Nothing to connect.</b> The report is on the site and in your inbox every week. No Claude, no Cursor, no developer.</p>
+        <p><b>The pages to fix, and the text to paste.</b> Not "improve your content", but this page, this line, this replacement.</p>
+        <p><b>Every score adds up by hand.</b> If we could not measure something, we say so instead of counting it as zero.</p>
+        <p><b>Pay once if you prefer.</b> A full audit of your site for 149 USD, no subscription.</p>
+      </div>
+    </section>
+
+    <section>
+      <p class="eyebrow">Our own cases</p>
+      <h2>We built this for our own sites first</h2>
+      <div class="proof">
+        <div class="proof-big">+279%</div>
+        <p class="proof-line">organic clicks month over month across {NETWORK_HERO.liveSites} of our own brands in {NETWORK_HERO.marketCount} countries.</p>
+        <p class="proof-src">Our own sites, not client promises. Data from Google Search Console. <a href="/cases/">See the cases</a></p>
+      </div>
       {score !== null && (
-        <div class="sample" aria-label="What the result looks like">
+        <div class="sample">
           <div class="sample-top">
             <div class="num">{score}<span>/100</span></div>
-            <p>This is what the answer looks like: our own site, measured by the same code{measured ? ` on ${measured}` : ''}. The score is the sum of five areas; add them up by hand and you get exactly this number. Below it the check lists which of the 14 AI crawlers a site lets in and which it turns away.</p>
+            <p>And we measure ourselves with the same tool: this site{measured ? ` on ${measured}` : ''}. The score is the sum of five areas; add them up by hand and you get exactly this number.</p>
           </div>
           <div class="bars">
             {areas.map((a) => (
@@ -72,108 +127,34 @@ const description = 'Generative engine optimization starts with a measurement. W
               </div>
             ))}
           </div>
+          {counts && <p class="small">One free run covers {counts.pages} pages, {counts.robots} AI crawlers by name and {counts.total} measurements in all.</p>}
         </div>
       )}
+      <p class="cta-row"><a class="btn-ghost" href={askChatGpt} target="_blank" rel="noopener">Ask ChatGPT about OperStack</a></p>
     </section>
 
-    {counts && (
-      <section>
-        <p class="eyebrow">What one run covers</p>
-        <h2>What the free check gets through</h2>
-        <p class="lede">One run, under two seconds, nothing to install.</p>
-        <div class="covers">
-          <ul class="covlist">
-            <li><b>{counts.robots} AI crawlers</b> checked by name: whether your robots.txt lets them in or turns them away</li>
-            <li><b>{counts.pages} pages</b> of the site read in full, not just the homepage</li>
-            <li><b>{counts.engines} engines</b> get their own readiness score: ChatGPT, Perplexity, Claude, Gemini, Copilot</li>
-            <li><b>5 areas</b> add up to a score out of 100, and you can add them up by hand</li>
-            <li><b>{counts.seoRules} SEO basics</b> in the same report: titles, descriptions, H1, canonical</li>
-            <li><b>3 fixes</b> naming what to close first</li>
-          </ul>
-          <div class="covcard">
-            <div class="covnum">{counts.total}</div>
-            <p class="covnum-label">measurements in one run</p>
-            <dl class="covcalc">
-              <div><dt>{counts.seo}</dt><dd>SEO checks: {counts.seoRules} rules on each of {counts.pages} pages</dd></div>
-              <div><dt>{counts.content}</dt><dd>content signals: {counts.contentFields} on every page</dd></div>
-              <div><dt>{counts.robots}</dt><dd>AI crawlers against your robots.txt</dd></div>
-              <div><dt>{counts.site}</dt><dd>checks on the site as a whole</dd></div>
-            </dl>
-            <p class="covnum-label covtags-head">Every crawler named</p>
-            <div class="covtags">{counts.robotNames.map((n) => <span>{n}</span>)}</div>
-            <p class="covfoot">Every number here was measured by our own code on our own site. Run yours and count again.</p>
-          </div>
-        </div>
-      </section>
-    )}
-
     <section>
-      <p class="eyebrow">Why people run it</p>
-      <h2>One check, three different reasons</h2>
-      <div class="three">
-        <div class="card"><span class="tag">Your own site</span><h3>Why does the assistant name someone else</h3><p>The site is alive and the copy is good, yet you are not in the AI answers. Usually it is not the copy but three files a robot looks for and cannot find. The check names them.</p></div>
-        <div class="card"><span class="tag">Rivals</span><h3>Who gets named instead of you, and why</h3><p>Run a rival through the same tool and compare the five areas side by side. You see exactly where they are ahead, and it is a measurement of their site, not a guess.</p></div>
-        <div class="card"><span class="tag">Clients</span><h3>For a marketer: a reason to start the conversation</h3><p>Check a client's site before the meeting. Come not with "let's do promotion" but with specifics: this is closed, this is missing, this is what it costs.</p></div>
+      <p class="eyebrow">Questions</p>
+      <h2>Before you start</h2>
+      <div class="faq">
+        <details><summary>How is this different from Semrush?</summary><p>Semrush gives you keyword and ranking data and leaves the conclusions to you. OperStack answers one question every week: does ChatGPT name you, who does it name instead, and what on your site to change. It costs {WATCH_PRICE} a month instead of 139 or more.</p></details>
+        <details><summary>What happens after the 7 days?</summary><p>If you do nothing, the subscription continues at {WATCH_PRICE} a month. Cancel before day 7 and you pay nothing.</p></details>
+        <details><summary>How do I cancel?</summary><p>In your Whop account, in one click, at any time. The weekly letters stop at the end of the period you paid for.</p></details>
+        <details><summary>What do you do with my data?</summary><p>We read the public pages of your site, the way a search engine does, and keep your email to send the weekly letter. Nothing else. <a href="/privacy/">Privacy</a></p></details>
+        <details><summary>Do I need a developer?</summary><p>No. Most fixes are text you paste into your site. The few that need a developer are marked, written so you can forward them.</p></details>
       </div>
-    </section>
-
-    <section>
-      <p class="eyebrow">How it works</p>
-      <h2>We read your site the way an AI crawler reads it</h2>
-      <ol class="steps">
-        <li><div><b>We knock the way an assistant knocks</b><p>We see whether the site lets in the 14 crawlers that fetch pages for ChatGPT, Perplexity, Claude and Copilot answers. One line in robots.txt can close you to all of them at once.</p></div></li>
-        <li><div><b>We look for the map for agents</b><p>llms.txt is a short list of your pages written for a machine. Most sites we have checked do not have one.</p></div></li>
-        <li><div><b>We check whether it is clear who you are</b><p>Structured data should name what you actually do. A dental clinic should be marked as a dental clinic, not as "an organisation".</p></div></li>
-        <li><div><b>We look for something to quote</b><p>An assistant takes a short, ready answer from the first paragraph. If the page opens with the company history, there is nothing to quote.</p></div></li>
-        <li><div><b>We check whether you can be trusted</b><p>Dates, authorship, sources under the figures. A figure without a source is not a fact to a machine.</p></div></li>
-      </ol>
-    </section>
-
-    <section>
-      <p class="eyebrow">What makes it different</p>
-      <h2>We only say what we measured</h2>
-      <div class="honest">
-        <p><b>The score can be checked by hand.</b> Five areas add up to exactly the number at the top. No weight taken from thin air.</p>
-        <p><b>Could not measure, we say so.</b> If a file could not be read, the area is marked "not measured" and counts neither for nor against. A zero would claim you are doing badly, and we do not know that.</p>
-        <p><b>No "our AI thinks".</b> Every finding is a specific file, a line, or its absence. Open it and see for yourself.</p>
-        <p><b>This work has names.</b> GEO, generative engine optimization, and AEO, answer engine optimization. We measure the things behind the names rather than the names: the files, the markup and the text. <a href="/guides/ai-seo/">What it is and what decides it</a>.</p>
-        {score !== null && <p><b>And we measure ourselves with the same tool.</b> This site scores <b class="amber">{score} of 100</b>{measured ? ` as of ${measured}` : ''}. Same code, same settings, and the number is refreshed every time the site is built.</p>}
-      </div>
-    </section>
-
-    <section>
-      <p class="eyebrow">After the check</p>
-      <h2>First you get the result. Then you decide whether you need more</h2>
-      <ol class="steps">
-        <li><div><b>The score and five areas, on screen</b><p>No email, no signup. That already answers whether AI sees you.</p></div></li>
-        <li><div><b>The first fix, in full</b><p>The most important one: what is there now, what to change, how to check it worked. On screen, and by email if you leave one, so you can hand it to whoever runs the site.</p></div></li>
-        <li><div><b>More only if you want it</b><p>Every fix across the whole site, a comparison with rivals, a review by a person. We write about that in the same email, and the prices are there, not here. <a href="/products/">See what there is</a>.</p></div></li>
-      </ol>
-    </section>
-
-    <section>
-      <p class="eyebrow">Why trust us</p>
-      <h2>We built this for ourselves, then gave it to people</h2>
-      <p class="lede">Fifteen sites of our own, more than two million words, {MAP_MODULES.length} modules around one hub. The tool grew out of what we fixed on our own sites every day.</p>
-      <div class="mods">
-        <div class="mod core"><b>{MAP_CORE.title}</b><span>{MAP_CORE.role}</span><p>{MAP_CORE.lede}</p></div>
-        {MAP_MODULES.map((m) => (
-          <div class="mod"><b>{m.name}</b><span>{m.role}{m.proof ? ` · ${m.proof}` : ''}</span><p>{m.lede}</p></div>
-        ))}
-      </div>
-      <p class="muted">Need the system rather than the tool? <a href="/services/">See the services</a>.</p>
     </section>
 
     <section class="final">
-      <h2>The check takes half a minute</h2>
-      <p class="lede">Knowing whether AI sees you costs less than not knowing.</p>
+      <h2>Find out what AI sees on your site</h2>
+      <p class="lede">The check takes half a minute and costs nothing.</p>
       <form class="check" action="/ai-visibility/" method="get">
         <label class="sr" for="home-url-2">Site address</label>
         <input id="home-url-2" name="url" type="text" inputmode="url" placeholder="your-site.com" autocomplete="url" required />
-        <button type="submit">Check for free</button>
+        <button type="submit">Check my site free</button>
       </form>
+      <p class="oneoff">Prefer a one-off? <a href="/products/seo-audit/">Full audit, 149 USD</a></p>
     </section>
-
   </main>
 </CommercialLayout>
 
@@ -269,4 +250,34 @@ const description = 'Generative engine optimization starts with a measurement. W
   .edge li { font-size: 14px; line-height: 1.5; color: rgba(245,242,236,.72); padding-left: 14px; border-left: 2px solid rgba(61,184,169,.55); }
   .edge b { display: block; color: var(--paper); font-weight: 600; margin-bottom: 2px; }
   @media (max-width: 760px) { .edge { grid-template-columns: 1fr; gap: 12px; margin-top: 18px; } }
+  /* Переупаковка 25.09.2026 */
+  .hero .eyebrow { margin-bottom: 14px; }
+  .ask { background: #141C28; border: 1px solid #243040; border-radius: 16px; padding: 22px 24px; margin-top: 22px; max-width: 760px; }
+  .ask-q { margin: 0 0 16px; font-size: 18px; color: var(--paper); font-weight: 500; }
+  .ask-q span { display: block; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; font-weight: 400; }
+  .ask-l { margin: 0 0 8px; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+  .ask-names { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .ask-names li { background: rgba(255,255,255,.05); border: 1px solid #2A3647; border-radius: 20px; padding: 6px 12px; font-size: 14px; color: #D6DAE0; }
+  .ask-you { margin: 18px 0 0; font-size: 16px; color: var(--amber-soft); }
+  .ask-you b { color: var(--paper); font-weight: 500; }
+  .ask-foot { margin: 14px 0 0; font-size: 13px; color: var(--muted); line-height: 1.5; }
+  .cta-row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 26px; align-items: center; }
+  .btn-main { display: inline-flex; align-items: center; height: 50px; padding: 0 24px; background: var(--teal-soft); color: #06231F !important; border-radius: 10px; font-weight: 600; text-decoration: none; }
+  .btn-ghost { display: inline-flex; align-items: center; height: 50px; padding: 0 20px; border: 1px solid #2A3647; border-radius: 10px; color: var(--paper) !important; text-decoration: none; }
+  .vs { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; margin-top: 24px; }
+  .vs-card { background: #141C28; border: 1px solid #243040; border-radius: 14px; padding: 20px; }
+  .vs-card.us { border-color: var(--teal); background: rgba(61,184,169,.07); }
+  .vs-price { margin: 0 0 8px; font-size: 17px; font-weight: 600; color: var(--paper); }
+  .vs-card p:last-child { margin: 0; font-size: 14.5px; color: #C6CBD2; }
+  .src { margin: 14px 0 0; font-size: 12.5px; color: var(--muted); }
+  .proof { margin-top: 22px; }
+  .proof-big { font-family: var(--fd); font-weight: 600; font-size: clamp(52px, 9vw, 76px); line-height: 1; color: var(--teal-soft); }
+  .proof-line { margin: 10px 0 0; font-size: 18px; color: var(--paper); max-width: 40ch; }
+  .proof-src { margin: 8px 0 0; font-size: 13.5px; color: var(--muted); }
+  .small { margin: 16px 0 0; font-size: 13px; color: var(--muted); }
+  .faq { margin-top: 18px; max-width: 760px; display: grid; gap: 10px; }
+  .faq details { background: #141C28; border: 1px solid #243040; border-radius: 12px; padding: 14px 18px; }
+  .faq summary { cursor: pointer; font-weight: 500; color: var(--paper); }
+  .faq p { margin: 10px 0 0; font-size: 15px; color: #C6CBD2; }
+  .oneoff { margin: 18px 0 0; font-size: 14px; color: var(--muted); }
 </style>
