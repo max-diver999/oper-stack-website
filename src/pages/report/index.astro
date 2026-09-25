@@ -35,7 +35,7 @@ const ru = claims ? claims.lang === 'ru' : Astro.url.searchParams.get('lang') ==
  * Конкуренты есть у двух ступеней, и их число разное: трое за 29, пятеро в аудите. Число берётся
  * из ступени в ссылке, а не из вёрстки, иначе поля и товар разъедутся.
  */
-const rivalSlots = claims?.tier === 'audit' ? 5 : claims?.tier === '29' ? 3 : 0;
+const rivalSlots = claims?.tier === 'audit' ? 5 : claims?.tier === '29' || claims?.tier === 'watch' ? 3 : 0;
 const withRivals = rivalSlots > 0;
 const isAudit = claims?.tier === 'audit';
 const t = ru

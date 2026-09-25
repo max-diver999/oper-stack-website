@@ -95,6 +95,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
   canonical={pageUrl}
   ogImage={`${cardUrl}?png=1`}
   noindex={true}
+  theme="light"
 >
   <div class="doc">
     <article class={`report t-${tone(score)}`}>
@@ -136,9 +137,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
             on a phone and copies the link on a desktop.
           */}
           <div class="btn-row">
-            {mailCta
-              ? <a class="btn btn-main" href="#capture">{mailCta}</a>
-              : <a class="btn btn-main" href="/products/site-report/">Every fix for your site</a>}
+            <a class="btn btn-main" href="/pricing/">Watch this weekly, 7 days free</a>
             <button type="button" class="btn" id="share" data-url={pageUrl} data-title={`${stored.domain} scored ${score}/100 on AI visibility`}>Share</button>
           </div>
           {moved && (
@@ -229,8 +228,9 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
               </li>
             ))}
           </ul>
-          <p class="note">The list is real and this is its length. The wording of each line comes with the full fix list, written the same way as the fix above.</p>
-          <a class="btn btn-main" href="/products/site-report/">Every fix for your site, as a list you can hand over</a>
+          <p class="note">The list is real and this is its length. Watch writes out every line the same way as the fix above, with the text to paste, and checks every week whether ChatGPT names you.</p>
+          <a class="btn btn-main" href="/pricing/">Watch this weekly, 7 days free</a>
+          <p class="note">Or the <a href="/products/seo-audit/">full one-off audit, 149 USD</a>.</p>
         </section>
       )}
 
@@ -331,11 +331,10 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
       <div class="sb-in">
         <span class={`sb-tile tile-${tone(score)}`}>{score}</span>
         <span class="sb-two">
-          <b>{total > 1 ? `All ${total} fixes as tasks you can hand over` : 'Every fix as a task you can hand over'}</b>
-          <span>A full detailed report, the findings explained, and concrete tasks to fix them</span>
+          <b>{`Who does ChatGPT name instead of ${stored.domain}?`}</b>
+          <span>Watch asks every week and sends the fixes. 7 days free, then 35 USD a month.</span>
         </span>
-        <a class="btn btn-buy" href={SITE_REPORT.cta.href}
-           {...(SITE_REPORT.cta.external ? { target: '_blank', rel: 'noopener' } : {})}><span class="buy-long">{`Get it for ${SITE_REPORT?.price ?? '9 USD'} →`}</span><span class="buy-short">{`${SITE_REPORT?.price ?? '9 USD'} →`}</span></a>
+        <a class="btn btn-buy" href="/pricing/"><span class="buy-long">Start 7 days free →</span><span class="buy-short">Try free →</span></a>
       </div>
     </div>
   )}
@@ -447,7 +446,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
          --card: #fff; --line: rgba(11,16,23,.09); --ink-2: #4A5362; --muted: #6B7480;
          --good: #1A8A7D; --good-bg: #E1F2EE; --fair: #A66F12; --fair-fill: #E8B84A; --fair-bg: #FBF0D5; --poor: #B5412D; --poor-fill: #D2694F; --poor-bg: #F9E1DB; --none: #9AA3AE; }
   html body .site-nav { background: #0B1017; border-bottom-color: rgba(255,255,255,.06); }
-  html body .site-foot { background: #0B1017; color: #F5F2EC; margin-top: 3rem; padding-bottom: 5rem; }
+  html body .site-foot { margin-top: 3rem; padding-bottom: 5rem; }
 </style>
 
 <style>

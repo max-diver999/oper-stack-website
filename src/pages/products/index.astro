@@ -2,12 +2,12 @@
 import CommercialLayout from '../../components/CommercialLayout.astro';
 import CitabilityBlock from '../../components/CitabilityBlock.astro';
 import FaqSection from '../../components/FaqSection.astro';
-import { PRODUCTS, PRODUCTS_FAQ } from '../../data/products';
+import { LISTED_PRODUCTS, PRODUCTS_FAQ } from '../../data/products';
 import { FOUNDER_STORY } from '../../data/products.plain';
 import { SITE } from '../../data/site';
 
 const canonical = `${SITE.url}/products/`;
-const products = [...PRODUCTS].sort((a, b) => a.order - b.order);
+const products = [...LISTED_PRODUCTS].sort((a, b) => a.order - b.order);
 // Сколько бесплатных и платных, считается из данных: 13 сентября 2026 в этом абзаце стояло
 // «пять бесплатных и восемь платных» при шести и девяти в массиве. Число, набитое руками,
 // протухает молча при каждом новом продукте.
@@ -15,6 +15,12 @@ const WORDS = ['zero', 'one', 'two', 'three', 'four', 'five', 'six', 'seven', 'e
 const freeCount = products.filter((p) => p.price === 'Free').length;
 const paidCount = products.length - freeCount;
 const cap = (w: string) => w.charAt(0).toUpperCase() + w.slice(1);
+/* Короткие имена для одной фразы: полные заголовки карточек в перечислении читаются тяжело. */
+const SHORT: Record<string, string> = { visits: 'the AI visit counter', 'ai-visibility': 'the AI visibility check', gates: 'sixteen quality gates', starter: 'an Astro starter', plugin: 'a Claude Code plugin', mcp: 'an MCP server', course: 'the Invisible to ChatGPT course', 'pain-to-seo': 'Pain to SEO', 'site-kit': 'Site Kit', 'seo-audit': 'a one-off audit' };
+const short = (p: { slug: string; name: string }) => SHORT[p.slug] ?? p.name;
+const freeNames = products.filter((p) => p.price === 'Free').map(short);
+const paidNames = products.filter((p) => p.price !== 'Free').map((p) => `${short(p)} at ${p.price}`);
+const oneSentence = `OperStack sells one subscription, OperStack Watch at 35 USD a month with 7 days free, and ${WORDS[products.length]} more products for content sites: ${WORDS[freeCount]} free (${freeNames.join(', ')}) and ${WORDS[paidCount]} paid (${paidNames.join(', ')}).`;
 const itemList = {
   '@context': 'https://schema.org',
   '@type': 'ItemList',
@@ -23,12 +29,13 @@ const itemList = {
 };
 const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: PRODUCTS_FAQ.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) };
 ---
-<CommercialLayout title="Tools for Content Sites That Rank and Get Cited · OperStack" description="Sixteen free content gates, an Astro starter, a Claude Code plugin, an MCP server, a site fix list from 9 USD and an SEO, AEO and GEO audit. Fifteen products out of one working pipeline." canonical={canonical} jsonLd={[itemList, faqSchema]}>
+<CommercialLayout title="All Products · OperStack" description="OperStack Watch, the weekly AI visibility subscription, plus free tools for content sites (quality gates, an Astro starter, a Claude Code plugin, an MCP server, the AI visibility check and visit counter) and a one-off audit." canonical={canonical} jsonLd={[itemList, faqSchema]}>
   <div class="wrap wide">
     <h1>Tools for content sites that have to rank, be cited and convert</h1>
     <p class="lede">Every product on this page came out of one pipeline, the one behind the <a href="/cases/">thirteen brands on the cases page</a>. {cap(WORDS[freeCount])} are free and stay free. The other {WORDS[paidCount]} have a price on the page, not in a call.</p>
-    <p class="lede plain-lede">Not a developer? Start with the <a href="/products/ai-visibility/">free AI visibility check</a> (ten seconds, nothing to install), then read the <a href="/products/seo-audit/">audit</a> if your site already exists or the <a href="/products/site-kit/">Site Kit</a> if you are building one. Developers usually start with the <a href="/products/gates/">gates</a> and the <a href="/products/starter/">starter</a>.</p>
-    <CitabilityBlock text="OperStack publishes fifteen products for content sites, six free and nine paid: sixteen free quality gates, a free Astro starter, a free Claude Code plugin, a free MCP server, a free AI visibility check, every fix for your site at 9 USD, a rival comparison at 29 USD, an agency plan at 39 USD a month, Pain to SEO at 69 USD, a Site Kit at 79 USD, an audit at 149 USD for the first ten, a Fix package at 249 USD and a Foundation package from 500 USD." />
+    <a class="watch-banner" href="/pricing/"><span class="wb-l">The main product</span><span class="wb-n">OperStack Watch</span><span class="wb-d">Every week: whether ChatGPT names you, who it names instead, and what to fix. 7 days free, then 35 USD a month.</span><span class="wb-go">See the plan →</span></a>
+    <p class="lede plain-lede">Not a developer? Start with the <a href="/">free AI visibility check</a> (half a minute, nothing to install), then <a href="/pricing/">Watch</a> or the one-off <a href="/products/seo-audit/">audit</a>. Developers usually start with the <a href="/products/gates/">gates</a> and the <a href="/products/starter/">starter</a>. Fixes done for you are <a href="/services/">quoted on request</a>.</p>
+    <CitabilityBlock text={oneSentence} />
     <div class="grid">
       {products.map((p) => (
         <a class="card" href={`/products/${p.slug}/`}>
@@ -54,6 +61,11 @@ const faqSchema = { '@context': 'https://schema.org', '@type': 'FAQPage', mainEn
   </div>
 </CommercialLayout>
 <style>
+  .watch-banner { display: grid; gap: 4px; margin: 8px 0 24px; padding: 22px 24px; border-radius: 16px; border: 1px solid rgba(61,184,169,.45); background: rgba(26,138,125,.10); text-decoration: none; }
+  .watch-banner .wb-l { font-family: var(--fm); font-size: 10px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal-soft); }
+  .watch-banner .wb-n { font-family: var(--fd); font-size: 24px; color: var(--paper); }
+  .watch-banner .wb-d { font-size: 15px; color: rgba(245,242,236,.82); }
+  .watch-banner .wb-go { font-family: var(--fm); font-size: 12px; color: var(--teal-soft); margin-top: 4px; }
   .story { margin: 8px 0 28px; padding: 24px 26px; border-radius: 14px; border: 1px solid rgba(61,184,169,.25); background: rgba(61,184,169,.05); }
   .story h2 { margin-top: 0; }
   .story p { color: rgba(245,242,236,.88); line-height: 1.6; margin-bottom: 12px; max-width: 70ch; }

@@ -1,21 +1,16 @@
 ---
 import CommercialLayout from '../components/CommercialLayout.astro';
 import { SITE } from '../data/site';
-import { MAP_CORE, MAP_MODULES } from '../data/map-copy';
+import { NETWORK_HERO } from '../data/cases';
 import ownScore from '../data/own-score.json';
-/* Разбивка «сколько замеров за запуск» считается при сборке настоящим прогоном, см. scripts/measure-own-score.mjs. */
-const counts = (ownScore as { counts?: { pages: number; seoRules: number; seo: number; contentFields: number; content: number; robots: number; site: number; engines: number; total: number; robotNames: string[] } }).counts ?? null;
-
 /*
- * The homepage is the free check. Variant A, approved by Maxim on 15 Sep 2026: the first screen
- * asks the question and offers the form; below it three reasons to run it, how it works, what
- * makes it different, what happens after the check (no prices here: they live in the email),
- * and the modules as text instead of the interactive map. Not one number typed by hand: our own
- * score comes from own-score.json, which the build measures with the same code as the check.
+ * Главная, переупаковка 25.09.2026 (план Максима, версия 2, светлый вариант утверждён).
+ * Порядок: форма бесплатной проверки, цифры рынка с источниками, что показывает проверка
+ * (балл, пять областей, 159 замеров), что добавляет подписка Watch, как это работает, цены,
+ * почему мы, наши кейсы и отзыв, вопросы. Бесплатная проверка к ChatGPT не обращается: вопросы
+ * ChatGPT задаются только подписчикам. Сравнений с похожими сервисами на сайте нет.
+ * Ни одно число не набито руками без источника: свой балл из own-score.json, рынок со ссылками.
  */
-const score = typeof ownScore?.score === 'number' ? ownScore.score : null;
-const areas = Array.isArray(ownScore?.areas) ? ownScore.areas : [];
-const measured = ownScore?.measured || '';
 const websiteSchema = {
   '@context': 'https://schema.org',
   '@type': 'WebSite',
@@ -25,248 +20,416 @@ const websiteSchema = {
   publisher: { '@id': `${SITE.url}/#organization` },
   inLanguage: 'en',
 };
-const title = 'Free AI Visibility Check: Your Site Through the Eyes of AI · OperStack';
-const description = 'Generative engine optimization starts with a measurement. What ChatGPT, Claude, Perplexity, Gemini, Copilot and the rest see on your site: which of the 14 AI crawlers it lets in, whether it has a map for agents, whether there is anything to quote. A score out of 100 and the first fix on screen, no signup.';
+const counts = (ownScore as { counts?: { pages: number; seoRules: number; seo: number; contentFields: number; content: number; robots: number; site: number; engines: number; total: number; robotNames: string[] } }).counts ?? null;
+const score = typeof ownScore?.score === 'number' ? ownScore.score : null;
+const areas = Array.isArray(ownScore?.areas) ? ownScore.areas : [];
+const measuredRaw = ownScore?.measured || '';
+const measured = measuredRaw ? new Date(`${measuredRaw}T12:00:00Z`).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : '';
+const WATCH_PRICE = '35 USD';
+/* Нейтральный пример по решению Максима: настоящие ответы ChatGPT с поиском, 25.09.2026, три
+   формулировки про стоматологов Бристоля. Названы клиники, которые встречались в ответах. */
+const WATCH_SAMPLE = {
+  question: 'Who is the best dentist in Bristol?',
+  named: ['The Bristol Dental Practice', 'Elgin Park Dental Practice', 'Bristol Dental Anaesthetic Clinic', 'Clare Street Dental Centre', 'Ridgeway Dental Practice'],
+  you: 'Your clinic',
+  when: '25 September 2026',
+};
+const ENGINES = [
+  { name: 'ChatGPT', icon: 'openai' },
+  { name: 'Claude', icon: 'claude' },
+  { name: 'Perplexity', icon: 'perplexity' },
+  { name: 'Gemini', icon: 'googlegemini' },
+];
+/* Цифры рынка: только с источником и датой, каждая сверена 25.09.2026 по первоисточнику или
+   его пересказу в отраслевом издании. Прогноз Gartner про минус 25% к 2026 году сюда не взят:
+   срок вышел, и прогноз не сбылся. */
+const MARKET = [
+  { value: '900M', label: 'people use ChatGPT every week, up from 400 million a year earlier', source: 'OpenAI, February 2026', href: 'https://searchengineland.com/chatgpt-900-million-weekly-active-users-470492' },
+  { value: '+393%', label: 'more visits from AI assistants to US retail sites in early 2026 than a year before', source: 'Adobe Analytics, April 2026', href: 'https://techcrunch.com/2026/04/16/ai-traffic-to-us-retailers-rose-393-in-q1-and-its-boosting-their-revenue-too/' },
+  { value: '4.4×', label: 'more valuable: a visitor from AI search against one from traditional search, by conversion', source: 'Semrush, July 2025', href: 'https://www.semrush.com/blog/ai-search-seo-traffic-study/' },
+  { value: '2028', label: 'the year AI search may start sending more visitors than traditional search, in marketing topics', source: 'Semrush forecast, July 2025', href: 'https://www.semrush.com/blog/ai-search-seo-traffic-study/' },
+];
+/* Лента «работает в»: бесплатный MCP-сервер по ссылке https://oper-stack.com/api/mcp/.
+   Порядок по слову Максима: сначала ChatGPT и Codex, потом Claude. Значки из simple-icons. */
+const WORKS_IN = [
+  { name: 'ChatGPT', icon: 'openai' },
+  { name: 'Codex', icon: 'openai' },
+  { name: 'Claude Code', icon: 'claude' },
+  { name: 'Claude Desktop', icon: 'claude' },
+  { name: 'Cursor', icon: 'cursor' },
+  { name: 'Windsurf', icon: 'windsurf' },
+  { name: 'Gemini CLI', icon: 'googlegemini' },
+  { name: 'VS Code', icon: 'visualstudiocode' },
+  { name: 'Cline', icon: 'cline' },
+  { name: 'n8n', icon: 'n8n' },
+];
+/* До и после. Первый отзыв настоящий: пост владельца сайта в Threads 23.09.2026, балл с 67 до 95
+   на oper-stack.ru, перевод с русского. Ник автора не показываем, решение Максима 25.09.2026. Второй наш собственный сайт, PR #174 от 22.09.2026, и так
+   и подписан. Отзывы от имени клиентов не пишем: только их собственные слова. */
+const BEFORE_AFTER = [
+  { site: 'adbento-bot.com', before: 67, after: 95, quote: 'Thanks for the service. I enjoyed fixing it: from 67 to 95. Now waiting for indexing.', who: 'A site owner on Threads, 23 September 2026, translated from Russian' },
+  { site: 'oper-stack.com', before: 88, after: 97, quote: 'We rewrote the opening paragraph of each page so it answers first, then measured again with the same code.', who: 'Our own site, 22 September 2026' },
+];
+const askChatGpt = `https://chatgpt.com/?q=${encodeURIComponent('What is OperStack (oper-stack.com), and is it a good way to check whether ChatGPT recommends my business?')}`;
+const title = 'Get Named by ChatGPT, Not Just Found on Google · OperStack';
+const description = 'AI visibility software. A free check of what ChatGPT, Claude, Perplexity and Gemini see on your site, then OperStack Watch: every week, whether ChatGPT names you, who it names instead, and what to fix.';
 ---
-<CommercialLayout title={title} description={description} canonical={`${SITE.url}/`} jsonLd={websiteSchema}>
-  <main class="hm">
 
+<CommercialLayout title={title} description={description} canonical={`${SITE.url}/`} jsonLd={websiteSchema} theme="light">
+  <main class="lh">
     <section class="hero">
-      <h1>Your site through the eyes of <em>AI</em></h1>
-      <p class="lede">People increasingly ask an assistant instead of a search engine: ChatGPT, Claude, Perplexity, Gemini, Copilot and the rest. The assistant reads a few sites and names two or three. This check shows what it sees on yours, whether you make that list, and what stands in the way.</p>
+      <p class="pill">AI visibility software</p>
+      <h1>
+        <span class="sr">Get named by ChatGPT, Claude, Perplexity and Gemini, not just found on Google</span>
+        <span aria-hidden="true">Get named by <span class="rot" id="rot">{ENGINES.map((e, i) => <span class:list={['eng', { on: i === 0 }]}><img src={`https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${e.icon}.svg`} alt="" width="44" height="44" />{e.name},</span>)}</span><br />not just found on Google</span>
+      </h1>
+      <p class="sub">More buyers now ask an assistant instead of a search engine. It reads a few sites and names two or three businesses. See what it sees on yours, free.</p>
       <form class="check" action="/ai-visibility/" method="get">
-        <label class="sr" for="home-url">Site address</label>
-        <input id="home-url" name="url" type="text" inputmode="url" placeholder="your-site.com" autocomplete="url" required />
-        <button type="submit">Check for free</button>
+        <label class="sr" for="u1">Site address</label>
+        <span class="pre">https://</span>
+        <input id="u1" name="url" type="text" inputmode="url" placeholder="your-site.com" autocomplete="url" required />
+        <button type="submit">Check my site free →</button>
       </form>
-      <p class="under">Half a minute · no signup · nothing to install · <b>result on screen</b></p>
-      {/*
-       * Три отличия прямо под кнопкой.
-       *
-       * Простым языком. Отличия у нас были в самом продукте, а на витрине о них не говорилось.
-       * 17.09.2026 проверено на боевом: строка про десять страниц лежала только на внутренней
-       * странице, куда пункт меню «Проверка» даже не ведёт, а про адреса страниц и про границы
-       * замера не было сказано нигде вовсе. Человек выбирает, проверяться у нас или у них, и
-       * решает это здесь, на первом экране.
-       *
-       * Каждая строка это то, что проверка действительно делает, а не обещание.
-       */}
-      <ul class="edge">
-        <li><b>Ten pages, not one.</b> Other tools read a single page and call it a site check.</li>
-        <li><b>We name the pages to fix.</b> Not "your content is hard to quote", but a list of addresses.</li>
-      </ul>
-
-
-      {score !== null && (
-        <div class="sample" aria-label="What the result looks like">
-          <div class="sample-top">
-            <div class="num">{score}<span>/100</span></div>
-            <p>This is what the answer looks like: our own site, measured by the same code{measured ? ` on ${measured}` : ''}. The score is the sum of five areas; add them up by hand and you get exactly this number. Below it the check lists which of the 14 AI crawlers a site lets in and which it turns away.</p>
-          </div>
-          <div class="bars">
-            {areas.map((a) => (
-              <div>
-                <p class="bar-label">{a.label}</p>
-                <div class="track"><div class={`fill${a.max && a.score / a.max < 0.5 ? ' low' : ''}`} style={`width:${a.max ? Math.round((a.score / a.max) * 100) : 0}%`}></div></div>
-                <p class="val">{a.score} of {a.max}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+      <p class="under">Half a minute · no signup · nothing to install</p>
+      <div class="works">
+        <span class="works-l">Works in</span>
+        <ul>{WORKS_IN.map((w) => <li><img src={`https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/${w.icon}.svg`} width="16" height="16" alt="" loading="lazy" />{w.name}</li>)}</ul>
+      </div>
     </section>
 
-    {counts && (
-      <section>
-        <p class="eyebrow">What one run covers</p>
-        <h2>What the free check gets through</h2>
-        <p class="lede">One run, under two seconds, nothing to install.</p>
-        <div class="covers">
-          <ul class="covlist">
-            <li><b>{counts.robots} AI crawlers</b> checked by name: whether your robots.txt lets them in or turns them away</li>
-            <li><b>{counts.pages} pages</b> of the site read in full, not just the homepage</li>
-            <li><b>{counts.engines} engines</b> get their own readiness score: ChatGPT, Perplexity, Claude, Gemini, Copilot</li>
-            <li><b>5 areas</b> add up to a score out of 100, and you can add them up by hand</li>
-            <li><b>{counts.seoRules} SEO basics</b> in the same report: titles, descriptions, H1, canonical</li>
-            <li><b>3 fixes</b> naming what to close first</li>
-          </ul>
-          <div class="covcard">
-            <div class="covnum">{counts.total}</div>
-            <p class="covnum-label">measurements in one run</p>
-            <dl class="covcalc">
-              <div><dt>{counts.seo}</dt><dd>SEO checks: {counts.seoRules} rules on each of {counts.pages} pages</dd></div>
-              <div><dt>{counts.content}</dt><dd>content signals: {counts.contentFields} on every page</dd></div>
-              <div><dt>{counts.robots}</dt><dd>AI crawlers against your robots.txt</dd></div>
-              <div><dt>{counts.site}</dt><dd>checks on the site as a whole</dd></div>
-            </dl>
-            <p class="covnum-label covtags-head">Every crawler named</p>
-            <div class="covtags">{counts.robotNames.map((n) => <span>{n}</span>)}</div>
-            <p class="covfoot">Every number here was measured by our own code on our own site. Run yours and count again.</p>
+    <section class="block market">
+      <p class="eyebrow">Why now</p>
+      <h2>Buyers are moving from Google to AI assistants</h2>
+      <div class="mk">
+        {MARKET.map((m) => (
+          <div class="card mk-c">
+            <p class="mk-v">{m.value}</p>
+            <p class="mk-l">{m.label}</p>
+            <p class="mk-s"><a href={m.href} target="_blank" rel="noopener">{m.source}</a></p>
           </div>
+        ))}
+      </div>
+      <p class="mk-end">If the assistant does not name you, that buyer never reaches your site.</p>
+    </section>
+
+    {score !== null && (
+      <section class="block">
+        <p class="eyebrow">The free check</p>
+        <h2>Your score out of 100, in half a minute</h2>
+        <p class="lead">The same check runs on your site. Here it is on ours, measured by the same code{measured ? ` on ${measured}` : ''}.</p>
+        <div class="checkgrid">
+          <div class="card scorecard">
+            <div class="sc-top">
+              <div class="ring" style={`--p:${score}`}><b>{score}</b><span>of 100</span></div>
+              <div>
+                <p class="sc-dom">oper-stack.com</p>
+                <p class="sc-note">Five areas add up to exactly this number. Add them by hand and check.</p>
+              </div>
+            </div>
+            <div class="bars">
+              {areas.map((a) => (
+                <div class="bar-row">
+                  <p class="bar-label">{a.label}</p>
+                  <div class="track"><div class={`fill${a.max && a.score / a.max < 0.5 ? ' low' : ''}`} style={`width:${a.max ? Math.round((a.score / a.max) * 100) : 0}%`}></div></div>
+                  <p class="val">{a.score}/{a.max}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+          {counts && (
+            <div class="card countcard">
+              <div class="bignum">{counts.total}</div>
+              <p class="bignum-l">measurements in one free run</p>
+              <dl>
+                <div><dt>{counts.seo}</dt><dd>SEO checks: {counts.seoRules} rules on each of {counts.pages} pages</dd></div>
+                <div><dt>{counts.content}</dt><dd>content signals: {counts.contentFields} on every page</dd></div>
+                <div><dt>{counts.robots}</dt><dd>AI crawlers checked against your robots.txt</dd></div>
+                <div><dt>{counts.site}</dt><dd>checks on the site as a whole</dd></div>
+              </dl>
+              <details class="crawl"><summary>Every crawler we ask about</summary><div class="tags">{counts.robotNames.map((n) => <span>{n}</span>)}</div></details>
+            </div>
+          )}
         </div>
+        <ul class="ticks">
+          <li><b>Ten pages, not one.</b> Other tools read a single page and call it a site check.</li>
+          <li><b>We name the pages to fix.</b> Not "your content is hard to quote", but a list of addresses.</li>
+          <li><b>Could not measure, we say so.</b> A zero would claim you are doing badly, and we would not know that.</li>
+        </ul>
       </section>
     )}
 
-    <section>
-      <p class="eyebrow">Why people run it</p>
-      <h2>One check, three different reasons</h2>
-      <div class="three">
-        <div class="card"><span class="tag">Your own site</span><h3>Why does the assistant name someone else</h3><p>The site is alive and the copy is good, yet you are not in the AI answers. Usually it is not the copy but three files a robot looks for and cannot find. The check names them.</p></div>
-        <div class="card"><span class="tag">Rivals</span><h3>Who gets named instead of you, and why</h3><p>Run a rival through the same tool and compare the five areas side by side. You see exactly where they are ahead, and it is a measurement of their site, not a guess.</p></div>
-        <div class="card"><span class="tag">Clients</span><h3>For a marketer: a reason to start the conversation</h3><p>Check a client's site before the meeting. Come not with "let's do promotion" but with specifics: this is closed, this is missing, this is what it costs.</p></div>
+    <section class="block">
+      <p class="eyebrow">What Watch adds every week</p>
+      <h2>Who ChatGPT names instead of you</h2>
+      <p class="lead">We asked ChatGPT what a patient in Bristol would ask. These are the practices it named.</p>
+      <div class="card chat">
+        <p class="q"><span>You ask</span>{WATCH_SAMPLE.question}</p>
+        <div class="a">
+          <p class="a-l"><img src="https://cdn.jsdelivr.net/npm/simple-icons@latest/icons/openai.svg" width="14" height="14" alt="" />ChatGPT names</p>
+          <ul>{WATCH_SAMPLE.named.map((n) => <li>{n}</li>)}</ul>
+        </div>
+        <p class="you"><b>{WATCH_SAMPLE.you}</b><span class="miss">not named</span></p>
+        <p class="foot">Real ChatGPT answers with web search, {WATCH_SAMPLE.when}, three wordings of the question. "Your clinic" stands for any practice that was not named. Answers change from run to run, which is why Watch asks every week and shows the trend.</p>
       </div>
     </section>
 
-    <section>
+    <section class="block">
       <p class="eyebrow">How it works</p>
-      <h2>We read your site the way an AI crawler reads it</h2>
-      <ol class="steps">
-        <li><div><b>We knock the way an assistant knocks</b><p>We see whether the site lets in the 14 crawlers that fetch pages for ChatGPT, Perplexity, Claude and Copilot answers. One line in robots.txt can close you to all of them at once.</p></div></li>
-        <li><div><b>We look for the map for agents</b><p>llms.txt is a short list of your pages written for a machine. Most sites we have checked do not have one.</p></div></li>
-        <li><div><b>We check whether it is clear who you are</b><p>Structured data should name what you actually do. A dental clinic should be marked as a dental clinic, not as "an organisation".</p></div></li>
-        <li><div><b>We look for something to quote</b><p>An assistant takes a short, ready answer from the first paragraph. If the page opens with the company history, there is nothing to quote.</p></div></li>
-        <li><div><b>We check whether you can be trusted</b><p>Dates, authorship, sources under the figures. A figure without a source is not a fact to a machine.</p></div></li>
+      <h2>Check free. Watch every week. Fix with the list.</h2>
+      <ol class="steps3">
+        <li class="card"><span class="n">01</span><b>Check your site, free</b><p>A score out of 100, five areas and the first fix, on screen. No email, no signup.</p></li>
+        <li class="card"><span class="n">02</span><b>Watch it every week</b><p>Whether ChatGPT names you for ten questions your buyers ask, who it names instead, three rivals beside you, what changed. By email. 7 days free, then {WATCH_PRICE} a month.</p></li>
+        <li class="card"><span class="n">03</span><b>Fix with the list</b><p>Every fix across the site, with the page address and the text ready to paste. Hand it to whoever runs the site.</p></li>
       </ol>
+      <p class="ctas"><a class="b-main" href="/pricing/">Start 7 days free</a><a class="b-ghost" href="#top-check">Or run the free check first</a></p>
     </section>
 
-    <section>
-      <p class="eyebrow">What makes it different</p>
-      <h2>We only say what we measured</h2>
-      <div class="honest">
-        <p><b>The score can be checked by hand.</b> Five areas add up to exactly the number at the top. No weight taken from thin air.</p>
-        <p><b>Could not measure, we say so.</b> If a file could not be read, the area is marked "not measured" and counts neither for nor against. A zero would claim you are doing badly, and we do not know that.</p>
-        <p><b>No "our AI thinks".</b> Every finding is a specific file, a line, or its absence. Open it and see for yourself.</p>
-        <p><b>This work has names.</b> GEO, generative engine optimization, and AEO, answer engine optimization. We measure the things behind the names rather than the names: the files, the markup and the text. <a href="/guides/ai-seo/">What it is and what decides it</a>.</p>
-        {score !== null && <p><b>And we measure ourselves with the same tool.</b> This site scores <b class="amber">{score} of 100</b>{measured ? ` as of ${measured}` : ''}. Same code, same settings, and the number is refreshed every time the site is built.</p>}
+    <section class="block">
+      <p class="eyebrow">What it costs to find out</p>
+      <h2>What it costs to learn whether AI recommends you</h2>
+      <div class="vs">
+        <div class="card"><p class="tag">An agency</p><p class="price">From 1,500 USD a month</p><p>Reports and calls. You still do not learn whether ChatGPT names you, or who it names instead.</p></div>
+        <div class="card"><p class="tag">Semrush</p><p class="price">139 USD a month, 199 with AI search</p><p>A large dashboard of data. What to change on your site is left to you.</p></div>
+        <div class="card"><p class="tag">Asking ChatGPT yourself</p><p class="price">Free, once</p><p>One answer, one day. It will not tell you what it said last week, why it picked them, or what to change.</p></div>
+        <div class="card us"><p class="tag">OperStack Watch</p><p class="price">{WATCH_PRICE} a month, 7 days free</p><p>Who ChatGPT names instead of you, every week, and the fixes that change it.</p></div>
+      </div>
+      <p class="src">Semrush prices from semrush.com/prices, monthly billing, checked on 25 September 2026. Agency retainers for AI search work run from 1,000 to 2,500 USD a month at entry level and 2,000 to 10,000 for most businesses, per the <a href="https://thedigitalelevator.com/blog/aeo-and-geo-pricing-guide/" target="_blank" rel="noopener">Digital Elevator pricing guide</a>, July 2026.</p>
+    </section>
+
+    <section class="block">
+      <p class="eyebrow">Why OperStack</p>
+      <h2>Built for the owner, not the SEO team</h2>
+      <div class="why">
+        <div class="card"><b>Ten pages read, not one</b><p>Most checks read your homepage and call it a site.</p></div>
+        <div class="card"><b>Nothing to connect</b><p>The report is on the site and in your inbox every week. No developer needed.</p></div>
+        <div class="card"><b>The text to paste</b><p>Not "improve your content", but this page, this line, this replacement.</p></div>
+        <div class="card"><b>Every score adds up by hand</b><p>If we could not measure something, we say so instead of counting it as zero.</p></div>
+        <div class="card"><b>Pay once if you prefer</b><p>A full audit of your site for 149 USD, no subscription.</p></div>
       </div>
     </section>
 
-    <section>
-      <p class="eyebrow">After the check</p>
-      <h2>First you get the result. Then you decide whether you need more</h2>
-      <ol class="steps">
-        <li><div><b>The score and five areas, on screen</b><p>No email, no signup. That already answers whether AI sees you.</p></div></li>
-        <li><div><b>The first fix, in full</b><p>The most important one: what is there now, what to change, how to check it worked. On screen, and by email if you leave one, so you can hand it to whoever runs the site.</p></div></li>
-        <li><div><b>More only if you want it</b><p>Every fix across the whole site, a comparison with rivals, a review by a person. We write about that in the same email, and the prices are there, not here. <a href="/products/">See what there is</a>.</p></div></li>
-      </ol>
+    <section class="block proof">
+      <p class="eyebrow">Our own cases</p>
+      <div class="proof-row">
+        <div class="big">+279%</div>
+        <div>
+          <p class="proof-line">organic clicks month over month across {NETWORK_HERO.liveSites} of our own brands in {NETWORK_HERO.marketCount} countries.</p>
+          <p class="proof-src">Our own sites, not client promises. Data from Google Search Console. <a href="/cases/">See the cases</a></p>
+        </div>
+      </div>
     </section>
 
-    <section>
-      <p class="eyebrow">Why trust us</p>
-      <h2>We built this for ourselves, then gave it to people</h2>
-      <p class="lede">Fifteen sites of our own, more than two million words, {MAP_MODULES.length} modules around one hub. The tool grew out of what we fixed on our own sites every day.</p>
-      <div class="mods">
-        <div class="mod core"><b>{MAP_CORE.title}</b><span>{MAP_CORE.role}</span><p>{MAP_CORE.lede}</p></div>
-        {MAP_MODULES.map((m) => (
-          <div class="mod"><b>{m.name}</b><span>{m.role}{m.proof ? ` · ${m.proof}` : ''}</span><p>{m.lede}</p></div>
+    <section class="block">
+      <p class="eyebrow">Before and after</p>
+      <h2>What one round of fixes does</h2>
+      <div class="ba">
+        {BEFORE_AFTER.map((b) => (
+          <figure class="card ba-c">
+            <div class="ba-scores">
+              <span class="ba-ring was" style={`--p:${b.before}`}><b>{b.before}</b></span>
+              <span class="ba-arrow" aria-hidden="true">→</span>
+              <span class="ba-ring now" style={`--p:${b.after}`}><b>{b.after}</b></span>
+              <span class="ba-site">{b.site}</span>
+            </div>
+            <blockquote>{b.quote}</blockquote>
+            <figcaption>{b.who}</figcaption>
+          </figure>
         ))}
       </div>
-      <p class="muted">Need the system rather than the tool? <a href="/services/">See the services</a>.</p>
+      <p class="ctas"><a class="b-ghost" href={askChatGpt} target="_blank" rel="noopener">Ask ChatGPT about OperStack</a></p>
     </section>
 
-    <section class="final">
-      <h2>The check takes half a minute</h2>
-      <p class="lede">Knowing whether AI sees you costs less than not knowing.</p>
+    <section class="block">
+      <p class="eyebrow">Questions</p>
+      <h2>Before you start</h2>
+      <div class="faq">
+        <details><summary>How is this different from Semrush?</summary><p>Semrush gives you keyword and ranking data and leaves the conclusions to you. OperStack answers one question every week: does ChatGPT name you, who does it name instead, and what on your site to change. It costs {WATCH_PRICE} a month instead of 139 or more.</p></details>
+        <details><summary>What happens after the 7 days?</summary><p>If you do nothing, the subscription continues at {WATCH_PRICE} a month. Cancel before day 7 and you pay nothing.</p></details>
+        <details><summary>How do I cancel?</summary><p>In your Whop account, in one click, at any time.</p></details>
+        <details><summary>What do you do with my data?</summary><p>We read the public pages of your site, the way a search engine does, and keep your email to send the weekly letter. <a href="/privacy/">Privacy</a></p></details>
+        <details><summary>Do I need a developer?</summary><p>No. Most fixes are text you paste into your site. The few that need a developer are marked, written so you can forward them.</p></details>
+      </div>
+    </section>
+
+    <section class="final" id="top-check">
+      <h2>Find out what AI sees on your site</h2>
+      <p class="sub">Half a minute, free, no signup.</p>
       <form class="check" action="/ai-visibility/" method="get">
-        <label class="sr" for="home-url-2">Site address</label>
-        <input id="home-url-2" name="url" type="text" inputmode="url" placeholder="your-site.com" autocomplete="url" required />
-        <button type="submit">Check for free</button>
+        <label class="sr" for="u2">Site address</label>
+        <span class="pre">https://</span>
+        <input id="u2" name="url" type="text" inputmode="url" placeholder="your-site.com" autocomplete="url" required />
+        <button type="submit">Check my site free →</button>
       </form>
+      <p class="oneoff">Prefer a one-off? <a href="/products/seo-audit/">Full audit, 149 USD</a></p>
     </section>
-
   </main>
+  <script>
+    const rot = document.getElementById('rot');
+    const still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (rot && !still) {
+      const items = [...rot.querySelectorAll<HTMLElement>('.eng')];
+      let i = 0;
+      const fit = () => { rot.style.width = `${items[i].offsetWidth}px`; };
+      fit();
+      rot.classList.add('js');
+      window.addEventListener('resize', fit);
+      /* Первая смена через секунду, дальше каждые полторы: за три секунды видно три имени. */
+      const next = () => {
+        items[i].classList.remove('on');
+        i = (i + 1) % items.length;
+        items[i].classList.add('on');
+        fit();
+      };
+      setTimeout(() => { next(); setInterval(next, 1500); }, 1000);
+    }
+  </script>
 </CommercialLayout>
 
 <style>
-  .hm { max-width: 1000px; margin: 0 auto; padding: 0 20px 40px; }
-  .hm section { padding-block: 52px; border-top: 1px solid rgba(255,255,255,.08); }
-  .hm section:first-child { border-top: 0; }
-  .hm h1, .hm h2, .hm h3 { text-wrap: balance; }
-  .hm h2 { font-family: var(--fd); font-weight: 600; font-size: clamp(23px, 3.6vw, 32px); line-height: 1.15; margin: 0 0 8px; }
-  .hm .eyebrow { font-size: 12px; letter-spacing: .14em; text-transform: uppercase; color: var(--teal-soft); margin: 0 0 12px; }
-  .hm .lede { color: #C6CBD2; font-size: 17px; max-width: 62ch; margin: 8px 0 0; }
-  .hm .muted { color: var(--muted); font-size: 14px; margin-top: 16px; }
-  .hm a { color: var(--teal-soft); }
-  .covers { display: grid; grid-template-columns: 1fr 1fr; gap: 36px; align-items: start; margin-top: 28px; }
-  .covlist { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 16px; }
-  .covlist li { font-size: 15px; line-height: 1.5; padding-left: 30px; position: relative; }
-  .covlist li::before { content: ''; position: absolute; left: 0; top: 2px; width: 20px; height: 20px; border-radius: 6px; background: var(--teal-soft); }
-  .covlist li::after { content: ''; position: absolute; left: 6px; top: 8px; width: 8px; height: 4px; border-left: 2px solid #06231F; border-bottom: 2px solid #06231F; transform: rotate(-45deg); }
-  .covlist b { color: var(--teal-soft); font-weight: 600; }
-  .covcard { background: #141C28; border: 1px solid #243040; border-radius: 16px; padding: 32px 26px; text-align: center; }
-  .covnum { font-family: var(--fd); font-weight: 600; font-size: clamp(56px, 9vw, 78px); line-height: 1; color: var(--teal-soft); letter-spacing: -.02em; }
-  .covnum-label { color: var(--muted); font-size: 15px; margin: 8px 0 0; }
-  .covcalc { margin: 20px 0 0; text-align: left; display: flex; flex-direction: column; gap: 8px; }
-  .covcalc > div { display: flex; gap: 12px; align-items: baseline; }
-  .covcalc dt { color: var(--teal-soft); font-weight: 600; font-variant-numeric: tabular-nums; min-width: 32px; text-align: right; }
-  .covcalc dd { margin: 0; color: var(--muted); font-size: 13.5px; line-height: 1.45; }
-  .covtags-head { margin-top: 22px; }
-  .covtags { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; margin-top: 12px; }
-  .covtags span { background: rgba(93,209,193,.08); border: 1px solid rgba(93,209,193,.22); color: var(--teal-soft); font-size: 11.5px; font-weight: 600; padding: 5px 11px; border-radius: 20px; }
-  .covfoot { margin: 20px 0 0; font-size: 12.5px; color: var(--muted); line-height: 1.5; }
-  @media (max-width: 760px) { .covers { grid-template-columns: 1fr; gap: 28px; } .covcard { padding: 26px 18px; } }
-
+  .lh { --c-ink: #0B1017; --c-ink2: #3F4854; --c-muted: #6B7480; --c-line: rgba(11,16,23,.09); --c-card: #fff; --c-teal: #1A8A7D; --c-teal-bg: #E6F4F1; --c-amber: #A66F12; --c-amber-bg: #FBF0D5; --c-coral: #B5412D; --c-coral-bg: #F9E1DB;
+    max-width: 1080px; margin: 0 auto; padding: 0 20px 40px; color: var(--c-ink); }
   .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }
-
-  .hero { text-align: center; padding-block: 56px 40px; }
-  .hero h1 { font-family: var(--fd); font-weight: 600; font-size: clamp(30px, 5.2vw, 50px); line-height: 1.1; letter-spacing: -.015em; margin: 0 0 16px; }
-  .hero h1 em { font-style: normal; color: var(--teal-soft); }
-  .hero .lede { margin: 0 auto 26px; }
-  .check { display: flex; gap: 10px; max-width: 520px; margin: 0 auto; flex-wrap: wrap; }
-  .check input { flex: 1 1 240px; min-width: 0; height: 54px; background: #141C28; border: 1px solid #243040; border-radius: 10px; padding: 0 16px; color: var(--paper); font: inherit; font-size: 16px; }
-  .check input::placeholder { color: var(--muted); }
-  .check input:focus { outline: 2px solid var(--teal-soft); outline-offset: 1px; }
-  .check button { height: 54px; padding: 0 26px; background: var(--teal-soft); color: #06231F; border: 0; border-radius: 10px; font: inherit; font-size: 16px; font-weight: 600; cursor: pointer; white-space: nowrap; }
-  .check button:hover { background: #4fc9ba; }
-  .under { margin: 14px 0 0; font-size: 13px; color: var(--muted); }
-  .under b { color: var(--paper); font-weight: 500; }
-
-  .sample { background: #141C28; border: 1px solid #243040; border-radius: 16px; padding: 22px; margin-top: 34px; text-align: left; }
-  .sample-top { display: flex; align-items: center; gap: 20px; flex-wrap: wrap; }
-  .num { font-family: var(--fd); font-weight: 600; font-size: 58px; line-height: 1; color: var(--amber-soft); }
-  .num span { font-size: 20px; color: var(--muted); }
-  .sample-top p { margin: 0; font-size: 14px; color: #C6CBD2; flex: 1 1 260px; min-width: 0; }
-  .bars { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-top: 20px; }
-  .bar-label { font-size: 12px; color: var(--muted); margin: 0 0 6px; line-height: 1.35; min-height: 2.7em; }
-  .track { height: 7px; background: #0E1520; border-radius: 4px; overflow: hidden; }
-  .fill { height: 100%; background: var(--teal); border-radius: 4px; }
-  .fill.low { background: #C9922A; }
-  .val { font-size: 12px; color: var(--paper); margin: 6px 0 0; font-variant-numeric: tabular-nums; }
-
-  .three { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 24px; }
-  .card { background: #141C28; border: 1px solid #243040; border-radius: 14px; padding: 22px; }
-  .card h3 { font-size: 17px; font-weight: 600; margin: 0 0 8px; }
-  .card p { margin: 0; font-size: 15px; color: #C6CBD2; }
-  .tag { display: inline-block; font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--teal-soft); margin: 0 0 12px; }
-
-  .steps { list-style: none; counter-reset: s; display: grid; gap: 14px; margin: 22px 0 0; padding: 0; max-width: 760px; }
-  .steps li { counter-increment: s; display: flex; gap: 16px; align-items: flex-start; }
-  .steps li > div { flex: 1; min-width: 0; }
-  .steps li::before { content: counter(s); flex: 0 0 34px; height: 34px; border-radius: 50%; background: #1B2533; color: var(--teal-soft); font-family: var(--fd); font-size: 16px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
-  .steps b { display: block; color: var(--paper); font-weight: 500; font-size: 16px; }
-  .steps p { margin: 4px 0 0; font-size: 15px; color: #C6CBD2; }
-
-  .honest { background: #141C28; border: 1px solid #243040; border-left: 3px solid var(--amber-soft); border-radius: 0 14px 14px 0; padding: 22px 24px; margin-top: 20px; max-width: 760px; }
-  .honest p { margin: 0 0 10px; font-size: 15px; color: #C6CBD2; }
-  .honest p:last-child { margin: 0; }
-  .honest b { color: var(--paper); font-weight: 500; }
-  .honest b.amber { color: var(--amber-soft); font-weight: 600; }
-
-  .mods { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 10px; margin-top: 22px; }
-  .mod { background: #141C28; border: 1px solid #243040; border-radius: 10px; padding: 14px 16px; }
-  .mod.core { border-color: var(--teal); }
-  .mod b { display: block; font-size: 14px; font-weight: 500; }
-  .mod span { display: block; font-size: 12px; color: var(--muted); margin: 2px 0 8px; }
-  .mod p { margin: 0; font-size: 13px; color: #B8BFC7; line-height: 1.45; }
-
-  .final { text-align: center; padding-block: 60px; }
-  .final h2 { font-size: clamp(24px, 4vw, 36px); }
-  .final .lede { margin: 0 auto 24px; }
-  @media (max-width: 560px) { .hm section { padding-block: 40px; } .num { font-size: 46px; } }
-
-  /* Три отличия под кнопкой: в строку на широком экране, столбиком на телефоне. */
-  .edge { list-style: none; margin: 22px auto 0; padding: 0; max-width: 680px; display: grid; gap: 14px; grid-template-columns: repeat(2, 1fr); text-align: left; }
-  .edge li { font-size: 14px; line-height: 1.5; color: rgba(245,242,236,.72); padding-left: 14px; border-left: 2px solid rgba(61,184,169,.55); }
-  .edge b { display: block; color: var(--paper); font-weight: 600; margin-bottom: 2px; }
-  @media (max-width: 760px) { .edge { grid-template-columns: 1fr; gap: 12px; margin-top: 18px; } }
+  .card { background: var(--c-card); border: 1px solid var(--c-line); border-radius: 18px; box-shadow: 0 1px 2px rgba(11,16,23,.03), 0 12px 32px -22px rgba(11,16,23,.22); }
+  .hero { text-align: center; padding: 72px 0 40px; }
+  .pill { display: inline-block; font-family: var(--fm); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--c-teal); background: var(--c-teal-bg); border: 1px solid rgba(26,138,125,.22); border-radius: 999px; padding: 6px 14px; margin: 0 0 22px; }
+  .hero h1 { font-family: var(--fd); font-weight: 600; font-size: clamp(36px, 6.4vw, 66px); line-height: 1.02; letter-spacing: -.025em; margin: 0 0 20px; text-wrap: balance; }
+  .hero h1 em { font-style: italic; color: var(--c-teal); }
+  .sub { color: var(--c-ink2); font-size: 18.5px; line-height: 1.55; max-width: 60ch; margin: 0 auto 30px; text-wrap: pretty; }
+  .check { display: flex; align-items: center; gap: 8px; max-width: 560px; margin: 0 auto; background: #fff; border: 1px solid rgba(11,16,23,.14); border-radius: 16px; padding: 7px 7px 7px 16px; box-shadow: 0 1px 2px rgba(11,16,23,.04), 0 16px 40px -24px rgba(26,138,125,.45); }
+  .check .pre { font-family: var(--fm); font-size: 13px; color: var(--c-muted); }
+  .check input { flex: 1 1 auto; min-width: 0; height: 46px; border: 0; outline: 0; background: transparent; font: inherit; font-size: 16.5px; color: var(--c-ink); }
+  .check:focus-within { border-color: var(--c-teal); }
+  .check button { height: 48px; padding: 0 20px; background: var(--c-teal); color: #fff; border: 0; border-radius: 11px; font: inherit; font-weight: 600; font-size: 15.5px; cursor: pointer; white-space: nowrap; }
+  .check button:hover { background: #157468; }
+  .under { margin: 14px 0 0; font-size: 13.5px; color: var(--c-muted); }
+  .works { margin: 44px auto 0; display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 10px 22px; max-width: 900px; padding-top: 26px; border-top: 1px solid var(--c-line); }
+  .works-l { font-family: var(--fm); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--c-teal); }
+  .works ul { list-style: none; margin: 0; padding: 0; display: contents; }
+  .works li { display: inline-flex; align-items: center; gap: 7px; font-family: var(--fm); font-size: 13.5px; color: var(--c-ink2); }
+  .works img { opacity: .82; }
+  .block { padding: 64px 0 8px; }
+  .eyebrow { font-family: var(--fm); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--c-teal); margin: 0 0 12px; }
+  .block h2, .final h2 { font-family: var(--fd); font-weight: 600; font-size: clamp(27px, 4vw, 40px); line-height: 1.1; letter-spacing: -.02em; margin: 0 0 10px; text-wrap: balance; }
+  .lead { color: var(--c-ink2); font-size: 17px; max-width: 62ch; margin: 0 0 26px; }
+  .checkgrid { display: grid; grid-template-columns: 1.35fr 1fr; gap: 18px; }
+  .scorecard { padding: 24px; }
+  .sc-top { display: flex; gap: 20px; align-items: center; margin-bottom: 20px; }
+  .ring { width: 104px; height: 104px; border-radius: 50%; flex: none; display: flex; flex-direction: column; align-items: center; justify-content: center; background: radial-gradient(closest-side, #fff 79%, transparent 80% 100%), conic-gradient(var(--c-teal) calc(var(--p, 97) * 1%), #ECE9E2 0); }
+  .ring b { font-family: var(--fd); font-size: 36px; line-height: 1; }
+  .ring span { font-family: var(--fm); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: var(--c-muted); margin-top: 4px; }
+  .sc-dom { font-family: var(--fd); font-size: 24px; font-weight: 600; margin: 0 0 4px; }
+  .sc-note { color: var(--c-ink2); font-size: 14.5px; margin: 0; }
+  .bars { display: grid; gap: 12px; }
+  .bar-row { display: grid; grid-template-columns: 1fr 120px 48px; gap: 12px; align-items: center; }
+  .bar-label { margin: 0; font-size: 14px; color: var(--c-ink2); }
+  .track { height: 8px; background: #ECE9E2; border-radius: 4px; overflow: hidden; }
+  .fill { height: 100%; background: var(--c-teal); border-radius: 4px; }
+  .fill.low { background: #E8B84A; }
+  .val { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; font-size: 13.5px; text-align: right; color: var(--c-ink); }
+  .countcard { padding: 24px; }
+  .bignum { font-family: var(--fd); font-weight: 600; font-size: 64px; line-height: 1; color: var(--c-teal); letter-spacing: -.02em; }
+  .bignum-l { margin: 6px 0 16px; color: var(--c-muted); font-size: 14.5px; }
+  .countcard dl { margin: 0; display: grid; gap: 8px; }
+  .countcard dl > div { display: flex; gap: 12px; align-items: baseline; }
+  .countcard dt { font-variant-numeric: tabular-nums; font-weight: 700; color: var(--c-teal); min-width: 30px; text-align: right; }
+  .countcard dd { margin: 0; color: var(--c-ink2); font-size: 14px; line-height: 1.45; }
+  .crawl { margin-top: 16px; }
+  .crawl summary { cursor: pointer; font-size: 14px; color: var(--c-teal); }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+  .tags span { font-family: var(--fm); font-size: 11.5px; padding: 4px 10px; border-radius: 999px; background: var(--c-teal-bg); color: var(--c-teal); }
+  .ticks { list-style: none; margin: 22px 0 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .ticks li { font-size: 14.5px; color: var(--c-ink2); padding-left: 14px; border-left: 2px solid rgba(26,138,125,.5); }
+  .ticks b { display: block; color: var(--c-ink); }
+  .chat { padding: 26px; max-width: 780px; }
+  .q { margin: 0 0 18px; font-size: 19px; font-weight: 500; }
+  .q span, .a-l { display: flex; align-items: center; gap: 6px; font-family: var(--fm); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--c-muted); font-weight: 400; margin-bottom: 6px; }
+  .a { background: #FAF8F4; border: 1px solid var(--c-line); border-radius: 14px; padding: 14px 16px; }
+  .a ul { list-style: none; margin: 4px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+  .a li { background: #fff; border: 1px solid var(--c-line); border-radius: 999px; padding: 6px 12px; font-size: 14px; }
+  .you { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 18px 0 0; font-size: 16px; }
+  .miss { font-family: var(--fm); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; border-radius: 999px; background: var(--c-coral-bg); color: var(--c-coral); }
+  .foot { margin: 14px 0 0; font-size: 13px; color: var(--c-muted); }
+  .steps3 { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .steps3 li { padding: 22px; }
+  .steps3 .n { font-family: var(--fm); font-size: 12px; color: var(--c-teal); }
+  .steps3 b { display: block; font-size: 17.5px; margin: 8px 0 6px; }
+  .steps3 p { margin: 0; color: var(--c-ink2); font-size: 15px; }
+  .ctas { display: flex; gap: 12px; flex-wrap: wrap; margin: 26px 0 0; }
+  .b-main { display: inline-flex; align-items: center; height: 50px; padding: 0 24px; background: var(--c-teal); color: #fff !important; border-radius: 12px; font-weight: 600; text-decoration: none; }
+  .b-main:hover { background: #157468; }
+  .b-ghost { display: inline-flex; align-items: center; height: 50px; padding: 0 20px; background: #fff; border: 1px solid rgba(11,16,23,.16); border-radius: 12px; color: var(--c-ink) !important; text-decoration: none; font-weight: 500; }
+  .vs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .vs .card { padding: 20px; }
+  .vs .us { border-color: rgba(26,138,125,.55); background: var(--c-teal-bg); }
+  .tag { font-family: var(--fm); font-size: 11px; letter-spacing: .12em; text-transform: uppercase; color: var(--c-muted); margin: 0 0 10px; }
+  .vs .us .tag { color: var(--c-teal); }
+  .price { font-size: 17px; font-weight: 700; margin: 0 0 8px; }
+  .vs .card p:last-child { margin: 0; color: var(--c-ink2); font-size: 14.5px; }
+  .src { margin: 12px 0 0; font-size: 12.5px; color: var(--c-muted); }
+  .why { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 14px; }
+  .why .card { padding: 18px 20px; }
+  .why b { display: block; font-size: 16px; margin-bottom: 6px; }
+  .why p { margin: 0; color: var(--c-ink2); font-size: 14.5px; }
+  .proof-row { display: flex; gap: 28px; align-items: center; flex-wrap: wrap; }
+  .big { font-family: var(--fd); font-weight: 600; font-size: clamp(64px, 11vw, 104px); line-height: .95; color: var(--c-teal); letter-spacing: -.03em; }
+  .proof-line { margin: 0; font-size: 20px; max-width: 36ch; }
+  .proof-src { margin: 8px 0 0; font-size: 14px; color: var(--c-muted); }
+  .faq { display: grid; gap: 10px; max-width: 780px; }
+  .faq details { background: #fff; border: 1px solid var(--c-line); border-radius: 14px; padding: 16px 20px; }
+  .faq summary { cursor: pointer; font-weight: 600; }
+  .faq p { margin: 10px 0 0; color: var(--c-ink2); font-size: 15px; }
+  .final { margin: 72px 0 0; padding: 56px 24px; text-align: center; border-radius: 24px; background: linear-gradient(180deg, #E6F4F1, #F4FAF8); border: 1px solid rgba(26,138,125,.18); }
+  .final .sub { margin-bottom: 24px; }
+  .oneoff { margin: 18px 0 0; font-size: 14px; color: var(--c-muted); }
+  @media (max-width: 900px) { .checkgrid, .steps3, .ticks { grid-template-columns: 1fr; } .vs { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) {
+    .hero { padding: 44px 0 28px; }
+    .check { flex-wrap: wrap; padding: 8px; }
+    .check .pre { display: none; }
+    .check input { flex-basis: 100%; padding: 0 8px; }
+    .check button { width: 100%; }
+    .works { gap: 10px 16px; }
+    .vs { grid-template-columns: 1fr; }
+    .bar-row { grid-template-columns: 1fr 72px 44px; }
+    .sc-top { flex-direction: column; align-items: flex-start; }
+    .block { padding-top: 48px; }
+    .final { padding: 40px 16px; }
+  }
+  /* v2: фон первого экрана, меняющееся имя ИИ, блок рынка, мелкая живость карточек */
+  .hero { position: relative; }
+  .hero::before { content: ''; position: absolute; top: -40px; bottom: 0; left: 50%; width: 100vw; transform: translateX(-50%); z-index: -1; background:
+      radial-gradient(600px 280px at 50% 0%, rgba(26,138,125,.14), transparent 70%),
+      radial-gradient(circle at 1px 1px, rgba(11,16,23,.07) 1px, transparent 0) 0 0 / 22px 22px;
+    -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+  .rot { display: inline-block; position: relative; vertical-align: bottom; height: 1.05em; transition: width .45s ease; }
+  .eng { position: absolute; left: 0; bottom: 0; display: inline-flex; align-items: center; gap: .18em; color: var(--c-teal); font-style: italic; opacity: 0; transform: translateY(.3em); transition: opacity .18s ease, transform .18s ease; white-space: nowrap; }
+  .eng.on { opacity: 1; transform: none; transition: opacity .4s ease .16s, transform .4s ease .16s; }
+  .rot:not(.js) .eng.on { position: relative; }
+  .eng img { width: .72em; height: .72em; opacity: .9; filter: invert(38%) sepia(62%) saturate(520%) hue-rotate(125deg) brightness(88%); }
+  .hero h1 > span[aria-hidden] { display: block; }
+  @media (prefers-reduced-motion: reduce) { .eng { transition: none; } }
+  .market { padding-top: 40px; }
+  .mk { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+  .mk-c { padding: 22px 20px; display: flex; flex-direction: column; }
+  .mk-v { margin: 0; font-family: var(--fd); font-weight: 600; font-size: 44px; line-height: 1; letter-spacing: -.02em; color: var(--c-teal); }
+  .mk-l { margin: 10px 0 14px; color: var(--c-ink2); font-size: 14.5px; line-height: 1.45; flex: 1; }
+  .mk-s { margin: 0; font-family: var(--fm); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
+  .mk-s a { color: var(--c-muted) !important; text-decoration: none; border-bottom: 1px dotted rgba(11,16,23,.3); }
+  .mk-end { margin: 22px 0 0; font-size: 19px; font-weight: 500; }
+  .card { transition: transform .2s ease, box-shadow .2s ease; }
+  .vs .card:hover, .why .card:hover, .steps3 li:hover, .mk-c:hover { transform: translateY(-2px); box-shadow: 0 1px 2px rgba(11,16,23,.04), 0 18px 40px -22px rgba(11,16,23,.3); }
+  @media (max-width: 900px) { .mk { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 560px) { .mk { grid-template-columns: 1fr; } .mk-v { font-size: 38px; } }
+  .ba { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .ba-c { margin: 0; padding: 22px 24px; }
+  .ba-scores { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+  .ba-ring { width: 64px; height: 64px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; background: radial-gradient(closest-side, #fff 78%, transparent 79% 100%), conic-gradient(var(--ring) calc(var(--p) * 1%), #ECE9E2 0); }
+  .ba-ring b { font-family: var(--fd); font-size: 22px; }
+  .ba-ring.was { --ring: #E8B84A; }
+  .ba-ring.now { --ring: var(--c-teal); }
+  .ba-arrow { font-size: 22px; color: var(--c-muted); }
+  .ba-site { font-family: var(--fd); font-weight: 600; font-size: 19px; margin-left: 4px; }
+  .ba-c blockquote { margin: 16px 0 10px; font-size: 16.5px; line-height: 1.5; color: var(--c-ink); border-left: 3px solid rgba(26,138,125,.45); padding-left: 14px; }
+  .ba-c figcaption { font-size: 13px; color: var(--c-muted); }
+  @media (max-width: 760px) { .ba { grid-template-columns: 1fr; } }
 </style>

@@ -1,6 +1,9 @@
 {
   "trailingSlash": true,
   "redirects": [
+    { "source": "/products/site-report/", "destination": "/pricing/", "statusCode": 301 },
+    { "source": "/products/rival-watch/", "destination": "/pricing/", "statusCode": 301 },
+    { "source": "/products/agency/", "destination": "/pricing/", "statusCode": 301 },
     {
       "source": "/sitemap.xml",
       "destination": "/sitemap-index.xml",

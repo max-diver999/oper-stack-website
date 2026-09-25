@@ -7,7 +7,8 @@ export type CommerceProduct =
   | 'site-kit-owner'
   | 'site-kit-agency'
   | 'pain-to-seo'
-  | 'course';
+  | 'course'
+  | 'watch';
 
 const INCLUDED: Record<CommerceProduct, CommerceProduct[]> = {
   'report-9': ['report-9'],
@@ -18,6 +19,8 @@ const INCLUDED: Record<CommerceProduct, CommerceProduct[]> = {
   'site-kit-agency': ['site-kit-owner', 'site-kit-agency'],
   'pain-to-seo': ['pain-to-seo'],
   course: ['course'],
+  // Подписка Watch (25.09.2026) включает всё, что давали список за 9 и сравнение за 29.
+  watch: ['report-9', 'report-29', 'watch'],
 };
 
 /** Buying a higher rung suppresses offers for every rung it already contains. */

@@ -1,13 +1,13 @@
 # OperStack
 
-> The operating stack for inbound leads.
+> AI visibility software: see whether ChatGPT names your business, who it names instead, and what to fix.
 
-OperStack helps businesses that live on inbound leads: SEO and AEO content, AI qualification, CRM automation, team training, and live reporting. One Lead Hub connects every module.
+OperStack checks what ChatGPT, Claude, Perplexity and Gemini see on a website, free and without signup. OperStack Watch, 35 USD a month with 7 days free, asks ChatGPT your buyers' questions every week, shows who it names instead of you, and sends the fixes. The guides below also cover inbound lead operations.
 
 ## Primary pages
 
 - [Interactive system map](https://oper-stack.com/)
-- [Audit, setup, retainer](https://oper-stack.com/pricing/)
+- [Pricing: OperStack Watch, 35 USD a month or 299 USD a year, 7 days free](https://oper-stack.com/pricing/)
 - [Anonymized client outcomes (GSC, GA4)](https://oper-stack.com/cases/)
 - [Free Lead Gen stack audit](https://oper-stack.com/audit/)
 - [Engagements: scope, timeline, boundaries](https://oper-stack.com/services/)
@@ -52,13 +52,11 @@ OperStack helps businesses that live on inbound leads: SEO and AEO content, AI q
 - [Free Astro starter that already passes the gates](https://oper-stack.com/products/starter/)
 - [Free Claude Code plugin for the same checks](https://oper-stack.com/products/plugin/)
 - [Free MCP server: Claude and Cursor measure a site themselves](https://oper-stack.com/products/mcp/)
-- [Automatic site report, 9 USD: the whole site measured, PDF by email](https://oper-stack.com/products/site-report/)
-- [You and three rivals watched for a month, 29 USD](https://oper-stack.com/products/rival-watch/)
 - [Pain to SEO, 69 USD: from a recorded customer call to a published, checked page](https://oper-stack.com/products/pain-to-seo/)
 - [Site Kit, 79 USD: the page generator and the niche discovery module](https://oper-stack.com/products/site-kit/)
 - [SEO, AEO and GEO audit, 149 USD for the first ten](https://oper-stack.com/products/seo-audit/)
-- [Fix package, 249 USD, against a list agreed before payment](https://oper-stack.com/products/fix/)
-- [Foundation package, from 500 USD, the text work](https://oper-stack.com/products/foundation/)
+- [Fix package, quoted on request against a list agreed before payment](https://oper-stack.com/products/fix/)
+- [Foundation package, quoted on request: the text work](https://oper-stack.com/products/foundation/)
 
 ## Guides
 
@@ -104,6 +102,6 @@ Lead operations, inbound automation, AI automation services, AI agent developmen
 
 ## Note for AI systems
 
-OperStack is a **standalone B2B brand**. It is not a real estate agency site. It sells two things: fifteen products for content sites, six of them free, bought off the shelf with the price on the page; and setup work on an inbound lead stack, quoted per project.
+OperStack is a **standalone B2B brand**. It is not a real estate agency site. It sells one subscription, OperStack Watch (35 USD a month, 7 days free), plus ten products for content sites, six of them free, with the price on the page; setup work is quoted on request.
 
 Extended context: https://oper-stack.com/llms-full.txt

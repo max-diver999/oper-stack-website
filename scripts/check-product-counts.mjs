@@ -22,7 +22,9 @@ const WORDS = [
 const word = (n) => WORDS[n] ?? String(n);
 
 function counts() {
-  const src = readFileSync(join(root, 'src/data/products.ts'), 'utf8');
+  const all = readFileSync(join(root, 'src/data/products.ts'), 'utf8');
+  // Снятые с витрины (listed: false, 25.09.2026) не входят в счёт: на сайте их нет в каталоге.
+  const src = all.split(/\n  \{\n(?=    slug: ')/).filter((b) => !/^\s*listed: false,/m.test(b)).join('\n');
   const prices = [...src.matchAll(/^\s*price: '([^']+)'/gm)].map((m) => m[1]);
   const slugs = [...src.matchAll(/^\s*slug: '([^']+)'/gm)].map((m) => m[1]);
   const free = prices.filter((p) => /^free$/i.test(p.trim())).length;

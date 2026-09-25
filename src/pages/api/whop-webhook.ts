@@ -157,7 +157,7 @@ export const POST: APIRoute = async ({ request }) => {
       await notifyTelegram(`Отчёт за ${report.tier} оплачен на Whop (${report.paymentId}), но почты покупателя нет ни в событии, ни в API: выдать вручную.`);
       return json({ ok: false, handled: false, reason: 'buyer email not found; retry required' }, 503);
     }
-    const product: CommerceProduct = report.tier === '9' ? 'report-9' : report.tier === '29' ? 'report-29' : 'audit-149';
+    const product: CommerceProduct = report.tier === '9' ? 'report-9' : report.tier === '29' ? 'report-29' : report.tier === 'watch' ? 'watch' : 'audit-149';
     let reserved;
     try {
       reserved = await reserveFulfilment({
@@ -172,7 +172,7 @@ export const POST: APIRoute = async ({ request }) => {
     }
     if (!reserved.process) return json({ ok: true, handled: false, reason: 'already delivered or being delivered' });
     const lang = env('WHOP_REPORT_LANG', 'en') === 'ru' ? 'ru' : 'en';
-    const token = makeReportToken({ orderId: reserved.orderId, purpose: 'report', email: buyer, tier: report.tier, lang, exp: Math.floor(Date.now() / 1000) + TOKEN_DAYS * 24 * 3600 }, downloadSecret);
+    const token = makeReportToken({ orderId: reserved.orderId, purpose: 'report', email: buyer, tier: report.tier, lang, exp: Math.floor(Date.now() / 1000) + TOKEN_DAYS * 24 * 3600, ...(report.tier === 'watch' && report.membership ? { membership: report.membership } : {}) }, downloadSecret);
     const link = `${SITE.url}/report/?t=${encodeURIComponent(token)}${lang === 'ru' ? '&lang=ru' : ''}`;
     try {
       const mail = buildReportWelcomeEmail({ tier: report.tier, lang, link });
@@ -182,7 +182,7 @@ export const POST: APIRoute = async ({ request }) => {
         subject: mail.subject, provider: sent.provider, providerMessageId: sent.messageId, status: 'accepted',
       });
       await finishFulfilment(reserved.jobId, 'accepted');
-      await notifyTelegram(`📄 Отчёт за ${report.tier}: ${buyer} получил ссылку на форму.`);
+      await notifyTelegram(report.tier === 'watch' ? `👀 Подписка Watch: ${buyer} начал (${report.type}), получил ссылку на форму.` : `📄 Отчёт за ${report.tier}: ${buyer} получил ссылку на форму.`);
       return json({ ok: true, handled: true, product: 'report', tier: report.tier });
     } catch (err) {
       console.error('report welcome mail failed:', err);

@@ -19,9 +19,11 @@ interface Props {
   /** Личные страницы, куда приходят по ссылке из письма. Маркетинговое меню там лишнее, а на
    *  русской странице оно ещё и английское. Одна ссылка домой вместо восьми. */
   bare?: { home: string; label: string; footer?: string };
+  /** Светлая тема, вариант 25.09.2026: светлый фон, шапка-пилюля с названием и кнопкой. */
+  theme?: 'light';
 }
 
-const { title, description, canonical, jsonLd = [], ogImage = '/og/og-default.png', article, noindex = false, bare } = Astro.props;
+const { title, description, canonical, jsonLd = [], ogImage = '/og/og-default.png', article, noindex = false, bare, theme } = Astro.props;
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE.url}${ogImage}`;
 
 const organizationSchema = {
@@ -300,34 +302,77 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
       }
       .prose td:empty { display: none; }
     }
+
+    /* Светлая тема (вариант 25.09.2026). Включается пропом theme="light". */
+    body[data-theme="light"] { background: #FAF8F4; color: #0B1017; overflow-x: clip; }
+    body[data-theme="light"] a { color: #1A8A7D; }
+    body[data-theme="light"] .lede { color: #3F4854; }
+    body[data-theme="light"] .site-foot { color: #6B7480; border-top: 1px solid rgba(11,16,23,.08); padding-top: 28px; max-width: 1080px; }
+    body[data-theme="light"] .site-foot .foot-links a { color: #6B7480; }
+    body[data-theme="light"] .site-foot a { color: #1A8A7D; }
+    /* !important нарочно: стили компонентов ограничены своей областью и весят больше. */
+    body[data-theme="light"] .cite-block { border-color: rgba(26,138,125,.22) !important; background: #E6F4F1 !important; }
+    body[data-theme="light"] .cite-label { color: #1A8A7D !important; }
+    body[data-theme="light"] .cite-text { color: #0B1017 !important; }
+    body[data-theme="light"] .faq { border-top-color: rgba(11,16,23,.09) !important; }
+    body[data-theme="light"] .faq dt { color: #0B1017 !important; }
+    body[data-theme="light"] .faq dd { color: #3F4854 !important; }
+    body[data-theme="light"] h1 { color: #0B1017; }
+    body[data-theme="light"] a.btn, body[data-theme="light"] .btn { color: #fff !important; }
+    .lnav { position: sticky; top: 0; z-index: 50; padding: 14px 16px 0; }
+    .lnav-in { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; gap: 20px; background: rgba(255,255,255,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(11,16,23,.08); border-radius: 999px; padding: 8px 8px 8px 18px; box-shadow: 0 1px 2px rgba(11,16,23,.04), 0 10px 30px -18px rgba(11,16,23,.25); }
+    .lnav .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: #0B1017 !important; text-decoration: none; letter-spacing: -.01em; }
+    .lnav nav { display: flex; gap: 22px; margin: 0 auto; }
+    .lnav nav a { color: #3F4854 !important; text-decoration: none; font-size: 14.5px; font-weight: 500; }
+    .lnav nav a:hover, .lnav nav a.active { color: #1A8A7D !important; }
+    .lnav-cta { background: #1A8A7D; color: #fff !important; text-decoration: none; font-weight: 600; font-size: 14px; padding: 10px 18px; border-radius: 999px; white-space: nowrap; }
+    .lnav-cta:hover { background: #157468; }
+    @media (max-width: 760px) {
+      .lnav { padding: 10px 10px 0; }
+      .lnav-in { flex-wrap: wrap; border-radius: 18px; padding: 8px 8px 6px 14px; gap: 6px 12px; }
+      .lnav nav { order: 3; width: 100%; margin: 0; gap: 4px 16px; flex-wrap: wrap; }
+      .lnav nav a { font-size: 13.5px; min-height: 36px; display: inline-flex; align-items: center; }
+      .lnav-cta { margin-left: auto; padding: 9px 14px; font-size: 13.5px; }
+    }
   </style>
   <!-- We run our own counter on our own site. It is the same line every customer gets, and the
        numbers on /visits/ are ours, measured, not illustrative. -->
   <script defer src="/v.js" data-key="osv_operstackowncom"></script>
 </head>
-<body>
-  {bare ? (
+<body data-theme={theme}>
+  {theme === 'light' && !bare ? (
+  <header class="lnav">
+    <div class="lnav-in">
+      <a class="brand" href="/"><img src="/favicon.svg" width="22" height="22" alt="" />OperStack</a>
+      <nav aria-label="Site">
+        <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
+        <a href="/cases/" class:list={{ active: Astro.url.pathname.startsWith('/cases') }}>Cases</a>
+        <a href="/guides/" class:list={{ active: Astro.url.pathname.startsWith('/guides') }}>Guides</a>
+        <a href="/products/" class:list={{ active: Astro.url.pathname.startsWith('/products') }}>All products</a>
+        <a href="/about/" class:list={{ active: Astro.url.pathname.startsWith('/about') }}>About</a>
+      </nav>
+      <a class="lnav-cta" href="/pricing/">Start 7 days free</a>
+    </div>
+  </header>
+  ) : bare ? (
   <nav class="site-nav" aria-label="Site">
     <a href={bare.home}>{bare.label}</a>
   </nav>
   ) : (
   <nav class="site-nav" aria-label="Site">
     <a href="/">Check</a>
-    <a href="/map/" class:list={{ active: Astro.url.pathname.startsWith('/map') }}>Map</a>
-    <a href="/services/" class:list={{ active: Astro.url.pathname.startsWith('/services') }}>Services</a>
-    <a href="/products/" class:list={{ active: Astro.url.pathname.startsWith('/products') }}>Products</a>
     <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
     <a href="/cases/" class:list={{ active: Astro.url.pathname.startsWith('/cases') }}>Cases</a>
     <a href="/guides/" class:list={{ active: Astro.url.pathname.startsWith('/guides') }}>Guides</a>
+    <a href="/products/" class:list={{ active: Astro.url.pathname.startsWith('/products') }}>All products</a>
     <a href="/about/" class:list={{ active: Astro.url.pathname.startsWith('/about') }}>About</a>
-    <a href="/audit/">Audit</a>
   </nav>
   )}
   <slot />
   <footer class="site-foot">
     <p>{bare?.footer ?? `${SITE.name} · ${SITE.tagline}`}</p>
     <p style="margin-top:8px"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
-    {!bare && <p class="foot-links"><a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>}
+    {!bare && <p class="foot-links"><a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/services/">Services on request</a> · <a href="/map/">Map</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>}
   </footer>
 </body>
 </html>
