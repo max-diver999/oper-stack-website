@@ -23,7 +23,7 @@ interface Props {
   theme?: 'light';
 }
 
-const { title, description, canonical, jsonLd = [], ogImage = '/og/og-default.png', article, noindex = false, bare, theme } = Astro.props;
+const { title, description, canonical, jsonLd = [], ogImage = '/og/og-home.png', article, noindex = false, bare, theme } = Astro.props;
 const ogImageUrl = ogImage.startsWith('http') ? ogImage : `${SITE.url}${ogImage}`;
 
 const organizationSchema = {
