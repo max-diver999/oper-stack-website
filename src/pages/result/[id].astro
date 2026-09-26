@@ -138,7 +138,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
           */}
           <div class="btn-row">
             <a class="btn btn-main" href="/pricing/">Watch this weekly, 7 days free</a>
-            <button type="button" class="btn" id="share" data-url={pageUrl} data-title={`${stored.domain} scored ${score}/100 on AI visibility`}>Share</button>
+            <button type="button" class="btn btn-quiet" id="share" data-url={pageUrl} data-title={`${stored.domain} scored ${score}/100 on AI visibility`}>Share</button>
           </div>
           {moved && (
             <p class="moved">This is the run from {when}, when it scored {score}. <a href={`/result/${moved.id}/`}>Checked again since: now {moved.score}</a>.</p>
@@ -308,7 +308,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
         </div>
         <div class="btn-row">
           <button type="button" class="btn btn-main" data-copy={`<a href="${pageUrl}"><img src="${badgeUrl}" alt="AI visibility score for ${stored.domain}" /></a>`}>Copy the code</button>
-          <button type="button" class="btn" data-copy={badgeUrl}>Copy the image address</button>
+          <button type="button" class="btn btn-quiet" data-copy={badgeUrl}>Copy the image address</button>
         </div>
         <details class="code">
           <summary>Show the code</summary>
@@ -320,7 +320,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
       </section>
 
       <footer class="foot">
-        <a class="btn" href="/ai-visibility/">Check another site</a>
+        <a class="btn btn-quiet" href="/ai-visibility/">Check another site</a>
         <p class="note">Public signals only, measured {when}. Nothing here was guessed: every line comes from a page, a file or a header that anyone can fetch. This page is not indexed, because it holds someone else's site and someone else's score.</p>
       </footer>
     </article>
@@ -581,7 +581,7 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
   .btn-row { display: flex; flex-wrap: wrap; gap: .6rem; margin-top: 1rem; }
   .btn { display: inline-flex; align-items: center; cursor: pointer; background: #fff; color: #0B1017; font: inherit; font-size: .95rem; padding: .6rem 1.1rem; border-radius: 10px; border: 1px solid rgba(11,16,23,.18); text-decoration: none; }
   .btn:hover { border-color: rgba(11,16,23,.4); }
-  .btn-main { background: var(--good); color: #fff; border-color: var(--good); font-weight: 600; }
+  .btn-main { background: #177C70; color: #fff; border-color: #177C70; font-weight: 600; }
   .btn-main:hover { background: #157569; }
   .btn[disabled] { opacity: .6; cursor: default; }
   .locked .btn-main { margin-top: 1rem; }
