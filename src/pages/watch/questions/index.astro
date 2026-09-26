@@ -1,0 +1,66 @@
+---
+import { createHmac, timingSafeEqual } from 'node:crypto';
+import CommercialLayout from '../../../components/CommercialLayout.astro';
+import { SITE } from '../../../data/site';
+import { readUnsubToken } from '../../api/unsubscribe';
+import { readWatchQuestionSettings, saveWatchQuestionSettings } from '../../../lib/sheets-log';
+export const prerender = false;
+Astro.response.headers.set('Cache-Control', 'private, no-store');
+Astro.response.headers.set('Referrer-Policy', 'no-referrer');
+Astro.response.headers.set('X-Robots-Tag', 'noindex, nofollow');
+const env = (k: string) => String((import.meta.env as Record<string,unknown>)[k] ?? process.env[k] ?? '').trim();
+const secret = env('KIT_DOWNLOAD_SECRET');
+const token = Astro.url.searchParams.get('t') || '';
+const email = secret ? readUnsubToken(token, secret) : null;
+const csrf = email ? createHmac('sha256', secret).update(`watch-questions:${token}`).digest('hex') : '';
+const validCsrf = (v: string) => /^[a-f0-9]{64}$/.test(v) && csrf.length === 64 && timingSafeEqual(Buffer.from(v), Buffer.from(csrf));
+let error = ''; let saved = false; let submitted: URLSearchParams | null = null; let entries: Awaited<ReturnType<typeof readWatchQuestionSettings>> = [];
+if (!email) { Astro.response.status = 400; error = 'Open the Change your questions link in your Watch report.'; }
+else {
+  try {
+    if (Astro.request.method === 'POST') {
+      const origin = Astro.request.headers.get('origin');
+      if (origin && origin !== 'null' && origin !== Astro.url.origin) { Astro.response.status = 403; throw new Error('Reopen this page from your Watch report before saving.'); }
+      const raw = await Astro.request.text();
+      if (raw.length > 20000) { Astro.response.status = 413; throw new Error('The form is too large. Each question can contain up to 500 characters.'); }
+      const form = new URLSearchParams(raw);
+      if (!validCsrf(form.get('_csrf') || '')) { Astro.response.status = 403; throw new Error('Reopen this page from your Watch report before saving.'); }
+      submitted = form;
+      await saveWatchQuestionSettings(email, form.get('subscription') || '', form.get('revision') || '', Array.from({length:10},(_,i)=>form.get(`question-${i}`)||''));
+      saved = true;
+    }
+    entries = await readWatchQuestionSettings(email);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : '';
+    error = /^(Enter exactly|Each question|Use 10|This subscription|These questions|Your questions|Questions are temporarily|Reopen this|The form)/.test(message) ? message : 'Questions are temporarily unavailable. Please try again.';
+    if (Astro.response.status === 200) Astro.response.status = /^(Enter|Each|Use)/.test(error) ? 400 : error.startsWith('These questions') ? 409 : 503;
+    try { entries = await readWatchQuestionSettings(email); } catch {}
+    if (submitted) entries = entries.map(e => e.id === submitted?.get('subscription') ? {...e, questions:e.questions.map((q,i)=>(submitted?.get(`question-${i}`)||q).slice(0,500))} : e);
+  }
+}
+---
+<CommercialLayout title="Change your questions · OperStack Watch" description="Choose the ten buyer questions in your next OperStack Watch report." canonical={`${SITE.url}/watch/questions/`} noindex={true} theme="light">
+  <main class="wq">
+    <p class="eyebrow">OperStack Watch</p>
+    <h1>Change your questions</h1>
+    <p>Choose the 10 questions your buyers ask. Each needs at least 5 words. Saved changes apply to the next scheduled check and do not start an extra check.</p>
+    <p>History starts again for each changed question. Unchanged questions keep their records. Your report marks the questions you supplied.</p>
+    {saved && <p class="success" role="status">Saved. Your new questions will be used at the next scheduled check.</p>}
+    {error && <p class="error" role="alert">{error}</p>}
+    {!error && !entries.length && <p>Your questions will appear after your first Watch report is ready.</p>}
+    {entries.map(entry => <section>
+      <h2>{entry.url}</h2>
+      <form method="post">
+        <input type="hidden" name="_csrf" value={csrf}/>
+        <input type="hidden" name="subscription" value={entry.id}/>
+        <input type="hidden" name="revision" value={entry.revision}/>
+        {entry.questions.map((question,i) => <label for={`${entry.id}-${i}`}><span>Question {i+1}</span><textarea id={`${entry.id}-${i}`} name={`question-${i}`} required maxlength="500" rows="3">{question}</textarea></label>)}
+        <button type="submit">Save questions for the next check</button>
+      </form>
+    </section>)}
+    <p class="help">Need help choosing questions? <a href="mailto:info@oper-stack.com">Write to us</a>.</p>
+  </main>
+</CommercialLayout>
+<style>
+  .wq{max-width:760px;margin:auto;padding:44px 20px 64px;color:#16202b}.wq h1{font-family:var(--fd);font-size:clamp(30px,5vw,44px);line-height:1.12}.wq p{line-height:1.65}.eyebrow{font-size:13px;text-transform:uppercase;letter-spacing:.1em;color:#11675d}.wq section{margin-top:32px;padding:24px;border:1px solid #c7d8d4;background:white;border-radius:18px}.wq h2{font-size:20px;overflow-wrap:anywhere}.wq label{display:block;margin:22px 0}.wq label span{display:block;font-weight:600;margin-bottom:8px}.wq textarea{box-sizing:border-box;width:100%;resize:vertical;font:inherit;line-height:1.5;padding:12px;border:1px solid #7c8d94;border-radius:8px;color:#16202b;background:#fff}.wq button{font:inherit;font-weight:600;border:0;border-radius:10px;background:#11675d;color:white;padding:14px 20px;cursor:pointer}.wq :focus-visible{outline:3px solid #11675d;outline-offset:3px}.success{background:#e7f3ef;padding:16px;border-radius:10px}.error{background:#fff0eb;color:#8b2b1f;padding:16px;border-radius:10px}.wq a{color:#11675d}.help{margin-top:28px}
+</style>

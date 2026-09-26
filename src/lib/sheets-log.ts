@@ -20,7 +20,8 @@
  * Env: SHEETS_SA_EMAIL, SHEETS_SA_KEY (приватный ключ целиком, \n можно экранированными),
  * FREE_CHECKS_SHEET_ID. Не задано хотя бы одно, запись молча выключена.
  */
-import { createSign } from 'node:crypto';
+import { createSign, createHash } from 'node:crypto';
+import { validateWatchQuestions, questionKey } from './watch/chatgpt-watch.mjs';
 
 const SHEET_LEADS = 'С почтой';
 const SHEET_ALL = 'Все прогоны';
@@ -278,4 +279,37 @@ export async function stopWatchLetters(email: string): Promise<'stopped' | 'abse
   } catch {
     return 'failed';
   }
+}
+
+
+const watchHash = (s: string) => createHash('sha256').update(s).digest('hex');
+const watchParse = (s: string) => { try { return JSON.parse(s || '{}'); } catch { return {}; } };
+export async function readWatchQuestionSettings(email: string) {
+  const token = await accessToken();
+  if (!token || !sheetsConfigured()) throw new Error('Questions are temporarily unavailable. Please try again.');
+  const endpoint = `https://sheets.googleapis.com/v4/spreadsheets/${env('FREE_CHECKS_SHEET_ID')}/values/${encodeURIComponent('Наблюдение!A2:K')}`;
+  const res = await fetch(endpoint, {headers:{Authorization:`Bearer ${token}`},signal:AbortSignal.timeout(TIMEOUT_MS)});
+  if (!res.ok) throw new Error('Questions are temporarily unavailable. Please try again.');
+  const rows: string[][] = (await res.json()).values || [];
+  return rows.flatMap((row, i) => {
+    if (row[1] !== 'watch-weekly' || String(row[2] || '').trim().toLowerCase() !== email.trim().toLowerCase()) return [];
+    const baseline = watchParse(row[6]); const configured = watchParse(row[10]);
+    const questions = Array.isArray(configured.questions) ? configured.questions : baseline.questions;
+    if (!Array.isArray(questions) || questions.length !== 10) return [];
+    return [{id:watchHash(JSON.stringify([row[0],row[2],row[4]])),row:i+2,url:String(row[4]),questions:questions.map(String),original:Array.isArray(baseline.questions)?baseline.questions:questions,revision:watchHash(row[10]||''),saved:Boolean(configured.questions)}];
+  });
+}
+export async function saveWatchQuestionSettings(email: string, id: string, revision: string, input: string[]) {
+  const questions = validateWatchQuestions(input);
+  const entries = await readWatchQuestionSettings(email);
+  const entry = entries.find((e) => e.id === id);
+  if (!entry) throw new Error('This subscription could not be found. Reopen the link from your report.');
+  if (entry.revision !== revision) throw new Error('These questions changed in another tab. Reload before saving again.');
+  const value = {questions,custom:questions.map((q:string,i:number)=>questionKey(q)!==questionKey(entry.original[i])),updatedAt:new Date().toISOString()};
+  const token = await accessToken();
+  const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${env('FREE_CHECKS_SHEET_ID')}/values:batchUpdate`, {
+    method:'POST',headers:{Authorization:`Bearer ${token}`,'Content-Type':'application/json'},signal:AbortSignal.timeout(TIMEOUT_MS),
+    body:JSON.stringify({valueInputOption:'RAW',data:[{range:`Наблюдение!K${entry.row}`,values:[[JSON.stringify(value)]]}]}),
+  });
+  if (!res.ok) throw new Error('Your questions were not saved. Please try again.');
 }
