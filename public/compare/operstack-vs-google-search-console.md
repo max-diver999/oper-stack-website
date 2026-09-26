@@ -1,293 +1,15 @@
+# OperStack vs Google Search Console for AI Visibility
+
+> >-
+
+**Source:** https://oper-stack.com/compare/operstack-vs-google-search-console/  
+**Section:** Comparisons  
+**Published:** 2026-09-26  
+**Updated:** 2026-09-26
+
 ---
-title: OperStack vs Google Search Console for AI Visibility
-description: >-
-  Search Console is free and now counts AI Overviews impressions. OperStack asks ChatGPT who it names instead
-  of you and writes the fix. Why most sites need both.
-h1: "OperStack vs Search Console: add ChatGPT checks to your Google data"
-answer: >-
-  OperStack adds 10 weekly ChatGPT questions, named competitors, repeated page checks and proposed edits to
-  your Google reporting for $35 monthly. Google Search Console is free and records your own Google
-  performance, including AI impressions where its Generative AI report is available. Keep it for those
-  records; it does not supply the ChatGPT question series or page wording in Watch.
-competitor:
-  name: Google Search Console
-  site: https://search.google.com/search-console/about
-kind: free-tool
-pubDate: "2026-09-26"
-checkedAt: "2026-09-26T00:00:00.000Z"
-chooseUs:
-  - >-
-    You want to know whether ChatGPT names your business: Watch asks it ten buyer questions every week with
-    web search on.
-  - You want the names of the firms ChatGPT recommends in your place, which Search Console never shows.
-  - >-
-    You want the fix written out as a paragraph to paste, built from your own pages, and one email a week with
-    what changed.
-  - >-
-    You want an answer today without verifying anything: the free check reads ten pages and asks ChatGPT three
-    questions, no signup.
-chooseThem:
-  - >-
-    You need Google's own clicks, impressions and positions for your site. Every site should have this, and it
-    costs nothing.
-  - You need to fix indexing, submit a sitemap or see which sites link to you.
-table:
-  - feature: Price per month
-    us:
-      text: $35 a month for OperStack Watch; the check is free
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Free
-      source: https://support.google.com/webmasters/answer/9128668
-  - feature: Price per year
-    us:
-      text: $299 a year, about $25 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Free; the optional BigQuery bulk export is billed by Google Cloud above a free usage level
-      source: https://support.google.com/webmasters/answer/12917675
-  - feature: Free trial and whether a card is needed
-    us:
-      text: 7 days free, card required at checkout
-      source: https://oper-stack.com/pricing/
-    them:
-      text: No trial needed; a Google account and verified ownership of the site are required
-      source: https://support.google.com/webmasters/answer/9128668
-  - feature: Free checks without paying
-    us:
-      text: "Free check with no signup: up to 10 pages scored and 3 live ChatGPT questions"
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: Every report is free, once you have verified that you own the site
-      source: https://search.google.com/search-console/about
-  - feature: Names who ChatGPT recommends instead of you
-    us:
-      text: Yes, by name, every week, with three rivals scored beside you
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "No: reports cover only sites you have verified or been given access to"
-      source: https://support.google.com/webmasters/answer/9008080
-  - feature: AI systems checked
-    us:
-      text: ChatGPT with web search on, weekly. Crawler access read for 14 AI crawlers and fetchers
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Google AI Overviews and AI Mode (Discover in a separate report); ChatGPT, Perplexity, Claude and the
-        Gemini app are not mentioned
-      source: https://support.google.com/webmasters/answer/16984139
-  - feature: Questions or prompts tracked
-    us:
-      text: Ten fixed buyer questions every week; three in the free check
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Real Google queries in the Performance report, at most 1,000 rows; the AI report has no query
-        dimension; no custom prompts
-      source: https://support.google.com/webmasters/answer/17011259
-  - feature: Pages of your site read per check
-    us:
-      text: Up to 10 per check; 100 in the $149 audit
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: No crawl on request; URL Inspection checks one address at a time, 2,000 a day per site through the API
-      source: https://developers.google.com/webmaster-tools/limits
-  - feature: Writes the text to paste on your page
-    us:
-      text: "Yes: a paragraph built from your own pages, with the page address"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "No: names issues and affected URLs, links to Google's docs, offers 'Validate fix'"
-      source: https://support.google.com/webmasters/answer/7440203
-  - feature: Weekly email report
-    us:
-      text: Yes, one email a week with what changed since last week
-      source: https://oper-stack.com/pricing/
-    them:
-      text: No weekly summary stated; email alerts when Google finds issues on your site
-      source: https://search.google.com/search-console/about
-  - feature: Works inside Claude, ChatGPT or Cursor (MCP)
-    us:
-      text: Free MCP server with five tools, no account
-      source: https://oper-stack.com/mcp/
-    them:
-      text: Official API, but no official Google MCP server for Search Console; community servers wrap the API
-      source: https://docs.cloud.google.com/mcp/supported-products
-  - feature: Keyword and backlink data
-    us:
-      text: "None: no keyword database, search volumes, backlink index or rank tracking"
-    them:
-      text: >-
-        Your own queries with clicks, impressions, CTR and position, and a sample of linking sites; no search
-        volumes
-      source: https://support.google.com/webmasters/answer/7576553
-  - feature: Built for whom
-    us:
-      text: Small and mid-size businesses and the agencies that serve them
-    them:
-      text: Business owners, SEO specialists, marketers, site administrators and developers
-      source: https://support.google.com/webmasters/answer/9128668
-  - feature: Needs a developer or SEO skills
-    us:
-      text: "No: fixes are text to paste; the few that need a developer are marked"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Proof of ownership: HTML file, meta tag, Analytics, Tag Manager or a DNS record (DNS is the only route
-        to a Domain property)
-      source: https://support.google.com/webmasters/answer/9008080
-  - feature: Interface language
-    us:
-      text: English (interface and letters)
-    them:
-      text: Full list not stated; the Help Center language menu lists 25 languages
-      source: https://support.google.com/webmasters/answer/7576553
-  - feature: How cancelling works
-    us:
-      text: Any time; nothing to pay inside the first 7 days, no further charge after that
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Nothing to cancel: there is no subscription"
-      source: https://support.google.com/webmasters/answer/9128668
-  - feature: Refund
-    us:
-      text: Paid periods are not refunded; the $149 audit is refunded in full before data collection starts
-      source: https://oper-stack.com/refunds/
-    them:
-      text: "Not applicable: the service is free"
-      source: https://support.google.com/webmasters/answer/9128668
-  - feature: Clicks, impressions and positions from Google
-    us:
-      text: "None: OperStack has no search data"
-    them:
-      text: >-
-        Yes, for your own queries and pages, grouped by query, page, country, device, search appearance or
-        date
-      source: https://support.google.com/webmasters/answer/7576553
-  - feature: AI Overviews and AI Mode impressions
-    us:
-      text: Not measured
-    them:
-      text: Impressions by page, country, device and date since June 2026; no clicks, no queries
-      source: https://support.google.com/webmasters/answer/16984139
-  - feature: Indexing tools
-    us:
-      text: None
-    them:
-      text: Page indexing, URL Inspection live test, indexing requests, sitemap submission, alerts
-      source: https://search.google.com/search-console/about
-  - feature: History kept
-    us:
-      text: Each weekly letter compares with the week before
-      source: https://oper-stack.com/pricing/
-    them:
-      text: 16 months in the report and the API; BigQuery export for longer
-      source: https://developers.google.com/search/docs/monitor-debug/debugging-search-traffic-drops
-sources:
-  - label: "Google: About Search Console"
-    url: https://search.google.com/search-console/about
-  - label: "Google Help: Search Console overview"
-    url: https://support.google.com/webmasters/answer/9128668
-  - label: "Google Help: Generative AI performance report"
-    url: https://support.google.com/webmasters/answer/16984139
-  - label: "Google Search Central blog: generative AI performance reports, June 2026"
-    url: https://developers.google.com/search/blog/2026/06/gen-ai-performance-reports
-  - label: "Google Help: Performance report"
-    url: https://support.google.com/webmasters/answer/7576553
-  - label: "Google Help: Performance report queries"
-    url: https://support.google.com/webmasters/answer/17011259
-  - label: "Google Help: Performance report table limits"
-    url: https://support.google.com/webmasters/answer/17010575
-  - label: "Google Help: Page indexing report"
-    url: https://support.google.com/webmasters/answer/7440203
-  - label: "Google Help: URL Inspection tool"
-    url: https://support.google.com/webmasters/answer/9012289
-  - label: "Google Help: Links report"
-    url: https://support.google.com/webmasters/answer/9049606
-  - label: "Google Help: add and verify a property"
-    url: https://support.google.com/webmasters/answer/9008080
-  - label: "Google Help: email preferences"
-    url: https://support.google.com/webmasters/answer/140528
-  - label: "Google Help: bulk data export to BigQuery"
-    url: https://support.google.com/webmasters/answer/12917675
-  - label: "Google Search Central: AI features and your website"
-    url: https://developers.google.com/search/docs/appearance/ai-features
-  - label: "Google Search Central: debugging search traffic drops (16 months of data)"
-    url: https://developers.google.com/search/docs/monitor-debug/debugging-search-traffic-drops
-  - label: "Google Search Central blog: Recommendations, August 2024"
-    url: https://developers.google.com/search/blog/2024/08/search-console-recommendations
-  - label: Search Console API overview
-    url: https://developers.google.com/webmaster-tools
-  - label: "Search Console API: usage limits"
-    url: https://developers.google.com/webmaster-tools/limits
-  - label: "Search Analytics API: query reference (search types)"
-    url: https://developers.google.com/webmaster-tools/v1/searchanalytics/query
-  - label: "Google Cloud: supported MCP servers (updated 25 September 2026)"
-    url: https://docs.cloud.google.com/mcp/supported-products
-  - label: mcp-gsc, a community MCP server for Search Console (not Google)
-    url: https://github.com/AminForou/mcp-gsc
-  - label: OperStack pricing
-    url: https://oper-stack.com/pricing/
-  - label: OperStack free check
-    url: https://oper-stack.com/ai-visibility/
-  - label: OperStack refund policy
-    url: https://oper-stack.com/refunds/
-  - label: OperStack MCP server
-    url: https://oper-stack.com/mcp/
-  - label: OperStack AI visit counter
-    url: https://oper-stack.com/visits/
-related:
-  - operstack-vs-semrush
-  - operstack-vs-hubspot-ai-search-grader
-  - operstack-vs-asking-chatgpt
-  - operstack-vs-contextbolt
-faq:
-  - question: Does Google Search Console show ChatGPT traffic?
-    answer: >-
-      No. Search Console reports Google's own surfaces: Search, AI Overviews, AI Mode and Discover. The help
-      pages we checked do not mention ChatGPT, Perplexity, Claude or the Gemini app, so neither ChatGPT's
-      answers nor the visits ChatGPT sends to your site show up in it. To learn whether ChatGPT names your
-      business, OperStack Watch asks it ten buyer questions a week, and OperStack's separate free visit
-      counter counts visits that arrive from AI systems.
-  - question: Can Search Console show which searches triggered an AI Overview for my site?
-    answer: >-
-      Not in the Generative AI performance report. It has no query dimension: you can split its impressions by
-      page, country, device and date, filter by search type and export them, but you cannot see the search
-      that was typed. The ordinary Performance report does list queries, yet there AI Overviews and AI Mode
-      are folded into the Web search type instead of being shown apart.
-  - question: Why can't I see the Generative AI report in my Search Console?
-    answer: >-
-      There are three usual reasons. The report needs a verified property, so an unverified site shows
-      nothing. It may not appear at all when a site has too few AI impressions. And it reached every website
-      only recently: Google launched it for a subset of sites on 3 June 2026 and says the worldwide rollout
-      was complete as of 31 August 2026. Data from Search Labs experiments is left out.
-  - question: Are clicks from AI Overviews counted in Search Console?
-    answer: >-
-      Yes, but not separately. In the Performance report, AI Overviews and AI Mode belong to the Web search
-      type: an AI Overview holds one position, all its links share that position, and a click on one of them
-      counts as an ordinary click. The Generative AI report added in June 2026 lists impressions only, so it
-      cannot tell you how many of your clicks came from AI answers.
-  - question: Do I still need Search Console if I pay for OperStack?
-    answer: >-
-      Yes. OperStack has no search data at all: no clicks, impressions, positions, indexing tools or links
-      report. Search Console is the only place Google itself reports those, and it costs nothing. OperStack
-      answers other questions: whether ChatGPT names you for ten buyer questions each week, which rivals it
-      names instead, and which text to put on which page. The two tools barely overlap.
-  - question: Can I connect Search Console to Claude or ChatGPT?
-    answer: >-
-      Not through a Google-made server. Search Console has an official API for search analytics, sites,
-      sitemaps and URL inspection, but Google's list of its MCP servers, updated 25 September 2026, has no
-      Search Console entry. Community servers such as mcp-gsc, MIT-licensed and not from Google, wrap the API.
-      OperStack's own MCP server is free, needs no account and runs in Claude, Cursor, and ChatGPT on a paid
-      plan with developer mode.
-  - question: Is Google Search Console really free?
-    answer: >-
-      Yes. Every report is free, including Performance, the Generative AI performance report, Page indexing,
-      URL Inspection, sitemaps, the Links report, email alerts and the API. The one optional paid part is the
-      bulk data export to BigQuery, which runs in a Google Cloud project with billing: there is a free usage
-      level, and storage and queries beyond it are charged by Google Cloud.
-updatedDate: "2026-09-26"
----
+
+>-
 
 ## What are OperStack and Google Search Console for?
 
@@ -459,3 +181,34 @@ A useful operator check starts with the submitted URL in Search Console. Open th
 Submitting the file to Google does not change its public discoverability for other systems. Conversely, a discoverable sitemap does not force Google to index every URL it contains. Preserve both observations rather than trying to turn them into one success label.
 
 That distinction also helps when reviewing Watch. The email may identify a map or page issue worth fixing, but Search Console remains the place to inspect Google's processing status. The [free OperStack check](/ai-visibility/) supplies a second viewpoint without requiring access to your Google account.
+
+
+## FAQ
+
+### Does Google Search Console show ChatGPT traffic?
+
+>-
+
+### Can Search Console show which searches triggered an AI Overview for my site?
+
+>-
+
+### Why can't I see the Generative AI report in my Search Console?
+
+>-
+
+### Are clicks from AI Overviews counted in Search Console?
+
+>-
+
+### Do I still need Search Console if I pay for OperStack?
+
+>-
+
+### Can I connect Search Console to Claude or ChatGPT?
+
+>-
+
+### Is Google Search Console really free?
+
+>-

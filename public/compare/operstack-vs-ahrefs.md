@@ -1,307 +1,15 @@
+# OperStack vs Ahrefs: AI Visibility and Brand Radar Compared
+
+> >-
+
+**Source:** https://oper-stack.com/compare/operstack-vs-ahrefs/  
+**Section:** Comparisons  
+**Published:** 2026-09-26  
+**Updated:** 2026-09-26
+
 ---
-title: "OperStack vs Ahrefs: AI Visibility and Brand Radar Compared"
-description: >-
-  OperStack Watch at $35 vs Ahrefs Custom Prompts from $50: weekly ChatGPT answers, rival comparisons,
-  repeated page checks and proposed fixes.
-h1: "OperStack vs Ahrefs: weekly ChatGPT checks with the fix written out"
-answer: >-
-  OperStack Watch follows 10 ChatGPT buyer questions weekly, identifies the businesses named instead of you,
-  measures 3 rivals and sends page findings with proposed text for $35 monthly. Ahrefs Custom Prompts starts
-  at $50 monthly; Lite includes a smaller allowance alongside its SEO suite for $129. Watch combines recurring
-  comparison with an editing task, while Ahrefs supplies wider research and tracking options.
-competitor:
-  name: Ahrefs
-  site: https://ahrefs.com/
-kind: seo-suite
-pubDate: "2026-09-26"
-checkedAt: "2026-09-26T00:00:00.000Z"
-chooseUs:
-  - >-
-    You want to know every week whether ChatGPT names you for ten buyer questions, and who it names instead,
-    by name
-  - >-
-    You want the fix written for you: the page address and a paragraph built only from your own pages, ready
-    to paste
-  - >-
-    You want recurring ChatGPT comparison, page checks and draft fixes together for $35 monthly; Ahrefs Custom
-    Prompts starts at $50.
-  - "You want to try it on your own site first: no signup, ten pages read, three live ChatGPT questions"
-chooseThem:
-  - You need keyword volumes and a backlink index for an SEO team
-  - You track rankings for hundreds of keywords or crawl sites with thousands of pages
-table:
-  - feature: Price per month
-    us:
-      text: $35 a month for OperStack Watch
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Custom Prompts Basic: $50 monthly for 2,500 checks. Lite: $129 with 5 tracked prompts plus SEO tools.
-        The separate AI Visibility Index starts at $199.
-      source: https://ahrefs.com/pricing
-  - feature: Price per year
-    us:
-      text: $299 a year, about $25 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Custom Prompts Basic: $600 across twelve monthly payments, calculated; annual discount not stated.
-        Lite: $1,290 annually. Index annual price not stated.
-      source: https://ahrefs.com/pricing
-  - feature: Free trial and whether a card is needed
-    us:
-      text: First 7 days free; card required at checkout
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "No free trial. Ahrefs Free instead: no card, no expiry, limited tools"
-      source: https://ahrefs.com/pricing
-  - feature: Free checks without paying
-    us:
-      text: >-
-        Free check with no signup: 10 pages scored, 3 live ChatGPT buyer questions, 3 ChatGPT runs per
-        connection per day
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Free AI Visibility Checker: type a brand name, no signup, no stated limit; top 5 per section, no
-        competitor comparison
-      source: https://ahrefs.com/ai-visibility-checker
-  - feature: Names who ChatGPT recommends instead of you
-    us:
-      text: >-
-        Yes, by name, in the free check and every week across 10 questions in Watch, plus 3 rivals measured
-        beside you
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "In paid Brand Radar: AI share of voice against competitors. Not in the free checker."
-      source: https://ahrefs.com/brand-radar
-  - feature: AI systems checked
-    us:
-      text: ChatGPT with web search on. The free check also reads whether 14 AI crawlers and fetchers may enter.
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: "Index: Google AI Overviews, AI Mode, ChatGPT, Perplexity, Gemini, Copilot. Custom prompts add Claude."
-      source: https://ahrefs.com/brand-radar
-  - feature: Questions or prompts tracked
-    us:
-      text: 10 buyer questions a week, the same ones each week (3 in the free check)
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Custom prompts: Lite 5, Standard 10, Advanced 20, Enterprise from 83. Index of 449M prompts (the
-        pricing page says 475M+).
-      source: https://ahrefs.com/pricing
-  - feature: Pages of your site read per check
-    us:
-      text: 10 pages sampled from the sitemap and scored for AI readiness; 100 in the one-off $149 audit
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        AI checker: none (brand name only). Site Audit on Lite: 100,000 crawl credits a month for SEO issues,
-        up to 25,000 pages per project.
-      source: https://ahrefs.com/pricing
-  - feature: Writes the text to paste on your page
-    us:
-      text: "Yes: the page address and the paragraph, written only from your own pages"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Titles and meta descriptions through Project Boost Pro ($20 a month per project) and Patches (Max,
-        $200). Answer paragraphs for AI visibility: not stated.
-      source: https://ahrefs.com/project-boosts
-  - feature: Weekly email report
-    us:
-      text: "One email every 7 days from your subscription date: what changed since last week"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Rank Tracker emails weekly or monthly; Report Builder schedules PDFs (not on Free or Starter). A
-        weekly Brand Radar email is not stated.
-      source: >-
-        https://help.ahrefs.com/en/articles/2337273-how-to-configure-automated-email-notifications-for-rank-tracker
-  - feature: Works inside Claude, ChatGPT or Cursor (MCP)
-    us:
-      text: Free remote MCP server, no account, five measurement tools
-      source: https://oper-stack.com/mcp/
-    them:
-      text: >-
-        Official remote MCP on Lite and above, not on Starter or Free. Brand Radar data through MCP needs the
-        add-on.
-      source: https://docs.ahrefs.com/en/mcp/docs/introduction
-  - feature: Keyword and backlink data
-    us:
-      text: "None: no keyword database, no search volumes, no backlink index"
-    them:
-      text: 35T external backlinks in history; 28.7B filtered keywords in 217 locations
-      source: https://ahrefs.com/big-data
-  - feature: Built for whom
-    us:
-      text: Small and mid-size businesses and agencies
-      source: https://oper-stack.com/
-    them:
-      text: >-
-        Lite: small businesses and personal projects. Standard: freelance SEOs. Advanced: lean in-house teams.
-        Enterprise: large teams.
-      source: https://ahrefs.com/pricing
-  - feature: Needs a developer or SEO skills
-    us:
-      text: "No developer: most fixes are text to paste, and the few that need one are marked"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: No general statement found. MCP needs no coding; Starter is described as good for SEO beginners.
-      source: https://ahrefs.com/seo-mcp
-  - feature: Interface language
-    us:
-      text: English
-    them:
-      text: 15 languages, including English, German, Spanish, French, Japanese and Korean
-      source: https://help.ahrefs.com/en/articles/852478-how-do-i-change-the-language-of-ahrefs-interface
-  - feature: How cancelling works
-    us:
-      text: >-
-        Cancel any time. Nothing is charged within the first 7 days; after cancelling you are not charged
-        again.
-      source: https://oper-stack.com/refunds/
-    them:
-      text: >-
-        Cancel in Account Settings; the plan runs to the end of the paid period, then the account becomes
-        Ahrefs Free
-      source: https://ahrefs.com/pricing
-  - feature: Refund
-    us:
-      text: >-
-        Periods already paid are not refunded; the $149 audit is refunded in full before data collection
-        starts
-      source: https://oper-stack.com/refunds/
-    them:
-      text: >-
-        No refunds in general; on a monthly plan you may ask if you did not use the service, at Ahrefs'
-        discretion
-      source: https://ahrefs.com/pricing
-  - feature: Rank tracking
-    us:
-      text: None
-    them:
-      text: 750 keywords on Lite, 2,000 on Standard, 5,000 on Advanced; 50 on Starter
-      source: https://ahrefs.com/pricing
-  - feature: Technical SEO audit
-    us:
-      text: Five AI-readiness areas plus an SEO basics score, on 10 pages
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: 170+ SEO issues checked per crawl
-      source: https://ahrefs.com/site-audit
-  - feature: Writing help and what it costs
-    us:
-      text: A ready opening paragraph for pages without one (free check); the weekly priority page fix (Watch, $35)
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: AI Content Helper $99 a month for 50 documents; Content Kit $299 for 250; 1 document a month free
-      source: https://ahrefs.com/ai-content-helper
-rivalScore:
-  score: 53
-  pages: 10
-  date: "2026-09-26T00:00:00.000Z"
-  note: >-
-    All ten sampled pages were read. AI crawlers get full access (25 of 25); the points go on three things: no
-    llms.txt at the usual address, no publication or modified date on any of the ten pages, and no FAQPage
-    schema.
-sources:
-  - label: Ahrefs pricing page (plans, add-ons, trial, refunds, cancellation)
-    url: https://ahrefs.com/pricing
-  - label: Ahrefs Brand Radar (platforms, index, competitors)
-    url: https://ahrefs.com/brand-radar
-  - label: Ahrefs free AI Visibility Checker
-    url: https://ahrefs.com/ai-visibility-checker
-  - label: Ahrefs Big Data (backlinks, keywords)
-    url: https://ahrefs.com/big-data
-  - label: Ahrefs Free
-    url: https://ahrefs.com/free
-  - label: Ahrefs Starter plan announcement
-    url: https://ahrefs.com/blog/starter-plan/
-  - label: "Ahrefs help: What is Ahrefs"
-    url: https://help.ahrefs.com/en/articles/78203-what-is-ahrefs
-  - label: Ahrefs Site Audit
-    url: https://ahrefs.com/site-audit
-  - label: Ahrefs Project Boosts (Ask AI, Patches)
-    url: https://ahrefs.com/project-boosts
-  - label: Ahrefs AI Content Helper
-    url: https://ahrefs.com/ai-content-helper
-  - label: "Ahrefs help: Rank Tracker email notifications"
-    url: >-
-      https://help.ahrefs.com/en/articles/2337273-how-to-configure-automated-email-notifications-for-rank-tracker
-  - label: Ahrefs Report Builder
-    url: https://ahrefs.com/report-builder
-  - label: Ahrefs MCP documentation
-    url: https://docs.ahrefs.com/en/mcp/docs/introduction
-  - label: Ahrefs SEO MCP page
-    url: https://ahrefs.com/seo-mcp
-  - label: "Ahrefs help: getting started with Ahrefs MCP"
-    url: https://help.ahrefs.com/en/articles/13913559-getting-started-with-ahrefs-mcp
-  - label: "Ahrefs help: interface languages"
-    url: https://help.ahrefs.com/en/articles/852478-how-do-i-change-the-language-of-ahrefs-interface
-  - label: Ahrefs terms of service
-    url: https://ahrefs.com/legal/terms
-  - label: OperStack pricing (Watch)
-    url: https://oper-stack.com/pricing/
-  - label: OperStack free check
-    url: https://oper-stack.com/ai-visibility/
-  - label: OperStack MCP server
-    url: https://oper-stack.com/mcp/
-  - label: OperStack refund policy
-    url: https://oper-stack.com/refunds/
-related:
-  - operstack-vs-semrush
-  - operstack-vs-peec-ai
-  - operstack-vs-google-search-console
-  - operstack-vs-seo-agency
-faq:
-  - question: Does Ahrefs have a free trial?
-    answer: >-
-      No. On 26 September 2026 the Ahrefs pricing page offered no free trial and said the company never runs
-      discounts. What it offers instead is Ahrefs Free, an account with no card and no expiry that includes
-      Site Explorer and Site Audit for sites you verify, plus free tools such as the AI Visibility Checker.
-      The cheapest paid entry is Starter at $29 a month, which has no tracked AI prompts.
-  - question: How much does Ahrefs Brand Radar cost?
-    answer: >-
-      Ahrefs advertised Custom Prompts from $50 monthly for 2,500 checks on 26 September 2026. The separate AI
-      Visibility Index starts at $199 per platform or $699 for all platforms. Lite includes 5 tracked prompts
-      with its wider SEO suite at $129 monthly. Choose the relevant product before comparing prices: an
-      indexed market view and your own tracked questions are different purchases.
-  - question: Is there a cheaper alternative to Ahrefs Brand Radar for ChatGPT?
-    answer: >-
-      OperStack Watch costs $35 monthly or $299 annually. Ahrefs Custom Prompts starts at $50 monthly, while
-      its separate index starts at $199. Watch combines 10 weekly ChatGPT questions, 3 rival checks, sampled
-      page findings and proposed edits in a recurring email. It covers ChatGPT only and does not include
-      Ahrefs keyword or backlink data, so compare the required work as well as price.
-  - question: Can OperStack replace Ahrefs?
-    answer: >-
-      Not for SEO work. OperStack has no keyword database, no search volumes, no backlink index and no rank
-      tracking, and it reads ten pages of a site rather than crawling thousands. What it covers is the AI
-      visibility question on ChatGPT: whether your business is named, who is named instead, and which text on
-      which page to change. A business can keep an SEO suite for the first job and use OperStack for the
-      second.
-  - question: Does Ahrefs have an MCP server for Claude and Cursor?
-    answer: >-
-      Yes. Ahrefs runs an official remote MCP server on every paid plan from Lite upward; Starter and Free
-      accounts cannot use it, and Brand Radar data through MCP needs the matching add-on. OperStack's MCP
-      server is free and needs no account: it scores a site out of 100, puts two to four sites on the same
-      scale, checks llms.txt and reads your AI visit counter.
-  - question: Can I get a refund from Ahrefs?
-    answer: >-
-      Usually not. The Ahrefs pricing page says it does not issue refunds in general; on a monthly
-      subscription you may ask for one if you have not used the service, and Ahrefs can decline if it sees
-      material activity. Cancelling keeps the plan until the end of the paid period, then the account drops to
-      Ahrefs Free. OperStack Watch charges nothing in the first 7 days, and you can cancel any time.
-  - question: Is the free Ahrefs AI Visibility Checker enough for a small business?
-    answer: >-
-      It gives a first look from a brand name: total AI mentions, mentions by platform and the top five
-      topics, cited domains and cited pages. It does not compare you with competitors, it reads none of your
-      pages, and Ahrefs says its index may have thin coverage for brands with little search volume.
-      OperStack's free check takes your site address, reads ten pages and asks ChatGPT three buyer questions
-      on the spot.
-updatedDate: "2026-09-26"
----
+
+>-
 
 ## What are OperStack and Ahrefs for?
 
@@ -466,3 +174,34 @@ The second row is calculated as 496 minus 214. Qualification is a rule in our ch
 An operator can use the finding by opening a service page, reading only its heading and first paragraph, and checking whether those lines actually answer the customer's question. Include a number only when it belongs in that answer and has a source. Do not add a price, deadline or percentage merely to gain points.
 
 Ahrefs' research tools and a page-writing task therefore belong in different parts of the review. Our [cases page](/cases/) explains the use of our own sites as examples. After an edit, save the old wording and observe the same questions again; a changed mention count is a follow-up observation, not proof of cause.
+
+
+## FAQ
+
+### Does Ahrefs have a free trial?
+
+>-
+
+### How much does Ahrefs Brand Radar cost?
+
+>-
+
+### Is there a cheaper alternative to Ahrefs Brand Radar for ChatGPT?
+
+>-
+
+### Can OperStack replace Ahrefs?
+
+>-
+
+### Does Ahrefs have an MCP server for Claude and Cursor?
+
+>-
+
+### Can I get a refund from Ahrefs?
+
+>-
+
+### Is the free Ahrefs AI Visibility Checker enough for a small business?
+
+>-

@@ -1,296 +1,15 @@
+# OperStack vs Peec AI: Pricing, Engines and Fixes Compared
+
+> >-
+
+**Source:** https://oper-stack.com/compare/operstack-vs-peec-ai/  
+**Section:** Comparisons  
+**Published:** 2026-09-26  
+**Updated:** 2026-09-26
+
 ---
-title: "OperStack vs Peec AI: Pricing, Engines and Fixes Compared"
-description: >-
-  OperStack Watch at $35 a month vs Peec AI Starter at $95: who ChatGPT names instead of you, ready fix text,
-  free checks, MCP, trial and cancelling.
-h1: "OperStack vs Peec AI: a weekly ChatGPT report with text to publish"
-answer: >-
-  OperStack Watch brings 10 weekly ChatGPT questions, 3 rival comparisons, repeated page checks and proposed
-  fixes into recurring reports for $35 a month. Peec Starter costs $95 monthly for 50 daily prompts across 3
-  models, checked on 26 September 2026. Watch gives a business owner a continuing record of what changed and
-  the page work to review next, with a free check before subscribing.
-competitor:
-  name: Peec AI
-  site: https://peec.ai/
-kind: ai-visibility
-pubDate: "2026-09-26"
-checkedAt: "2026-09-26T00:00:00.000Z"
-chooseUs:
-  - >-
-    You want a weekly answer, not a daily dashboard: did ChatGPT name you for ten buyer questions, and who was
-    named instead
-  - >-
-    You want the paragraph itself, written from your own pages with the page it goes on, rather than a brief
-    to write from
-  - >-
-    You want to see a result before creating any account: the free check reads ten pages and asks ChatGPT
-    three questions
-  - $35 a month or $299 a year fits your budget better than $95 a month or $960 a year
-chooseThem:
-  - "You need enterprise brand analytics: SSO, many countries and data piped into Looker Studio or an API"
-  - You want AI bot visits read from server logs and AI referral revenue joined from GA4
-table:
-  - feature: Price per month
-    us:
-      text: $35 a month for OperStack Watch
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Starter $95 a month billed monthly (USD in our browser), the cheapest plan; Pro $245; Advanced $495;
-        Enterprise on request
-      source: https://peec.ai/pricing
-  - feature: Price per year
-    us:
-      text: $299 a year, about $25 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Starter $80 a month billed annually, $960 a year (our arithmetic); Pro $2,460; Advanced $5,040
-      source: https://peec.ai/pricing
-  - feature: Free trial and whether a card is needed
-    us:
-      text: First 7 days free; card required at checkout
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Free trial, length not stated on official pages; Peec's comparison page calls it no-credit-card; an
-        account is needed
-      source: https://peec.ai/comparison/peec-vs-profound
-  - feature: Free checks without paying
-    us:
-      text: "Free check with no signup: 10 pages scored, 3 live ChatGPT buyer questions, names given instead"
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: No free plan and no public free checker found on the site or in its sitemap
-      source: https://peec.ai/pricing
-  - feature: Names who ChatGPT recommends instead of you
-    us:
-      text: Yes, by name, in the free check and weekly in Watch, plus 3 rivals measured beside you
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Yes: tracks competitors you add (unlimited) and shows brands AI names alongside or instead of yours"
-      source: https://docs.peec.ai/identifying-your-competitors
-  - feature: AI systems checked
-    us:
-      text: ChatGPT with web search on. The free check also reads whether 14 AI crawlers and fetchers may enter.
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: Choose 3 of ChatGPT, AI Mode, AI Overviews, Copilot, Gemini, Naver AI; more models as paid add-ons
-      source: https://peec.ai/pricing
-  - feature: Questions or prompts tracked
-    us:
-      text: 10 buyer questions a week, the same ones each week (3 in the free check)
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        50 / 150 / 350 prompts (Starter / Pro / Advanced), each run daily on every selected model; you write
-        or choose them
-      source: https://peec.ai/pricing
-  - feature: Pages of your site read per check
-    us:
-      text: 10 pages sampled from the sitemap and scored; 100 in the one-off $149 audit
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Not stated. Actions include a site audit group; the crawlability check reads robots.txt for 40+ AI
-        bots.
-      source: https://docs.peec.ai/actions
-  - feature: Writes the text to paste on your page
-    us:
-      text: "Yes: the page address and the paragraph, written only from your own pages"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Partly: ranked Actions with a brief and steps. Peec's FAQ says you still create the content yourself."
-      source: https://peec.ai/product-actions
-  - feature: Weekly email report
-    us:
-      text: "One email every 7 days from your subscription date: what changed since last week"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Built-in weekly email not stated. A Weekly Visibility Pulse prompt runs inside your AI tool through
-        MCP.
-      source: https://docs.peec.ai/mcp/prompts
-  - feature: Works inside Claude, ChatGPT or Cursor (MCP)
-    us:
-      text: Free remote MCP server, no account, five measurement tools
-      source: https://oper-stack.com/mcp/
-    them:
-      text: Remote MCP on all paid plans; needs a Peec account with a project
-      source: https://docs.peec.ai/mcp/introduction
-  - feature: Keyword and backlink data
-    us:
-      text: "None: no keyword database, no search volumes, no backlink index"
-    them:
-      text: No backlink data stated; prompt volume scored 1 to 5; no search volume database stated
-      source: https://peec.ai/pricing
-  - feature: Built for whom
-    us:
-      text: Small and mid-size businesses and agencies
-      source: https://oper-stack.com/
-    them:
-      text: "Business customers only: SEO and content managers, marketing teams, global brands, agencies"
-      source: https://peec.ai/legal/terms-of-use
-  - feature: Needs a developer or SEO skills
-    us:
-      text: "No developer: most fixes are text to paste, and the few that need one are marked"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Self-serve setup; you write or pick the prompts; bot analytics needs a CDN or log connection and GA4
-      source: https://docs.peec.ai/my-website
-  - feature: Interface language
-    us:
-      text: English
-    them:
-      text: Not stated. The sign-up screen showed in English, with no language picker seen.
-      source: https://app.peec.ai/
-  - feature: How cancelling works
-    us:
-      text: >-
-        Cancel any time. Nothing is charged within the first 7 days; after cancelling you are not charged
-        again.
-      source: https://oper-stack.com/refunds/
-    them:
-      text: >-
-        Monthly: cancel any time, ends with the payment cycle. 12-month plan: 30 days' notice, ends with the
-        12-month cycle.
-      source: https://peec.ai/legal/terms-of-use
-  - feature: Refund
-    us:
-      text: >-
-        Periods already paid are not refunded; the $149 audit is refunded in full before data collection
-        starts
-      source: https://oper-stack.com/refunds/
-    them:
-      text: No automatic refund for ending a fixed term early; pro rata only if Peec is at fault
-      source: https://peec.ai/legal/terms-of-use
-  - feature: How answers are collected
-    us:
-      text: ChatGPT asked with web search switched on
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Browser automation of the logged-out web interface, not the model APIs
-      source: https://docs.peec.ai/intro-to-peec-ai
-  - feature: Agency pricing
-    us:
-      text: No separate agency tier; the free MCP server compares two to four sites
-      source: https://oper-stack.com/mcp/
-    them:
-      text: Agency Essential $205, Growth $420, Scale $675 a month, billed annually, on a credit system
-      source: https://peec.ai/for-agencies
-  - feature: AI traffic measurement
-    us:
-      text: Separate free visit counter for visits AI assistants send you
-      source: https://oper-stack.com/visits/
-    them:
-      text: Bot visits from server logs and AI referrals from GA4; log or CDN connection needed
-      source: https://docs.peec.ai/my-website
-rivalScore:
-  score: 42
-  pages: 10
-  date: "2026-09-26T00:00:00.000Z"
-  note: >-
-    The check read all ten pages it sampled. AI crawlers are let in (25 of 25); the site loses its points on a
-    missing llms.txt, no Organization or business schema, and no publication or modified date on any sampled
-    page.
-sources:
-  - label: Peec AI pricing page (plans, models, add-ons)
-    url: https://peec.ai/pricing
-  - label: Peec AI homepage (daily refresh, onboarding)
-    url: https://peec.ai/
-  - label: Peec AI vs Profound, Peec's own comparison page (EUR prices, trial)
-    url: https://peec.ai/comparison/peec-vs-profound
-  - label: Peec AI for agencies
-    url: https://peec.ai/for-agencies
-  - label: "Peec docs: agency credits"
-    url: https://docs.peec.ai/agencies/understanding_credits
-  - label: "Peec docs: intro to Peec AI (how answers are collected)"
-    url: https://docs.peec.ai/intro-to-peec-ai
-  - label: "Peec docs: identifying your competitors"
-    url: https://docs.peec.ai/identifying-your-competitors
-  - label: "Peec docs: Actions"
-    url: https://docs.peec.ai/actions
-  - label: "Peec docs: crawlability"
-    url: https://docs.peec.ai/crawlability
-  - label: Peec Actions product page and FAQ
-    url: https://peec.ai/product-actions
-  - label: "Peec docs: MCP introduction"
-    url: https://docs.peec.ai/mcp/introduction
-  - label: "Peec docs: MCP prompts (Weekly Visibility Pulse)"
-    url: https://docs.peec.ai/mcp/prompts
-  - label: "Peec docs: MCP tools"
-    url: https://docs.peec.ai/mcp/tools
-  - label: "Peec blog: MCP on all paid plans (13 April 2026)"
-    url: https://peec.ai/blog/peec-ai-mcp
-  - label: "Peec docs: my website (logs, GA4)"
-    url: https://docs.peec.ai/my-website
-  - label: Peec terms of use (trial, cancellation, refunds)
-    url: https://peec.ai/legal/terms-of-use
-  - label: Peec sign-up screen
-    url: https://app.peec.ai/
-  - label: Peec sitemap (checked for a free tool)
-    url: https://peec.ai/sitemap.xml
-  - label: Marketer Milk, Peec AI review (6 August 2025, trial length)
-    url: https://www.marketermilk.com/blog/peec-ai-review
-  - label: OperStack pricing (Watch)
-    url: https://oper-stack.com/pricing/
-  - label: OperStack free check
-    url: https://oper-stack.com/ai-visibility/
-  - label: OperStack MCP server
-    url: https://oper-stack.com/mcp/
-  - label: OperStack AI visit counter
-    url: https://oper-stack.com/visits/
-  - label: OperStack refund policy
-    url: https://oper-stack.com/refunds/
-related:
-  - operstack-vs-profound
-  - operstack-vs-otterly-ai
-  - operstack-vs-ahrefs
-  - operstack-vs-contextbolt
-faq:
-  - question: How much does Peec AI cost?
-    answer: >-
-      On 26 September 2026 Peec's pricing page showed Starter at $95 a month billed monthly or $80 a month
-      billed annually, Pro at $245 or $205, and Advanced at $495 or $420, with Enterprise on request. Our
-      browser saw US dollars, while Peec's own comparison page against Profound quotes EUR 89 and EUR 199, so
-      check the currency at checkout. Each extra AI model costs from $30 a month.
-  - question: Does Peec AI have a free trial or a free plan?
-    answer: >-
-      There is a free trial but no free plan. Peec's official pages do not state the trial length; its terms
-      say the period is set by Peec, and a third-party review from August 2025 says seven days. Peec's
-      comparison page describes it as a no-credit-card trial. You need an account to start, and we found no
-      public free checker on the site or in its sitemap.
-  - question: Is there a cheaper alternative to Peec AI for a small business?
-    answer: >-
-      OperStack Watch costs $35 a month or $299 a year, against $95 a month or $960 a year for Peec Starter.
-      It asks ChatGPT ten buyer questions every week with web search on, names who ChatGPT recommends instead
-      of you, scores ten of your pages and emails the text to paste. It covers ChatGPT only and has no keyword
-      or backlink data. The free check shows the approach first.
-  - question: Does Peec AI write the content for you?
-    answer: >-
-      Partly. Peec’s Actions gives content briefs and steps, and some MCP action templates include concrete
-      edits. Its FAQ says the customer creates the content. OperStack Watch brings proposed page text into the
-      recurring email alongside question results, rival comparisons and page findings. The owner can review
-      the wording against business facts, publish it and inspect the next report for changes.
-  - question: Which AI models does Peec AI track?
-    answer: >-
-      Self-serve plans let you pick three models from ChatGPT, Google AI Mode, Google AI Overviews, Microsoft
-      Copilot, Gemini and Naver AI, with more sold as add-ons from $30 a month. Enterprise lists up to 13
-      models. Peec's agency page names Perplexity instead of Naver among its six channels, so the pricing page
-      and the agency page disagree. OperStack Watch asks ChatGPT alone, once a week.
-  - question: Can I cancel Peec AI at any time?
-    answer: >-
-      On a monthly plan, yes: cancellation takes effect at the end of the current payment cycle. On a 12-month
-      plan, Peec's terms ask for 30 days' notice in text form, such as an email, and the plan ends with the
-      12-month cycle. There is no automatic refund for ending a fixed term early. OperStack Watch can be
-      cancelled whenever you like, and nothing is charged in the first 7 days.
-  - question: Does Peec AI have an MCP server?
-    answer: >-
-      Yes. Peec runs a remote MCP server with guides for Claude, ChatGPT, Cursor, VS Code and Windsurf,
-      included on all paid plans, and it needs a Peec account with a project. OperStack's MCP server is free
-      and needs no account at all: it scores any site out of 100, compares two to four sites on one scale,
-      checks llms.txt and reads your AI visit counter.
-updatedDate: "2026-09-26"
----
+
+>-
 
 ## What are OperStack and Peec AI for?
 
@@ -460,3 +179,34 @@ Those rows suggest different editing decisions. A trust link should identify a r
 For a team already using Peec Actions, compare the action with the affected page before drafting. Some template actions contain concrete text; others require new writing. Watch's proposed wording also needs review against what the business currently provides, even when it was derived from the website.
 
 A practical review can start with one commercial claim: follow its link, check that the source supports the wording and preserve any limitation. Use our [cases page](/cases/) for context about owned examples, then maintain a separate record of your business's edits and question results. A finding count is not a forecast of leads.
+
+
+## FAQ
+
+### How much does Peec AI cost?
+
+>-
+
+### Does Peec AI have a free trial or a free plan?
+
+>-
+
+### Is there a cheaper alternative to Peec AI for a small business?
+
+>-
+
+### Does Peec AI write the content for you?
+
+>-
+
+### Which AI models does Peec AI track?
+
+>-
+
+### Can I cancel Peec AI at any time?
+
+>-
+
+### Does Peec AI have an MCP server?
+
+>-

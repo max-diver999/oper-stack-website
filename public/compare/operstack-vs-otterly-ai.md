@@ -1,288 +1,15 @@
+# OperStack vs Otterly.AI: Prices, Pages Read and Fixes
+
+> >-
+
+**Source:** https://oper-stack.com/compare/operstack-vs-otterly-ai/  
+**Section:** Comparisons  
+**Published:** 2026-09-26  
+**Updated:** 2026-09-26
+
 ---
-title: "OperStack vs Otterly.AI: Prices, Pages Read and Fixes"
-description: >-
-  OperStack vs Otterly.AI, checked 26 September 2026: plan prices per month and year, pages read, who ChatGPT
-  names instead of you and who writes the fix.
-h1: "OperStack vs Otterly.AI: page fixes in your weekly ChatGPT report"
-answer: >-
-  OperStack Watch brings 10 weekly ChatGPT questions, 3 rival comparisons, repeated page checks and proposed
-  fixes into recurring reports for $35 monthly. A free check shows the approach before signup. Otterly Lite
-  costs $29 monthly for 15 prompts, checked on 26 September 2026. Watch’s value is the combined routine: see
-  who was named, review changes and choose the next page improvement from the report.
-competitor:
-  name: Otterly.AI
-  site: https://otterly.ai/
-kind: ai-visibility
-pubDate: "2026-09-26"
-checkedAt: "2026-09-26T00:00:00.000Z"
-chooseUs:
-  - "You want the fix written out: the page address and a paragraph built only from what your own pages say."
-  - >-
-    You want ChatGPT's live answer before you sign up for anything: ten pages read, three buyer questions, no
-    account.
-  - You want one email a week with what changed and the names ChatGPT picked instead of you.
-  - You want your site read ten pages at a time, with three rivals measured beside you, not one URL per audit.
-chooseThem:
-  - Your marketing department reports daily share of voice across many countries and languages.
-  - You need AI bot analytics from server logs and a Looker Studio feed for client dashboards.
-table:
-  - feature: Price per month
-    us:
-      text: $35 (OperStack Watch)
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        On 26 September 2026: Lite $29 (15 prompts), Standard $189, Premium $489, Enterprise custom; USD
-        excluding tax
-      source: https://otterly.ai/pricing
-  - feature: Price per year
-    us:
-      text: $299, about $25 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Lite $25 a month billed annually ('Annually 15% off'), $300 a year by our multiplication; the page
-        shows no yearly total
-      source: https://otterly.ai/pricing
-  - feature: Free trial and whether a card is needed
-    us:
-      text: First 7 days free; card at checkout
-      source: https://oper-stack.com/pricing/
-    them:
-      text: 7 days, no card; 50 prompts and 100 GEO audit URLs; ends on its own with no charge
-      source: https://help.otterly.ai/free-trial
-  - feature: Free checks without paying
-    us:
-      text: "Free check, no signup: up to 10 pages scored and 3 live ChatGPT questions"
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: No free check of live AI answers; a free brand check reads AI training data, 'not real-time web'
-      source: https://geo.otterly.ai/geo/ai-brand-entity/
-  - feature: Names who ChatGPT recommends instead of you
-    us:
-      text: Yes, by name, with non-rivals such as portals kept apart from competitors
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: "Yes: a Competitors column in the Prompts tab; share of voice and average position in brand reports"
-      source: https://help.otterly.ai/search-prompt-monitoring
-  - feature: AI systems checked
-    us:
-      text: ChatGPT with web search on; robots.txt read for 14 AI crawlers and fetchers
-    them:
-      text: >-
-        ChatGPT, Google AI Overviews, Perplexity, Microsoft Copilot on every plan; AI Mode, Gemini and Claude
-        as paid add-ons
-      source: https://otterly.ai/pricing
-  - feature: Questions or prompts tracked
-    us:
-      text: 10 buyer questions every week; the free check needs only your address
-    them:
-      text: 15 (Lite), 100 (Standard), 400 (Premium), written by you; each prompt counts once per country
-      source: https://help.otterly.ai/amount-prompts-limit
-  - feature: Pages of your site read per check
-    us:
-      text: Up to 10 pages per check, scored again every week
-    them:
-      text: One URL per GEO audit, 'even if you input your domain URL'
-      source: https://help.otterly.ai/what-does-the-geo-audit-do
-  - feature: Writes the text to paste on your page
-    us:
-      text: "Yes: page address plus a paragraph built only from your own pages"
-    them:
-      text: Not stated. Recommendations give a Reasoning and a Suggestion; Lite sees up to 3 per 7-day cycle
-      source: https://help.otterly.ai/ai-recommendations
-  - feature: Weekly email report
-    us:
-      text: "One email every 7 days: what changed since the last one"
-    them:
-      text: Not stated as a weekly email; alerts when brand mentions change
-      source: https://otterly.ai/
-  - feature: Works inside Claude, ChatGPT or Cursor (MCP)
-    us:
-      text: Free MCP server for everyone, no account, five tools
-      source: https://oper-stack.com/mcp/
-    them:
-      text: From Standard ($189) and in the trial; not included on Lite
-      source: https://help.otterly.ai/does-otterlyai-have-an-mcp
-  - feature: Keyword and backlink data
-    us:
-      text: None
-    them:
-      text: No keyword database or backlink index stated; prompt research with an Intent Volume estimate
-      source: https://help.otterly.ai/search-prompt-monitoring
-  - feature: Built for whom
-    us:
-      text: Small and mid-size businesses and agencies
-    them:
-      text: >-
-        In-house marketing teams, agencies, SEO, GEO and AEO practitioners; Lite 'for solo marketers, and
-        small teams'
-      source: https://otterly.ai/llm-info/
-  - feature: Needs a developer or SEO skills
-    us:
-      text: "No: most fixes are text to paste; the few needing a developer are marked"
-    them:
-      text: Not stated as needing a developer; you choose and maintain your own prompt list
-      source: https://help.otterly.ai/search-prompt-monitoring
-  - feature: Interface language
-    us:
-      text: English
-    them:
-      text: Not stated for the app; prompts run in any language as written
-      source: https://help.otterly.ai/languages
-  - feature: How cancelling works
-    us:
-      text: Cancel any time; nothing to pay within the first 7 days
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Any time from Billing; features stay to the end of the cycle, then tracked engines and historical data
-        are deleted
-      source: https://help.otterly.ai/cancel-subscription
-  - feature: Refund
-    us:
-      text: >-
-        Periods already paid are not refunded; the $149 audit is refunded in full before data collection
-        starts
-      source: https://oper-stack.com/refunds/
-    them:
-      text: Not stated on the web pages we read; full terms sit in a downloadable PDF (April 2026) we did not open
-      source: https://otterly.ai/terms
-  - feature: How often answers are collected
-    us:
-      text: Weekly in Watch; on demand in the free check
-    them:
-      text: Every tracked prompt, every day
-      source: https://help.otterly.ai/search-prompt-monitoring
-  - feature: Site readiness score
-    us:
-      text: Out of 100 on ten pages across five areas, measured again every week
-    them:
-      text: >-
-        GEO audit of one URL: crawlability, robots.txt per bot, static or dynamic content, structured data,
-        query fan-out
-      source: https://help.otterly.ai/what-does-the-geo-audit-do
-  - feature: AI visits to your site
-    us:
-      text: Free AI visit counter, separate from Watch
-      source: https://oper-stack.com/visits/
-    them:
-      text: "Agent Analytics from server logs: 200k events a month on Standard, 1M on Premium"
-      source: https://otterly.ai/pricing
-  - feature: Who makes it
-    us:
-      text: Maksim Shchegolev; support at info@oper-stack.com
-    them:
-      text: OtterlyAI GmbH, Persenbeug, Austria
-      source: https://otterly.ai/llm-info/
-rivalScore:
-  score: 75
-  pages: 1
-  date: "2026-09-26T00:00:00.000Z"
-  note: >-
-    Our check could read only the homepage: otterly.ai has no XML sitemap at the usual addresses or in
-    robots.txt, so there was no list of pages to sample. Treat this as a homepage score. It took full marks
-    for crawler access, llms.txt and schema, and 10 of 25 for quotable content.
-sources:
-  - label: Otterly.AI pricing
-    url: https://otterly.ai/pricing
-  - label: Otterly.AI homepage
-    url: https://otterly.ai/
-  - label: Otterly.AI company information for LLMs
-    url: https://otterly.ai/llm-info/
-  - label: "Otterly help: free trial"
-    url: https://help.otterly.ai/free-trial
-  - label: "Otterly help: buying a plan"
-    url: https://help.otterly.ai/buy-a-plan
-  - label: "Otterly help: cancelling a subscription"
-    url: https://help.otterly.ai/cancel-subscription
-  - label: "Otterly help: search prompt monitoring"
-    url: https://help.otterly.ai/search-prompt-monitoring
-  - label: "Otterly help: prompt limits"
-    url: https://help.otterly.ai/amount-prompts-limit
-  - label: "Otterly help: what the GEO audit does"
-    url: https://help.otterly.ai/what-does-the-geo-audit-do
-  - label: "Otterly help: AI recommendations"
-    url: https://help.otterly.ai/ai-recommendations
-  - label: "Otterly help: MCP server"
-    url: https://help.otterly.ai/does-otterlyai-have-an-mcp
-  - label: "Otterly help: languages"
-    url: https://help.otterly.ai/languages
-  - label: "Otterly help: supported countries"
-    url: https://help.otterly.ai/countries-otterlyai
-  - label: "Otterly help: notifications"
-    url: https://help.otterly.ai/turn-off-the-notifications
-  - label: "Otterly help: changelog"
-    url: https://help.otterly.ai/changelog
-  - label: Otterly free GEO tools
-    url: https://otterly.ai/geo-tools/
-  - label: Otterly AI Brand Authority Check
-    url: https://geo.otterly.ai/geo/ai-brand-entity/
-  - label: Otterly alternatives pages
-    url: https://otterly.ai/alternatives/
-  - label: Otterly terms
-    url: https://otterly.ai/terms
-  - label: OperStack pricing
-    url: https://oper-stack.com/pricing/
-  - label: OperStack free check
-    url: https://oper-stack.com/ai-visibility/
-  - label: OperStack MCP server
-    url: https://oper-stack.com/mcp/
-  - label: OperStack refunds
-    url: https://oper-stack.com/refunds/
-  - label: OperStack AI visit counter
-    url: https://oper-stack.com/visits/
-related:
-  - operstack-vs-peec-ai
-  - operstack-vs-profound
-  - operstack-vs-semrush
-  - operstack-vs-contextbolt
-faq:
-  - question: How much does Otterly.AI cost per month and per year?
-    answer: >-
-      On 26 September 2026 Otterly's pricing page listed Lite at $29 a month, Standard at $189 and Premium at
-      $489, with Enterprise on custom terms. Billed annually, those become $25, $160 and $422 a month; the
-      page shows no yearly totals, so Lite works out to $300 a year by our arithmetic. Google AI Mode, Gemini
-      and Claude cost extra on every plan. OperStack Watch is $35 a month or $299 a year.
-  - question: Does the Otterly free trial need a credit card?
-    answer: >-
-      No. Otterly's help center says the 7-day trial needs no card, includes 50 prompts and 100 GEO audit
-      URLs, and ends on its own without a charge. You do have to sign up to see any live AI answers. OperStack
-      Watch takes a card at checkout, but its free check needs no signup at all and shows ChatGPT's live
-      answer to three buyer questions before you commit to anything.
-  - question: Does Otterly check more than one page of my site?
-    answer: >-
-      Not per audit. Otterly's help center says a GEO audit covers one URL only, even if you enter your
-      domain, and bulk audits run through the API, which is not on the Lite plan. OperStack's free check reads
-      up to ten pages sampled from your sitemap and scores them together out of 100; Watch repeats that
-      ten-page measurement every week, with three rivals measured beside you.
-  - question: Does Otterly write the text to fix my pages?
-    answer: >-
-      Otterly's recommendations give a reasoning and a suggested action, sorted by impact and refreshed every
-      seven days once you have 15 or more prompts, three or more competitors and three days of data.
-      Ready-to-paste page text is not stated. OperStack writes the paragraph itself: for a checked page with
-      no short answer at the top, an opening built only from what your own pages already say, with the page
-      address.
-  - question: What happens to my Otterly data if I cancel?
-    answer: >-
-      Paid features stay until the end of the billing cycle, then the account moves to a free plan, and
-      Otterly says tracked AI search engines and historical data are deleted after cancellation. Pull anything
-      you want to keep before you cancel. With OperStack Watch you can cancel any time; within the first seven
-      days you pay nothing, and after that you are not charged again.
-  - question: Is OperStack cheaper than Otterly.AI?
-    answer: >-
-      Month to month, no: Otterly Lite is $29 and Watch is $35. On annual billing the two are a dollar apart,
-      $300 a year for Lite by our multiplication against $299 for Watch. The money buys different things. Lite
-      gives 15 prompts you write, up to three suggestions a week and single-URL audits. Watch gives ten pages
-      scored weekly, the names ChatGPT chose instead of you, and text to paste.
-  - question: Does Otterly have an MCP server, and does OperStack?
-    answer: >-
-      Both do. Otterly's remote MCP server comes with Standard and Premium and the trial, not Lite, and
-      returns your brand reports, prompts, raw answers, citations and recommendations. OperStack's MCP server
-      is free with no account for anyone, with five tools: score a site out of 100, compare two to four sites,
-      check an llms.txt file, and read or verify an AI visit counter. Setup steps are at oper-stack.com/mcp/.
-updatedDate: "2026-09-26"
----
+
+>-
 
 ## What are OperStack and Otterly.AI for?
 
@@ -435,3 +162,34 @@ The combined technical score is our arithmetic from 25, 15 and 20 points. A high
 For your own site, review the page that receives the most qualified enquiries rather than assuming the homepage represents the whole business. Read its introduction in isolation, open any cited source and confirm what changed on the stated update date. Keep necessary caveats in the paragraph a reader might copy.
 
 That review gives context to the written fix in Watch. The draft should solve a specific omission the owner has verified, while the next report supplies a further observation of the questions. Neither this example nor a future score increase promises a gain in sales.
+
+
+## FAQ
+
+### How much does Otterly.AI cost per month and per year?
+
+>-
+
+### Does the Otterly free trial need a credit card?
+
+>-
+
+### Does Otterly check more than one page of my site?
+
+>-
+
+### Does Otterly write the text to fix my pages?
+
+>-
+
+### What happens to my Otterly data if I cancel?
+
+>-
+
+### Is OperStack cheaper than Otterly.AI?
+
+>-
+
+### Does Otterly have an MCP server, and does OperStack?
+
+>-

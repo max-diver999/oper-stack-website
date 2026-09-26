@@ -1,290 +1,15 @@
+# OperStack vs Semrush: AI Visibility Compared for 2026
+
+> >-
+
+**Source:** https://oper-stack.com/compare/operstack-vs-semrush/  
+**Section:** Comparisons  
+**Published:** 2026-09-26  
+**Updated:** 2026-09-26
+
 ---
-title: "OperStack vs Semrush: AI Visibility Compared for 2026"
-description: >-
-  OperStack vs Semrush for AI visibility: prices checked 26 September 2026, who ChatGPT names instead of you,
-  the text to paste, and what each costs a year.
-h1: "OperStack vs Semrush: ChatGPT checks and written fixes for $35"
-answer: >-
-  OperStack Watch combines 10 weekly ChatGPT buyer questions, 3 rival comparisons, repeated page checks and
-  reports showing changes with proposed fixes for $35 monthly. Semrush’s standalone AI Visibility Toolkit
-  starts at $99 for 25 tracked prompts. For an owner who wants a continuing routine from observation to page
-  improvement, Watch brings the findings and the next editing task together in each report.
-competitor:
-  name: Semrush
-  site: https://www.semrush.com/
-kind: seo-suite
-pubDate: "2026-09-26"
-checkedAt: "2026-09-26T00:00:00.000Z"
-chooseUs:
-  - >-
-    You want the names ChatGPT recommends instead of you, and the paragraph to paste on the right page, every
-    week.
-  - You want AI visibility for $35 a month or $299 a year, not a $99 add-on or a $199 suite.
-  - "You want ChatGPT's live answer before you pay: the free check asks three buyer questions with no signup."
-  - "Nobody on your team does SEO: most fixes are text to paste, and the few that need a developer are marked."
-chooseThem:
-  - You need keyword volumes and a backlink index for an SEO team.
-  - You track Google rankings for hundreds of keywords every day.
-  - You run technical audits on sites with tens of thousands of pages.
-table:
-  - feature: Price per month
-    us:
-      text: $35 (OperStack Watch)
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        On 26 September 2026: AI Visibility Toolkit bought alone $99, the cheapest custom-prompt tracking;
-        Starter (SEO + AI Search) $199 on the pricing page
-      source: https://www.semrush.com/kb/1493-ai-visibility-toolkit
-  - feature: Price per year
-    us:
-      text: $299, about $25 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Starter billed annually: $165.17 a month, $1,982.04 a year by our multiplication, paid upfront.
-        Toolkit alone: annual price not stated in the toolkit article
-      source: https://www.semrush.com/pricing/seo-ai-search/
-  - feature: Free trial and whether a card is needed
-    us:
-      text: First 7 days free; card at checkout
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        7 days on SEO + AI Search plans, card required, exports disabled; the AI Visibility Toolkit alone has
-        no trial
-      source: https://www.semrush.com/kb/1011-subscriptions
-  - feature: Free checks without paying
-    us:
-      text: "Free check with no signup: up to 10 pages scored and 3 live ChatGPT questions, 3 runs a day"
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        AI Visibility Checker 3 times a day without an account; a free account (signup) gives 10 requests a
-        day and 1 project
-      source: https://www.semrush.com/free-tools/ai-search-visibility-checker/
-  - feature: Names who ChatGPT recommends instead of you
-    us:
-      text: >-
-        Yes: every name from the answer, sorted into competitors, not-competitors and names it could not
-        identify
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Competitor Research compares you with up to four competitors; the score is benchmarked against
-        competitors Semrush picks
-      source: https://www.semrush.com/kb/1626-ai-visibility-features
-  - feature: AI systems checked
-    us:
-      text: ChatGPT with web search on; robots.txt read for 14 AI crawlers and fetchers
-    them:
-      text: >-
-        ChatGPT, Google AI Mode, Gemini, AI Overviews, Perplexity; Semrush help pages disagree on which tool
-        covers which
-      source: https://www.semrush.com/kb/1608-semrush-one
-  - feature: Questions or prompts tracked
-    us:
-      text: 10 buyer questions every week (Watch); 3 in the free check
-    them:
-      text: 25 (toolkit alone), 50 (Starter), 100 (Pro+), 200 (Advanced) a day; 50 more for $60 a month
-      source: https://www.semrush.com/pricing/seo-ai-search/
-  - feature: Pages of your site read per check
-    us:
-      text: Up to 10 pages scored, measured again every week; 100 in the $149 audit
-    them:
-      text: "Toolkit alone: AI checks on up to 100 pages; Starter Site Audit up to 20,000 pages per site"
-      source: https://www.semrush.com/pricing/seo-ai-search/
-  - feature: Writes the text to paste on your page
-    us:
-      text: "Yes: page address and the paragraph, written only from what your own pages say"
-    them:
-      text: >-
-        Partly: Site Audit gives how-to-fix advice, the Content Toolkit ($60 a month) writes articles. A
-        paste-ready opening for an existing page: not stated
-      source: https://www.semrush.com/kb/1536-content-toolkit-pricing-and-plans
-  - feature: Weekly email report
-    us:
-      text: "One email every 7 days: what changed since last week"
-    them:
-      text: PDF reports you schedule in My Reports, daily, weekly or monthly; 3 Base reports per plan
-      source: https://www.semrush.com/kb/1178-report-automation
-  - feature: Works inside Claude, ChatGPT or Cursor (MCP)
-    us:
-      text: Free MCP server, no account, five tools
-      source: https://oper-stack.com/mcp/
-    them:
-      text: >-
-        Official remote MCP server using API units; AI Visibility prompt data is not listed among its data
-        sources
-      source: https://developer.semrush.com/api/v4/introduction/semrush-mcp/
-  - feature: Keyword and backlink data
-    us:
-      text: "None: no keyword database, no search volumes, no backlink index"
-    them:
-      text: 28.9B keywords in 142 geo databases, 43T backlinks (stats page, 25 September 2026)
-      source: https://www.semrush.com/stats/
-  - feature: Built for whom
-    us:
-      text: Small and mid-size businesses and agencies
-    them:
-      text: "SEO plan: freelancers and small businesses; Starter: small teams and agencies; up to Enterprise"
-      source: https://www.semrush.com/pricing/seo-ai-search/
-  - feature: Needs a developer or SEO skills
-    us:
-      text: "No: most fixes are text to paste; the few that need a developer are marked"
-    them:
-      text: No general statement found; a free training session is offered after trial signup
-      source: https://www.semrush.com/kb/1011-subscriptions
-  - feature: Interface language
-    us:
-      text: English
-    them:
-      text: Site switcher lists 14 languages, Russian not among them; in-app language list not stated
-      source: https://www.semrush.com/pricing/seo-ai-search/
-  - feature: How cancelling works
-    us:
-      text: Cancel any time; nothing to pay within the first 7 days, no further charges after
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Cancellation Form while logged in, then a confirmation link to click within 24 hours or billing
-        continues; ends at the end of the committed term
-      source: https://www.semrush.com/kb/252-cancelling-your-account
-  - feature: Refund
-    us:
-      text: >-
-        Periods already paid are not refunded; the $149 audit is refunded in full before data collection
-        starts
-      source: https://oper-stack.com/refunds/
-    them:
-      text: >-
-        7-day money-back only on a first annual plan or first add-on paid by card; monthly plans and renewals
-        not refundable
-      source: https://www.semrush.com/company/legal/refund-policy/
-  - feature: Live ChatGPT answer in the free tool
-    us:
-      text: "Yes: asked while you wait, with web search on"
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: Reads a stored database of '26M+ prompts and responses', not questions you write
-      source: https://www.semrush.com/free-tools/ai-search-visibility-checker/
-  - feature: Rank tracking
-    us:
-      text: None
-    them:
-      text: 500 to 5,000 keywords tracked daily, by plan
-      source: https://www.semrush.com/pricing/seo-ai-search/
-  - feature: Who runs it
-    us:
-      text: Maksim Shchegolev; support at info@oper-stack.com
-    them:
-      text: An Adobe company since 2026
-      source: https://www.semrush.com/company/
-rivalScore:
-  score: 70
-  pages: 1
-  date: "2026-09-26T00:00:00.000Z"
-  note: >-
-    Our check could read only the homepage: the semrush.com sitemap lists thousands of addresses and the check
-    stops at its time limit, so treat this as a homepage score. It took full marks for crawler access and
-    llms.txt and lost most points on dates and sources (1 of 15).
-sources:
-  - label: Semrush pricing, SEO + AI Search plans
-    url: https://www.semrush.com/pricing/seo-ai-search/
-  - label: "Semrush KB: AI Visibility Toolkit"
-    url: https://www.semrush.com/kb/1493-ai-visibility-toolkit
-  - label: "Semrush KB: subscriptions and trials"
-    url: https://www.semrush.com/kb/1011-subscriptions
-  - label: "Semrush KB: billing FAQ"
-    url: https://www.semrush.com/kb/1013-billing-faq
-  - label: "Semrush KB: AI visibility features"
-    url: https://www.semrush.com/kb/1626-ai-visibility-features
-  - label: "Semrush KB: Semrush One"
-    url: https://www.semrush.com/kb/1608-semrush-one
-  - label: "Semrush KB: Prompt Tracking"
-    url: https://www.semrush.com/kb/1503-prompt-tracking
-  - label: "Semrush KB: Site Audit"
-    url: https://www.semrush.com/kb/31-site-audit
-  - label: "Semrush KB: Content Toolkit pricing"
-    url: https://www.semrush.com/kb/1536-content-toolkit-pricing-and-plans
-  - label: "Semrush KB: report automation"
-    url: https://www.semrush.com/kb/1178-report-automation
-  - label: "Semrush KB: My Reports"
-    url: https://www.semrush.com/kb/34-my-reports
-  - label: Semrush free AI Visibility Checker
-    url: https://www.semrush.com/free-tools/ai-search-visibility-checker/
-  - label: Semrush MCP server, developer docs
-    url: https://developer.semrush.com/api/v4/introduction/semrush-mcp/
-  - label: Semrush MCP marketing page
-    url: https://www.semrush.com/mcp/
-  - label: Semrush stats page
-    url: https://www.semrush.com/stats/
-  - label: Semrush company page
-    url: https://www.semrush.com/company/
-  - label: "Semrush KB: cancelling your account"
-    url: https://www.semrush.com/kb/252-cancelling-your-account
-  - label: Semrush refund policy
-    url: https://www.semrush.com/company/legal/refund-policy/
-  - label: OperStack pricing
-    url: https://oper-stack.com/pricing/
-  - label: OperStack free check
-    url: https://oper-stack.com/ai-visibility/
-  - label: OperStack MCP server
-    url: https://oper-stack.com/mcp/
-  - label: OperStack refunds
-    url: https://oper-stack.com/refunds/
-related:
-  - operstack-vs-ahrefs
-  - operstack-vs-otterly-ai
-  - operstack-vs-google-search-console
-  - operstack-vs-profound
-faq:
-  - question: Does Semrush show who ChatGPT recommends instead of my business?
-    answer: >-
-      Partly. Semrush's Competitor Research compares you with up to four competitors and lists prompts where
-      they are cited and you are not, and its AI Visibility Score is benchmarked against competitors Semrush
-      picks. OperStack lists every business ChatGPT named in your place, by name, and the free check sorts
-      them into competitors, not-competitors such as portals, and names it could not identify. Watch repeats
-      that for ten buyer questions every week.
-  - question: What is the cheapest Semrush plan that tracks AI prompts?
-    answer: >-
-      On 26 September 2026 it was the AI Visibility Toolkit bought on its own: $99 a month for 25 prompts, one
-      domain and AI checks on up to 100 pages, with no free trial. Among the bundled plans, Starter (SEO + AI
-      Search) at $199 a month includes 50 prompts tracked daily. OperStack Watch costs $35 a month or $299 a
-      year, and the first seven days are free.
-  - question: Is the Semrush AI Visibility Checker free?
-    answer: >-
-      Yes, three checks a day without an account. It shows a score from 0 to 100, mentions, citations and a
-      split by platform, drawn from Semrush's stored database of prompts and responses rather than questions
-      you write. The OperStack free check also needs no signup, but it asks ChatGPT three buyer questions
-      live, reads up to ten of your pages and writes an opening paragraph for any page that lacks one.
-  - question: Can I get a refund on a monthly Semrush plan?
-    answer: >-
-      Not according to Semrush's refund policy: monthly subscriptions and renewals are not refundable. The
-      one-time 7-day money-back offer covers only a first annual subscription or a first add-on bought by card
-      on semrush.com, asked for in writing. With OperStack Watch you pay nothing if you cancel within the
-      first seven days; after that you are not charged again, and periods already paid are not refunded.
-  - question: Does OperStack have keyword or backlink data?
-    answer: >-
-      No. OperStack has no keyword database, no search volumes, no backlink index and no rank tracking. It
-      measures whether AI systems can read and quote your pages, asks ChatGPT the questions your buyers ask,
-      records who it names instead of you, and writes the text to change. Teams that need keyword and link
-      data keep a suite for that work and use OperStack for the ChatGPT question.
-  - question: Do Semrush and OperStack work inside Claude or Cursor?
-    answer: >-
-      Both publish MCP servers. Semrush's official remote server runs on API units and exposes SEO, Trends and
-      read-only Projects data; AI Visibility prompt data is not among its listed sources. OperStack's server
-      is free with no account and has five tools, including scoring a site out of 100 and comparing two to
-      four sites on one scale. Setup steps for Claude, ChatGPT, Cursor and other clients are at
-      oper-stack.com/mcp/.
-  - question: Is Semrush worth it just for AI visibility?
-    answer: >-
-      Semrush offers a standalone AI Visibility Toolkit at $99 monthly, so buying its SEO suite is not
-      required. OperStack Watch costs $35 and combines 10 weekly ChatGPT questions, 3 rival comparisons,
-      repeated page checks and suggested wording in recurring reports. Watch fits the owner who wants that
-      continuing editing routine; compare prompt volume and engine coverage against your actual needs.
-updatedDate: "2026-09-26"
----
+
+>-
 
 ## What are OperStack and Semrush for?
 
@@ -438,3 +163,34 @@ The middle row is calculated by subtracting 172 and 4 from 496. Rounding means t
 Use the score to select a review task. A missing date, an unclear business identity and a blocked crawler are different findings, requiring different evidence and different people. Improving a total by adding unnecessary text can make the page less useful even if a mechanical threshold is met.
 
 For a team paying for Semrush, preserve its research metrics in their own report. Watch can add the current page findings and a proposed edit without pretending those numbers share a scale. Our [owned-site examples](/cases/) provide context for the method; your before-and-after record should show what actually changed on your site.
+
+
+## FAQ
+
+### Does Semrush show who ChatGPT recommends instead of my business?
+
+>-
+
+### What is the cheapest Semrush plan that tracks AI prompts?
+
+>-
+
+### Is the Semrush AI Visibility Checker free?
+
+>-
+
+### Can I get a refund on a monthly Semrush plan?
+
+>-
+
+### Does OperStack have keyword or backlink data?
+
+>-
+
+### Do Semrush and OperStack work inside Claude or Cursor?
+
+>-
+
+### Is Semrush worth it just for AI visibility?
+
+>-

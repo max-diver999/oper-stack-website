@@ -1,308 +1,15 @@
+# OperStack vs HubSpot AI Search Grader: What Each Checks
+
+> >-
+
+**Source:** https://oper-stack.com/compare/operstack-vs-hubspot-ai-search-grader/  
+**Section:** Comparisons  
+**Published:** 2026-09-26  
+**Updated:** 2026-09-26
+
 ---
-title: "OperStack vs HubSpot AI Search Grader: What Each Checks"
-description: >-
-  HubSpot's free AI Search Grader rates how AI describes your brand. OperStack reads 10 of your pages, names
-  who ChatGPT picks instead and writes the fix.
-h1: "OperStack vs HubSpot AI Search Grader: turn the check into a page edit"
-answer: >-
-  OperStack Watch combines 10 weekly ChatGPT questions, named competitors, 3 rival comparisons, repeated page
-  checks and reports with changes and proposed fixes for $35 monthly. The free OperStack check lets you try
-  the approach without signup. HubSpot AI Search Grader supplies a free brand snapshot; its separate paid AEO
-  product has a different scope. Watch gives the owner a continuing routine after that first assessment.
-competitor:
-  name: HubSpot AI Search Grader
-  site: https://www.hubspot.com/ai-search-grader
-kind: free-tool
-pubDate: "2026-09-26"
-checkedAt: "2026-09-26T00:00:00.000Z"
-chooseUs:
-  - >-
-    You want up to 10 of your pages read and a ready-to-paste paragraph written only from what those pages
-    already say
-  - >-
-    You want the names ChatGPT recommends instead of you, by name, without a form: the free check asks only
-    for your site address
-  - >-
-    You want one email a week with what changed, for $35 a month or $299 a year, with no developer and
-    cancelling at any time
-  - >-
-    You want to run the check from Claude, ChatGPT or Cursor through a free MCP server, where HubSpot's AI
-    data over MCP needs Marketing Hub Professional from $800 a month
-chooseThem:
-  - You need a CRM and marketing automation suite, and a brand report is one small part of what you are buying
-  - Your brand team wants a sentiment score and market-position labels for a board deck
-table:
-  - feature: Price per month
-    us:
-      text: Watch $35 a month; free check $0
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Grader $0. Cheapest plan with tracking: HubSpot AEO (Beta), $50 a month for 25 daily prompts"
-      source: https://www.hubspot.com/pricing/marketing
-  - feature: Price per year
-    us:
-      text: Watch $299 a year, about $25 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: HubSpot AEO $45 a month billed annually, which is $540 a year by our arithmetic
-      source: https://www.hubspot.com/pricing/marketing
-  - feature: Free trial and whether a card is needed
-    us:
-      text: "Watch: first 7 days free, card required at checkout"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Grader is free, so no trial. HubSpot AEO: 28-day trial with 25 prompts, no credit card"
-      source: https://knowledge.hubspot.com/seo/set-up-and-analyze-ai-visibility
-  - feature: Free checks without paying
-    us:
-      text: >-
-        Free check with no signup: up to 10 pages scored and 3 ChatGPT questions; 3 ChatGPT runs per
-        connection per day
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Grader is free; the full report unlocks only after a form asking for name, email, phone, website and
-        number of employees
-      source: https://www.hubspot.com/ai-search-grader
-  - feature: Names who ChatGPT recommends instead of you
-    us:
-      text: >-
-        Yes, by name, sorted into competitors, not-competitors and names it could not identify; Watch does it
-        for 10 questions a week
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Grader: whether names are listed is not stated; a Share of Voice score ranks you against competitors.
-        AEO: visibility per prompt for competitors you confirm
-      source: https://www.hubspot.com/ai-search-grader
-  - feature: AI systems checked
-    us:
-      text: ChatGPT with web search on; robots.txt rules read for 14 AI crawlers and fetchers
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Grader: one OpenAI model (GPT-5.4 mini, GPT-5.2 or GPT-4o, depending on the HubSpot page), Perplexity,
-        Gemini. AEO: ChatGPT, Gemini, Perplexity
-      source: https://www.hubspot.com/ai-search-grader
-  - feature: Questions or prompts tracked
-    us:
-      text: 3 in the free check; the same 10 every week in Watch
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Grader: pre-set queries, number and wording not stated. AEO: 25 prompts daily (50 on Enterprise),
-        extra packs of 10 for $20 a month
-      source: https://www.hubspot.com/products/aeo
-  - feature: Pages of your site read per check
-    us:
-      text: Up to 10, sampled from the sitemap; 100 in the one-off $149 audit
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: "None described: the grader sends brand name, location, industry and products to the models"
-      source: https://www.hubspot.com/aeo-grader-aeog-vs-otterly
-  - feature: Writes the text to paste on your page
-    us:
-      text: >-
-        Yes: an opening paragraph built from your own pages (free), a priority page fix with page address and text
-        (Watch)
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Grader: not stated beyond a sample of recommendations. AEO: prioritized recommendations with content
-        type, channel and priority
-      source: https://www.hubspot.com/products/aeo
-  - feature: Weekly email report
-    us:
-      text: "Yes: one email every 7 days from the day you subscribe, with what changed"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Grader: no, it is a one-time snapshot. AEO: an email report is not stated; trends appear on the
-        dashboard
-      source: https://www.hubspot.com/ai-search-grader
-  - feature: Works inside Claude, ChatGPT or Cursor (MCP)
-    us:
-      text: >-
-        Free remote MCP server, no account, five tools; setup guides for Claude, ChatGPT, Cursor, VS Code,
-        Windsurf and Zed
-      source: https://oper-stack.com/mcp/
-    them:
-      text: "Grader: no. HubSpot's MCP server reaches AEO data only on Marketing Hub Professional or Enterprise"
-      source: >-
-        https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server
-  - feature: Keyword and backlink data
-    us:
-      text: "None: no keyword database, search volumes, backlink index or rank tracking"
-    them:
-      text: Not stated on the grader or AEO pages; AEO does show which domains and pages AI answers cite
-      source: https://www.hubspot.com/products/aeo
-  - feature: Built for whom
-    us:
-      text: Small and mid-size businesses and agencies
-      source: https://oper-stack.com/
-    them:
-      text: >-
-        Marketing leaders, brand managers, SEO professionals and content strategists; AEO is 'built so any
-        marketer can get started'
-      source: https://www.hubspot.com/ai-search-grader
-  - feature: Needs a developer or SEO skills
-    us:
-      text: "No: most fixes are text to paste, and the few that need a developer are marked"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "No: 'No sign-up, credit card, or technical setup required'; AEO does not need HubSpot's CMS"
-      source: https://www.hubspot.com/aeo-grader-aeog-vs-otterly
-  - feature: Interface language
-    us:
-      text: English
-    them:
-      text: Grader pages in English, French, German, Spanish, Japanese and Brazilian Portuguese
-      source: https://www.hubspot.fr/ai-search-grader
-  - feature: How cancelling works
-    us:
-      text: Cancel at any time; cancel inside the first 7 days and you pay nothing
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Grader: nothing to cancel. Paid plans: only at the end of the commitment term, by turning off
-        auto-renewal; not mid-term
-      source: https://knowledge.hubspot.com/account/how-do-i-cancel-my-hubspot-account
-  - feature: Refund
-    us:
-      text: Paid periods are not refunded; the $149 audit is refunded in full before data collection starts
-      source: https://oper-stack.com/refunds/
-    them:
-      text: "'All amounts paid are non-refundable', except where the agreement says otherwise"
-      source: https://legal.hubspot.com/terms-of-service
-  - feature: Personal details asked before the full result
-    us:
-      text: Only the site address; the result appears on screen with a permanent link
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: First name, last name, email, phone number, website URL, number of employees, all required
-      source: https://forms.hsforms.com/embed/v3/form/53/45afae4b-f2a7-4d63-b4bf-d8a4418bbcc1/json
-  - feature: Cheapest plan with AI data over MCP
-    us:
-      text: Free, no account
-      source: https://oper-stack.com/mcp/
-    them:
-      text: Marketing Hub Professional, from $800 a month with 3 core seats plus a one-time $3,000 onboarding
-      source: https://www.hubspot.com/pricing/marketing
-  - feature: Brand sentiment score
-    us:
-      text: Not scored
-    them:
-      text: Sentiment worth up to 40 of 100 points, plus Leader, Challenger or Niche Player labels
-      source: https://www.hubspot.com/ai-search-grader
-rivalScore:
-  score: 72
-  pages: 1
-  date: "2026-09-26T00:00:00.000Z"
-  note: >-
-    Our check could read only the homepage: hubspot.com's sitemap lists thousands of addresses and the check
-    stops at its time limit, so treat this as a homepage score, not a score for the grader page. Crawler
-    access and llms.txt got full marks; the homepage had no answer-first paragraph, no publication date and no
-    FAQPage schema.
-sources:
-  - label: HubSpot AI Search Grader, English page
-    url: https://www.hubspot.com/ai-search-grader
-  - label: HubSpot AI Search Grader, French page
-    url: https://www.hubspot.fr/ai-search-grader
-  - label: HubSpot AI Search Grader, German page
-    url: https://www.hubspot.de/ai-search-grader
-  - label: HubSpot AI Search Grader, Spanish page
-    url: https://www.hubspot.es/ai-search-grader
-  - label: HubSpot AI Search Grader, Japanese page
-    url: https://www.hubspot.jp/ai-search-grader
-  - label: HubSpot AI Search Grader, Brazilian Portuguese page
-    url: https://br.hubspot.com/ai-search-grader
-  - label: HubSpot grader full-report form definition (form fields)
-    url: https://forms.hsforms.com/embed/v3/form/53/45afae4b-f2a7-4d63-b4bf-d8a4418bbcc1/json
-  - label: "HubSpot: AEO Grader vs Otterly"
-    url: https://www.hubspot.com/aeo-grader-aeog-vs-otterly
-  - label: HubSpot AEO product page
-    url: https://www.hubspot.com/products/aeo
-  - label: HubSpot Marketing Hub pricing
-    url: https://www.hubspot.com/pricing/marketing
-  - label: HubSpot product and services catalog
-    url: https://legal.hubspot.com/hubspot-product-and-services-catalog
-  - label: "HubSpot help: set up and analyze AI visibility"
-    url: https://knowledge.hubspot.com/seo/set-up-and-analyze-ai-visibility
-  - label: "HubSpot help: review and manage AEO prompts"
-    url: https://knowledge.hubspot.com/seo/review-and-manage-aeo-prompts
-  - label: "HubSpot developer docs: remote HubSpot MCP server"
-    url: >-
-      https://developers.hubspot.com/docs/apps/developer-platform/build-apps/integrate-with-the-remote-hubspot-mcp-server
-  - label: "HubSpot help: how to cancel a HubSpot account"
-    url: https://knowledge.hubspot.com/account/how-do-i-cancel-my-hubspot-account
-  - label: HubSpot terms of service
-    url: https://legal.hubspot.com/terms-of-service
-  - label: HubSpot launch announcement, 26 February 2025
-    url: >-
-      https://www.hubspot.com/company-news/from-seo-to-lmo-hubspot-launches-the-first-free-tool-for-ai-discovery
-  - label: "SparkToro and Gumshoe: AIs are highly inconsistent when recommending brands (28 January 2026)"
-    url: >-
-      https://sparktoro.com/blog/new-research-ais-are-highly-inconsistent-when-recommending-brands-or-products-marketers-should-take-care-when-tracking-ai-visibility/
-  - label: "OpenAI help: searching the web with ChatGPT"
-    url: https://help.openai.com/en/articles/9237897-chatgpt-search
-  - label: OperStack pricing
-    url: https://oper-stack.com/pricing/
-  - label: OperStack free AI visibility check
-    url: https://oper-stack.com/ai-visibility/
-  - label: OperStack MCP server
-    url: https://oper-stack.com/mcp/
-  - label: OperStack refund policy
-    url: https://oper-stack.com/refunds/
-related:
-  - operstack-vs-otterly-ai
-  - operstack-vs-asking-chatgpt
-  - operstack-vs-semrush
-  - operstack-vs-peec-ai
-faq:
-  - question: Is the HubSpot AI Search Grader really free?
-    answer: >-
-      Yes, HubSpot charges nothing for the grader. The condition is the full report: it unlocks only after a
-      form where first name, last name, email, phone number, website URL and number of employees are all
-      required, and the privacy text says HubSpot will use them to contact you about its products. The
-      OperStack free check asks only for your site address and shows the result on screen.
-  - question: Which AI models does the HubSpot AI Search Grader check?
-    answer: >-
-      One OpenAI model plus Perplexity and Gemini. HubSpot's pages disagree on the OpenAI model: the English
-      grader page says GPT-5.4 mini, the French page and the body of HubSpot's AEO Grader vs Otterly page say
-      GPT-5.2, and the German, Spanish, Japanese and Brazilian pages plus that comparison's FAQ say GPT-4o.
-      HubSpot's AEO page adds that ChatGPT and Gemini answer from training data.
-  - question: Does the HubSpot grader look at my website pages?
-    answer: >-
-      HubSpot describes no crawl. The grader sends your company name, location, industry and products to the
-      models and scores what they say about the brand, so nothing in the report points to a page address.
-      OperStack's free check reads up to 10 pages from your sitemap, scores crawler access, llms.txt, schema,
-      quotable content and dates, and drafts an opening paragraph for any page that lacks one.
-  - question: How much does HubSpot AEO cost compared with OperStack Watch?
-    answer: >-
-      On 26 September 2026 HubSpot listed standalone AEO (Beta) at $50 a month, or $45 a month billed
-      annually, for 25 prompts run daily, with extra packs of 10 prompts at $20 a month. OperStack Watch costs
-      $35 a month or $299 a year for ten ChatGPT questions a week, a ten-page score, three rivals measured
-      beside you, written fixes and a weekly email.
-  - question: Can I cancel HubSpot AEO mid-term and get a refund?
-    answer: >-
-      HubSpot's help center says paid subscriptions can be cancelled or downgraded only at the end of the
-      commitment term, by turning off auto-renewal in Account & Billing, not mid-term. Its terms say amounts
-      paid are non-refundable except in cases the agreement names. OperStack Watch can be cancelled at any
-      time and costs nothing if you cancel in the first 7 days; paid periods are not refunded.
-  - question: Why does OperStack Watch ask ChatGPT and not every AI assistant?
-    answer: >-
-      Watch puts ten buyer questions to ChatGPT each week with web search on, and spends the rest of its
-      effort on your pages: a ten-page score and the text to paste. It does not ask Claude, Perplexity or
-      Gemini for answers every week. For those systems the free check reads your robots.txt rules for 14 AI
-      crawlers and fetchers and shows whether each engine is allowed in.
-  - question: Is there a HubSpot grader alternative that needs no email?
-    answer: >-
-      The OperStack free check asks only for the site address. It shows the result on screen with a permanent
-      link, reads up to 10 pages, scores them out of 100 and asks ChatGPT three buyer questions, listing who
-      was named instead of you. It allows three ChatGPT runs per connection per day, and a repeat of the same
-      site within 24 hours shows the saved answer.
-updatedDate: "2026-09-26"
----
+
+>-
 
 ## What are OperStack and HubSpot AI Search Grader for?
 
@@ -485,3 +192,34 @@ An owner can perform the useful part of the review without treating the total as
 A brand-reputation score answers a different question. The words an assistant associates with a company do not reveal whether a particular service page has a date, a source or an accessible explanation. Conversely, adding those elements does not establish that sentiment or recommendations improved.
 
 Our [case examples](/cases/) illustrate our use of the same checker on sites we operate. For a purchasing decision, inspect your own page evidence and the work you can actually assign after reading the report.
+
+
+## FAQ
+
+### Is the HubSpot AI Search Grader really free?
+
+>-
+
+### Which AI models does the HubSpot AI Search Grader check?
+
+>-
+
+### Does the HubSpot grader look at my website pages?
+
+>-
+
+### How much does HubSpot AEO cost compared with OperStack Watch?
+
+>-
+
+### Can I cancel HubSpot AEO mid-term and get a refund?
+
+>-
+
+### Why does OperStack Watch ask ChatGPT and not every AI assistant?
+
+>-
+
+### Is there a HubSpot grader alternative that needs no email?
+
+>-

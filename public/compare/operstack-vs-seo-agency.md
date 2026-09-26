@@ -1,281 +1,15 @@
+# OperStack vs an SEO Agency: What Each Costs for AI Search
+
+> >-
+
+**Source:** https://oper-stack.com/compare/operstack-vs-seo-agency/  
+**Section:** Comparisons  
+**Published:** 2026-09-26  
+**Updated:** 2026-09-26
+
 ---
-title: "OperStack vs an SEO Agency: What Each Costs for AI Search"
-description: >-
-  The most common SEO retainer is $501 to $1,000 a month (Ahrefs, 439 providers). OperStack Watch is $35: who
-  ChatGPT names instead of you, and what to paste.
-h1: "OperStack vs an SEO agency: $35 weekly checks, with you making the edits"
-answer: >-
-  OperStack Watch gives an owner 10 weekly ChatGPT questions, 3 rival comparisons, repeated page checks and
-  reports showing changes with proposed fixes for $35 monthly. An agency can take responsibility for
-  implementing work and broader promotion; the services differ. Watch supplies a recurring record and concrete
-  editing tasks the owner or an existing contractor can review, with a free check to start.
-competitor:
-  name: an SEO agency
-kind: agency
-pubDate: "2026-09-26"
-checkedAt: "2026-09-26T00:00:00.000Z"
-chooseUs:
-  - >-
-    You want to know every week whether ChatGPT names you and who it names instead, for $35 a month or $299 a
-    year, with no contract to sit out.
-  - >-
-    You will paste the fixes yourself: each arrives with the page address and text built only from your own
-    pages, and Google says a small local business can do much of this work alone.
-  - >-
-    You want a first look before spending anything: the free check needs no signup, no Search Console access
-    and no call, and shows ChatGPT's answers to three buyer questions.
-  - You want an outside number to hold an agency to, before you hire one or while you pay one.
-chooseThem:
-  - You need someone to write pages, fix redirects and JavaScript, or run a redesign or migration.
-  - You need keyword research, link building and rank tracking carried out for you.
-table:
-  - feature: Price per month
-    us:
-      text: $35 a month for Watch, month to month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Most common retainer $501 to $1,000 a month (20.4% of 439 providers); agency average $3,209
-      source: https://ahrefs.com/blog/seo-pricing/
-  - feature: Price per year
-    us:
-      text: $299 a year, about $25 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        No annual list price. Twelve months at the most common band: $6,012 to $12,000 (our arithmetic).
-        Clutch average engagement $37,158.66, usually 12 months
-      source: https://clutch.co/seo-firms/pricing
-  - feature: Free trial and whether a card is needed
-    us:
-      text: First 7 days free; card taken at checkout
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Not stated in the Ahrefs, Backlinko or Clutch pricing studies
-      source: https://ahrefs.com/blog/seo-pricing/
-  - feature: Free checks without paying
-    us:
-      text: "Free check with no signup: up to 10 pages scored, 3 ChatGPT buyer questions"
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: Not stated in the surveys; Backlinko lists site audits among standard projects at $1,000 to $5,000
-      source: https://backlinko.com/seo-pricing
-  - feature: Names who ChatGPT recommends instead of you
-    us:
-      text: Yes, by name with a count, every week, plus 3 rivals scored beside you
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Depends on the agency; Google now lists 'optimizing for generative AI' among SEO services
-      source: https://developers.google.com/search/docs/fundamentals/do-i-need-seo
-  - feature: AI systems checked
-    us:
-      text: ChatGPT with web search on
-      source: https://oper-stack.com/pricing/
-    them:
-      text: No standard; not stated in any named survey. Clutch lists 392 US firms in its GEO category
-      source: https://clutch.co/us/seo-firms/generative-engine-optimization
-  - feature: Questions or prompts tracked
-    us:
-      text: 10 buyer questions every week
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Not stated in any named survey
-      source: https://clutch.co/us/seo-firms/generative-engine-optimization
-  - feature: Pages of your site read per check
-    us:
-      text: 10 pages, scored again each week; 100 in the $149 audit
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Set by each agency's audit scope; not stated in the surveys
-      source: https://backlinko.com/seo-pricing
-  - feature: Writes the text to paste on your page
-    us:
-      text: "Yes: page address plus text built only from your own pages; you publish it"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Writes and publishes content itself; content creation appears from the $1,001 to $2,500 tier
-      source: https://backlinko.com/seo-pricing
-  - feature: Weekly email report
-    us:
-      text: One letter every 7 days with what changed
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Monthly retainers often include regular progress reports; frequency not stated
-      source: https://clutch.co/seo-firms/pricing
-  - feature: Works inside Claude, ChatGPT or Cursor (MCP)
-    us:
-      text: Free remote MCP server, no account, five tools
-      source: https://oper-stack.com/mcp/
-    them:
-      text: Not stated as an agency service in any source we read
-      source: https://developers.google.com/search/docs/fundamentals/do-i-need-seo
-  - feature: Keyword and backlink data
-    us:
-      text: "None: no keyword database, search volumes, backlink index or rank tracking"
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Keyword research is a standard SEO service; link building appears from Backlinko's $1,001 to $2,500
-        tier
-      source: https://backlinko.com/seo-pricing
-  - feature: Built for whom
-    us:
-      text: Small and mid-size businesses and agencies
-      source: https://oper-stack.com/
-    them:
-      text: Any size; providers serving a local market average $1,557.08 a month
-      source: https://ahrefs.com/blog/seo-pricing/
-  - feature: Needs a developer or SEO skills
-    us:
-      text: "No: most fixes are text to paste, and the few that need a developer are marked"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Nothing from you, since the agency does the work; Google adds that a small local business can probably
-        do much of it alone
-      source: https://developers.google.com/search/docs/fundamentals/do-i-need-seo
-  - feature: Interface language
-    us:
-      text: English (interface and letters)
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Whatever language the agency works in; Google suggests asking about its experience in your country or
-        city
-      source: https://developers.google.com/search/docs/fundamentals/do-i-need-seo
-  - feature: How cancelling works
-    us:
-      text: Cancel any time; nothing charged in the first 7 days
-      source: https://oper-stack.com/refunds/
-    them:
-      text: Contract length not stated in any named survey; Clutch says the usual engagement is 12 months
-      source: https://clutch.co/seo-firms/pricing
-  - feature: Refund
-    us:
-      text: Paid periods are not refunded; the $149 audit is refunded in full before data collection starts
-      source: https://oper-stack.com/refunds/
-    them:
-      text: Not stated in any named survey
-      source: https://ahrefs.com/blog/seo-pricing/
-  - feature: Does the work on your site
-    us:
-      text: No, unless you buy a service, quoted after the list of work is agreed in writing
-      source: https://oper-stack.com/services/
-    them:
-      text: "Yes: content, site structure, technical fixes such as redirects and error pages"
-      source: https://developers.google.com/search/docs/fundamentals/do-i-need-seo
-  - feature: Hourly rate
-    us:
-      text: "Not applicable: Watch is a flat $35 a month"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Ahrefs survey section: $75 to $100 most popular (24%); its summary box says $100 to $150 (25%)"
-      source: https://ahrefs.com/blog/seo-pricing/
-  - feature: One-off project
-    us:
-      text: "Full audit $149: 100 pages, five rivals, reviewed by a person"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Most popular one-off fee $2,501 to $5,000 (21.2%); agency average $9,507.84
-      source: https://ahrefs.com/blog/seo-pricing/
-  - feature: Price of AI-search (GEO) work
-    us:
-      text: Included in $35 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        WebFX, itself an agency: $1,500 to $5,000 a month for small-business GEO, gathered from the web, not a
-        survey
-      source: https://www.webfx.com/blog/ai/generative-engine-optimization-cost/
-  - feature: Time to results
-    us:
-      text: Measured again every week, so you see when an answer changes
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Google: some changes take effect in hours, others take several months"
-      source: https://developers.google.com/search/docs/fundamentals/seo-starter-guide
-sources:
-  - label: "Ahrefs: SEO pricing survey of 439 providers (updated 15 Aug 2024)"
-    url: https://ahrefs.com/blog/seo-pricing/
-  - label: "Backlinko: SEO pricing, 300+ professionals (updated 29 Dec 2025)"
-    url: https://backlinko.com/seo-pricing
-  - label: "Clutch: SEO pricing guide (updated 21 Sep 2026)"
-    url: https://clutch.co/seo-firms/pricing
-  - label: "Clutch: Generative Engine Optimization companies, US"
-    url: https://clutch.co/us/seo-firms/generative-engine-optimization
-  - label: "Google Search Central: Do you need an SEO? (updated 5 Jun 2026)"
-    url: https://developers.google.com/search/docs/fundamentals/do-i-need-seo
-  - label: "Google Search Central: SEO Starter Guide (updated 10 Dec 2025)"
-    url: https://developers.google.com/search/docs/fundamentals/seo-starter-guide
-  - label: "Ahrefs: How long does it take to rank in Google (15 May 2025)"
-    url: https://ahrefs.com/blog/how-long-does-it-take-to-rank/
-  - label: "WebFX: Generative engine optimization cost (26 May 2026)"
-    url: https://www.webfx.com/blog/ai/generative-engine-optimization-cost/
-  - label: "Conductor: State of AEO/GEO report (14 Apr 2026)"
-    url: https://www.conductor.com/academy/state-of-aeo-geo-report/
-  - label: "Search Engine Journal: State of SEO 2026 (10 Sep 2025)"
-    url: https://www.searchenginejournal.com/the-state-of-seo-2026-how-to-survive/555368/
-  - label: "SEO Sherpa: SEO contract length (agency blog, 20 May 2026)"
-    url: https://seosherpa.com/seo-contract-length/
-  - label: OperStack pricing
-    url: https://oper-stack.com/pricing/
-  - label: OperStack free check
-    url: https://oper-stack.com/ai-visibility/
-  - label: OperStack MCP server
-    url: https://oper-stack.com/mcp/
-  - label: OperStack services
-    url: https://oper-stack.com/services/
-  - label: OperStack refunds
-    url: https://oper-stack.com/refunds/
-related:
-  - operstack-vs-google-search-console
-  - operstack-vs-ahrefs
-  - operstack-vs-semrush
-  - operstack-vs-asking-chatgpt
-faq:
-  - question: How much does an SEO agency cost per month?
-    answer: >-
-      In Ahrefs' survey of 439 SEO providers, the most common retainer was $501 to $1,000 a month, chosen by
-      20.4%, and 68.8% charged $2,000 or less. Agencies averaged $3,209 a month and freelancers $1,348.
-      Clutch, drawing on 65,550 companies, put the average monthly SEO project at $3,199.19 in September 2026.
-      Backlinko's survey of 300+ professionals found $1,001 to $2,500 the most common tier.
-  - question: Do I need an SEO agency for AI search?
-    answer: >-
-      Not to find out where you stand. Google's own page on hiring an SEO says a small local business can
-      probably do much of the work itself, starting with the SEO Starter Guide. Google now lists optimizing
-      for generative AI among SEO services and tells owners to check that any AEO or GEO advice matches its
-      guidance. OperStack Watch measures ChatGPT answers weekly for $35 a month.
-  - question: What are the red flags when hiring an SEO agency?
-    answer: >-
-      Google lists them: SEO firms that email you out of the blue, promises of first place, claims of a
-      special relationship with Google or a priority submit, secrecy about their plans, deceptive content made
-      in your name, requests that you link to them, link schemes, tools said to be approved by Google, and
-      asking for write access to Search Console during an audit.
-  - question: How much do SEO agencies charge per hour?
-    answer: >-
-      It depends on whose figures you read. The Ahrefs survey section names $75 to $100 an hour as the most
-      popular rate (24%), while the summary box on the same page says $100 to $150 (25%). Ninety percent of
-      Ahrefs respondents charge $150 or less. Clutch says most agencies it lists charge $100 to $149;
-      Backlinko averages $75 in the US, UK and Australia.
-  - question: How long does SEO take to show results?
-    answer: >-
-      Google's SEO Starter Guide says some changes take effect within hours and others take several months,
-      and suggests waiting a few weeks before judging a change. An Ahrefs study of a million new pages found
-      only 1.74% reached Google's top ten within a year. No named source we found gives a timeframe for being
-      named by ChatGPT, which is why a weekly measurement helps.
-  - question: Can OperStack replace an SEO agency?
-    answer: >-
-      For AI visibility it replaces the measuring and the diagnosis: each week it asks ChatGPT ten buyer
-      questions, names who is recommended instead of you and writes the text for the right page, for $35 a
-      month. It does not replace the hands. It will not edit your site, research keywords, build links or
-      track rankings. You paste the fixes yourself or forward the letter to whoever edits the site.
-  - question: How long are SEO agency contracts?
-    answer: >-
-      No named survey states a typical contract length or notice period. Clutch says the usual SEO engagement
-      in its verified client reviews lasts 12 months, and Ahrefs found 78.2% of providers bill by monthly
-      retainer. Agency blogs often mention six to twelve months, but that is not survey data, and
-      month-to-month retainers exist. OperStack Watch has no term and cancels at any time.
-updatedDate: "2026-09-26"
----
+
+>-
 
 ## What do OperStack and an SEO agency do?
 
@@ -454,3 +188,34 @@ Bring a concrete page to an agency review rather than accusing a supplier from a
 A dental page illustrates why judgement is necessary. Adding a treatment deadline to satisfy a numerical rule would be inappropriate without evidence. A truthful opening might use an already published appointment price or a defined service area, but the practice must confirm that it remains accurate and suitable to publish.
 
 Watch supplies observations and proposed wording that can help prepare that conversation. Keep the agency's implementation record beside the report, with the approved text and publication date. The next observation can show that an answer changed; attributing the change to one edit requires more evidence than this site study provides.
+
+
+## FAQ
+
+### How much does an SEO agency cost per month?
+
+>-
+
+### Do I need an SEO agency for AI search?
+
+>-
+
+### What are the red flags when hiring an SEO agency?
+
+>-
+
+### How much do SEO agencies charge per hour?
+
+>-
+
+### How long does SEO take to show results?
+
+>-
+
+### Can OperStack replace an SEO agency?
+
+>-
+
+### How long are SEO agency contracts?
+
+>-

@@ -1,7 +1,7 @@
 ---
 /**
  * Страница сравнения «OperStack vs X» (задание 26.09.2026, п. 7). Всё проверяемое лежит в
- * frontmatter: таблица возможностей с источником у каждой ячейки конкурента, живой тест с датой,
+ * frontmatter: таблица возможностей с источником у каждой ячейки конкурента, измерение сайта с датой,
  * источники с датой проверки, вопросы (из них же разметка FAQPage). В тексте статьи только разбор.
  */
 import { getCollection, render } from 'astro:content';
@@ -26,6 +26,12 @@ const canonical = `${SITE.url}/compare/${entry.id}/`;
 const withBrand = `${d.title} · ${SITE.name}`;
 const pageTitle = withBrand.length <= 60 ? withBrand : d.title;
 const updated = d.updatedDate || d.pubDate;
+const choiceLabel = d.kind === 'agency' ? 'Consider an agency when' : d.kind === 'diy' ? 'Use manual checks when' : `Consider ${d.competitor.name} when`;
+const sourceNote = d.kind === 'agency'
+  ? 'Agency figures come from the named provider surveys and guidance linked below. Their collection methods and dates differ; these are not quotations for your project.'
+  : d.kind === 'diy'
+    ? 'ChatGPT capabilities and prices are based on the official pages linked in the table. Our manual-time estimate is an illustration, not a measured result.'
+    : 'Prices and capabilities come from the linked supplier pages. A feature not stated in those sources is not necessarily unavailable.';
 const fmt = (x: Date) => x.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 const jsonLd = [
   {
@@ -48,10 +54,11 @@ const jsonLd = [
     <p class="meta">Updated <time datetime={updated.toISOString()}>{fmt(updated)}</time> · {d.author} · prices checked {fmt(d.checkedAt)}</p>
     <h1>{d.h1}</h1>
     <p class="answer">{d.answer}</p>
+    <p class="note disclosure">OperStack is our product. We compare documented scope and prices, with sources and limits shown below.</p>
 
     <div class="pick">
       <div class="pick-us"><h2>Choose OperStack if</h2><ul>{d.chooseUs.map((x) => <li>{x}</li>)}</ul></div>
-      <div class="pick-them"><h2>Choose {d.competitor.name} if</h2><ul>{d.chooseThem.map((x) => <li>{x}</li>)}</ul></div>
+      <div class="pick-them"><h2>{choiceLabel}</h2><ul>{d.chooseThem.map((x) => <li>{x}</li>)}</ul></div>
     </div>
 
     <section class="tbl" id="features">
@@ -70,7 +77,7 @@ const jsonLd = [
           </tbody>
         </table>
       </div>
-      <p class="note">{d.competitor.name} prices and features as published on their own pages on {fmt(d.checkedAt)}; each cell links to where we read it. Prices can change after this date.</p>
+      <p class="note">{sourceNote} Sources checked {fmt(d.checkedAt)}. Prices may change.</p>
     </section>
 
     <WatchExample />
@@ -106,12 +113,18 @@ const jsonLd = [
     <section class="srcs">
       <h2>Sources</h2>
       <ol>{d.sources.map((s) => <li><a href={s.url} rel="nofollow noopener">{s.label}</a></li>)}</ol>
-      <p class="note">Checked {fmt(d.checkedAt)}. OperStack is our product; we say so because it matters when you read a comparison.</p>
+      <p class="note">Sources reviewed {fmt(d.checkedAt)}. Supplier claims remain supplier claims; our observations are labelled separately.</p>
     </section>
   </article>
 </CommercialLayout>
 
 <style>
+  :global(body[data-theme="light"]:has(.cmp) .site-foot) { color: #56606B; }
+  .disclosure { margin: -12px 0 24px; }
+  :global(body:has(.cmp) a:not(.btn):not(.lnav-cta):not(.brand)) { color: #11675D; }
+  :global(body:has(.cmp) .lnav nav a:hover), :global(body:has(.cmp) .lnav nav a.active) { color: #11675D !important; }
+  .cmp :global(a:focus-visible), .tw:focus-visible { outline: 3px solid #11675D; outline-offset: 4px; }
+
   .cmp { max-width: 860px; margin: 0 auto; padding: 36px 20px 64px; }
   .crumbs { font-size: 13px; color: #56606B; margin: 0 0 14px; }
   .meta { font-family: var(--fm); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: #56606B; margin: 0 0 12px; }

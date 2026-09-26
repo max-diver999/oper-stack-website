@@ -22,6 +22,11 @@
       "dir": "services",
       "urlPrefix": "/services",
       "label": "Services"
+    },
+    {
+      "dir": "compare",
+      "urlPrefix": "/compare",
+      "label": "Comparisons"
     }
   ],
   "keyPages": [
@@ -48,6 +53,10 @@
     {
       "url": "/contact/",
       "label": "Contact"
+    },
+    {
+      "url": "/compare/",
+      "label": "Compare AI visibility tools, prices and recurring reports"
     }
   ],
   "contentPolicy": {

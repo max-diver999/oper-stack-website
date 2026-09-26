@@ -13,6 +13,7 @@ const parts = (t: string) => t.split('{brand}');
 <section class="wx" id="what-you-get">
   <h2>What you get for $35: one real week of OperStack Watch</h2>
   <p class="wx-lede">This is the actual first report for {ex.site}, run on {fmt(ex.date)} by the same code subscribers get. We hide the brand name because it is our own site, not a client.</p>
+  <p class="wx-lede">Watch keeps this work going every 7 days: the same 10 buyer questions, the businesses named in the answers, 3 rivals measured beside your site and repeated page checks. Later reports compare the new observation with the previous week and include proposed fixes for the pages checked. You review and publish the changes.</p>
   <div class="wx-grid">
     <div class="wx-stat"><b>{ex.named} of {ex.asked}</b><span>buyer questions where ChatGPT named the site</span></div>
     <div class="wx-stat"><b>{ex.score}/100</b><span>AI visibility score across {ex.pages} pages</span></div>
@@ -51,7 +52,7 @@ const parts = (t: string) => t.split('{brand}');
   .wx-yes { background: #E1F2EE; color: #13614F; } .wx-no { background: #F9E1DB; color: #8E2F1F; }
   .wx-act { font-weight: 600; margin: 4px 0 8px; }
   .wx-box { white-space: pre-wrap; background: #FAF8F4; border: 1px solid rgba(11,16,23,.1); border-radius: 12px; padding: 14px 16px; line-height: 1.6; }
-  .wx-mask { display: inline-block; background: #16202B; color: #16202B; border-radius: 4px; padding: 0 6px; user-select: none; }
+  .wx-mask { display: inline-block; background: #16202B; color: #FFFFFF; border-radius: 4px; padding: 0 6px; user-select: none; }
   .wx-note { font-size: 14px; color: #56606B; margin: 8px 0 0; }
   .wx-foot { font-size: 14.5px; color: #3F4854; margin: 14px 0 0; }
   @media (max-width: 680px) { .wx-grid { grid-template-columns: 1fr; } }

@@ -1,300 +1,15 @@
+# OperStack vs Profound: Pricing and a Smaller Alternative
+
+> >-
+
+**Source:** https://oper-stack.com/compare/operstack-vs-profound/  
+**Section:** Comparisons  
+**Published:** 2026-09-26  
+**Updated:** 2026-09-26
+
 ---
-title: "OperStack vs Profound: Pricing and a Smaller Alternative"
-description: >-
-  Profound has shown brands no public price since mid-September 2026. OperStack Watch is $35 a month: ten
-  ChatGPT questions weekly, rivals named, text to paste.
-h1: "OperStack vs Profound: weekly ChatGPT checks for $35, without a sales call"
-answer: >-
-  OperStack Watch gives a small business 10 weekly ChatGPT questions, 3 rival comparisons, repeated page
-  checks and reports with changes and proposed fixes for $35 monthly. On 26 September 2026 Profound showed
-  custom pricing for brands; Agency Growth listed a $99 base plus $399 per full client workspace. Watch offers
-  the owner a recurring observation and editing routine at a published subscription price.
-competitor:
-  name: Profound
-  site: https://www.tryprofound.com/
-kind: ai-visibility
-pubDate: "2026-09-26"
-checkedAt: "2026-09-26T00:00:00.000Z"
-chooseUs:
-  - >-
-    You want a price on the page: $35 a month or $299 a year, first 7 days free, cancel any time. Profound has
-    shown brands no plan price since mid-September 2026.
-  - >-
-    You want the names: who ChatGPT recommends instead of you across ten buyer questions each week, with three
-    rivals scored beside you.
-  - >-
-    You want the fix written for you: a paragraph for the exact page, built only from what your own site says,
-    with no agent credits to buy.
-  - >-
-    You want to try it before talking to anyone: the free check needs no signup, reads ten pages and asks
-    ChatGPT three buyer questions.
-chooseThem:
-  - Your procurement team requires SSO, SOC 2 Type II, an API and a support SLA from every marketing vendor.
-  - >-
-    You run a global brand and want AI bot traffic analytics wired into your CDN logs, sold as an enterprise
-    contract.
-table:
-  - feature: Price per month
-    us:
-      text: $35 a month for Watch, month to month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Brand plans: custom price after demo. Agency Growth: $99 monthly base plus $399 per full client
-        workspace, $498 monthly for one workspace (calculated).
-      source: https://www.tryprofound.com/pricing
-  - feature: Price per year
-    us:
-      text: $299 a year, about $25 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Brand plans: custom. Agency annual billing price not stated on the current pricing page."
-      source: https://www.tryprofound.com/pricing
-  - feature: Free trial and whether a card is needed
-    us:
-      text: First 7 days free; card taken at checkout
-      source: https://oper-stack.com/pricing/
-    them:
-      text: 7-day Trial with an account (email sign-up); card requirement not stated on the pricing page
-      source: https://www.tryprofound.com/pricing
-  - feature: Free checks without paying
-    us:
-      text: >-
-        Free check with no signup: up to 10 pages scored, 3 ChatGPT buyer questions, three runs per connection
-        a day
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Free AEO Report: site URL plus an email address; ChatGPT, Perplexity and Google AI Overviews; usage
-        limits not stated
-      source: https://www.tryprofound.com/aeo-report
-  - feature: Names who ChatGPT recommends instead of you
-    us:
-      text: Yes, every name, counted across ten questions each week, plus three rivals scored beside you
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Yes: competitive benchmarking and share of voice across AI platforms"
-      source: https://www.tryprofound.com/features/answer-engine-insights
-  - feature: AI systems checked
-    us:
-      text: >-
-        ChatGPT with web search on (Watch asks no other assistant weekly); the free check also reads
-        robots.txt access for 14 AI crawlers and fetchers
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Up to 9 on Enterprise; Trial: ChatGPT, Gemini, Google AI Overviews; agency workspaces: ChatGPT,
-        Perplexity, Google AI Overviews
-      source: https://www.tryprofound.com/pricing
-  - feature: Questions or prompts tracked
-    us:
-      text: 10 buyer questions every week
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Trial: 50 unique prompts daily for 7 days; agency client workspace: 100 daily; Enterprise: tailored"
-      source: https://www.tryprofound.com/pricing
-  - feature: Pages of your site read per check
-    us:
-      text: 10 pages, scored again every week; up to 10 in the free check; 100 in the $149 audit
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Not stated as a number; 'Pages' crawls your content and scores AEO readiness per page
-      source: https://help.tryprofound.com/articles/6700593218-about-pages
-  - feature: Writes the text to paste on your page
-    us:
-      text: "Yes: page address plus ready text, built only from your own pages, included in the price"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Drafts through AI Marketer Agents that run on credits (limited on the Trial) and stage rewrites in
-        your CMS for approval
-      source: https://www.tryprofound.com/
-  - feature: Weekly email report
-    us:
-      text: "Yes: one letter every 7 days from the day you subscribe, with what changed"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Not stated as a built-in email report; you can build a reporting Agent (Slack example) or send mail
-        through Outlook
-      source: https://help.tryprofound.com/articles/3615698866-about-integrations-and-connectors
-  - feature: Works inside Claude, ChatGPT or Cursor (MCP)
-    us:
-      text: Free remote MCP server, no account, five tools (Watch commands not yet available)
-      source: https://oper-stack.com/mcp/
-    them:
-      text: >-
-        Hosted MCP with OAuth 2.1 sign-in to a Profound account; API-key access needs Enterprise; which plans
-        include OAuth access not stated
-      source: https://docs.tryprofound.com/mcp/overview
-  - feature: Keyword and backlink data
-    us:
-      text: "None: no keyword database, search volumes, backlink index or rank tracking"
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        Prompt Volumes from real AI conversations (5 searches on the Trial); backlink data and Google keyword
-        volumes not stated
-      source: https://www.tryprofound.com/pricing
-  - feature: Built for whom
-    us:
-      text: Small and mid-size businesses and agencies
-      source: https://oper-stack.com/
-    them:
-      text: Enterprise brands and agencies
-      source: https://www.tryprofound.com/pricing
-  - feature: Needs a developer or SEO skills
-    us:
-      text: "No developer: most fixes are text to paste, and the few that need one are marked"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Prompt tracking setup 'Instant'; Agent Analytics needs a CDN or log integration; Agents built in a
-        node-based builder
-      source: https://www.tryprofound.com/pricing
-  - feature: Interface language
-    us:
-      text: English (interface and letters)
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Sign-in page offers 31 interface languages; in-app coverage not checked
-      source: https://platform.tryprofound.com/welcome
-  - feature: How cancelling works
-    us:
-      text: Cancel any time; nothing charged in the first 7 days; after that no further charge
-      source: https://oper-stack.com/refunds/
-    them:
-      text: >-
-        Orders auto-renew unless notice of non-renewal is given at least 30 days before the next term (MSA
-        10.1); self-serve steps not stated
-      source: https://www.tryprofound.com/legal/master-subscription-agreement
-  - feature: Refund
-    us:
-      text: Paid periods are not refunded; the $149 audit is refunded in full before data collection starts
-      source: https://oper-stack.com/refunds/
-    them:
-      text: "'All Fees are non-refundable', except the infringement case in section 13.4"
-      source: https://www.tryprofound.com/legal/master-subscription-agreement
-  - feature: How often answers are collected
-    us:
-      text: Weekly
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Daily
-      source: https://www.tryprofound.com/pricing
-  - feature: Enterprise controls
-    us:
-      text: Not listed on our pricing page
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        SOC 2 Type II, SSO over SAML or OIDC, role-based access; support up to a dedicated specialist with a
-        24-hour SLA
-      source: https://www.tryprofound.com/features/answer-engine-insights
-  - feature: AI visit counting
-    us:
-      text: Separate free visit counter for AI visits
-      source: https://oper-stack.com/visits/
-    them:
-      text: >-
-        Agent Analytics: bot and AI referral traffic through Cloudflare, AWS, Vercel, Fastly, Netlify, Akamai,
-        GCP or a WordPress plugin
-      source: https://docs.tryprofound.com/agent-analytics/overview
-rivalScore:
-  score: 49
-  pages: 1
-  date: "2026-09-26T00:00:00.000Z"
-  note: >-
-    Our check could read only the homepage: the tryprofound.com sitemap lists thousands of addresses and the
-    check stops at its time limit, so treat this as a homepage score. On that page it found no llms.txt, no
-    Organization schema and no short answer with a figure right under the H1.
-sources:
-  - label: Profound pricing page (live, checked 25 and 26 Sep 2026)
-    url: https://www.tryprofound.com/pricing
-  - label: Profound pricing page, archived 14 Sep 2026 (Starter and Growth)
-    url: https://web.archive.org/web/20260914175614/https://www.tryprofound.com/pricing
-  - label: Profound homepage
-    url: https://www.tryprofound.com/
-  - label: "Profound: Answer Engine Insights"
-    url: https://www.tryprofound.com/features/answer-engine-insights
-  - label: "Profound help: About Pages"
-    url: https://help.tryprofound.com/articles/6700593218-about-pages
-  - label: "Profound help: integrations and connectors"
-    url: https://help.tryprofound.com/articles/3615698866-about-integrations-and-connectors
-  - label: "Profound docs: Outlook connection"
-    url: https://docs.tryprofound.com/integrations/microsoft-365/connect-microsoft-outlook-to-profound
-  - label: "Profound docs: MCP overview"
-    url: https://docs.tryprofound.com/mcp/overview
-  - label: "Profound docs: MCP clients"
-    url: https://docs.tryprofound.com/mcp/common-mcp-clients
-  - label: "Profound docs: MCP authentication"
-    url: https://docs.tryprofound.com/mcp/authentication
-  - label: "Profound docs: Agent Analytics"
-    url: https://docs.tryprofound.com/agent-analytics/overview
-  - label: Profound free AEO Report
-    url: https://www.tryprofound.com/aeo-report
-  - label: "Profound blog: free AEO report, 29 Jan 2026"
-    url: https://www.tryprofound.com/blog/free-aeo-report-check-ai-visibility
-  - label: Profound Master Subscription Agreement (updated 5 Jun 2026)
-    url: https://www.tryprofound.com/legal/master-subscription-agreement
-  - label: Profound platform sign-in page
-    url: https://platform.tryprofound.com/welcome
-  - label: Trakkr review of Profound pricing (third party)
-    url: https://trakkr.ai/reviews/profound-review/pricing
-  - label: OperStack pricing
-    url: https://oper-stack.com/pricing/
-  - label: OperStack free check
-    url: https://oper-stack.com/ai-visibility/
-  - label: OperStack MCP server
-    url: https://oper-stack.com/mcp/
-  - label: OperStack refunds
-    url: https://oper-stack.com/refunds/
-  - label: OperStack AI visit counter
-    url: https://oper-stack.com/visits/
-related:
-  - operstack-vs-peec-ai
-  - operstack-vs-otterly-ai
-  - operstack-vs-semrush
-  - operstack-vs-contextbolt
-faq:
-  - question: How much does Profound cost?
-    answer: >-
-      On 26 September 2026, Profound's pricing page showed brands no plan price: a free 7-day Trial, then
-      Enterprise, priced after a demo. Agencies see Agency Growth at $99 a month plus add-ons, with each full
-      client workspace at $399 a month. A copy of the page archived on 14 September 2026 still listed Starter
-      at $99 and Growth at $399 a month, billed yearly. OperStack Watch costs $35 a month.
-  - question: Does Profound have a free trial?
-    answer: >-
-      Yes. The pricing page lists a 7-day Trial with 50 unique prompts run daily on ChatGPT, Gemini and Google
-      AI Overviews, one language, one region and limited AI Marketer credits, with no history, exports, API or
-      support. It needs an account made with an email address; whether a card is required is not stated. One
-      third-party review describes a smaller trial, which contradicts Profound's own page.
-  - question: What is a cheaper alternative to Profound for a small business?
-    answer: >-
-      OperStack Watch costs $35 a month or $299 a year with the first 7 days free. Each week it asks ChatGPT
-      ten buyer questions with web search on, names who it recommends instead of you, scores ten of your pages
-      and sends the text to paste. It asks ChatGPT only and has no keyword or backlink data. The free check
-      needs no signup.
-  - question: Which AI engines does Profound track?
-    answer: >-
-      Profound's Enterprise plan tracks up to nine answer engines daily, including ChatGPT, Perplexity,
-      Gemini, Claude, Microsoft Copilot, DeepSeek, Google AI Mode, Google AI Overviews and Exa Search. The
-      Trial covers ChatGPT, Gemini and Google AI Overviews; agency workspaces cover ChatGPT, Perplexity and
-      Google AI Overviews. OperStack Watch asks ChatGPT, the assistant it is built around, once a week.
-  - question: Does Profound work inside Claude or Cursor?
-    answer: >-
-      Yes. Profound runs a hosted MCP server that signs in to a Profound account through OAuth 2.1, with setup
-      guides for Claude Code, Claude Desktop, ChatGPT, Cursor, VS Code, Windsurf and others; access by API key
-      needs Enterprise. OperStack's MCP server is free and needs no account at all: it scores a site out of
-      100, compares two to four sites and checks llms.txt.
-  - question: Can I cancel Profound and get a refund?
-    answer: >-
-      Profound's Master Subscription Agreement, updated 5 June 2026, renews an order automatically unless
-      either side gives notice at least 30 days before the next term, and states that fees are non-refundable
-      apart from one infringement case in section 13.4. Self-serve cancel steps are not stated. OperStack
-      Watch can be cancelled at any time; a period already paid is not refunded.
-updatedDate: "2026-09-26"
----
+
+>-
 
 ## What are OperStack and Profound for?
 
@@ -438,3 +153,30 @@ The table deliberately does not turn these areas into a comparison of software q
 For an owner evaluating a report, ask whether the specific commercial page you want to improve appears in the sample. If it does not, request or run the relevant check rather than borrowing the homepage result. For a larger catalogue, a broader audit still needs an explicit coverage limit.
 
 Watch's value is the recurring task and proposed wording on the pages it examines. It is not certification of the rest of the site. Keep that boundary with any exported report, and review the actual passage before publishing an edit. Our [free check](/ai-visibility/) makes the method visible before a subscription; the [MCP page](/mcp/) describes the available free inspection tools.
+
+
+## FAQ
+
+### How much does Profound cost?
+
+>-
+
+### Does Profound have a free trial?
+
+>-
+
+### What is a cheaper alternative to Profound for a small business?
+
+>-
+
+### Which AI engines does Profound track?
+
+>-
+
+### Does Profound work inside Claude or Cursor?
+
+>-
+
+### Can I cancel Profound and get a refund?
+
+>-

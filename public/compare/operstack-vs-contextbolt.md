@@ -1,289 +1,15 @@
+# OperStack vs ContextBolt: Two $35 AI Visibility Tools
+
+> >-
+
+**Source:** https://oper-stack.com/compare/operstack-vs-contextbolt/  
+**Section:** Comparisons  
+**Published:** 2026-09-26  
+**Updated:** 2026-09-26
+
 ---
-title: "OperStack vs ContextBolt: Two $35 AI Visibility Tools"
-description: >-
-  OperStack vs ContextBolt at $35 a month: weekly ChatGPT checks, rivals named, fix text, yearly plan, refunds
-  and who needs an AI app. Checked 26 September 2026.
-h1: "OperStack vs ContextBolt: $35 for a weekly report that runs itself"
-answer: >-
-  OperStack Watch and ContextBolt SEO both cost $35 monthly, checked on 26 September 2026. Watch runs 10
-  ChatGPT buyer questions every week, records the businesses named, compares 3 rivals, checks sampled pages
-  again and emails changes with proposed fixes. ContextBolt is an SEO research kit operated inside an AI
-  assistant. Watch supplies the continuing reporting routine without requiring the owner to initiate each
-  check.
-competitor:
-  name: ContextBolt
-  site: https://contextbolt.com/seo/
-kind: ai-visibility
-pubDate: "2026-09-26"
-checkedAt: "2026-09-26T00:00:00.000Z"
-chooseUs:
-  - >-
-    You want ChatGPT asked the same ten buyer questions every week without anyone remembering to run a report.
-    ContextBolt's own docs say nothing runs on its own.
-  - >-
-    You want the fix as a paragraph to paste, written only from your own pages, with the page address, instead
-    of a prompt to hand to an AI agent.
-  - >-
-    You want one email a week with what changed and the names ChatGPT gave instead of you, with no Claude,
-    Cursor or connector to set up.
-  - "You would rather pay $299 for a year than $420: ContextBolt has no yearly plan."
-chooseThem:
-  - You need keyword volumes, live search results and a backlink index for your own SEO research.
-  - You do all your SEO work inside Claude, Cursor or Codex and want every lookup saved to one dashboard.
-table:
-  - feature: Price per month
-    us:
-      text: $35 a month for OperStack Watch
-      source: https://oper-stack.com/pricing/
-    them:
-      text: $35 a month, one plan with 1,000 credits (26 September 2026)
-      source: https://contextbolt.com/docs/seo/mcp-tools/
-  - feature: Price per year
-    us:
-      text: $299 a year, about $25 a month
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "No yearly plan: the terms say both products are billed monthly, so twelve months cost $420"
-      source: https://contextbolt.com/terms/
-  - feature: Free trial and whether a card is needed
-    us:
-      text: 7 days free, card required at checkout
-      source: https://oper-stack.com/pricing/
-    them:
-      text: 7 days free with 100 credits, card required
-      source: https://contextbolt.com/docs/billing/
-  - feature: Free checks without paying
-    us:
-      text: "Free check with no signup: up to 10 pages scored and 3 live ChatGPT questions, up to 3 runs a day"
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        AI Visibility Checker: 2 checks read from an answer index. GEO Audit: 1 URL. Site check on the SEO
-        page: 1 live ChatGPT search, one new site a day
-      source: https://contextbolt.com/tools/
-  - feature: Names who ChatGPT recommends instead of you
-    us:
-      text: Yes, by name, for ten questions every week, with three rivals scored beside you
-      source: https://oper-stack.com/pricing/
-    them:
-      text: >-
-        Free checker lists 'who they recommend instead'; paid share of voice only against up to 4 competitors
-        you name
-      source: https://contextbolt.com/docs/seo/ai-visibility/
-  - feature: AI systems checked
-    us:
-      text: ChatGPT with web search on, weekly. Crawler access read for 14 AI crawlers and fetchers
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: >-
-        ChatGPT and Google AI counted from an answer index; Perplexity, Claude and Gemini get one live
-        question each per full report
-      source: https://contextbolt.com/seo/ai-visibility/
-  - feature: Questions or prompts tracked
-    us:
-      text: The same ten buyer questions every week
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "No fixed set and no prompt slots: questions come from their index, checks run on demand for credits"
-      source: https://contextbolt.com/docs/seo/ai-visibility/
-  - feature: Pages of your site read per check
-    us:
-      text: Up to 10 in the free check and in Watch; 100 in the $149 audit
-      source: https://oper-stack.com/ai-visibility/
-    them:
-      text: "Free GEO Audit: 1 URL. Paid audit: 25 pages by default, up to 50 per run, 1 credit a page"
-      source: https://contextbolt.com/tools/geo-audit/
-  - feature: Writes the text to paste on your page
-    us:
-      text: "Yes: the page address and a paragraph written only from your own pages"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "No page text: 'a specific fix' per issue and prompts marked 'Hand to your agent'"
-      source: https://contextbolt.com/docs/seo/ai-visibility/
-  - feature: Weekly email report
-    us:
-      text: Yes, one email a week with what changed since last week
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "No. Their automation page: 'Ask what moved since last month instead of reading a weekly email'"
-      source: https://contextbolt.com/seo/automation/
-  - feature: Works inside Claude, ChatGPT or Cursor (MCP)
-    us:
-      text: Free MCP server with five tools and no account; paid Watch commands are not in it yet
-      source: https://oper-stack.com/mcp/
-    them:
-      text: >-
-        Yes, the MCP server is the product: 13 named clients, sign-in by email code, needs a trial or
-        subscription
-      source: https://contextbolt.com/docs/connect-your-agent/
-  - feature: Keyword and backlink data
-    us:
-      text: "None: no keyword database, search volumes, backlink index or rank tracking"
-    them:
-      text: "Yes, from DataForSEO: volume, difficulty, CPC, intent, live top 10, backlinks, link gap"
-      source: https://contextbolt.com/docs/seo/mcp-tools/
-  - feature: Built for whom
-    us:
-      text: Small and mid-size businesses and the agencies that serve them
-    them:
-      text: Founders, marketers and indie hackers who do their own SEO inside an AI agent
-      source: https://www.99helpers.com/makers/contextbolt
-  - feature: Needs a developer or SEO skills
-    us:
-      text: "No: fixes are text to paste; the few that need a developer are marked"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: No code, but a paid MCP-capable AI app, a custom connector and a sign-in; your agent edits your files
-      source: https://contextbolt.com/seo/automation/
-  - feature: Interface language
-    us:
-      text: English (interface and letters)
-    them:
-      text: Not stated; site, docs and terms are in English only
-      source: https://contextbolt.com/seo/
-  - feature: How cancelling works
-    us:
-      text: Any time; nothing to pay inside the first 7 days, no further charge after that
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Any time in the Lemon Squeezy billing portal; access runs to the end of the paid period
-      source: https://contextbolt.com/docs/billing/
-  - feature: Refund
-    us:
-      text: Paid periods are not refunded; the $149 audit is refunded in full before data collection starts
-      source: https://oper-stack.com/refunds/
-    them:
-      text: No refund window; partial months and monthly credits are not refunded
-      source: https://contextbolt.com/terms/
-  - feature: Runs on a schedule by itself
-    us:
-      text: Yes, every 7 days from the day you subscribe
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "No: 'Every report is your call, made in your agent'"
-      source: https://contextbolt.com/docs/seo/ai-visibility/
-  - feature: Needs a separate paid AI app
-    us:
-      text: "No: the report is on the site and in your inbox"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Yes: 'your AI app bills separately'"
-      source: https://contextbolt.com/seo/compare/contextbolt-seo-vs-otterly/
-  - feature: Cost of one AI visibility report
-    us:
-      text: Included in the $35, every week
-      source: https://oper-stack.com/pricing/
-    them:
-      text: Full report 50 credits plus 8 per competitor, up to 82; quick check 8 credits
-      source: https://contextbolt.com/docs/seo/mcp-tools/
-  - feature: Answer history
-    us:
-      text: Each weekly letter compares with the week before
-      source: https://oper-stack.com/pricing/
-    them:
-      text: 12 months of ChatGPT and Google AI history on the first report
-      source: https://contextbolt.com/seo/ai-visibility/
-  - feature: Extra purchases
-    us:
-      text: "Optional $149 one-off audit: 100 pages, five rivals, reviewed by a person"
-      source: https://oper-stack.com/pricing/
-    them:
-      text: "Credit top-ups: $9 for 250, $19 for 600, $39 for 1,500, never expire"
-      source: https://contextbolt.com/terms/
-rivalScore:
-  score: 76
-  pages: 10
-  date: "2026-09-26T00:00:00.000Z"
-  note: >-
-    Our check read ten pages of contextbolt.com. Crawler access, llms.txt and business schema scored full
-    marks. It lost most points on quotable content (12 of 25): only 1 of the 10 pages opens with an
-    answer-first paragraph that carries a figure, 2 hold under 300 words and 3 have fewer than three H2
-    sections. Dates and sources scored 4 of 15. The sample included the terms and privacy pages, which rarely
-    open with a direct answer.
-sources:
-  - label: ContextBolt SEO product page
-    url: https://contextbolt.com/seo/
-  - label: "ContextBolt docs: MCP tools and credit costs"
-    url: https://contextbolt.com/docs/seo/mcp-tools/
-  - label: "ContextBolt docs: billing, trial and cancellation"
-    url: https://contextbolt.com/docs/billing/
-  - label: ContextBolt terms (monthly billing, refunds, top-ups)
-    url: https://contextbolt.com/terms/
-  - label: "ContextBolt docs: AI visibility"
-    url: https://contextbolt.com/docs/seo/ai-visibility/
-  - label: ContextBolt AI visibility page
-    url: https://contextbolt.com/seo/ai-visibility/
-  - label: ContextBolt free tools
-    url: https://contextbolt.com/tools/
-  - label: ContextBolt AI Visibility Checker
-    url: https://contextbolt.com/tools/ai-visibility-checker/
-  - label: ContextBolt GEO Audit
-    url: https://contextbolt.com/tools/geo-audit/
-  - label: ContextBolt automation page
-    url: https://contextbolt.com/seo/automation/
-  - label: "ContextBolt docs: connect your agent"
-    url: https://contextbolt.com/docs/connect-your-agent/
-  - label: "ContextBolt docs: features (Search Console connection)"
-    url: https://contextbolt.com/docs/seo/features/
-  - label: ContextBolt SEO vs Otterly (their comparison page)
-    url: https://contextbolt.com/seo/compare/contextbolt-seo-vs-otterly/
-  - label: ContextBolt for solo founders
-    url: https://contextbolt.com/seo/for-solo-founders/
-  - label: Founder interview, 22 September 2026 (99helpers)
-    url: https://www.99helpers.com/makers/contextbolt
-  - label: OperStack pricing
-    url: https://oper-stack.com/pricing/
-  - label: OperStack free check
-    url: https://oper-stack.com/ai-visibility/
-  - label: OperStack refund policy
-    url: https://oper-stack.com/refunds/
-  - label: OperStack MCP server
-    url: https://oper-stack.com/mcp/
-related:
-  - operstack-vs-otterly-ai
-  - operstack-vs-peec-ai
-  - operstack-vs-ahrefs
-  - operstack-vs-google-search-console
-faq:
-  - question: Does ContextBolt have a yearly plan or refunds?
-    answer: >-
-      No to both, as of 26 September 2026. ContextBolt's terms say its products are billed monthly and its
-      about page promises no annual contract, so a year costs twelve payments of $35, or $420. There is no
-      refund window, and partial months and unused monthly credits are not returned. OperStack Watch has a
-      $299 yearly plan; it also does not refund periods already paid, but nothing is charged if you cancel in
-      the first seven days.
-  - question: Does ContextBolt check ChatGPT automatically every week?
-    answer: >-
-      No. ContextBolt's comparison page against Otterly asks whether it monitors prompts on a schedule and
-      answers no. Reports run when you ask for them inside your AI agent, and its docs suggest about once a
-      month. A routine is possible only if you build one in your own agent. OperStack Watch runs every seven
-      days from the day you subscribe and emails you the result.
-  - question: Can I use ContextBolt without Claude or Cursor?
-    answer: >-
-      Only its free tools. The paid ContextBolt SEO product is an MCP server: you connect it as a custom
-      connector to an MCP-capable app such as Claude, Cursor, Codex or ChatGPT, which you pay for separately,
-      and sign in with an email code. OperStack Watch needs no AI app at all. The report is on the site and in
-      your inbox, and most fixes are text you paste into your pages.
-  - question: Is OperStack a good ContextBolt alternative for AI visibility?
-    answer: >-
-      For a business that wants a weekly answer without running anything, yes. OperStack Watch costs the same
-      $35 a month, or $299 a year, asks ChatGPT ten fixed buyer questions each week with web search on, names
-      the businesses it recommends instead of you, scores three rivals and writes the fix as text to paste. It
-      does not replace ContextBolt's keyword and backlink research, which OperStack does not offer.
-  - question: Does OperStack have keyword research or backlinks like ContextBolt?
-    answer: >-
-      No. OperStack has no keyword database, no search volumes, no backlink index and no rank tracking, and we
-      do not claim otherwise. ContextBolt draws that data from DataForSEO and charges 1 to 3 credits a lookup.
-      OperStack does one job: whether ChatGPT names your business, who it names instead, how readable your
-      pages are to AI systems, and the exact text to change.
-  - question: Which AI assistants does each tool look at?
-    answer: >-
-      OperStack Watch asks ChatGPT, with web search on, ten questions a week; for Claude, Perplexity and
-      Gemini it reads only whether your robots.txt lets their crawlers in. ContextBolt counts ChatGPT and
-      Google AI answers from a stored index and asks Perplexity, Claude and Gemini one live question each when
-      you run a full report, which costs 50 credits plus 8 per competitor.
-updatedDate: "2026-09-26"
----
+
+>-
 
 ## What are OperStack and ContextBolt for?
 
@@ -442,3 +168,30 @@ A short privacy or navigation page does not need padding merely to pass an artic
 For a business choosing between agent research and Watch, this is the proposed working sequence: inspect the finding, confirm that the page is commercially important, review the draft and publish only a useful change. It is separate from choosing a keyword dataset or maintaining an agent connection.
 
 The free [MCP tools](/mcp/) can help an existing agent user inspect that page evidence. They do not make the paid Watch email available inside a chat client, and a readiness result must not be presented as an observed gain in enquiries.
+
+
+## FAQ
+
+### Does ContextBolt have a yearly plan or refunds?
+
+>-
+
+### Does ContextBolt check ChatGPT automatically every week?
+
+>-
+
+### Can I use ContextBolt without Claude or Cursor?
+
+>-
+
+### Is OperStack a good ContextBolt alternative for AI visibility?
+
+>-
+
+### Does OperStack have keyword research or backlinks like ContextBolt?
+
+>-
+
+### Which AI assistants does each tool look at?
+
+>-
