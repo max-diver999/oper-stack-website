@@ -84,7 +84,7 @@ const jsonLd = [
 
     {d.rivalScore && (
       <section class="rival" id="their-site">
-        <h2>{d.competitor.name}'s own site in our free check</h2>
+        <h2>{d.competitor.name === 'Ahrefs' ? "Ahrefs’" : `${d.competitor.name}’s`} own site in our free check</h2>
         <p>On {fmt(d.rivalScore.date)} the OperStack free check scored {d.competitor.site ? new URL(d.competitor.site).host.replace(/^www\./, '') : d.competitor.name} at <b>{d.rivalScore.score} out of 100</b>, reading {d.rivalScore.pages} {d.rivalScore.pages === 1 ? 'page' : 'pages'}. {d.rivalScore.note}</p>
         <p class="note">Same code and same rules as for any site, including ours (oper-stack.com scored 96 the same day). It measures whether AI systems can read and quote a site, not how good the product is.</p>
       </section>

@@ -3,7 +3,7 @@ title: "OperStack vs Profound: Pricing and a Smaller Alternative"
 description: >-
   Profound has shown brands no public price since mid-September 2026. OperStack Watch is $35 a month: ten
   ChatGPT questions weekly, rivals named, text to paste.
-h1: "OperStack vs Profound: weekly ChatGPT checks for $35, without a sales call"
+h1: "OperStack vs Profound: weekly ChatGPT checks for $35"
 answer: >-
   OperStack Watch gives a small business 10 weekly ChatGPT questions, 3 rival comparisons, repeated page
   checks and reports with changes and proposed fixes for $35 monthly. On 26 September 2026 Profound showed
