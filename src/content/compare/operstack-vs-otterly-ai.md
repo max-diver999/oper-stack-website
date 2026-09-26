@@ -7,8 +7,8 @@ h1: "OperStack vs Otterly.AI: page fixes in your weekly ChatGPT report"
 answer: >-
   OperStack Watch brings 10 weekly ChatGPT questions, 3 rival comparisons, repeated page checks and proposed
   fixes into recurring reports for $35 monthly. A free check shows the approach before signup. Otterly Lite
-  costs $29 monthly for 15 prompts, checked on 26 September 2026. Watch’s value is the combined routine: see
-  who was named, review changes and choose the next page improvement from the report.
+  costs $29 monthly for 15 prompts, checked on 26 September 2026. For $35, Watch reads up to 10 pages,
+  names the businesses recommended instead of you and supplies a priority fix with text to paste.
 competitor:
   name: Otterly.AI
   site: https://otterly.ai/
@@ -28,7 +28,7 @@ chooseThem:
 table:
   - feature: Price per month
     us:
-      text: $35 (OperStack Watch)
+      text: "$35: up to 10 pages read weekly, businesses named instead of you, a priority fix with text to paste"
       source: https://oper-stack.com/pricing/
     them:
       text: >-

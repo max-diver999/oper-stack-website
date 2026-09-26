@@ -3,7 +3,7 @@ title: "OperStack vs an SEO Agency: What Each Costs for AI Search"
 description: >-
   The most common SEO retainer is $501 to $1,000 a month (Ahrefs, 439 providers). OperStack Watch is $35: who
   ChatGPT names instead of you, and what to paste.
-h1: "OperStack vs an SEO agency: $35 weekly checks, with you making the edits"
+h1: "OperStack vs an SEO agency: weekly checks and fixes for $35"
 answer: >-
   OperStack Watch gives an owner 10 weekly ChatGPT questions, 3 rival comparisons, repeated page checks and
   reports showing changes with proposed fixes for $35 monthly. An agency can take responsibility for
