@@ -1,0 +1,58 @@
+---
+/**
+ * «What you get for $35»: настоящий прогон OperStack Watch на нашем собственном сайте (решение
+ * Максима 26.09.2026 для страниц сравнения). Данные из src/data/watch-example.json, одного прогона
+ * одним кодом с подписчиками; название марки скрыто, потому что это наш сайт, а не клиент.
+ */
+import ex from '../data/watch-example.json';
+
+const fmt = (x: string) => new Date(x).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const parts = (t: string) => t.split('{brand}');
+---
+
+<section class="wx" id="what-you-get">
+  <h2>What you get for $35: one real week of OperStack Watch</h2>
+  <p class="wx-lede">This is the actual first report for {ex.site}, run on {fmt(ex.date)} by the same code subscribers get. We hide the brand name because it is our own site, not a client.</p>
+  <div class="wx-grid">
+    <div class="wx-stat"><b>{ex.named} of {ex.asked}</b><span>buyer questions where ChatGPT named the site</span></div>
+    <div class="wx-stat"><b>{ex.score}/100</b><span>AI visibility score across {ex.pages} pages</span></div>
+    <div class="wx-stat"><b>{ex.instead[0].name}</b><span>named most often instead ({ex.instead[0].times} of {ex.asked})</span></div>
+  </div>
+  <ul class="wx-rows">
+    {ex.rows.map((r: any) => (
+      <li>
+        <p class="wx-q">"{r.question}"</p>
+        <p class="wx-a"><span class={r.named ? 'wx-yes' : 'wx-no'}>{r.named ? 'named the site' : 'not named'}</span> {r.named ? 'Also named' : 'Named instead'}: {r.names.join(', ')}</p>
+      </li>
+    ))}
+  </ul>
+  <h3>The fix of the week, as it arrived</h3>
+  <p class="wx-q">For the question "{ex.fix.question}"</p>
+  <p class="wx-act">{ex.fix.action}</p>
+  <div class="wx-box">{parts(ex.fix.text).map((p: string, i: number) => (<>{i > 0 && <span class="wx-mask" title="Brand name hidden">brand</span>}{p}</>))}</div>
+  {ex.fix.notes.map((n: string) => <p class="wx-note">{n}</p>)}
+  <p class="wx-foot">Every sentence in the paragraph comes from the site's own pages; the tool checks each one against a quote before it goes in. Answers change from run to run, so Watch asks the same ten questions every week and shows the trend. <a href="/pricing/">Seven days free</a>, then $35 a month.</p>
+</section>
+
+<style>
+  .wx { background: #fff; border: 1px solid rgba(23,124,112,.3); border-radius: 18px; padding: 22px 22px 18px; margin: 0 0 36px; }
+  .wx h2 { font-family: var(--fd); font-size: clamp(21px, 2.8vw, 26px); line-height: 1.2; margin: 0 0 8px; }
+  .wx h3 { font-size: 17px; margin: 18px 0 6px; }
+  .wx-lede { color: #3F4854; margin: 0 0 14px; }
+  .wx-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; margin: 0 0 14px; }
+  .wx-stat { background: #F4FAF8; border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; }
+  .wx-stat b { font-size: 20px; line-height: 1.2; }
+  .wx-stat span { font-size: 13.5px; color: #3F4854; }
+  .wx-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+  .wx-rows li { border-top: 1px solid rgba(11,16,23,.08); padding-top: 10px; }
+  .wx-q { font-weight: 600; margin: 0 0 4px; }
+  .wx-a { margin: 0; font-size: 15px; color: #1F2933; }
+  .wx-yes, .wx-no { font-family: var(--fm); font-size: 10.5px; letter-spacing: .08em; text-transform: uppercase; padding: 2px 8px; border-radius: 999px; margin-right: 6px; }
+  .wx-yes { background: #E1F2EE; color: #13614F; } .wx-no { background: #F9E1DB; color: #8E2F1F; }
+  .wx-act { font-weight: 600; margin: 4px 0 8px; }
+  .wx-box { white-space: pre-wrap; background: #FAF8F4; border: 1px solid rgba(11,16,23,.1); border-radius: 12px; padding: 14px 16px; line-height: 1.6; }
+  .wx-mask { display: inline-block; background: #16202B; color: #16202B; border-radius: 4px; padding: 0 6px; user-select: none; }
+  .wx-note { font-size: 14px; color: #56606B; margin: 8px 0 0; }
+  .wx-foot { font-size: 14.5px; color: #3F4854; margin: 14px 0 0; }
+  @media (max-width: 680px) { .wx-grid { grid-template-columns: 1fr; } }
+</style>

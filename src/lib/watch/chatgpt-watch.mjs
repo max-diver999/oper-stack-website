@@ -79,6 +79,18 @@ async function responses(body, timeoutMs = 60_000) {
 
 const outputText = (data) => (data.output || []).filter((o) => o.type === 'message').flatMap((o) => o.content || []).map((c) => c.text || '').join('\n').trim();
 const citations = (data) => (data.output || []).filter((o) => o.type === 'message').flatMap((o) => o.content || []).flatMap((c) => c.annotations || []).filter((a) => a.type === 'url_citation' && a.url).map((a) => a.url);
+/** Адрес без меток utm и якоря: OpenAI дописывает ?utm_source=openai, и один сайт считался бы дважды. */
+export const cleanUrl = (u) => { try { const x = new URL(u); [...x.searchParams.keys()].filter((k) => /^utm_/i.test(k)).forEach((k) => x.searchParams.delete(k)); x.hash = ''; return x.toString(); } catch { return String(u || ''); } };
+/** Страницы, которые ChatGPT прочитал для ответа, с заголовком (задание «функции Watch», 1.1). */
+const sourcesOf = (data) => {
+  const seen = new Map();
+  for (const a of (data.output || []).filter((o) => o.type === 'message').flatMap((o) => o.content || []).flatMap((c) => c.annotations || [])) {
+    if (a.type !== 'url_citation' || !a.url) continue;
+    const url = cleanUrl(a.url);
+    if (!seen.has(url)) seen.set(url, { url, title: String(a.title || '').replace(/\s+/g, ' ').trim().slice(0, 160) });
+  }
+  return [...seen.values()];
+};
 
 async function json(prompt, schema, name, maxTokens = 2000, model = MODEL()) {
   const data = await responses({ model, input: prompt, reasoning: { effort: 'low' }, max_output_tokens: maxTokens, text: { format: { type: 'json_schema', name, schema, strict: true } } });
@@ -249,6 +261,14 @@ export function isNamed({ names = [], text = '', cited = [] }, { brand = '', url
   return { named: inNames || inText, cited: inCited };
 }
 
+/** Строки ответа, где назван клиент: по ним ставится тональность (1.3). Не больше двух строк и 400 знаков. */
+export function mentionOf(text, { brand = '', url = '' }) {
+  const host = hostOf(url); const root = norm(host.split('.').slice(0, -1).join('.') || host); const b = norm(brand);
+  const hit = (t) => (b.length >= 4 && norm(t).includes(b)) || (root.length >= 4 && norm(t).includes(root));
+  const parts = String(text || '').split(/\n+|(?<=[.!?])\s+(?=[A-Z])/).map((x) => x.replace(/^[\s*#>\d.)-]+/, '').trim()).filter(Boolean);
+  return parts.filter(hit).slice(0, 2).join(' ').slice(0, 400);
+}
+
 /** Один вопрос: одна модель, один поиск. */
 export async function askOne(question, target) {
   const data = await responses({
@@ -257,10 +277,11 @@ export async function askOne(question, target) {
   });
   const text = outputText(data);
   const cited = citations(data);
+  const sources = sourcesOf(data);
   const lines = namedLines(text);
   const names = lines.map((x) => x.name);
   const notes = Object.fromEntries(lines.filter((x) => x.note).map((x) => [x.name, x.note]));
-  return { question, names, notes, cited, ...isNamed({ names, text, cited }, target) };
+  return { question, names, notes, cited, sources, mention: mentionOf(text, target), ...isNamed({ names, text, cited }, target) };
 }
 
 /** Вопросы разом, а не по очереди: бесплатная проверка ждёт ответа на экране (задание 26.09.2026, п. 3). */
@@ -1116,7 +1137,42 @@ export const shortName = (n) => String(n || '').replace(/,?\s*\b(?:Co\.?,?\s*Ltd
  * Отчёт Watch, первый (week 0) и недельные. Структура сверху вниз по разделу 3.2 задания.
  * history: прошлые недели, последняя в конце; rivals: только настоящие, из формы.
  */
-export function buildReportLetter({ host, email, week = 0, summary, history = [], site = null, rivals = [], fix = null, fixRepeat = false, fixLive = false, when, replaced = [] }) {
+/** «(↑1)» к числу против прошлой недели; нет прошлой недели или не изменилось, пусто. */
+const arrow = (now, was) => (Number.isFinite(was) && now !== was ? ` (${now > was ? '↑' : '↓'}${Math.abs(now - was)})` : '');
+/** Строка доли: «Named in 10 answers: You 5 (↑1) · Butler Estates 3 · …» (1.2). */
+export function shareLine(share, prevShare = null) {
+  const was = (name) => prevShare?.rivals?.find((r) => nameKey(r.name) === nameKey(name))?.times;
+  return `Named in ${share.asked} answers: You ${share.you}${arrow(share.you, prevShare?.you)}${share.rivals.map((r) => ` · ${r.name} ${r.times}${arrow(r.times, was(r.name))}`).join('')}`;
+}
+/** Тональность одной строкой: «How ChatGPT describes you: neutral in 3, positive in 1.» (1.3). */
+export function toneLine(tone) {
+  const c = { positive: 0, neutral: 0, caveats: 0 };
+  for (const t of tone) c[t.label] += 1;
+  const parts = ['neutral', 'positive', 'caveats'].filter((k) => c[k]).sort((a, b) => c[b] - c[a]).map((k) => `${k === 'caveats' ? 'with caveats' : k} in ${c[k]}`);
+  return parts.length ? `How ChatGPT describes you: ${parts.join(', ')}.` : '';
+}
+/** «Where to get mentioned» (1.1): какие сайты ChatGPT прочитал, есть ли там клиент, с чего начать. */
+export function whereToGetMentioned(src) {
+  if (!src || !src.top?.length) return null;
+  const n = src.asked;
+  const tag = (e) => `${e.domain} (${e.answers} ${e.answers === 1 ? 'answer' : 'answers'})`;
+  const lines = [`To answer these questions, ChatGPT read: ${listAnd(src.top.map(tag))}.`];
+  const missing = src.top.filter((e) => e.mentioned === false);
+  const present = src.top.filter((e) => e.mentioned === true);
+  const unknown = src.top.filter((e) => e.mentioned === null);
+  if (missing.length === src.top.length) lines.push("You are not on any of them.");
+  else if (missing.length) lines.push(`You are not on ${listAnd(missing.map((e) => e.domain))}.`);
+  if (present.length) lines.push(`You're already on ${listAnd(present.map((e) => e.domain))}. Good.`);
+  if (unknown.length) lines.push(`We could not open ${listAnd(unknown.map((e) => e.domain))} to check whether you are there.`);
+  const start = missing[0];
+  if (start) lines.push(`Start with ${start.domain}: it shaped ${start.answers} of ${n} answers.`);
+  const whose = (n) => (/s$/i.test(n) ? `${n}'` : `${n}'s`);
+  for (const r of src.rivals || []) lines.push(`ChatGPT read ${whose(r.name)} own site for ${r.answers} ${r.answers === 1 ? 'answer' : 'answers'}.`);
+  if (src.own) lines.push(`It read your own site for ${src.own} ${src.own === 1 ? 'answer' : 'answers'}.`);
+  return { lines, top: src.top };
+}
+
+export function buildReportLetter({ host, email, week = 0, summary, history = [], site = null, rivals = [], fix = null, fixRepeat = false, fixLive = false, when, replaced = [], insight = null }) {
   const first = week === 0;
   const prev = history.length ? history[history.length - 1] : null;
   const plateau = history.length >= 2 && history.slice(-2).every((h) => h.named === summary.named) && summary.named < summary.asked;
@@ -1149,7 +1205,17 @@ export function buildReportLetter({ host, email, week = 0, summary, history = []
     const line = endQuote(w.next.length ? `You were named next to ${listAnd(w.next)} for "${w.question}".` : `You were named for "${w.question}".`);
     blocks.push(par(esc(line))); text.push(line);
   }
-  if (summary.competitors.length) {
+  // Оговорка в ответах ChatGPT важнее всего остального: отдельным блоком наверху (1.3).
+  const caveat = (insight?.tone || []).find((t) => t.label === 'caveats');
+  if (caveat) {
+    const line = `ChatGPT mentions a concern: "${caveat.quote}". Here is what to do about it: answer the reviews or pages it draws on, and add a fact to your site that settles the question.`;
+    blocks.splice(1, 0, `<p style="margin:0 0 14px;padding:12px 14px;border-radius:10px;background:#FBF0D5;font-family:${FONT};font-size:15px;line-height:1.5;color:#16202B">${esc(line)}</p>`); text.splice(3, 0, line, '');
+  }
+  if (insight?.share && insight.share.rivals.length) {
+    // Доля теми же числами, что таблица по вопросам ниже (1.2): «You 5 · Butler Estates 3 …».
+    const line = shareLine(insight.share, prev?.share || null);
+    blocks.push(par(`<strong>${esc(line.split(':')[0])}:</strong>${esc(line.slice(line.indexOf(':') + 1))}`)); text.push('', line);
+  } else if (summary.competitors.length) {
     const list = listAnd(summary.competitors.map((c) => `${c.name} (in ${c.times} ${c.times === 1 ? 'answer' : 'answers'})`));
     blocks.push(par(`<strong>Named most often instead of you:</strong> ${esc(list)}.`)); text.push('', `Named most often instead of you: ${list}.`);
   } else if (summary.named < summary.asked) {
@@ -1166,6 +1232,8 @@ export function buildReportLetter({ host, email, week = 0, summary, history = []
       unclear.length ? `${unclear.length} other ${unclear.length === 1 ? 'name we could not classify is' : 'names we could not classify are'} listed in the table below.` : ''].filter(Boolean).join(' ');
     blocks.push(`<p style="margin:0 0 12px;font-family:${FONT};font-size:14px;line-height:1.5;color:#5A6470">${esc(line)}</p>`); text.push(line);
   }
+  const tl = !caveat && insight?.tone?.length ? toneLine(insight.tone) : '';
+  if (tl) { blocks.push(par(esc(tl))); text.push(tl); }
   blocks.push(listBlock(summary.rows));
   text.push('', ...summary.rows.map(rowText));
 
@@ -1179,12 +1247,18 @@ export function buildReportLetter({ host, email, week = 0, summary, history = []
     blocks.push(par(esc("Publish it, and next week we'll check if ChatGPT picks it up.")));
     text.push('', 'Fix of the week', intro2, fix.a, ...(fix.x ? ['', fix.x, ...notesText(fix)] : []), '', "Publish it, and next week we'll check if ChatGPT picks it up.");
   }
+  // «Where to get mentioned» вместо общей фразы про каталоги и отзывы, если источники пришли (1.1.6).
+  const where = whereToGetMentioned(insight?.sources);
+  if (where) {
+    blocks.push(h3('Where to get mentioned'), ...where.lines.map((l) => par(esc(l))));
+    text.push('', 'Where to get mentioned', ...where.lines);
+  }
   // Балл сайта одной строкой (задание 25.09.2026, 9): «технически готов» уже несёт цифру.
   if (site) {
     const lastWeek = Number.isFinite(site.was) && !first ? `, last week ${site.was}` : '';
     const ready = Number.isFinite(site.now) && site.now >= 80 && summary.named < summary.asked / 2;
     const s = ready
-      ? `Your site is technically ready (${site.now} out of 100${lastWeek}). What's missing is other sites talking about you: directories, reviews, articles.`
+      ? `Your site is technically ready (${site.now} out of 100${lastWeek}).${where ? '' : " What's missing is other sites talking about you: directories, reviews, articles."}`
       : `Your site score: ${Number.isFinite(site.now) ? `${site.now} out of 100` : 'not measured'}${lastWeek ? ` (${lastWeek.slice(2)})` : ''}.`;
     const rs = rivals.filter((r) => r.host).map((r) => `${r.host}: ${Number.isFinite(r.now) ? `${r.now} out of 100` : 'not measured'}${Number.isFinite(r.was) && !first ? ` (last week ${r.was})` : ''}.`);
     blocks.push(par(esc([s, ...rs].join(' ')))); text.push('', s, ...rs);
@@ -1298,6 +1372,83 @@ export function buildPlateauLetter({ host, email, summary, fix = null, fixLive =
   return { subject: `${title} (${when})`, text, html };
 }
 
+/*
+ * Почему они, а не я (задание «функции Watch», этап 1). Три вещи из того, что уже пришло в ответах:
+ * 1.1 какие сайты ChatGPT прочитал, чтобы ответить, и есть ли на них клиент («Where to get mentioned»);
+ * 1.2 доля ответов: клиент против каждого конкурента, теми же числами, что таблица по вопросам;
+ * 1.3 как ChatGPT о клиенте отзывается, одной меткой на ответ, где он назван, с цитатой из ответа.
+ */
+const rootOf = (host) => norm(String(host).replace(/^www\./, '').split('.').slice(0, -1).join('.') || host);
+export function sourceSummary(answers, { url }, summary) {
+  const own = hostOf(url);
+  const rivals = (summary.competitors || []).concat(summary.overall || []).map((c) => c.name).filter((n, i, a) => a.indexOf(n) === i);
+  const rivalOf = (host) => {
+    const r = rootOf(host);
+    return rivals.find((n) => { const k = coreKey(n) || norm(n); return k.length >= 4 && (r.includes(k) || k.includes(r)) && r.length >= 4; }) || null;
+  };
+  const byDomain = new Map();
+  let withSources = 0;
+  for (const a of answers) {
+    const list = (a.sources || []).filter((x) => x && x.url);
+    if (list.length) withSources += 1;
+    const seen = new Set();
+    for (const x of list) {
+      const d = hostOf(x.url); if (!d || seen.has(d)) continue; seen.add(d);
+      const e = byDomain.get(d) || { domain: d, answers: 0, url: x.url, title: x.title || '' };
+      e.answers += 1; byDomain.set(d, e);
+    }
+  }
+  const all = [...byDomain.values()].sort((a, b) => b.answers - a.answers || a.domain.localeCompare(b.domain));
+  const isOwn = (d) => d === own || d.endsWith(`.${own}`);
+  return {
+    asked: answers.length, withSources,
+    own: all.filter((e) => isOwn(e.domain)).reduce((n, e) => n + e.answers, 0),
+    rivals: all.filter((e) => !isOwn(e.domain) && rivalOf(e.domain)).map((e) => ({ ...e, name: rivalOf(e.domain) })).slice(0, 3),
+    top: all.filter((e) => !isOwn(e.domain) && !rivalOf(e.domain)).slice(0, 5),
+  };
+}
+/** Есть ли клиент на сайте-источнике: по названию и по домену на самой странице. Не открылась, значит неизвестно. */
+export async function markMentions(top, { brand, url }, fetchPage = (u) => readHomepage(u, 200000)) {
+  const b = norm(brand); const host = hostOf(url);
+  return Promise.all(top.map(async (e) => {
+    try {
+      const p = await fetchPage(e.url);
+      const hay = norm(`${p.title} ${p.text}`);
+      if (hay.length < 200) return { ...e, mentioned: null };
+      return { ...e, mentioned: (b.length >= 4 && hay.includes(b)) || hay.includes(norm(host)) };
+    } catch { return { ...e, mentioned: null }; }
+  }));
+}
+/** Доля ответов по строкам таблицы: у клиента и у конкурентов (юристы, порталы и неопознанные сюда не входят). */
+export function shareOfAnswers(summary, limit = 4) {
+  const rows = (summary.rows || []).filter((r) => !r.error);
+  const counts = new Map();
+  for (const r of rows) { const seen = new Set(); for (const n of r.comp || []) { const k = nameKey(n); if (seen.has(k)) continue; seen.add(k); const c = counts.get(k) || { name: n, times: 0 }; c.times += 1; counts.set(k, c); } }
+  const rivals = [...counts.values()].sort((a, b) => b.times - a.times || a.name.localeCompare(b.name)).slice(0, limit);
+  return { asked: rows.length, you: rows.filter((r) => r.named).length, rivals };
+}
+/** Тональность: одна метка на ответ, где клиент назван, и дословная цитата-основание. Без цитаты метки нет. */
+export async function toneOf(answers, brand) {
+  const items = answers.map((a, id) => ({ id, a })).filter((x) => x.a.named && x.a.mention);
+  if (!items.length) return [];
+  const schema = { type: 'object', additionalProperties: false, required: ['items'], properties: { items: { type: 'array', items: { type: 'object', additionalProperties: false, required: ['id', 'label', 'quote'], properties: { id: { type: 'integer' }, label: { type: 'string', enum: ['positive', 'neutral', 'caveats', 'none'] }, quote: { type: 'string' } } } } } };
+  const out = await json([
+    `Each item is the part of a ChatGPT answer that mentions ${brand}. Label how the answer describes ${brand}:`,
+    'positive: praises or recommends it; neutral: states facts without judgement; caveats: mentions a concern, limitation or complaint about it; none: not enough to tell.',
+    'quote: the exact words from the item (5 to 20 words) that justify the label, copied character for character, or "" for none.',
+    '', ...items.map((x) => `${x.id}. ${x.a.mention}`),
+  ].join('\n'), schema, 'watch_tone', 600, env('WATCH_CLASSIFY_MODEL', 'gpt-5.4-mini'));
+  const byId = new Map(items.map((x) => [x.id, x.a]));
+  return (out.items || []).filter((t) => t.label !== 'none' && byId.has(t.id) && t.quote && norm(byId.get(t.id).mention).includes(norm(t.quote)))
+    .map((t) => ({ question: byId.get(t.id).question, label: t.label, quote: t.quote.trim() }));
+}
+export async function buildInsight(answers, target, summary, { fetchPage } = {}) {
+  const src = sourceSummary(answers, target, summary);
+  const top = await markMentions(src.top, target, fetchPage).catch(() => src.top.map((e) => ({ ...e, mentioned: null })));
+  const tone = await toneOf(answers, target.brand).catch(() => []);
+  return { sources: { ...src, top }, share: shareOfAnswers(summary), tone };
+}
+
 /** Одна неделя целиком: вопросы, разбор имён, итог и правка. Общая для первого отчёта и недельных. */
 export async function runWeek({ url, brand, category, city, questions, previousFix = null, log = () => {} }) {
   const target = { brand, url };
@@ -1314,5 +1465,6 @@ export async function runWeek({ url, brand, category, city, questions, previousF
       catch (e) { log(`  правка не написана: ${e.message}`); }
     }
   }
-  return { answers, summary, fix, fixRepeat, fixLive };
+  const insight = await buildInsight(answers, target, summary).catch(() => null);
+  return { answers, summary, fix, fixRepeat, fixLive, insight };
 }

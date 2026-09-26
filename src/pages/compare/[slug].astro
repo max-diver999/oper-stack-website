@@ -1,0 +1,146 @@
+---
+/**
+ * Страница сравнения «OperStack vs X» (задание 26.09.2026, п. 7). Всё проверяемое лежит в
+ * frontmatter: таблица возможностей с источником у каждой ячейки конкурента, живой тест с датой,
+ * источники с датой проверки, вопросы (из них же разметка FAQPage). В тексте статьи только разбор.
+ */
+import { getCollection, render } from 'astro:content';
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import FaqSection from '../../components/FaqSection.astro';
+import WatchExample from '../../components/WatchExample.astro';
+import { SITE } from '../../data/site';
+
+export async function getStaticPaths() {
+  const all = await getCollection('compare');
+  return all.map((entry) => ({ params: { slug: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const d = entry.data;
+const all = await getCollection('compare');
+const byId = new Map(all.map((e) => [e.id, e]));
+const related = d.related.map((id) => byId.get(id)).filter(Boolean);
+
+const canonical = `${SITE.url}/compare/${entry.id}/`;
+const withBrand = `${d.title} · ${SITE.name}`;
+const pageTitle = withBrand.length <= 60 ? withBrand : d.title;
+const updated = d.updatedDate || d.pubDate;
+const fmt = (x: Date) => x.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+const jsonLd = [
+  {
+    '@context': 'https://schema.org', '@type': 'Article', headline: d.h1, description: d.description,
+    datePublished: d.pubDate.toISOString(), dateModified: updated.toISOString(),
+    author: { '@type': 'Person', name: d.author }, publisher: { '@type': 'Organization', name: SITE.name, url: SITE.url },
+    mainEntityOfPage: canonical, about: [{ '@type': 'SoftwareApplication', name: 'OperStack', url: SITE.url }, { '@type': 'Thing', name: d.competitor.name, ...(d.competitor.site ? { url: d.competitor.site } : {}) }],
+  },
+  { '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: d.faq.map((f) => ({ '@type': 'Question', name: f.question, acceptedAnswer: { '@type': 'Answer', text: f.answer } })) },
+  { '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Compare', item: `${SITE.url}/compare/` },
+    { '@type': 'ListItem', position: 2, name: `OperStack vs ${d.competitor.name}`, item: canonical },
+  ] },
+];
+---
+
+<CommercialLayout title={pageTitle} description={d.description} canonical={canonical} jsonLd={jsonLd} article={{ published: d.pubDate.toISOString(), modified: updated.toISOString() }} theme="light">
+  <article class="cmp">
+    <nav class="crumbs" aria-label="Breadcrumb"><a href="/compare/">Compare</a> <span aria-hidden="true">/</span> OperStack vs {d.competitor.name}</nav>
+    <p class="meta">Updated <time datetime={updated.toISOString()}>{fmt(updated)}</time> · {d.author} · prices checked {fmt(d.checkedAt)}</p>
+    <h1>{d.h1}</h1>
+    <p class="answer">{d.answer}</p>
+
+    <div class="pick">
+      <div class="pick-us"><h2>Choose OperStack if</h2><ul>{d.chooseUs.map((x) => <li>{x}</li>)}</ul></div>
+      <div class="pick-them"><h2>Choose {d.competitor.name} if</h2><ul>{d.chooseThem.map((x) => <li>{x}</li>)}</ul></div>
+    </div>
+
+    <section class="tbl" id="features">
+      <h2>OperStack vs {d.competitor.name}, feature by feature</h2>
+      <div class="tw" tabindex="0" role="region" aria-label={`OperStack and ${d.competitor.name} compared`}>
+        <table>
+          <thead><tr><th scope="col">What you get</th><th scope="col">OperStack</th><th scope="col">{d.competitor.name}</th></tr></thead>
+          <tbody>
+            {d.table.map((r) => (
+              <tr>
+                <th scope="row">{r.feature}</th>
+                <td>{r.us.source ? <a href={r.us.source}>{r.us.text}</a> : r.us.text}</td>
+                <td>{r.them.text}{r.them.source && <a class="src" href={r.them.source} rel="nofollow noopener" aria-label={`Source for ${r.feature}`}>source</a>}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+      <p class="note">{d.competitor.name} prices and features as published on their own pages on {fmt(d.checkedAt)}; each cell links to where we read it. Prices can change after this date.</p>
+    </section>
+
+    <WatchExample />
+
+    {d.rivalScore && (
+      <section class="rival" id="their-site">
+        <h2>{d.competitor.name}'s own site in our free check</h2>
+        <p>On {fmt(d.rivalScore.date)} the OperStack free check scored {d.competitor.site ? new URL(d.competitor.site).host.replace(/^www\./, '') : d.competitor.name} at <b>{d.rivalScore.score} out of 100</b>, reading {d.rivalScore.pages} {d.rivalScore.pages === 1 ? 'page' : 'pages'}. {d.rivalScore.note}</p>
+        <p class="note">Same code and same rules as for any site, including ours (oper-stack.com scored 96 the same day). It measures whether AI systems can read and quote a site, not how good the product is.</p>
+      </section>
+    )}
+
+    <div class="prose-light">
+      <Content />
+    </div>
+
+    <section class="cta">
+      <h2>See it on your own site first</h2>
+      <p>The free check reads ten pages, scores them out of 100 and asks ChatGPT three questions a buyer would ask. No signup.</p>
+      <p class="cta-row"><a class="btn" href="/ai-visibility/">Check your site free →</a><a class="btn btn-quiet" href="/pricing/">Watch: 7 days free</a></p>
+    </section>
+
+    <FaqSection items={d.faq} />
+
+    {related.length > 0 && (
+      <section class="rel">
+        <h2>Other comparisons</h2>
+        <ul>{related.map((r) => <li><a href={`/compare/${r!.id}/`}>OperStack vs {r!.data.competitor.name}</a><span>{r!.data.h1}</span></li>)}</ul>
+        <p><a href="/compare/">All comparisons</a> · <a href="/pricing/">Pricing</a> · <a href="/ai-visibility/">Free check</a></p>
+      </section>
+    )}
+
+    <section class="srcs">
+      <h2>Sources</h2>
+      <ol>{d.sources.map((s) => <li><a href={s.url} rel="nofollow noopener">{s.label}</a></li>)}</ol>
+      <p class="note">Checked {fmt(d.checkedAt)}. OperStack is our product; we say so because it matters when you read a comparison.</p>
+    </section>
+  </article>
+</CommercialLayout>
+
+<style>
+  .cmp { max-width: 860px; margin: 0 auto; padding: 36px 20px 64px; }
+  .crumbs { font-size: 13px; color: #56606B; margin: 0 0 14px; }
+  .meta { font-family: var(--fm); font-size: 11.5px; letter-spacing: .06em; text-transform: uppercase; color: #56606B; margin: 0 0 12px; }
+  .cmp h1 { font-family: var(--fd); font-size: clamp(30px, 4.6vw, 44px); line-height: 1.1; letter-spacing: -.02em; margin: 0 0 18px; }
+  .answer { font-size: 19px; line-height: 1.6; color: #16202B; margin: 0 0 26px; }
+  .pick { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 0 0 34px; }
+  .pick > div { background: #fff; border: 1px solid rgba(11,16,23,.1); border-radius: 16px; padding: 18px 20px; }
+  .pick-us { border-color: rgba(23,124,112,.35) !important; background: #F4FAF8 !important; }
+  .pick h2 { font-family: var(--fd); font-size: 19px; margin: 0 0 8px; }
+  .pick ul { margin: 0; padding-left: 18px; } .pick li { margin: 6px 0; line-height: 1.5; }
+  section { margin: 0 0 36px; }
+  section > h2, .prose-light :global(h2) { font-family: var(--fd); font-size: clamp(22px, 3vw, 28px); line-height: 1.2; margin: 38px 0 12px; }
+  .tw { overflow-x: auto; -webkit-overflow-scrolling: touch; border: 1px solid rgba(11,16,23,.1); border-radius: 14px; background: #fff; }
+  table { border-collapse: collapse; width: 100%; font-size: 15px; min-width: 560px; }
+  th, td { text-align: left; vertical-align: top; padding: 11px 14px; border-bottom: 1px solid rgba(11,16,23,.07); line-height: 1.45; }
+  thead th { font-size: 12px; letter-spacing: .06em; text-transform: uppercase; color: #56606B; background: #FAF8F4; }
+  tbody th { font-weight: 600; width: 30%; }
+  tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+  .src { margin-left: 6px; font-size: 12px; color: #56606B !important; }
+  .note { font-size: 14px; color: #56606B; margin: 10px 0 0; }
+  figure { margin: 18px 0 0; } figure img { width: 100%; height: auto; border: 1px solid rgba(11,16,23,.1); border-radius: 12px; } figcaption { font-size: 13.5px; color: #56606B; margin-top: 6px; }
+  .prose-light :global(p), .prose-light :global(li) { font-size: 17px; line-height: 1.7; color: #1F2933; }
+  .prose-light :global(h3) { font-size: 19px; margin: 26px 0 8px; }
+  .prose-light :global(table) { margin: 14px 0; display: block; overflow-x: auto; }
+  .cta { background: linear-gradient(180deg, #E6F4F1, #F4FAF8); border: 1px solid rgba(23,124,112,.2); border-radius: 18px; padding: 24px; }
+  .cta h2 { margin-top: 0; } .cta-row { display: flex; gap: 10px; flex-wrap: wrap; margin: 14px 0 0; }
+  .rel ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+  .rel li { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; background: #fff; border: 1px solid rgba(11,16,23,.08); border-radius: 12px; }
+  .rel li span { font-size: 14px; color: #56606B; }
+  .srcs ol { padding-left: 20px; font-size: 14.5px; } .srcs li { margin: 5px 0; overflow-wrap: anywhere; }
+  @media (max-width: 680px) { .pick { grid-template-columns: 1fr; } .answer { font-size: 17.5px; } }
+</style>

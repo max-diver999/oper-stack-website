@@ -356,6 +356,7 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
         <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
         <a href="/cases/" class:list={{ active: Astro.url.pathname.startsWith('/cases') }}>Cases</a>
         <a href="/guides/" class:list={{ active: Astro.url.pathname.startsWith('/guides') }}>Guides</a>
+        <a href="/compare/" class:list={{ active: Astro.url.pathname.startsWith('/compare') }}>Compare</a>
         <a href="/products/" class:list={{ active: Astro.url.pathname.startsWith('/products') }}>All products</a>
         <a href="/about/" class:list={{ active: Astro.url.pathname.startsWith('/about') }}>About</a>
       </nav>
@@ -372,6 +373,7 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
     <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
     <a href="/cases/" class:list={{ active: Astro.url.pathname.startsWith('/cases') }}>Cases</a>
     <a href="/guides/" class:list={{ active: Astro.url.pathname.startsWith('/guides') }}>Guides</a>
+    <a href="/compare/" class:list={{ active: Astro.url.pathname.startsWith('/compare') }}>Compare</a>
     <a href="/products/" class:list={{ active: Astro.url.pathname.startsWith('/products') }}>All products</a>
     <a href="/about/" class:list={{ active: Astro.url.pathname.startsWith('/about') }}>About</a>
   </nav>
@@ -380,7 +382,7 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
   <footer class="site-foot">
     <p>{bare?.footer ?? `${SITE.name} · ${SITE.tagline}`}</p>
     <p style="margin-top:8px"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
-    {!bare && <p class="foot-links"><a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/services/">Services on request</a> · <a href="/map/">Map</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>}
+    {!bare && <p class="foot-links"><a href="/about/">About</a> · <a href="/compare/">Compare</a> · <a href="/contact/">Contact</a> · <a href="/services/">Services on request</a> · <a href="/map/">Map</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>}
   </footer>
 </body>
 </html>

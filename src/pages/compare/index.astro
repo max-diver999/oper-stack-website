@@ -1,0 +1,79 @@
+---
+/**
+ * Все сравнения OperStack с фильтром по видам инструментов (задание 26.09.2026, п. 7).
+ * Показываются только выложенные страницы: планы следующих партий на сайт не попадают.
+ */
+import { getCollection } from 'astro:content';
+import CommercialLayout from '../../components/CommercialLayout.astro';
+import { SITE } from '../../data/site';
+
+const KINDS: Record<string, string> = {
+  'ai-visibility': 'AI visibility tools',
+  'seo-suite': 'SEO suites',
+  'free-tool': 'Free tools',
+  agency: 'Agencies',
+  diy: 'Doing it yourself',
+  mcp: 'MCP servers',
+};
+const all = (await getCollection('compare')).sort((a, b) => a.data.competitor.name.localeCompare(b.data.competitor.name));
+const present = Object.keys(KINDS).filter((k) => all.some((e) => e.data.kind === k));
+const canonical = `${SITE.url}/compare/`;
+const title = 'OperStack compared with other tools';
+const description = 'OperStack compared with Semrush, Ahrefs, AI visibility trackers, free graders, agencies and asking ChatGPT yourself: prices, features and a live test on each page.';
+const jsonLd = {
+  '@context': 'https://schema.org', '@type': 'CollectionPage', name: title, description, url: canonical,
+  hasPart: all.map((e) => ({ '@type': 'Article', headline: e.data.h1, url: `${SITE.url}/compare/${e.id}/` })),
+};
+---
+
+<CommercialLayout title={`${title} · ${SITE.name}`} description={description} canonical={canonical} jsonLd={jsonLd} theme="light">
+  <main class="hub">
+    <p class="eyebrow">Compare</p>
+    <h1>OperStack next to the tools you are weighing</h1>
+    <p class="lede">Each page puts prices and features side by side with a link to where we read them, runs the same sites through both tools on a stated date, and says plainly when the other tool is the better buy. OperStack is our product; the comparisons are written by us.</p>
+    <div class="chips" role="group" aria-label="Filter by kind">
+      <button type="button" class="chip on" data-kind="all" aria-pressed="true">All ({all.length})</button>
+      {present.map((k) => <button type="button" class="chip" data-kind={k} aria-pressed="false">{KINDS[k]} ({all.filter((e) => e.data.kind === k).length})</button>)}
+    </div>
+    <ul class="cards">
+      {all.map((e) => (
+        <li data-kind={e.data.kind}>
+          <a href={`/compare/${e.id}/`}>
+            <span class="k">{KINDS[e.data.kind]}</span>
+            <b>OperStack vs {e.data.competitor.name}</b>
+            <span class="v">{e.data.h1}</span>
+          </a>
+        </li>
+      ))}
+    </ul>
+    <p class="after">Not sure yet? <a href="/ai-visibility/">Run the free check</a> on your own site: ten pages, a score out of 100 and three ChatGPT answers, no signup.</p>
+  </main>
+</CommercialLayout>
+
+<script>
+  const chips = [...document.querySelectorAll<HTMLButtonElement>('.chip')];
+  const cards = [...document.querySelectorAll<HTMLElement>('.cards li')];
+  chips.forEach((c) => c.addEventListener('click', () => {
+    const k = c.dataset.kind;
+    chips.forEach((x) => { const on = x === c; x.classList.toggle('on', on); x.setAttribute('aria-pressed', String(on)); });
+    cards.forEach((li) => { li.hidden = k !== 'all' && li.dataset.kind !== k; });
+  }));
+</script>
+
+<style>
+  .hub { max-width: 980px; margin: 0 auto; padding: 40px 20px 64px; }
+  .eyebrow { font-family: var(--fm); font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #177C70; margin: 0 0 12px; }
+  .hub h1 { font-family: var(--fd); font-size: clamp(30px, 4.8vw, 46px); line-height: 1.1; letter-spacing: -.02em; margin: 0 0 16px; }
+  .lede { font-size: 18px; line-height: 1.6; max-width: 70ch; margin: 0 0 24px; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 22px; }
+  .chip { font: inherit; font-size: 14px; padding: 8px 14px; border-radius: 999px; border: 1px solid rgba(11,16,23,.18); background: #fff; color: #16202B; cursor: pointer; }
+  .chip.on { background: #177C70; border-color: #177C70; color: #fff; }
+  .cards { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .cards a { display: flex; flex-direction: column; gap: 6px; height: 100%; padding: 18px 20px; background: #fff; border: 1px solid rgba(11,16,23,.1); border-radius: 16px; text-decoration: none; color: #16202B !important; }
+  .cards a:hover { border-color: rgba(23,124,112,.5); }
+  .cards b { font-size: 18px; }
+  .k { font-family: var(--fm); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: #56606B; }
+  .v { font-size: 15px; color: #3F4854; line-height: 1.5; }
+  .after { margin-top: 28px; font-size: 16px; }
+  @media (max-width: 680px) { .cards { grid-template-columns: 1fr; } }
+</style>
