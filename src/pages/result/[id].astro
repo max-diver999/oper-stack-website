@@ -22,6 +22,8 @@ import { loadCheck, latestForDomain } from '../../lib/check-store';
 import { BADGE_LABEL, badgeSize } from '../../lib/badge';
 import { SITE } from '../../data/site';
 import { PRODUCTS } from '../../data/products';
+import { getExtras } from '../../lib/extras-store';
+import { pickPage, FREE_RUNS_PER_IP } from '../../lib/free-extras.mjs';
 
 export const prerender = false;
 
@@ -54,6 +56,26 @@ const grade = String(p.grade || (score >= 80 ? 'A' : score >= 65 ? 'B' : score >
 
 /* English needs one form, not three: plural(n, 'thing') gives "thing" or "things". */
 const plural = (n: number, one: string) => (n === 1 ? one : `${one}s`);
+
+/*
+ * Платная часть проверки (задание 26.09.2026, п. 2 и 3): ответы ChatGPT на три вопроса покупателя и
+ * готовый абзац для страницы. Считаются после показа страницы, сохраняются к этой проверке и
+ * показываются отсюда же; скрипт ниже только запускает прогон и подменяет два блока готовыми.
+ */
+const extras = await getExtras(id);
+const xs: string = extras?.status || 'none';
+const xp: any = extras?.payload || {};
+const named: any = xs === 'done' ? xp.named : null;
+const ready: any = xs === 'done' ? xp.ready : null;
+const readyPage = pickPage(sample);
+const envOf = (k: string) => String((import.meta.env as any)[k] || process.env[k] || '').trim();
+// Тестовый ключ Cloudflare «всегда проходит, невидимый» только вне Vercel, для локальной проверки.
+const tsKey = envOf('PUBLIC_TURNSTILE_SITE_KEY') || (process.env.VERCEL ? '' : '1x00000000000000000000BB');
+const namedState = xs === 'done' ? 'done' : xs === 'needs' ? 'needs' : xs === 'error' ? 'error' : 'pending';
+const askedOn = xp.at ? new Date(xp.at).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' }) : when;
+// Город не повторяется, если он уже в нише: «Phuket property shortlist», а не «…, Phuket».
+const nichePlace = xp.profile ? (xp.profile.city || xp.profile.country || '') : '';
+const niche = xp.profile ? [xp.profile.category, nichePlace && !String(xp.profile.category || '').toLowerCase().includes(nichePlace.toLowerCase()) ? nichePlace : ''].filter(Boolean).join(', ') : '';
 /* One colour rule for the whole page: the same thresholds the grade letter uses. */
 const tone = (n: number | null) => (n === null ? 'none' : n >= 80 ? 'good' : n >= 45 ? 'fair' : 'poor');
 const pct = (s: number | null, m: number) => (s === null || !m ? 0 : Math.round((s / m) * 100));
@@ -146,6 +168,46 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
         </div>
       </header>
 
+      {tsKey && (
+        <section class="card named" id="x-named" data-state={namedState} data-id={stored.id} data-sitekey={tsKey} aria-live="polite">
+          <div class="card-head"><h2>Who ChatGPT names instead of you</h2><span class="card-meta">3 buyer questions</span></div>
+          {namedState === 'done' && named ? (
+            <>
+              <p class="nm-big">ChatGPT named {stored.domain} in <b>{named.named} of {named.asked}</b> answers.</p>
+              {niche && <p class="lede">We asked it the way a buyer looking for <b>{niche}</b> would.</p>}
+              <ul class="nm-rows">
+                {named.rows.map((r: any) => (
+                  <li>
+                    <p class="nm-q">"{r.question}"</p>
+                    <p class="nm-a">
+                      {r.error ? <span class="chip chip-none">not answered</span> : r.named ? <span class="chip chip-good">named you</span> : <span class="chip chip-poor">not named</span>}
+                      {r.comp.length > 0 && <span class="nm-names">{r.named ? 'Also named' : 'Named instead'}: {r.comp.join(', ')}</span>}
+                    </p>
+                    {r.other.length > 0 && <p class="nm-meta">Not counted as competitors: {r.other.join(', ')}</p>}
+                    {r.unclear.length > 0 && <p class="nm-meta">Could not identify: {r.unclear.join(', ')}</p>}
+                  </li>
+                ))}
+              </ul>
+              <p class="nm-cta">Watch asks ten questions like these every week and shows what changes. 7 days free.</p>
+              <a class="btn btn-main" href="/pricing/">Start 7 days free</a>
+              <p class="note">Answers come from ChatGPT through its API with web search switched on, asked on {askedOn}. They change from run to run, so treat one run as a sample, not a verdict.</p>
+            </>
+          ) : namedState === 'needs' ? (
+            <form class="nm-sell" id="nm-sell">
+              <label for="sell">We could not tell from the site what you sell. What do you sell, and where?</label>
+              <div class="nm-row"><input id="sell" name="sell" required maxlength="120" placeholder="dentist, Bristol" autocomplete="off" /><button type="submit" class="btn btn-main">Ask ChatGPT</button></div>
+            </form>
+          ) : namedState === 'error' ? (
+            <p class="lede">ChatGPT did not answer this time. <button type="button" class="btn btn-quiet" id="nm-retry">Ask again</button></p>
+          ) : (
+            <p class="lede nm-wait"><span class="spin" aria-hidden="true"></span>Asking ChatGPT three questions a buyer would ask about a business like {stored.domain}. This takes under a minute.</p>
+          )}
+          <template id="nm-limit"><p class="lede">You have used your {FREE_RUNS_PER_IP} free checks today. Watch runs them every week: 7 days free.</p><a class="btn btn-main" href="/pricing/">Start 7 days free</a></template>
+          <template id="nm-blocked"><p class="lede">We could not confirm this is a person and not a script, so ChatGPT was not asked. Reload the page to try again.</p></template>
+          <div id="nm-ts" class="nm-ts"></div>
+        </section>
+      )}
+
       {searchBlocked > 0 && (
         <p class="alarm">{searchBlocked} of the crawlers that fetch pages in order to cite them {searchBlocked === 1 ? 'is' : 'are'} turned away in robots.txt. Those are the bots that put a site into an answer.</p>
       )}
@@ -213,6 +275,24 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
             <dt>{fix.labels?.verify || 'How to check'}</dt><dd>{fix.verify}</dd>
           </dl>
           <p class="note">Hand this to whoever runs the site. It is written so it can be done without asking us anything.</p>
+        </section>
+      )}
+
+      {tsKey && (ready || (namedState !== 'done' && readyPage)) && (
+        <section class="card ready" id="x-ready">
+          <div class="card-head"><h2>Ready to paste</h2><span class="card-meta">{(ready ? ready.page : readyPage?.path) === '/' ? 'your homepage' : (ready ? ready.page : readyPage?.path)}</span></div>
+          {ready ? (
+            <>
+              <p class="lede"><b>{ready.a}</b></p>
+              <div class="rt-box" id="ready-text">{ready.x}</div>
+              {(ready.n || []).map((t: string) => <p class="note">{t}</p>)}
+              <button type="button" class="rt-copy" data-copy-from="ready-text">Copy the text</button>
+              <p class="rt-cta">Watch writes one of these every week, for the questions your buyers ask ChatGPT.</p>
+              <a class="btn btn-main" href="/pricing/">Watch this weekly, 7 days free</a>
+            </>
+          ) : (
+            <p class="lede nm-wait"><span class="spin" aria-hidden="true"></span>Writing an opening paragraph for {readyPage?.path === '/' ? 'your homepage' : readyPage?.path} from what your own pages say.</p>
+          )}
         </section>
       )}
 
@@ -435,6 +515,81 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
   syncBar();
 </script>
 
+<script>
+  /*
+   * Платная часть проверки. Невидимый Turnstile даёт токен, POST /api/check-extras/ запускает прогон
+   * (или отдаёт сохранённое), затем два блока подменяются теми, что сервер нарисовал заново: один
+   * способ рисовать, на сервере. Лимит и Turnstile показываются здесь, их сервер не хранит.
+   */
+  const named = document.getElementById('x-named') as HTMLElement | null;
+  const checkId = named?.dataset.id || '';
+  const siteKey = named?.dataset.sitekey || '';
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+  async function swap() {
+    const html = await (await fetch(location.href, { cache: 'no-store' })).text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    for (const id of ['x-named', 'x-ready']) {
+      const fresh = doc.getElementById(id); const old = document.getElementById(id);
+      if (old && fresh) old.replaceWith(fresh); else if (old && !fresh) old.remove();
+    }
+    bind();
+  }
+  function showTemplate(name: string) {
+    const box = document.getElementById('x-named'); const t = document.getElementById(name) as HTMLTemplateElement | null;
+    if (!box || !t) return;
+    const head = box.querySelector('.card-head');
+    [...box.children].forEach((c) => { if (c !== head && c.tagName !== 'TEMPLATE' && c.id !== 'nm-ts') c.remove(); });
+    box.insertBefore(t.content.cloneNode(true), document.getElementById('nm-ts'));
+    document.getElementById('x-ready')?.remove();
+  }
+  function loadTurnstile(): Promise<any> {
+    const w = window as any;
+    if (w.turnstile) return Promise.resolve(w.turnstile);
+    return new Promise((resolve, reject) => {
+      const s = document.createElement('script');
+      s.src = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
+      s.async = true; s.onload = () => resolve(w.turnstile); s.onerror = reject;
+      document.head.appendChild(s);
+    });
+  }
+  async function token(): Promise<string> {
+    const ts = await loadTurnstile();
+    return new Promise((resolve) => {
+      const holder = document.getElementById('nm-ts'); if (!holder) return resolve('');
+      holder.innerHTML = '';
+      ts.render(holder, { sitekey: siteKey, callback: (t: string) => resolve(t), 'error-callback': () => { resolve(''); return true; }, 'expired-callback': () => resolve('') });
+    });
+  }
+  async function run(sell = '') {
+    let t = '';
+    try { t = await token(); } catch { t = ''; }
+    const res = await fetch('/api/check-extras/', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id: checkId, token: t, sell }) });
+    const data = await res.json().catch(() => ({ status: 'error' }));
+    if (data.status === 'running') { for (let k = 0; k < 45; k += 1) { await sleep(4000); const d = await (await fetch(`/api/check-extras/?id=${encodeURIComponent(checkId)}`, { cache: 'no-store' })).json().catch(() => ({})); if (d.status && d.status !== 'running') break; } return swap(); }
+    if (data.status === 'limit') return showTemplate('nm-limit');
+    if (data.status === 'blocked') return showTemplate('nm-blocked');
+    return swap();
+  }
+  function bind() {
+    const box = document.getElementById('x-named') as HTMLElement | null;
+    if (!box) return;
+    const state = box.dataset.state;
+    if (state === 'pending' && !box.dataset.started) { box.dataset.started = '1'; run(); }
+    document.getElementById('nm-retry')?.addEventListener('click', () => { run(); });
+    const form = document.getElementById('nm-sell') as HTMLFormElement | null;
+    form?.addEventListener('submit', (e) => { e.preventDefault(); const v = String(new FormData(form).get('sell') || '').trim(); if (!v) return; form.querySelector('button')?.setAttribute('disabled', ''); run(v); });
+  }
+  document.addEventListener('click', async (e) => {
+    const b = (e.target as HTMLElement).closest('[data-copy-from]') as HTMLButtonElement | null;
+    if (!b) return;
+    const box = document.getElementById(b.dataset.copyFrom || '');
+    try { await navigator.clipboard.writeText(box?.textContent || ''); b.textContent = 'Copied'; }
+    catch { const r = document.createRange(); if (box) { r.selectNodeContents(box); const s = getSelection(); s?.removeAllRanges(); s?.addRange(r); } b.textContent = 'Selected: press Cmd+C'; }
+    setTimeout(() => { b.textContent = 'Copy the text'; }, 2500);
+  });
+  if (checkId && siteKey) bind();
+</script>
+
 <style is:global>
   /* The document is light; the site nav stays a dark strip above it.
      Colour tokens on body, not on .doc: the sticky bar lives outside .doc, and with the tokens on
@@ -621,4 +776,27 @@ const path = (u: string) => { try { return new URL(u).pathname; } catch { return
     .seo { grid-template-columns: 1fr; }
   }
   @media (max-width: 460px) { .eng-grid { grid-template-columns: 1fr; } }
+
+  /* Платная часть проверки: «кого называет ChatGPT» и готовый текст (26.09.2026). */
+  .nm-big { font-size: 1.25rem; margin: .2rem 0 .6rem; }
+  .nm-rows { list-style: none; margin: 1rem 0; padding: 0; display: grid; gap: .9rem; }
+  .nm-rows li { padding: .8rem 0 0; border-top: 1px solid rgba(11,16,23,.08); }
+  .nm-q { margin: 0 0 .35rem; font-weight: 600; }
+  .nm-a { margin: 0; display: flex; flex-wrap: wrap; gap: .5rem; align-items: baseline; }
+  .nm-names { color: #16202B; }
+  .nm-meta { margin: .3rem 0 0; font-size: .9rem; color: #56606B; }
+  .chip-good { background: #E1F2EE; color: #13614F; }
+  .chip-none { background: #ECEAE4; color: #4A525C; }
+  .nm-cta, .rt-cta { margin: 1rem 0 .6rem; font-weight: 500; }
+  .nm-sell label { display: block; margin: 0 0 .5rem; }
+  .nm-row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .nm-row input { flex: 1 1 220px; min-width: 0; font: inherit; padding: .6rem .8rem; border-radius: 10px; border: 1px solid rgba(11,16,23,.25); }
+  .nm-wait { display: flex; gap: .6rem; align-items: center; }
+  .spin { width: 16px; height: 16px; flex: none; border-radius: 50%; border: 2px solid rgba(23,124,112,.25); border-top-color: #177C70; animation: nmspin 1s linear infinite; }
+  @keyframes nmspin { to { transform: rotate(360deg); } }
+  @media (prefers-reduced-motion: reduce) { .spin { animation: none; } }
+  .nm-ts { min-height: 0; }
+  .rt-box { white-space: pre-wrap; background: #fff; border: 1px solid rgba(11,16,23,.12); border-radius: 14px; padding: 18px 20px; font-size: 1.05rem; line-height: 1.6; margin: .8rem 0 0; }
+  .rt-copy { margin-top: 14px; height: 48px; padding: 0 22px; background: #177C70; color: #fff; border: 0; border-radius: 12px; font: inherit; font-weight: 600; cursor: pointer; }
+  .rt-copy:hover { background: #146A60; }
 </style>
