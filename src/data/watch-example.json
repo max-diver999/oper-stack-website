@@ -1,0 +1,69 @@
+{
+ "date": "2026-09-26",
+ "site": "a Phuket property brand we run",
+ "score": 89,
+ "pages": 10,
+ "asked": 10,
+ "named": 5,
+ "instead": [
+  {
+   "name": "Butler Estates",
+   "times": 3
+  },
+  {
+   "name": "ZODIAC Co., Ltd.",
+   "times": 3
+  },
+  {
+   "name": "Subata Realty",
+   "times": 2
+  },
+  {
+   "name": "Pearl Property Phuket",
+   "times": 2
+  }
+ ],
+ "rows": [
+  {
+   "question": "Best property advisors for foreign buyers in Phuket?",
+   "named": false,
+   "names": [
+    "Butler Estates",
+    "Freedom Group Real Estate",
+    "ZODIAC Co., Ltd.",
+    "Storm Real Estate",
+    "Subata Realty"
+   ]
+  },
+  {
+   "question": "Which property buyer’s advisors should I use for researching beachfront and branded residences in Phuket?",
+   "named": false,
+   "names": [
+    "Butler Estates",
+    "Issara Property",
+    "Pearl Property Phuket",
+    "Subata Realty",
+    "Twins Real Estate"
+   ]
+  },
+  {
+   "question": "Who can help me compare Phuket condo and villa projects with a shortlist?",
+   "named": true,
+   "names": [
+    "Etagi",
+    "Colliers",
+    "THAI.ESTATE",
+    "AIProperty Phuket"
+   ]
+  }
+ ],
+ "fix": {
+  "question": "Top firms to help foreign buyers evaluate Phuket developments before reservation?",
+  "action": "Add this to your homepage, just below the first section.",
+  "text": "{brand} helps foreign buyers compare Phuket property before reservation with a three-project shortlist matched to budget and use, plus checked construction status and buyer review. Featured projects include Origin Residences Bang Tao, So Origin Bangtao Beach and Essence Residence Rawai. We provide verified inventory and transparent prices for the main investment districts, with median prices from our price list. We also show a 0% interest construction payment plan with 20% down, 30% during construction and 50% on completion, and Thai bank mortgage terms of up to 15 years with 50% down payment required.",
+  "notes": [
+   "Before you publish: add the words \"developments\" to this paragraph if you sell them."
+  ]
+ },
+ "costUsd": 0.149
+}

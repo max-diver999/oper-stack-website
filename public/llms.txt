@@ -58,6 +58,20 @@ OperStack checks what ChatGPT, Claude, Perplexity and Gemini see on a website, f
 - [Fix package, quoted on request against a list agreed before payment](https://oper-stack.com/products/fix/)
 - [Foundation package, quoted on request: the text work](https://oper-stack.com/products/foundation/)
 
+## Comparisons
+
+- [All comparisons: scope, costs and the recurring work](https://oper-stack.com/compare/)
+- [OperStack vs Ahrefs](https://oper-stack.com/compare/operstack-vs-ahrefs/)
+- [OperStack vs asking ChatGPT yourself](https://oper-stack.com/compare/operstack-vs-asking-chatgpt/)
+- [OperStack vs ContextBolt](https://oper-stack.com/compare/operstack-vs-contextbolt/)
+- [OperStack vs Google Search Console](https://oper-stack.com/compare/operstack-vs-google-search-console/)
+- [OperStack vs HubSpot AI Search Grader](https://oper-stack.com/compare/operstack-vs-hubspot-ai-search-grader/)
+- [OperStack vs Otterly.AI](https://oper-stack.com/compare/operstack-vs-otterly-ai/)
+- [OperStack vs Peec AI](https://oper-stack.com/compare/operstack-vs-peec-ai/)
+- [OperStack vs Profound](https://oper-stack.com/compare/operstack-vs-profound/)
+- [OperStack vs Semrush](https://oper-stack.com/compare/operstack-vs-semrush/)
+- [OperStack vs an SEO agency](https://oper-stack.com/compare/operstack-vs-seo-agency/)
+
 ## Guides
 
 - [llms.txt: What It Is, How to Write One, and Why Most of Them Rot](https://oper-stack.com/guides/llms-txt-guide/): A practical guide to llms.txt: what the format actually asks for, a working example, how to generate it so it cannot drift, and how to check whether the links in yours still lead anywhere.

@@ -34,7 +34,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
   <div class="wrap">
     <p class="label">Free tool</p>
     <h1>Can AI assistants read and cite your site?</h1>
-    <p class="lede">Enter a site. In about ten seconds you get a score out of 100 across the five things an answer engine needs before it quotes a page, and the three fixes that move it most.</p>
+    <p class="lede">Enter a site. In about ten seconds you get a score out of 100 across the five things an answer engine needs before it quotes a page, and the three fixes that move it most. Then ChatGPT answers three questions a buyer would ask: you see whether it names you and who it names instead.</p>
     <p class="coverage">Other tools check one page. We check ten.</p>
     <CitabilityBlock text="The OperStack AI visibility check reads a site's robots.txt, llms.txt, sitemap, schema and a sample of pages, and scores whether ChatGPT, Perplexity, Copilot, Claude and Gemini can read, understand and cite it. It is free and uses public signals only." />
 
@@ -120,6 +120,7 @@ const appSchema = { '@context': 'https://schema.org', '@type': 'WebApplication',
       <li><strong>Entity, 20 points.</strong> Organization or business schema, FAQPage, a page-level type (Article, Service, Product, Course and the like), a canonical tag and Open Graph on the homepage.</li>
       <li><strong>Quotable content, 25 points.</strong> On the ten sampled pages: at least 300 words, an answer-first paragraph with a figure right after the H1, three or more H2 sections, a table.</li>
       <li><strong>Dates and sources, 15 points.</strong> Publication dates in meta or schema, source phrases in the text, a sitemap with lastmod.</li>
+      <li><strong>Who ChatGPT names, not part of the score.</strong> After the score we ask ChatGPT, with web search on, three questions a buyer of a business like yours would ask, and show whether it names you and who it names instead. If a checked page lacks a short answer at the top, you also get a ready-to-paste opening paragraph for it, written only from what your own pages say. Three of these a day per connection.</li>
     </ol>
 
     <h2>What it does not measure</h2>

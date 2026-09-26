@@ -112,6 +112,8 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
       --ink: #0B1017;
       --paper: #F5F2EC;
       --teal: #1A8A7D;
+      /* Фон кнопок темнее основной бирюзы: белый текст на #1A8A7D давал 4.2:1, нужно 4.5 (задание 26.09.2026, п. 1). */
+      --teal-btn: #177C70;
       --teal-soft: #3DB8A9;
       --amber-soft: #E8B84A;
       --muted: #8B939E;
@@ -173,7 +175,7 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
       gap: 8px;
       padding: 13px 20px;
       border-radius: 10px;
-      background: linear-gradient(135deg, var(--teal), #156b62);
+      background: linear-gradient(135deg, var(--teal-btn), #156b62);
       color: #fff;
       font-weight: 600;
       font-size: 14px;
@@ -182,6 +184,11 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
       cursor: pointer;
     }
     .btn:hover { filter: brightness(1.06); }
+    /* Кнопка внутри текста статьи не берёт цвет ссылок статьи: бирюза на бирюзе давала 1.7:1. */
+    .prose a.btn:not(.btn-ghost):not(.btn-quiet) { color: #fff; }
+    /* Второстепенная кнопка: светлый фон, рамка, тёмный текст. */
+    .btn.btn-quiet, .prose a.btn.btn-quiet { background: #fff; color: #0B1017; border: 1px solid rgba(11,16,23,.22); }
+    .btn.btn-quiet:hover { filter: none; border-color: rgba(11,16,23,.45); }
     .btn-ghost {
       background: transparent;
       border: 1px solid rgba(61, 184, 169, 0.35);
@@ -318,14 +325,15 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
     body[data-theme="light"] .faq dt { color: #0B1017 !important; }
     body[data-theme="light"] .faq dd { color: #3F4854 !important; }
     body[data-theme="light"] h1 { color: #0B1017; }
-    body[data-theme="light"] a.btn, body[data-theme="light"] .btn { color: #fff !important; }
+    body[data-theme="light"] a.btn:not(.btn-quiet), body[data-theme="light"] .btn:not(.btn-quiet) { color: #fff !important; }
+    body[data-theme="light"] .btn.btn-quiet { color: #0B1017 !important; }
     .lnav { position: sticky; top: 0; z-index: 50; padding: 14px 16px 0; }
     .lnav-in { max-width: 1080px; margin: 0 auto; display: flex; align-items: center; gap: 20px; background: rgba(255,255,255,.86); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(11,16,23,.08); border-radius: 999px; padding: 8px 8px 8px 18px; box-shadow: 0 1px 2px rgba(11,16,23,.04), 0 10px 30px -18px rgba(11,16,23,.25); }
     .lnav .brand { display: inline-flex; align-items: center; gap: 8px; font-weight: 700; font-size: 16px; color: #0B1017 !important; text-decoration: none; letter-spacing: -.01em; }
     .lnav nav { display: flex; gap: 22px; margin: 0 auto; }
     .lnav nav a { color: #3F4854 !important; text-decoration: none; font-size: 14.5px; font-weight: 500; }
     .lnav nav a:hover, .lnav nav a.active { color: #1A8A7D !important; }
-    .lnav-cta { background: #1A8A7D; color: #fff !important; text-decoration: none; font-weight: 600; font-size: 14px; padding: 10px 18px; border-radius: 999px; white-space: nowrap; }
+    .lnav-cta { background: #177C70; color: #fff !important; text-decoration: none; font-weight: 600; font-size: 14px; padding: 10px 18px; border-radius: 999px; white-space: nowrap; }
     .lnav-cta:hover { background: #157468; }
     @media (max-width: 760px) {
       .lnav { padding: 10px 10px 0; }
@@ -348,6 +356,7 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
         <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
         <a href="/cases/" class:list={{ active: Astro.url.pathname.startsWith('/cases') }}>Cases</a>
         <a href="/guides/" class:list={{ active: Astro.url.pathname.startsWith('/guides') }}>Guides</a>
+        <a href="/compare/" class:list={{ active: Astro.url.pathname.startsWith('/compare') }}>Compare</a>
         <a href="/products/" class:list={{ active: Astro.url.pathname.startsWith('/products') }}>All products</a>
         <a href="/about/" class:list={{ active: Astro.url.pathname.startsWith('/about') }}>About</a>
       </nav>
@@ -364,6 +373,7 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
     <a href="/pricing/" class:list={{ active: Astro.url.pathname.startsWith('/pricing') }}>Pricing</a>
     <a href="/cases/" class:list={{ active: Astro.url.pathname.startsWith('/cases') }}>Cases</a>
     <a href="/guides/" class:list={{ active: Astro.url.pathname.startsWith('/guides') }}>Guides</a>
+    <a href="/compare/" class:list={{ active: Astro.url.pathname.startsWith('/compare') }}>Compare</a>
     <a href="/products/" class:list={{ active: Astro.url.pathname.startsWith('/products') }}>All products</a>
     <a href="/about/" class:list={{ active: Astro.url.pathname.startsWith('/about') }}>About</a>
   </nav>
@@ -372,7 +382,7 @@ const schemas = [organizationSchema, ...(webPageSchema ? [webPageSchema] : []), 
   <footer class="site-foot">
     <p>{bare?.footer ?? `${SITE.name} · ${SITE.tagline}`}</p>
     <p style="margin-top:8px"><a href={`mailto:${SITE.email}`}>{SITE.email}</a></p>
-    {!bare && <p class="foot-links"><a href="/about/">About</a> · <a href="/contact/">Contact</a> · <a href="/services/">Services on request</a> · <a href="/map/">Map</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>}
+    {!bare && <p class="foot-links"><a href="/about/">About</a> · <a href="/compare/">Compare</a> · <a href="/contact/">Contact</a> · <a href="/services/">Services on request</a> · <a href="/map/">Map</a> · <a href="/privacy/">Privacy</a> · <a href="/terms/">Terms</a> · <a href="/refunds/">Refunds</a></p>}
   </footer>
 </body>
 </html>

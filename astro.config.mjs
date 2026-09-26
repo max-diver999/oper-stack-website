@@ -26,7 +26,8 @@ export default defineConfig({
   site: 'https://oper-stack.com',
   output: 'static',
   trailingSlash: 'always',
-  adapter: vercel({ maxDuration: 30 }),
+  // 120 с: платная часть бесплатной проверки (ChatGPT с поиском и готовый абзац) идёт 15-40 с (26.09.2026).
+  adapter: vercel({ maxDuration: 120 }),
   markdown: {
     // Подписи колонок в ячейках: на телефоне таблица раскладывается в карточки, и без подписи
     // ячейка теряет смысл. Делается на сборке, чтобы подпись была в готовой странице.
