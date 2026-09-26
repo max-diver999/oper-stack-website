@@ -65,6 +65,16 @@ try {
   assert.equal((await m.marketingEligibility(base.email, ['report-29'])).allowed, true);
   await m.setMarketingPermission(base.email, false, 'unsubscribe');
   assert.equal((await m.marketingEligibility(base.email, ['audit-149'])).allowed, false);
+  const watchOrder = await m.reserveFulfilment({ ...base, eventId: 'watch-event', orderKey: 'watch-order', providerRef: 'mem_watch_test', email: 'watch-buyer@example.test', product: 'watch' });
+  await m.finishFulfilment(watchOrder.jobId, 'accepted');
+  const beforeWatch = sends;
+  for (const offered of ['watch', 'report-9', 'report-29']) {
+    assert.equal((await m.marketingEligibility('WATCH-BUYER@example.test', [offered])).allowed, false);
+    const blocked = await m.sendCommerceMail({ logicalKey: 'watch-offer-' + offered, kind: 'sequence', payload: { ...payload, to: ['watch-buyer@example.test'] }, offered: [offered] });
+    assert.equal(blocked.suppressed, true);
+  }
+  assert.equal(sends, beforeWatch, 'Watch owners receive no offers for Watch or its included products');
+  assert.equal((await m.marketingEligibility('watch-buyer@example.test', ['audit-149'])).allowed, true);
   const timestamp = String(Math.floor(Date.now()/1000));
   const key = Buffer.from('test-signing-secret').toString('base64');
   const signature = 'v1,' + createHmac('sha256', Buffer.from(key,'base64')).update('evt.'+timestamp+'.{}').digest('base64');

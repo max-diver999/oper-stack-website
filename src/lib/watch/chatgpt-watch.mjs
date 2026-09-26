@@ -191,7 +191,16 @@ export async function deriveProfile(url, { count = QUESTIONS_PER_WEEK, hint = ''
  */
 /** Похоже на название фирмы, а не на строку-пояснение из ответа ChatGPT (кавычки, «reference», длинная фраза). */
 export const validName = (name) => Boolean(name) && name.length <= 80 && !/[?"“”«»]/.test(name) && name.split(/\s+/).length <= 7 && !/\b(reference|workflow|checklist|guide|process|option|options|resources?)\b/i.test(name) && !/^(here|these|i would|i'd|sure|note|вот|я бы)/i.test(name);
-export const cleanName = (n) => String(n || '').replace(/\s*\([^)]*\)/g, '').replace(/\s*\([^)]*$/, '').replace(/\s+\/\s+.*$/, '').replace(/\s+(?:sales office|office|team) for .*$/i, '').replace(/[.,;:]+$/, '').trim();
+const withoutParentheses = (value) => {
+  let depth = 0; let out = '';
+  for (const c of String(value || '')) {
+    if (c === '(') { depth += 1; continue; }
+    if (c === ')') { depth = Math.max(0, depth - 1); continue; }
+    if (depth === 0) out += c;
+  }
+  return out;
+};
+export const cleanName = (n) => withoutParentheses(n).replace(/\s+\/\s+.*$/, '').replace(/\s+(?:sales office|office|team) for .*$/i, '').replace(/[.,;:]+$/, '').trim();
 export function namedLines(text) {
   return String(text || '')
     .split('\n')
@@ -264,7 +273,7 @@ export function isNamed({ names = [], text = '', cited = [] }, { brand = '', url
 /** Строки ответа, где назван клиент: по ним ставится тональность (1.3). Не больше двух строк и 400 знаков. */
 export function mentionOf(text, { brand = '', url = '' }) {
   const host = hostOf(url); const root = norm(host.split('.').slice(0, -1).join('.') || host); const b = norm(brand);
-  const hit = (t) => (b.length >= 4 && norm(t).includes(b)) || (root.length >= 4 && norm(t).includes(root));
+  const hit = (t) => (b.length >= 4 && norm(t).includes(b)) || (root.length >= 4 && norm(t).includes(root)) || namedLines(t).some(({ name }) => isNamed({ names: [name] }, { brand, url }).named);
   const parts = String(text || '').split(/\n+|(?<=[.!?])\s+(?=[A-Z])/).map((x) => x.replace(/^[\s*#>\d.)-]+/, '').trim()).filter(Boolean);
   return parts.filter(hit).slice(0, 2).join(' ').slice(0, 400);
 }
@@ -1106,13 +1115,14 @@ const notesText = (fix) => (fix?.n?.length ? ['', ...fix.n] : []);
 const quote = (t) => `<!--copy--><div style="margin:6px 0 12px;padding:14px 16px;border-left:3px solid #1A8A7D;background:#FFFFFF;border-radius:6px;font-family:${FONT};font-size:15px;line-height:1.55;color:#14181C">${esc(t)}</div><!--/copy-->`;
 // Таблица по тому же правилу, что строки над ней: конкуренты в строке ответа, не конкуренты ниже
 // серым, все имена без обрезки (задание 25.09.2026, 1.2 и 2.2).
+const questionStatus = (a) => a.previousNamed === null ? 'New question; history starts here.' : typeof a.previousNamed === 'boolean' ? `Previous check: ${a.previousNamed ? 'named you' : 'did not name you'}.` : '';
 const listBlock = (rows) => rows.map((a) => `<div style="padding:10px 0;border-bottom:1px solid #E2DDD2;font-family:${FONT}">
-  <div style="font-size:15px;line-height:1.4;color:#14181C;font-weight:600">${esc(a.question)}</div>
+  <div style="font-size:15px;line-height:1.4;color:#14181C;font-weight:600">${esc(a.question)}${a.custom ? ' <span style="font-weight:400">(Your question)</span>' : ''}</div>${questionStatus(a) ? `<div style="font-size:13px;color:#5A6470">${esc(questionStatus(a))}</div>` : ''}
   <div style="margin-top:3px;font-size:14px;line-height:1.45"><span style="font-weight:700;color:${a.error ? '#5A6470' : a.named ? '#1A8A7D' : '#B5412D'}">${a.error ? 'not asked' : a.named ? 'yes, named you' : 'no'}</span>${a.comp?.length ? `<span style="color:#3F4854"> · ${esc(a.comp.join(', '))}</span>` : !a.error && !a.named ? '<span style="color:#3F4854"> · no competitor named</span>' : ''}</div>
   ${a.other?.length ? `<div style="margin-top:2px;font-size:13px;line-height:1.45;color:#5A6470">Not counted as competitors: ${esc(a.other.join(', '))}</div>` : ''}
   ${a.unclear?.length ? `<div style="margin-top:2px;font-size:13px;line-height:1.45;color:#5A6470">Could not identify: ${esc(a.unclear.join(', '))}</div>` : ''}
 </div>`).join('');
-const rowText = (a) => `- ${a.question}: ${a.error ? 'not asked' : a.named ? 'yes' : 'no'}${a.comp?.length ? `. ${a.comp.join(', ')}` : !a.error && !a.named ? '. no competitor named' : ''}${a.other?.length ? `. Not counted as competitors: ${a.other.join(', ')}` : ''}${a.unclear?.length ? `. Could not identify: ${a.unclear.join(', ')}` : ''}`;
+const rowText = (a) => `- ${a.question}${a.custom ? " (Your question)" : ""}${questionStatus(a) ? ` [${questionStatus(a)}]` : ""}: ${a.error ? 'not asked' : a.named ? 'yes' : 'no'}${a.comp?.length ? `. ${a.comp.join(', ')}` : !a.error && !a.named ? '. no competitor named' : ''}${a.other?.length ? `. Not counted as competitors: ${a.other.join(', ')}` : ''}${a.unclear?.length ? `. Could not identify: ${a.unclear.join(', ')}` : ''}`;
 
 /** Тема отчёта по заданию: с цифрой и главным конкурентом. */
 export function reportSubject({ host, week, summary, when = '' }) {
@@ -1160,9 +1170,9 @@ export function whereToGetMentioned(src) {
   const missing = src.top.filter((e) => e.mentioned === false);
   const present = src.top.filter((e) => e.mentioned === true);
   const unknown = src.top.filter((e) => e.mentioned === null);
-  if (missing.length === src.top.length) lines.push("You are not on any of them.");
-  else if (missing.length) lines.push(`You are not on ${listAnd(missing.map((e) => e.domain))}.`);
-  if (present.length) lines.push(`You're already on ${listAnd(present.map((e) => e.domain))}. Good.`);
+  if (missing.length === src.top.length) lines.push("We did not find your name on any of the checked source pages.");
+  else if (missing.length) lines.push(`We did not find your name on the checked pages from ${listAnd(missing.map((e) => e.domain))}.`);
+  if (present.length) lines.push(`We found your name on the checked pages from ${listAnd(present.map((e) => e.domain))}.`);
   if (unknown.length) lines.push(`We could not open ${listAnd(unknown.map((e) => e.domain))} to check whether you are there.`);
   const start = missing[0];
   if (start) lines.push(`Start with ${start.domain}: it shaped ${start.answers} of ${n} answers.`);
@@ -1172,7 +1182,7 @@ export function whereToGetMentioned(src) {
   return { lines, top: src.top };
 }
 
-export function buildReportLetter({ host, email, week = 0, summary, history = [], site = null, rivals = [], fix = null, fixRepeat = false, fixLive = false, when, replaced = [], insight = null }) {
+export function buildReportLetter({ host, email, week = 0, summary, history = [], site = null, rivals = [], fix = null, fixRepeat = false, fixLive = false, when, replaced = [], insight = null, changedQuestions = [] }) {
   const first = week === 0;
   const prev = history.length ? history[history.length - 1] : null;
   const plateau = history.length >= 2 && history.slice(-2).every((h) => h.named === summary.named) && summary.named < summary.asked;
@@ -1182,7 +1192,7 @@ export function buildReportLetter({ host, email, week = 0, summary, history = []
   const blocks = [];
   const text = [headLine, ''];
 
-  const intro = first
+  const intro = changedQuestions.length ? `On ${when} we checked ${n} buyer questions, including your updated questions.` : first
     ? `On ${when} we asked ChatGPT, with web search, the ${n} questions below, the way your buyers would ask them.`
     : `On ${when} we asked ChatGPT the same ${n} questions as before.`;
   blocks.push(par(esc(intro))); text.push(intro);
@@ -1192,6 +1202,10 @@ export function buildReportLetter({ host, email, week = 0, summary, history = []
       ? `We replaced one question that was not about your work: "${replaced[0].from}" → "${replaced[0].to}"`
       : `We replaced ${replaced.length} questions that were not about your work: ${replaced.map((r) => `"${r.from}" → "${r.to}"`).join('; ')}`;
     blocks.push(note(esc(line))); text.push(line);
+  }
+  if (changedQuestions.length) {
+    const changeNote = `Your updated questions are now in use. History starts again for each changed question; unchanged questions keep their records. The overall total is not compared with the old question set this week.`;
+    blocks.push(note(esc(changeNote))); text.push(changeNote);
   }
   if (!first && prev) {
     const d = summary.named - prev.named;
@@ -1234,6 +1248,7 @@ export function buildReportLetter({ host, email, week = 0, summary, history = []
   }
   const tl = !caveat && insight?.tone?.length ? toneLine(insight.tone) : '';
   if (tl) { blocks.push(par(esc(tl))); text.push(tl); }
+  else if (insight && summary.named > 0 && !insight.tone?.length) { const unavailable = 'No supported tone assessment is available for this check.'; blocks.push(note(esc(unavailable))); text.push(unavailable); }
   blocks.push(listBlock(summary.rows));
   text.push('', ...summary.rows.map(rowText));
 
@@ -1271,6 +1286,8 @@ export function buildReportLetter({ host, email, week = 0, summary, history = []
     const cta = fixRepeat ? 'See the fix' : "See this week's fix";
     blocks.push(button(fixLink(fix, week), `${cta} →`)); text.push('', `${cta}: ${fixLink(fix, week)}`);
   }
+  const questionsUrl = `${settingsLink(email).replace('/email-settings/', '/watch/questions/')}&site=${encodeURIComponent(host)}`;
+  blocks.push(par(`<a href="${esc(questionsUrl)}">Change your questions</a>`)); text.push('', `Change your questions: ${questionsUrl}`);
   const honest = 'The answers come from ChatGPT through its API with web search switched on. They change from run to run, so read the trend across weeks rather than any single answer.';
   blocks.push(note(esc(honest))); text.push('', honest, '', `Email settings: ${settingsLink(email)}`, `Manage subscription: ${MANAGE_URL}`);
 
@@ -1428,6 +1445,11 @@ export function shareOfAnswers(summary, limit = 4) {
   return { asked: rows.length, you: rows.filter((r) => r.named).length, rivals };
 }
 /** Тональность: одна метка на ответ, где клиент назван, и дословная цитата-основание. Без цитаты метки нет. */
+export function supportedToneQuote(quote, mention) {
+  const plain = String(quote || '').replace(/\[[^\]]*\]\(https?:[^)]+\)/g, '').replace(/https?:\/\/\S+/g, '');
+  const words = plain.match(/[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*/gu) || [];
+  return words.length >= 5 && words.length <= 20 && norm(mention).includes(norm(quote));
+}
 export async function toneOf(answers, brand) {
   const items = answers.map((a, id) => ({ id, a })).filter((x) => x.a.named && x.a.mention);
   if (!items.length) return [];
@@ -1439,7 +1461,7 @@ export async function toneOf(answers, brand) {
     '', ...items.map((x) => `${x.id}. ${x.a.mention}`),
   ].join('\n'), schema, 'watch_tone', 600, env('WATCH_CLASSIFY_MODEL', 'gpt-5.4-mini'));
   const byId = new Map(items.map((x) => [x.id, x.a]));
-  return (out.items || []).filter((t) => t.label !== 'none' && byId.has(t.id) && t.quote && norm(byId.get(t.id).mention).includes(norm(t.quote)))
+  return (out.items || []).filter((t) => t.label !== 'none' && byId.has(t.id) && t.quote && supportedToneQuote(t.quote, byId.get(t.id).mention))
     .map((t) => ({ question: byId.get(t.id).question, label: t.label, quote: t.quote.trim() }));
 }
 export async function buildInsight(answers, target, summary, { fetchPage } = {}) {
@@ -1467,4 +1489,41 @@ export async function runWeek({ url, brand, category, city, questions, previousF
   }
   const insight = await buildInsight(answers, target, summary).catch(() => null);
   return { answers, summary, fix, fixRepeat, fixLive, insight };
+}
+
+
+export const questionKey = (value) => String(value || '').normalize('NFKC').trim().replace(/\s+/g, ' ').toLowerCase();
+export function validateWatchQuestions(values) {
+  if (!Array.isArray(values) || values.length !== 10) throw new Error('Enter exactly 10 questions.');
+  const questions = values.map((v) => {
+    if (typeof v !== 'string' || v.length > 500 || /[\u0000-\u0008\u000b\u000c\u000e-\u001f]/.test(v)) throw new Error('Each question must be plain text, up to 500 characters.');
+    const q = v.trim().replace(/\s+/g, ' ');
+    if ((q.match(/[\p{L}\p{N}]+(?:['’-][\p{L}\p{N}]+)*/gu) || []).length < 5) throw new Error('Each question needs at least 5 words.');
+    return q;
+  });
+  if (new Set(questions.map(questionKey)).size !== 10) throw new Error('Use 10 different questions.');
+  return questions;
+}
+export function watchQuestionPlan(baseline, last, customRaw = '') {
+  const custom = customRaw ? JSON.parse(customRaw) : null;
+  const questions = custom ? validateWatchQuestions(custom.questions) : baseline.questions || [];
+  const previous = last.report?.rows || baseline.report?.rows || [];
+  const oldQuestions = previous.length ? previous.map((r) => r.question) : baseline.questions || [];
+  const changed = questions.filter((q) => !oldQuestions.some((old) => questionKey(old) === questionKey(q)));
+  const sameSet = (a, b) => a.length === b.length && a.every((q) => b.some((x) => questionKey(x) === questionKey(q)));
+  const history = (last.history || baseline.history || []).filter((h) => h.questions ? sameSet(h.questions, questions) : sameSet(oldQuestions, questions));
+  return { questions, changed, history, custom: custom ? questions.filter((q, i) => custom.custom?.[i] !== false) : [] };
+}
+export function attachQuestionHistory(summary, previous, custom, existing = {}) {
+  const history = {};
+  summary.rows = summary.rows.map((row) => {
+    const key = questionKey(row.question);
+    const old = previous.find((p) => questionKey(p.question) === key);
+    const samples = [...(existing[key] || [])];
+    if (!samples.length && old && !old.error) samples.push(Boolean(old.named));
+    if (!row.error) samples.push(Boolean(row.named));
+    history[key] = samples.slice(-60);
+    return { ...row, custom: custom.some((q) => questionKey(q) === key), previousNamed: old && !old.error ? Boolean(old.named) : null };
+  });
+  return history;
 }

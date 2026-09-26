@@ -31,6 +31,7 @@ if (!email) Astro.response.status = 400;
     ) : (
       <>
         <p>Weekly OperStack Watch letters go to <b>{email}</b>: whether ChatGPT names you, who it names instead, and the fix of the week.</p>
+        <p><a href={`/watch/questions/?t=${encodeURIComponent(token)}`}>Change your 10 buyer questions</a></p>
         <form method="post">
           <button type="submit">Stop the weekly letters</button>
         </form>
